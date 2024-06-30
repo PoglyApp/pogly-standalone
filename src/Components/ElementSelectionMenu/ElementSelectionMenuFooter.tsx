@@ -73,7 +73,7 @@ export const ElementSelectionMenuFooter = () => {
       <FooterLinkContainer>
         <BugReportIcon />
         <Link
-          href="https://github.com/PoglyApp/PoglyStandalone/issues"
+          href="https://github.com/PoglyApp/pogly-standalone/issues"
           target="_blank"
           underline="always"
           sx={{ paddingTop: "3px", paddingLeft: "5px", color: "#ffffffa6" }}
@@ -85,7 +85,7 @@ export const ElementSelectionMenuFooter = () => {
       <FooterLinkContainer>
         <GitHubIcon />
         <Link
-          href="https://github.com/PoglyApp/PoglyStandalone"
+          href="https://github.com/PoglyApp/pogly-standalone"
           target="_blank"
           underline="always"
           sx={{ paddingTop: "3px", paddingLeft: "5px", color: "#ffffffa6" }}
