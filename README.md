@@ -50,8 +50,6 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 
 [example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
-This repository holds our Standalone version. If self-hosting is not your thing, we are developing a cloud offering where the hosting and scaling is done for you. Sign up for the waitlist on our [website](https://pogly.gg). 
-
 ## How do I get a Pogly module?
 You can either publish one yourself (see below), or join our [Discord](https://discord.gg/uPQsBaVdB7) and ask for one!
 
