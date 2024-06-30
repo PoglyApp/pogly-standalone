@@ -52,7 +52,10 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 
 This repository holds our Standalone version. If self-hosting is not your thing, we are developing a cloud offering where the hosting and scaling is done for you. Sign up for the waitlist on our [website](https://pogly.gg). 
 
-## Installing & Using Pogly Standalone
+## How do I get a Pogly module?
+You can either publish one yourself (see below), or join our [Discord](https://discord.gg/uPQsBaVdB7) and ask for one!
+
+## Installing
 
 Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md). 
 
