@@ -38,7 +38,9 @@
     <a href="https://x.com/PoglyApp"><img height="25" src="./images/social/twitter.svg" alt="Twitter" /></a>
 </p>
 
-<br>[example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
+<br>
+
+[example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
 
 ## What is [Pogly](https://pogly.gg) Standalone?
