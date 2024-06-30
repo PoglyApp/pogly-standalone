@@ -50,9 +50,9 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 
 [example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
-## How do I get a Pogly module?
-You can either publish one yourself (see below), or join our [Discord](https://discord.gg/uPQsBaVdB7) and ask for one!
-
+## Can I use Pogly without hosting the project myself?
+You can publish your own Pogly module (see below) and connect to it at [standalone.pogly.gg](https://standalone.pogly.gg/) or join our [Discord](https://discord.gg/uPQsBaVdB7) and ask for a module there!
+ 
 ## Installing
 
 Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md). 
