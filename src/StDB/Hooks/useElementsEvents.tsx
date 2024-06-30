@@ -1,0 +1,183 @@
+import { useContext, useEffect, useRef } from "react";
+import Elements from "../../module_bindings/elements";
+import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
+import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
+import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
+import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
+import ElementData from "../../module_bindings/element_data";
+import { CanvasElementType } from "../../Types/General/CanvasElementType";
+import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
+import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
+import { IdentityContext } from "../../Contexts/IdentityContext";
+import TextElement from "../../module_bindings/text_element";
+import WidgetElement from "../../module_bindings/widget_element";
+import Selecto from "react-selecto";
+import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
+import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+
+export const useElementsEvents = (
+  selectoRef: React.RefObject<Selecto>,
+  setSelected: Function,
+  setSelectoTargets: Function,
+  canvasInitialized: CanvasInitializedType,
+  setCanvasInitialized: Function
+) => {
+  const identityContext = useContext(IdentityContext);
+  const dispatch = useAppDispatch();
+
+  const elementData = useRef<ElementData[]>([]);
+
+  const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
+
+  useEffect(() => {
+    elementData.current = elementDataStore;
+  }, [elementDataStore]);
+
+  useEffect(() => {
+    if (canvasInitialized.elementEventsInitialized) return;
+
+    Elements.onInsert((element, reducerEvent) => {
+      if (reducerEvent && reducerEvent.reducerName !== "AddElement") return;
+
+      const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
+
+      dispatch(addElement(newElement.Elements));
+      dispatch(addCanvasElement(newElement));
+    });
+
+    Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+      const component = document.getElementById(oldElement.id.toString());
+
+      if (!component) return;
+
+      // ===== GENERAL =====
+
+      // UPDATE LOCKED
+      if (oldElement.locked !== newElement.locked) {
+        component.setAttribute("data-locked", newElement.locked ? "true" : "false");
+        if (newElement.locked && selectoRef.current) {
+          setSelectoTargets(
+            selectoRef.current
+              .getSelectedTargets()
+              .filter((e) => e.id !== component.id && e.getAttribute("data-locked") === "false")
+          );
+        }
+      }
+
+      // UPDATE ZINDEX
+      if (oldElement.zIndex !== newElement.zIndex) {
+        component.style.setProperty("z-index", newElement.zIndex.toString());
+      }
+
+      // UPDATE TRANSPARENCY
+      if (oldElement.transparency !== newElement.transparency) {
+        const transparency = newElement.transparency / 100 <= 0.2 ? 0.2 : newElement.transparency / 100;
+
+        if (transparency === 0.2) {
+          component.style.setProperty("background-color", "rgba(245, 39, 39, 0.8)");
+        } else {
+          component.style.setProperty("background-color", "");
+        }
+
+        component.style.setProperty("opacity", transparency.toString());
+      }
+
+      // ======================================================================
+
+      // ===== ELEMENT SPECIFIC =====
+
+      switch (newElement.element.tag) {
+        case "TextElement":
+          const oldTextElement: TextElement = oldElement.element.value as TextElement;
+          const newTextElement: TextElement = newElement.element.value as TextElement;
+
+          // UPDATE TEXT
+          if (oldTextElement.text !== newTextElement.text) {
+            component.innerHTML = newTextElement.text;
+          }
+
+          // UPDATE SIZE
+          if (oldTextElement.size !== newTextElement.size) {
+            const newFontSize = StdbToViewportFontSize(newTextElement.size).fontSize;
+            component.style.fontSize = `${newFontSize}px`;
+          }
+
+          // UPDATE COLOR
+          if (oldTextElement.color !== newTextElement.color) {
+            component.style.color = newTextElement.color;
+          }
+
+          // UPDATE FONT
+          if (oldTextElement.font !== newTextElement.font) {
+            component.style.fontFamily = newTextElement.font;
+          }
+          break;
+
+        case "WidgetElement":
+          const oldWidgetElement: WidgetElement = oldElement.element.value as WidgetElement;
+          const newWidgetElement: WidgetElement = newElement.element.value as WidgetElement;
+
+          // UPDATE TOGGLE
+          // if (oldWidgetElement.toggle !== newWidgetElement.toggle) {
+          //   component.setAttribute("data-toggle", newWidgetElement.toggle ? "true" : "false");
+          // }
+
+          // UPDATE WIDTH
+          if (oldWidgetElement.width !== newWidgetElement.width) {
+            component.style.width = newWidgetElement.width.toString();
+          }
+
+          // UPDATE HEIGHT
+          if (oldWidgetElement.height !== newWidgetElement.height) {
+            component.style.height = newWidgetElement.height.toString();
+          }
+
+          // UPDATE RAW DATA
+          if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
+            const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
+
+            component.children[0].setAttribute("data-widget-element-data-id", "-1");
+            component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
+          }
+          break;
+      }
+
+      // ======================================================================
+
+      // ===== MOVEABLE OBJECT RELATED =====
+      if (reducerEvent?.callerIdentity.toHexString() === identityContext.identity.toHexString() || !component) return;
+
+      const offsetElement = OffsetElementForCanvas(newElement);
+      component.style.setProperty("transform", offsetElement.transform);
+
+      // UPDATE RESIZE
+      if (newElement.element.tag === "ImageElement" || newElement.element.tag === "WidgetElement") {
+        const oldImageElement: any = oldElement.element.value;
+        const newImageElement: any = newElement.element.value;
+
+        if (oldImageElement.height !== newImageElement.height || oldImageElement.width !== newImageElement.width) {
+          const newSize = StdbToViewportSize(newImageElement.width, newImageElement.height);
+          component.style.width = newSize.width + "px";
+          component.style.height = newSize.height + "px";
+        }
+      }
+
+      // UPDATE CLIP
+      if (oldElement.clip !== newElement.clip) {
+        component.style.clipPath = newElement.clip;
+        component.style.setProperty("transform", newElement.transform);
+      }
+    });
+
+    Elements.onDelete((element, reducerEvent) => {
+      if (!reducerEvent) return;
+
+      setSelected(null);
+      dispatch(removeCanvasElement(element));
+      dispatch(removeElement(element));
+    });
+
+    setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementEventsInitialized: true }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+};

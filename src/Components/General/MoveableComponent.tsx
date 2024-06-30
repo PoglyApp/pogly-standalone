@@ -1,0 +1,251 @@
+import { useContext, useEffect, useState } from "react";
+import Moveable, { OnDragGroup, OnRotateGroup } from "react-moveable";
+import Selecto from "react-selecto";
+import ElementStruct from "../../module_bindings/element_struct";
+import ImageElement from "../../module_bindings/image_element";
+import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
+import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
+import { SelectedType } from "../../Types/General/SelectedType";
+import Config from "../../module_bindings/config";
+import WidgetElement from "../../module_bindings/widget_element";
+import { SettingsContext } from "../../Contexts/SettingsContext";
+import { ConfigContext } from "../../Contexts/ConfigContext";
+import { GetCoordsFromTransform, ViewportToStdbSize } from "../../Utility/ConvertCoordinates";
+import UpdateWidgetElementSizeReducer from "../../module_bindings/update_widget_element_size_reducer";
+import UpdateImageElementSizeReducer from "../../module_bindings/update_image_element_size_reducer";
+
+interface IProp {
+  transformSelect: any;
+  selected?: SelectedType;
+  moveableRef: React.RefObject<Moveable>;
+  selectoRef: React.RefObject<Selecto>;
+  selectoTargets: Array<SVGElement | HTMLElement>;
+}
+
+export const MoveableComponent = (props: IProp) => {
+  const { settings } = useContext(SettingsContext);
+  const config: Config = useContext(ConfigContext);
+
+  const debugText = document.getElementById("debug-text" + props.selected?.Elements.id);
+  const stream = document.getElementById("stream")?.getBoundingClientRect();
+
+  const [isShiftPressed, setIsShiftPressed] = useState(false);
+  //const [isResize, setIsResize] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: any) => {
+      if (event.key === "Shift") {
+        setIsShiftPressed(true);
+      }
+    };
+
+    const handleKeyUp = (event: any) => {
+      if (event.key === "Shift") {
+        setIsShiftPressed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    // Clean up event listeners on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!debugText) return;
+
+    if (!settings.debug) {
+      debugText.style.display = "none";
+    } else {
+      debugText.style.display = "Inline";
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.debug]);
+
+  const onTransformStop = (event: any) => {
+    if (!event.isDrag || !props.selected) return;
+
+    updateElementTransform(props.selected.Elements.id, event.lastEvent.style.transform);
+  };
+
+  let transformWaitUntil = 0;
+
+  const onTransform = (event: any) => {
+    //if (!props.selected) return;
+
+    if (Date.now() < transformWaitUntil) return;
+
+    if (settings.debug && debugText) {
+      if (!stream) return;
+      const bounds = event.target.getBoundingClientRect();
+
+      const insideStream =
+        bounds.right >= stream.left &&
+        bounds.left <= stream.right &&
+        bounds.bottom >= stream.top &&
+        bounds.top <= stream.bottom;
+
+      const coords = GetCoordsFromTransform(event.target.style.transform);
+
+      debugText.innerHTML = `Pos: ${coords.x},${coords.y}<br />Vis: ${insideStream}`;
+    }
+
+    updateElementTransform(
+      //props.selected.Elements.id,
+      event.target.id,
+      event.target.style.transform
+    );
+
+    transformWaitUntil = Date.now() + 1000 / config.updateHz;
+  };
+
+  let transformMultiWaitUntil = 0;
+
+  const onTransformMulti = (e: OnDragGroup | OnRotateGroup) => {
+    if (Date.now() < transformMultiWaitUntil) return;
+
+    e.events.forEach((ev) => {
+      ev.target.style.transform = ev.transform;
+      updateElementTransform(parseInt(ev.target.id), ev.target.style.transform);
+    });
+
+    transformMultiWaitUntil = Date.now() + 1000 / config.updateHz;
+  };
+
+  const onResizeStop = (event: any) => {
+    //setIsResize(false);
+    if (!event.isDrag || !props.selected) return;
+
+    switch (props.selected.Elements.element.tag) {
+      case "ImageElement":
+        const imageSize = ViewportToStdbSize(event.lastEvent.width, event.lastEvent.height);
+
+        UpdateImageElementSizeReducer.call(event.target.id, imageSize.width, imageSize.height);
+        break;
+
+      case "WidgetElement":
+        const widgetSize = ViewportToStdbSize(event.lastEvent.width, event.lastEvent.height);
+
+        UpdateWidgetElementSizeReducer.call(event.target.id, widgetSize.width, widgetSize.height);
+        break;
+    }
+
+    updateElementTransform(props.selected.Elements.id, event.target.style.transform);
+  };
+
+  let resizeWaitUntil = 0;
+
+  const onResize = (event: any) => {
+    //setIsResize(true);
+    if (!props.selected) return;
+
+    if (Date.now() < resizeWaitUntil) return;
+
+    switch (props.selected.Elements.element.tag) {
+      case "ImageElement":
+        const imageSize = ViewportToStdbSize(event.width, event.height);
+
+        UpdateImageElementSizeReducer.call(event.target.id, imageSize.width, imageSize.height);
+        break;
+
+      case "WidgetElement":
+        const widgetSize = ViewportToStdbSize(event.width, event.height);
+
+        UpdateWidgetElementSizeReducer.call(event.target.id, widgetSize.width, widgetSize.height);
+        break;
+    }
+
+    updateElementTransform(event.target.id, event.target.style.transform);
+
+    resizeWaitUntil = Date.now() + 1000 / config.updateHz;
+  };
+
+  const onClip = (event: any) => {
+    if (!props.selected) return;
+    //updateElementClip(props.selected.Elements.id, event.style.clipPath);
+  };
+
+  const onClipStop = (event: any) => {
+    if (!event.isDrag || !props.selected) return;
+    //updateElementClip(props.selected.Elements.id, event.lastEvent.style.clipPath);
+  };
+
+  return (
+    <Moveable
+      ref={props.moveableRef}
+      //target={props.selected?.Component}
+      target={props.selectoTargets}
+      onClickGroup={(e) => {
+        if (!props.selectoRef.current) return;
+        props.selectoRef.current.clickTarget(e.inputEvent, e.inputTarget);
+      }}
+      keepRatio={isShiftPressed}
+      origin={false}
+      draggable={true}
+      rotatable={true}
+      // snappable={isShiftPressed && !isResize}
+      // snapGridWidth={10}
+      // snapGridHeight={10}
+      resizable={true && props.transformSelect.size}
+      // warpable={true && props.transformSelect.warp}
+      // clippable={true && props.transformSelect.clip}
+      warpable={false}
+      clippable={false}
+      throttleResize={1}
+      // DRAG EVENTS
+      onDrag={(event) => {
+        event.target.style.transform = event.transform;
+        onTransform(event);
+      }}
+      onDragEnd={(event) => onTransformStop(event)}
+      onDragGroup={(e) => {
+        onTransformMulti(e);
+      }}
+      // RESIZE EVENTS
+      onResize={(event) => {
+        event.target.style.width = `${event.width}px`;
+        event.target.style.height = `${event.height}px`;
+        event.target.style.transform = event.drag.transform;
+        onResize(event);
+      }}
+      onResizeEnd={(event) => onResizeStop(event)}
+      // onResizeGroup={(e) => {
+      //   e.events.forEach((ev) => {
+      //     ev.target.style.width = `${ev.width}px`;
+      //     ev.target.style.height = `${ev.height}px`;
+      //     ev.target.style.transform = ev.drag.transform;
+      //     onResize(ev);
+      //   });
+      // }}
+
+      // ROTATE EVENTS
+      onRotate={(event) => {
+        event.target.style.transform = event.drag.transform;
+        onTransform(event);
+      }}
+      onRotateEnd={(event) => {
+        onTransformStop(event);
+      }}
+      onRotateGroup={(e) => {
+        onTransformMulti(e);
+      }}
+      // WARP EVENTS
+      onWarp={(event) => {
+        event.target.style.transform = event.transform;
+        onTransform(event);
+      }}
+      onWarpEnd={(event) => onTransformStop(event)}
+      // CLIP EVENTS
+      onClip={(event) => {
+        event.target.style.clipPath = event.clipStyle;
+        onClip(event);
+      }}
+      onClipEnd={(event) => onClipStop(event)}
+    />
+  );
+};

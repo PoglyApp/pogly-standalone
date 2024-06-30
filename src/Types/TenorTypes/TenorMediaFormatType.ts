@@ -1,0 +1,25 @@
+import TenorMediaPayloadType from "./TenorMediaPayloadType";
+
+export default interface TenorMediaFormatType {
+    gif: TenorMediaPayloadType,
+    mediumgif?: TenorMediaPayloadType,
+    tinygif?: TenorMediaPayloadType,
+    nanogif?: TenorMediaPayloadType,
+    mp4?: TenorMediaPayloadType,
+    loopedmp4?: TenorMediaPayloadType,
+    tinymp4?: TenorMediaPayloadType,
+    nanomp4?: TenorMediaPayloadType,
+    webm?: TenorMediaPayloadType,
+    tinywebm?: TenorMediaPayloadType,
+    nanowebm?: TenorMediaPayloadType,
+    webp_transparent?: TenorMediaPayloadType,
+    tinywebp_transparent?: TenorMediaPayloadType,
+    nanowebp_transparent?: TenorMediaPayloadType,
+    gif_transparent?: TenorMediaPayloadType,
+    tinygif_transparent?: TenorMediaPayloadType,
+    nanogif_transparent?: TenorMediaPayloadType,
+    nanogifpreview?: TenorMediaPayloadType,
+    gifpreview?: TenorMediaPayloadType,
+    tinygifpreview?: TenorMediaPayloadType,
+    webp?: TenorMediaPayloadType,
+}
