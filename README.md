@@ -57,6 +57,9 @@ You can [publish your own Pogly module](https://github.com/PoglyApp/pogly-docume
 
 Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md). 
 
+## Contributing
+Check out our [contribution guidelines](https://github.com/PoglyApp/pogly-standalone/blob/main/CONTRIBUTING.md).
+
 ## License
 
 Pogly Standalone is licensed under the Apache-2.0 license.
