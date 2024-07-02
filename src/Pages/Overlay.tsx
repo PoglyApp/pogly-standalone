@@ -41,9 +41,7 @@ export const Overlay = () => {
     });
 
     dispatch(initCanvasElements(canvasElements));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canvasInitialized.elementsFetchInitialized]);
+  }, [canvasInitialized.elementsFetchInitialized, elements, dispatch]);
 
   return (
     <>

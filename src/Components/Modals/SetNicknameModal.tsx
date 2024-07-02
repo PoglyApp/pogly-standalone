@@ -33,9 +33,7 @@ export const SetNicknameModal = (props: IProps) => {
     if (isOverlay) {
       props.setNickname("Overlay");
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props, isOverlay]);
 
   const handleLogin = () => {
     if (!props.identity || !nickname || nickname === "") return;
@@ -54,7 +52,7 @@ export const SetNicknameModal = (props: IProps) => {
     props.setNickname(nickname);
   };
 
-  if(isOverlay) return(<></>);
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={true}>

@@ -63,9 +63,7 @@ export const MoveableComponent = (props: IProp) => {
     } else {
       debugText.style.display = "Inline";
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.debug]);
+  }, [settings.debug, debugText]);
 
   const onTransformStop = (event: any) => {
     if (!event.isDrag || !props.selected) return;

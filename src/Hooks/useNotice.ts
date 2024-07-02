@@ -20,7 +20,5 @@ export const useNotice = (setNoticeMessage: Function) => {
 
       setNoticeMessage({ noticeId: responseJson.id, notice: responseJson.notice });
     })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isPoglyOrDevInstance, setNoticeMessage]);
 };

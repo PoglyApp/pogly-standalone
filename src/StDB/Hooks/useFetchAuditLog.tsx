@@ -4,17 +4,15 @@ import AuditLog from "../../module_bindings/audit_log";
 import { initAuditLog } from "../../Store/Features/AuditLogSlice";
 
 const useFetchAuditLog = (setAuditInitialized: Function) => {
-    const dispatch = useAppDispatch();
-  
-    useEffect(() => {
-        // const auditLog = AuditLog.all();
-        // dispatch(initAuditLog(auditLog));
-        // Disabling initAuditLog so we don't get the history
+  const dispatch = useAppDispatch();
 
-        setAuditInitialized(true);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-  };
+  useEffect(() => {
+    // const auditLog = AuditLog.all();
+    // dispatch(initAuditLog(auditLog));
+    // Disabling initAuditLog so we don't get the history
 
+    setAuditInitialized(true);
+  }, []);
+};
 
 export default useFetchAuditLog;

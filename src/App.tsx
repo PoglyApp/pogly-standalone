@@ -71,8 +71,6 @@ export const App: React.FC = () => {
 
       setNickname(nickname);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stdbInitialized]);
 
   const router = createBrowserRouter(

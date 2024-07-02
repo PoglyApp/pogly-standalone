@@ -12,7 +12,5 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
       //console.log(newElement.tick);
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity]);
+  }, [identity, canvasInitialized.elementEventsInitialized]);
 };

@@ -12,7 +12,7 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Config from "../../module_bindings/config";
 import SetConfigReducer from "../../module_bindings/set_config_reducer";
 import { StyledInput } from "../StyledComponents/StyledInput";
@@ -36,10 +36,13 @@ export const InitialSetupModal = (props: IProp) => {
   const [authentication, setAuthentication] = useState<boolean>(props.config.authentication);
   const [authKey, setAuthKey] = useState<string>("");
   const [strictMode, setStrictMode] = useState<boolean>(props.config.strictMode);
-  const [overlayURL, setOverlayURL] = useState<string>(baseOverlayURL());
+  const [overlayURL, setOverlayURL] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const [initializing, setInitializing] = useState<boolean>(false);
   const [defaultElements, setDefaultElements] = useState<string>("");
+
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
+  const [copyAuthButtonText, setAuthButtonText] = useState("Copy Auth Token");
 
   const [error, setError] = useState<string>("");
 
@@ -48,19 +51,17 @@ export const InitialSetupModal = (props: IProp) => {
   useGetDefaultElements(setDefaultElements);
 
   useEffect(() => {
-    if (!authentication) return;
+    let baseUrl =
+      window.location.origin +
+      "/overlay?domain=" +
+      props.connectionConfig.domain +
+      "&module=" +
+      props.connectionConfig.module;
 
-    setOverlayURL(baseOverlayURL() + "&auth=" + authKey);
+    if (authentication) baseUrl = baseUrl + "&auth=" + authKey;
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authKey]);
-
-  useEffect(() => {
-    if (authentication) return;
-    setOverlayURL(baseOverlayURL());
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authentication]);
+    setOverlayURL(baseUrl);
+  }, [authKey, authentication, props.connectionConfig]);
 
   const handleSave = () => {
     const regex = new RegExp("^[0-9]+$");
@@ -92,16 +93,6 @@ export const InitialSetupModal = (props: IProp) => {
       window.location.reload();
     }, 2750);
   };
-
-  function baseOverlayURL(): string {
-    return (
-      window.location.origin +
-      "/overlay?domain=" +
-      props.connectionConfig.domain +
-      "&module=" +
-      props.connectionConfig.module
-    );
-  }
 
   if (isOverlay) return <></>;
 
@@ -225,10 +216,14 @@ export const InitialSetupModal = (props: IProp) => {
             title="This is your token to prove that you are the owner of this Pogly instance. Keep this saved somewhere in case your local cache gets cleared!"
             onClick={() => {
               navigator.clipboard.writeText(localStorage.getItem("stdbToken")!);
-              alert("Copied!");
+              setAuthButtonText("Copied!");
+
+              setTimeout(() => {
+                setAuthButtonText("Copy Auth Token");
+              }, 1000);
             }}
           >
-            Copy Auth Token
+            {copyAuthButtonText}
           </Button>
 
           <Button
@@ -236,10 +231,15 @@ export const InitialSetupModal = (props: IProp) => {
             title={overlayURL}
             onClick={() => {
               navigator.clipboard.writeText(overlayURL);
-              alert("Copied!");
+
+              setCopyOverlayButtonText("Copied!");
+
+              setTimeout(() => {
+                setCopyOverlayButtonText("Copy Overlay URL");
+              }, 1000);
             }}
           >
-            Copy Overlay URL
+            {copyOverlayButtonText}
           </Button>
         </FormGroup>
 

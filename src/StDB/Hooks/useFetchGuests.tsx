@@ -21,8 +21,7 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
     dispatch(initGuests(guests));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestFetchInitialized: true }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity]);
+  }, [identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch]);
 };
 
 export default useFetchGuests;

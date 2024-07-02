@@ -31,9 +31,7 @@ const useFetchElement = (canvasInitialized: CanvasInitializedType, setCanvasInit
     dispatch(initElements(offsetElements));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canvasInitialized.elementsFetchInitialized, config, isOverlay, setCanvasInitialized, dispatch]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

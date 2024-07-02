@@ -46,7 +46,5 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementDataEventsInitialized: true }));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canvasInitialized.elementDataEventsInitialized, setCanvasInitialized, dispatch]);
 };

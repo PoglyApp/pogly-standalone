@@ -35,9 +35,7 @@ export const ChangelogModal = (props: IProps) => {
     if (showModal) return;
 
     setShowModal(true);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.changelog]);
+  }, [props, showModal]);
 
   const handleOnClose = () => {
     localStorage.setItem("changelog", props.latestVersion);

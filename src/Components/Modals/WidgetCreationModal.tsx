@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,6 @@ import {
   DialogContentText,
   Button,
   FormGroup,
-  Alert,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -41,7 +40,7 @@ import {
   GetWidgetCodeJsonByElementDataID,
   StringifyRawDataWidgetCode,
 } from "../../Utility/GetWidgetCodeJson";
-import { VariableValueType, WidgetVariableType } from "../../Types/General/WidgetVariableType";
+import { WidgetVariableType } from "../../Types/General/WidgetVariableType";
 import Elements from "../../module_bindings/elements";
 import WidgetElement from "../../module_bindings/widget_element";
 import ElementStruct from "../../module_bindings/element_struct";
@@ -82,16 +81,7 @@ export const WidgetCreationModal = (props: IProps) => {
     Permission: Permissions.findByIdentity(identityContext.identity)?.permissionLevel,
   };
 
-  useEffect(() => {
-    if (props.editElementDataId) return loadByElementDataID();
-    if (props.editElementId) return loadByElementID();
-
-    return setShowModal(true);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadByElementDataID = () => {
+  const loadByElementDataID = useCallback(() => {
     const elementData = ElementData.findById(props.editElementDataId!);
     if (!elementData) return;
 
@@ -108,9 +98,9 @@ export const WidgetCreationModal = (props: IProps) => {
     setVariables(() => jsonObject.variables);
 
     setShowModal(true);
-  };
+  }, [props]);
 
-  const loadByElementID = () => {
+  const loadByElementID = useCallback(() => {
     const element: Elements = Elements.findById(props.editElementId!)!;
     const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
@@ -130,7 +120,7 @@ export const WidgetCreationModal = (props: IProps) => {
     setVariables(() => widgetData.variables);
 
     setShowModal(true);
-  };
+  }, [props]);
 
   const loadByWidgetString = (widgetString: string) => {
     const jsonObject = JSON.parse(widgetString);
@@ -224,6 +214,13 @@ export const WidgetCreationModal = (props: IProps) => {
     ]);
   };
 
+  useEffect(() => {
+    if (props.editElementDataId) return loadByElementDataID();
+    if (props.editElementId) return loadByElementID();
+
+    return setShowModal(true);
+  }, [props, loadByElementDataID, loadByElementID]);
+
   if (isOverlay) return <></>;
 
   return (
@@ -235,13 +232,20 @@ export const WidgetCreationModal = (props: IProps) => {
             {props.editElementDataId && !props.editElementId && "Edit Widget Data"}
             {!props.editElementDataId && props.editElementId && "Edit Widget Element"}
 
-            <Typography variant="subtitle2" color="#ffffffa6">
-              Find community made widgets in{" "}
-              <Link href="https://discord.gg/uPQsBaVdB7" target="_blank" underline="always" sx={{ color: "#ffffffa6" }}>
-                Pogly Discord
-              </Link>
-              !
-            </Typography>
+            {!props.editElementDataId && !props.editElementId && (
+              <Typography color="#ffffffa6" fontSize={14}>
+                Find community made widgets in{" "}
+                <Link
+                  href="https://discord.gg/uPQsBaVdB7"
+                  target="_blank"
+                  underline="always"
+                  sx={{ color: "#ffffffa6" }}
+                >
+                  Pogly Discord
+                </Link>
+                !
+              </Typography>
+            )}
           </DialogTitle>
 
           <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>

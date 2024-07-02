@@ -70,9 +70,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       setWidgetVariables(() => (toggleVariables.length > 0 ? toggleVariables : null));
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.contextMenu]);
+  }, [props.contextMenu, selectedElement?.element.tag, selectedElement?.id]);
 
   const handleClose = () => {
     props.setContextMenu(null);

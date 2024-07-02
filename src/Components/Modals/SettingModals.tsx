@@ -74,8 +74,7 @@ export const SettingsModal = (props: IProp) => {
     const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
 
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [settings, setSettings]);
 
   function clearConnectionSettings() {
     localStorage.removeItem("stdbConnectDomain");

@@ -28,9 +28,7 @@ export const ErrorRefreshModal = (props: IProp) => {
     setTimeout(function () {
       setTimer(timer - 1);
     }, 1000);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer]);
+  }, [timer, isOverlay, props.type]);
 
   if (isOverlay) return <></>;
 

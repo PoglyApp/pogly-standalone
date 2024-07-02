@@ -20,25 +20,11 @@ interface IProps {
 }
 
 export const WidgetVariableTable = (props: IProps) => {
-  const [rows, setRows] = useState<Row[]>([] /*props.variables*/);
-
-  useEffect(() => {
-    // Due to variables being overhauled for version 0.1.0, this is here to wipe variables from older widgets that were made before this version
-    // Can delete later, when the odds of someone still having old widgets are low
-    // Remove empty array and uncomment props.variables when you delete this
-
-    if (props.variables.length > 0 && props.variables[0].variableType !== undefined) {
-      setRows(props.variables);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [rows, setRows] = useState<Row[]>(props.variables);
 
   useEffect(() => {
     props.setVariables(() => rows);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows]);
+  }, [rows, props]);
 
   const handleVariableNameChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;

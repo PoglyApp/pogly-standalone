@@ -77,9 +77,7 @@ export const Canvas = (props: IProps) => {
 
   useEffect(() => {
     props.setActivePage(1);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props]);
 
   useEffect(() => {
     if (props.canvasInitialized.canvasInitialized) return;
@@ -92,10 +90,9 @@ export const Canvas = (props: IProps) => {
     });
 
     dispatch(initCanvasElements(canvasElements));
-    props.setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, canvasInitialized: true }));
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elements]);
+    props.setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, canvasInitialized: true }));
+  }, [props, elements, dispatch]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;

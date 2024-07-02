@@ -93,7 +93,12 @@ export const useGuestsEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestEventsInitialized: true }));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    canvasInitialized.guestEventsInitialized,
+    identityContext.identity,
+    isOverlay,
+    transformRef,
+    setCanvasInitialized,
+    dispatch,
+  ]);
 };

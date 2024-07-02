@@ -15,17 +15,13 @@ export const useSevenTV = (setEmotes: Function) => {
 
   useEffect(() => {
     setStreamerIdPromise(SevenTVWrap.GetTwitchId(config.streamName));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setStreamerIdPromise, config.streamName]);
 
   useEffect(() => {
     streamerIdPromise?.then((p) => {
       if (!p.data) return;
       setStreamerId(p.data.users[0].id);
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streamerIdPromise]);
 
   useEffect(() => {
@@ -36,8 +32,6 @@ export const useSevenTV = (setEmotes: Function) => {
     SevenTVWrap.GetEmoteSetId(streamerId).then((id) => {
       setStreamerEmotePromise(SevenTVWrap.GetEmoteSetEmotes(id));
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streamerId]);
 
   useEffect(() => {
@@ -46,14 +40,10 @@ export const useSevenTV = (setEmotes: Function) => {
 
       setStreamerEmotes(p);
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streamerEmotePromise]);
 
   useEffect(() => {
     if (!streamerEmotes) return;
     setEmotes(streamerEmotes);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streamerEmotes]);
+  }, [streamerEmotes, setEmotes]);
 };

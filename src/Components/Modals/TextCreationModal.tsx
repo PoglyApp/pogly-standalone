@@ -59,9 +59,7 @@ export const TextCreationModal = (props: IProps) => {
     setFont(textStruct.font);
 
     setShowModal(true);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props.editElementId]);
 
   const handleTextChange = (newText: any) => {
     if (newText.length < 1) {

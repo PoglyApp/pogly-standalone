@@ -6,9 +6,7 @@ export const NotFound: React.FC = () => {
 
   useEffect(() => {
     navigate("/");
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
 
   return null;
 };

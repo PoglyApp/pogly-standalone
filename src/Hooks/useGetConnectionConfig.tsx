@@ -25,7 +25,5 @@ export const useGetConnectionConfig = (setConnectionConfig: Function) => {
           remember: true,
         });
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isOverlay, setConnectionConfig]);
 };

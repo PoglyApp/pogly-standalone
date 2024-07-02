@@ -34,9 +34,13 @@ export const Image = (props: IProp) => {
       setImageData(imageElement.imageElementData.value);
       setImageName("RawData");
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    elementData,
+    identity.identity,
+    imageElement.imageElementData.tag,
+    imageElement.imageElementData.value,
+    props.elements.id,
+  ]);
 
   return (
     <div

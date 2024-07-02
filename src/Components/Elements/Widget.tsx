@@ -24,9 +24,7 @@ export const Widget = (props: IProp) => {
     else htmlCode = WidgetCodeCompiler(undefined, widgetElement.rawData);
 
     setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [widgetElement.elementDataId, widgetElement.rawData]);
 
   const showWidgetCreationModal = () => {
     setModals((oldModals: any) => [

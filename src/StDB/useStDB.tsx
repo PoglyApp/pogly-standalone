@@ -183,8 +183,7 @@ const useStDB = (
     });
 
     client?.connect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionConfig]);
+  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized]);
 
   return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error };
 };

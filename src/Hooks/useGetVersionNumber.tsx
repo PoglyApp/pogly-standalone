@@ -8,7 +8,5 @@ export const useGetVersionNumber = async (setVersionNumber: Function) => {
 
       setVersionNumber(versionText);
     })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setVersionNumber]);
 };

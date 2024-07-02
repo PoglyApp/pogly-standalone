@@ -15,9 +15,7 @@ export const useChangeLog = async (setChangelog: Function) => {
 
       setChangelog(changeLog);
     })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setChangelog]);
 };
 
 export const GetLatestChangelogVersion = (changelog: ChangelogType) => {

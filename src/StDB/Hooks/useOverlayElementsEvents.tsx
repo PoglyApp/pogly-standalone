@@ -129,7 +129,5 @@ export const useOverlayElementsEvents = (canvasInitialized: CanvasInitializedTyp
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canvasInitialized.elementEventsInitialized, setCanvasInitialized, dispatch]);
 };

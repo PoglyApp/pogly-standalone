@@ -8,7 +8,5 @@ export const useGetDefaultElements = async (setDefaultElements: Function) => {
 
       setDefaultElements(responseText);
     })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setDefaultElements]);
 };

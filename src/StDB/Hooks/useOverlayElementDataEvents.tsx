@@ -40,7 +40,5 @@ export const useOverlayElementDataEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementDataEventsInitialized: true }));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setCanvasInitialized, dispatch]);
 };
