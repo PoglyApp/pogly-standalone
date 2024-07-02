@@ -97,6 +97,7 @@ export const WidgetCategory = (props: IProps) => {
                   sx={{
                     color: "#ffffffa6",
                     textTransform: "initial",
+                    justifyContent: "left",
                   }}
                   onClick={() => AddElementToCanvas(elementData)}
                   data-widget-selection-button={elementData.id}
