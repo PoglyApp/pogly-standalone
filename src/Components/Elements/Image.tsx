@@ -4,7 +4,7 @@ import ElementData from "../../module_bindings/element_data";
 import Elements from "../../module_bindings/elements";
 import ImageElement from "../../module_bindings/image_element";
 import { useAppSelector } from "../../Store/Features/store";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   elements: Elements;
@@ -13,7 +13,7 @@ interface IProp {
 export const Image = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const identity = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [imageData, setImageData] = useState<string>("");
@@ -23,7 +23,7 @@ export const Image = (props: IProp) => {
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(identity.identity, props.elements.id.toString());
+    handleElementBorder(Identity.identity, props.elements.id.toString());
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
       const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
@@ -36,7 +36,7 @@ export const Image = (props: IProp) => {
     }
   }, [
     elementData,
-    identity.identity,
+    Identity.identity,
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,

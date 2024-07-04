@@ -1,7 +1,6 @@
 import { Menu, MenuItem, Paper } from "@mui/material";
 import Guests from "../../../module_bindings/guests";
-import { useContext } from "react";
-import { IdentityContext } from "../../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import Permissions from "../../../module_bindings/permissions";
 import styled from "styled-components";
@@ -14,8 +13,8 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const identity = useContext(IdentityContext);
-  const identityPermission = Permissions.findByIdentity(identity.identity)?.permissionLevel;
+  const { Identity } = useSpacetimeContext();
+  const identityPermission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
   let selectedGuestPermission: PermissionLevel | undefined;
@@ -51,7 +50,7 @@ export const GuestListContextMenu = (props: IProps) => {
             {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
           </Paper>
 
-          {!selectedGuest.identity.isEqual(identity.identity) && identityPermission?.tag === "Owner" ? (
+          {!selectedGuest.identity.isEqual(Identity.identity) && identityPermission?.tag === "Owner" ? (
             selectedGuestPermission?.tag === "Moderator" ? (
               <StyledMenuItem
                 onClick={() => {
