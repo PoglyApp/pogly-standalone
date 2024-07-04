@@ -20,13 +20,15 @@ import { Loading } from "./Components/General/Loading";
 import Guests from "./module_bindings/guests";
 import { ErrorRefreshModal } from "./Components/Modals/ErrorRefreshModal";
 import { SetSubscriptions } from "./Utility/SetSubscriptions";
-import { IdentityContext } from "./Contexts/IdentityContext";
+import { SpacetimeContext } from "./Contexts/SpacetimeContext";
 import { ConfigContext } from "./Contexts/ConfigContext";
 import { SettingsContext } from "./Contexts/SettingsContext";
 import { ModalContext } from "./Contexts/ModalContext";
 import { CanvasInitializedType } from "./Types/General/CanvasInitializedType";
 import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_reducer";
 import { NotFound } from "./Pages/NotFound";
+import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
+import { Identity } from "@clockworklabs/spacetimedb-sdk";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -56,6 +58,8 @@ export const App: React.FC = () => {
   const [nickname, setNickname] = useState<string | null>(null);
   const [modals, setModals] = useState<ReactNode[]>([]);
 
+  const [spacetimeContext, setSpacetimeContext] = useState<SpacetimeContextType>();
+
   useGetVersionNumber(setVersionNumber);
   useGetConnectionConfig(setConnectionConfig);
 
@@ -71,7 +75,18 @@ export const App: React.FC = () => {
 
       setNickname(nickname);
     }
-  }, [stdbInitialized]);
+
+    // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
+    const guest = Guests.findByIdentity(spacetime.Identity!);
+    const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
+
+    setSpacetimeContext({
+      Identity: guestWithNickname,
+      Elements: [],
+      ElementData: [],
+      Guests: [],
+    });
+  }, [stdbInitialized, spacetime.Identity]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -162,7 +177,7 @@ export const App: React.FC = () => {
   // Step 8) Load Pogly
   return (
     <>
-      <IdentityContext.Provider value={{ identity: spacetime.Identity, nickname: nickname }}>
+      <SpacetimeContext.Provider value={spacetimeContext}>
         <ConfigContext.Provider value={spacetime.InstanceConfig}>
           <SettingsContext.Provider value={{ settings, setSettings }}>
             <ModalContext.Provider value={{ modals, setModals, closeModal }}>
@@ -174,7 +189,7 @@ export const App: React.FC = () => {
             </ModalContext.Provider>
           </SettingsContext.Provider>
         </ConfigContext.Provider>
-      </IdentityContext.Provider>
+      </SpacetimeContext.Provider>
     </>
   );
 };

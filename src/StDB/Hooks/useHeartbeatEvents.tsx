@@ -1,16 +1,16 @@
-import { useContext, useEffect } from "react";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useEffect } from "react";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Heartbeat from "../../module_bindings/heartbeat";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 
 export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => {
-  const identity = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
 
   useEffect(() => {
-    if (!identity || canvasInitialized.elementEventsInitialized) return;
+    if (!Identity || canvasInitialized.elementEventsInitialized) return;
 
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
       //console.log(newElement.tick);
     });
-  }, [identity, canvasInitialized.elementEventsInitialized]);
+  }, [Identity, canvasInitialized.elementEventsInitialized]);
 };

@@ -26,7 +26,7 @@ import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Permissions from "../../module_bindings/permissions";
 import { InstancePasswordModal } from "./InstancePasswordModal";
 import Config from "../../module_bindings/config";
@@ -38,8 +38,8 @@ interface IProp {
 
 export const SettingsModal = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
-  const identity = useContext(IdentityContext);
-  const permission = Permissions.findByIdentity(identity.identity)?.permissionLevel;
+  const { Identity } = useSpacetimeContext();
+  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);

@@ -10,7 +10,7 @@ import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
 import PermissionLevel from "../../module_bindings/permission_level";
 import Config from "../../module_bindings/config";
 import Permissions from "../../module_bindings/permissions";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 
@@ -19,14 +19,14 @@ interface IProps {
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
+  const { Identity } = useSpacetimeContext();
   const config: Config = useContext(ConfigContext);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
-  const identity = useContext(IdentityContext);
 
-  const strictSettings: {StrictMode: boolean, Permission?: PermissionLevel} = {
+  const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
     StrictMode: Config.findByVersion(0)!.strictMode,
-    Permission: Permissions.findByIdentity(identity.identity)?.permissionLevel
+    Permission: Permissions.findByIdentity(Identity.identity)?.permissionLevel,
   };
 
   return (
@@ -34,13 +34,23 @@ export const ElementSelectionMenu = (props: IProps) => {
       <SelectionMenuContainer id="SelectionMenu">
         <CategoryContainer>
           <TextCategory />
-          <ImageCategory elementData={props.elementData} strictSettings={strictSettings} contextMenu={contextMenu} setContextMenu={setContextMenu} />
-          <WidgetCategory elementData={props.elementData} strictSettings={strictSettings} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+          <ImageCategory
+            elementData={props.elementData}
+            strictSettings={strictSettings}
+            contextMenu={contextMenu}
+            setContextMenu={setContextMenu}
+          />
+          <WidgetCategory
+            elementData={props.elementData}
+            strictSettings={strictSettings}
+            contextMenu={contextMenu}
+            setContextMenu={setContextMenu}
+          />
           {config.streamingPlatform === "twitch" && <SevenTVCategory />}
           <TenorCategory />
         </CategoryContainer>
 
-        <ElementSelectionMenuFooter  />
+        <ElementSelectionMenuFooter />
       </SelectionMenuContainer>
 
       <ElementSelectionContextMenu contextMenu={contextMenu} setContextMenu={setContextMenu} />

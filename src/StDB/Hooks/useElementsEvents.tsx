@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Elements from "../../module_bindings/elements";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
@@ -8,7 +8,7 @@ import ElementData from "../../module_bindings/element_data";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
@@ -22,7 +22,7 @@ export const useElementsEvents = (
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function
 ) => {
-  const identityContext = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
   const dispatch = useAppDispatch();
 
   const elementData = useRef<ElementData[]>([]);
@@ -145,7 +145,7 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerIdentity.toHexString() === identityContext.identity.toHexString() || !component) return;
+      if (reducerEvent?.callerIdentity.toHexString() === Identity.identity.toHexString() || !component) return;
 
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
@@ -180,7 +180,7 @@ export const useElementsEvents = (
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementEventsInitialized: true }));
   }, [
     canvasInitialized.elementEventsInitialized,
-    identityContext.identity,
+    Identity.identity,
     selectoRef,
     setCanvasInitialized,
     setSelected,
