@@ -124,6 +124,7 @@ export const App: React.FC = () => {
           buttonText="Reload"
           titleText="Error connecting to Pogly instance!"
           contentText="This means that either the domain or module name selected are invalid. Please try again!"
+          clearSettings={true}
         />
       );
     }
@@ -142,6 +143,7 @@ export const App: React.FC = () => {
           titleText="Authentication Required"
           contentText="This Pogly Standalone instance requires authentication.
                 You either did not provide an authentication key, or it was incorrect."
+          clearSettings={true}
         />
       );
     }
