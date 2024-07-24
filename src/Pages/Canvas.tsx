@@ -30,6 +30,7 @@ import { ConfigContext } from "../Contexts/ConfigContext";
 import UpdateGuestPositionReducer from "../module_bindings/update_guest_position_reducer";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
+import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
 
 interface IProps {
   setActivePage: Function;
@@ -68,7 +69,7 @@ export const Canvas = (props: IProps) => {
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
   useElementsEvents(selectoRef, setSelected, setSelectoTargets, props.canvasInitialized, props.setCanvasInitialized);
 
-  useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
+  const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
   useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
 
   useHeartbeatEvents(props.canvasInitialized);
@@ -110,6 +111,19 @@ export const Canvas = (props: IProps) => {
 
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
+
+  if(disconnected)
+  {
+    return (
+      <ErrorRefreshModal
+        type="button"
+        buttonText="Reload"
+        titleText="Disconnected"
+        contentText="You have been disconnected from the Pogly instance."
+        clearSettings={false}
+      />
+    );
+  }
 
   return (
     <>
