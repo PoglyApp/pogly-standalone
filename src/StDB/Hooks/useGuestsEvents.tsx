@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
@@ -15,6 +15,7 @@ export const useGuestsEvents = (
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
   const { Identity } = useSpacetimeContext();
+  const [disconnected,setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -91,6 +92,11 @@ export const useGuestsEvents = (
       handleElementBorder(Identity.identity, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
+
+      if(guest.identity.toHexString() === Identity.identity.toHexString())
+      {
+        setDisconnected(true);
+      }
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestEventsInitialized: true }));
@@ -102,4 +108,6 @@ export const useGuestsEvents = (
     setCanvasInitialized,
     dispatch,
   ]);
+
+  return disconnected;
 };
