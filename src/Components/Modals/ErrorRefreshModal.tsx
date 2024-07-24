@@ -9,6 +9,7 @@ interface IProp {
   buttonText?: string;
   titleText: string;
   contentText: string;
+  clearSettings: boolean;
 }
 
 export const ErrorRefreshModal = (props: IProp) => {
@@ -16,7 +17,7 @@ export const ErrorRefreshModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   //Clear out connection settings to prevent getting stuck
-  ClearConnectionSettings();
+  if(props.clearSettings) ClearConnectionSettings();
 
   useEffect(() => {
     if (isOverlay) return;
