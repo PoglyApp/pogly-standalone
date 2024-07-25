@@ -8,7 +8,7 @@ public partial class Module
         var g = Guests.FindByIdentity(ctx);
         if (g is null)
         {
-            Log($"[{reducerContext}] Unable to GetGuest: {ctx} does not have Guest entry.",LogLevel.Error);
+            Log($"[{reducerContext}] Unable to GetGuest: {ctx} does not have Guest entry.",LogLevel.Warn);
             guest = new Guests();
             return false;
         }
@@ -34,7 +34,7 @@ public partial class Module
         var p = Permissions.FindByIdentity(ctx);
         if (p is null)
         {
-            Log($"[{reducerContext}] Unable to GetPermission: {ctx} does not have Permission entry.",LogLevel.Error);
+            Log($"[{reducerContext}] Unable to GetPermission: {ctx} does not have Permission entry.",LogLevel.Warn);
             permissions = new Permissions();
             return false;
         }
