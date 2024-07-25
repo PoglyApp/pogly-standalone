@@ -42,7 +42,7 @@ public partial class Module
         public int Ceiling;
     }
 
-    private const string SEVEN_TV_REGEX = @"^https?:\/\/(www\.)?cdn\.7tv\.app(?:\/.*)?$";
+    private const string SEVEN_TV_TENOR_REGEX = @"^https?:\/\/(www\.)?cdn\.7tv\.app(?:\/.*)?$|^https?:\/\/(www\.)?media\.tenor\.com(?:\/.*)?$";
 
     private const string HTML_TAG_REGEX = @"<[^>]*>";
 }
