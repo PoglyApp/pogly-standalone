@@ -33,7 +33,7 @@
     &nbsp;
     <a href="https://www.twitch.tv/poglygg"><img height="25" src="./images/social/twitch.svg" alt="Twitch" /></a>
     &nbsp;
-    <a href="https://www.youtube.com/watch?v=c19tKRKa2ik"><img height="25" src="./images/social/youtube.svg" alt="YouTube" /></a>
+    <a href="https://www.youtube.com/@PoglyApp"><img height="25" src="./images/social/youtube.svg" alt="YouTube" /></a>
     &nbsp;
     <a href="https://x.com/PoglyApp"><img height="25" src="./images/social/twitter.svg" alt="Twitter" /></a>
 </p>
