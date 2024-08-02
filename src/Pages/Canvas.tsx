@@ -71,7 +71,14 @@ export const Canvas = (props: IProps) => {
   useFetchElement(activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
-  useElementsEvents(selectoRef, setSelected, setSelectoTargets, props.canvasInitialized, props.setCanvasInitialized);
+  useElementsEvents(
+    selectoRef,
+    setSelected,
+    setSelectoTargets,
+    props.canvasInitialized,
+    props.setCanvasInitialized,
+    activeLayout
+  );
 
   const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
   useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
