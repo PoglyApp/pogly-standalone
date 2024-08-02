@@ -14,15 +14,18 @@ import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
 import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import Layouts from "../../module_bindings/layouts";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
   setSelected: Function,
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
-  setCanvasInitialized: Function
+  setCanvasInitialized: Function,
+  layout: Layouts | undefined
 ) => {
   const { Identity } = useSpacetimeContext();
+
   const dispatch = useAppDispatch();
 
   const elementData = useRef<ElementData[]>([]);
@@ -34,10 +37,11 @@ export const useElementsEvents = (
   }, [elementDataStore]);
 
   useEffect(() => {
-    if (canvasInitialized.elementEventsInitialized) return;
+    if (canvasInitialized.elementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
+      if (element.layoutId !== layout?.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
@@ -46,6 +50,8 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+      if (oldElement.layoutId !== layout?.id) return;
+
       const component = document.getElementById(oldElement.id.toString());
 
       if (!component) return;
@@ -171,6 +177,7 @@ export const useElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
+      if (element.layoutId !== layout?.id) return;
 
       setSelected(null);
       dispatch(removeCanvasElement(element));
@@ -185,6 +192,7 @@ export const useElementsEvents = (
     setCanvasInitialized,
     setSelected,
     setSelectoTargets,
+    layout?.id,
     dispatch,
   ]);
 };
