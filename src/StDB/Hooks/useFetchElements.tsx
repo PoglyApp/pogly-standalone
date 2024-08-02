@@ -8,21 +8,29 @@ import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import Config from "../../module_bindings/config";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { ConfigContext } from "../../Contexts/ConfigContext";
+import Layouts from "../../module_bindings/layouts";
+import { CanvasElementType } from "../../Types/General/CanvasElementType";
+import { CreateElementComponent } from "../../Utility/CreateElementComponent";
+import { initCanvasElements } from "../../Store/Features/CanvasElementSlice";
 
-const useFetchElement = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
+const useFetchElement = (
+  layout: Layouts | undefined,
+  canvasInitialized: CanvasInitializedType,
+  setCanvasInitialized: Function
+) => {
   const dispatch = useAppDispatch();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config = useContext(ConfigContext);
 
   useEffect(() => {
-    if (canvasInitialized.elementsFetchInitialized) return;
+    if (canvasInitialized.elementsFetchInitialized || !layout) return;
 
     // Fetch ElementData
     const datas = ElementData.all();
     dispatch(initData(datas));
 
     // Fetch Elements
-    const elements = Elements.all();
+    const elements = Array.from(Elements.filterByLayoutId(layout.id));
 
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
@@ -30,8 +38,16 @@ const useFetchElement = (canvasInitialized: CanvasInitializedType, setCanvasInit
 
     dispatch(initElements(offsetElements));
 
+    const canvasElements: CanvasElementType[] = [];
+
+    offsetElements.forEach((element: Elements) => {
+      canvasElements.push(CreateElementComponent(element));
+    });
+
+    dispatch(initCanvasElements(canvasElements));
+
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [canvasInitialized.elementsFetchInitialized, config, isOverlay, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.elementsFetchInitialized, config, isOverlay, setCanvasInitialized, dispatch]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

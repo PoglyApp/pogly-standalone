@@ -10,6 +10,7 @@ import { initCanvasElements } from "../Store/Features/CanvasElementSlice";
 import { Loading } from "../Components/General/Loading";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
+import Layouts from "../module_bindings/layouts";
 
 export const Overlay = () => {
   const dispatch = useAppDispatch();
@@ -23,7 +24,9 @@ export const Overlay = () => {
 
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
-  useFetchElement(canvasInitialized, setCanvasInitialized);
+  const [activeLayout, setActiveLayout] = useState<Layouts>();
+
+  useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
 
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
   useOverlayElementsEvents(canvasInitialized, setCanvasInitialized);

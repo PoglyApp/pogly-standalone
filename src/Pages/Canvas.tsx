@@ -31,6 +31,7 @@ import UpdateGuestPositionReducer from "../module_bindings/update_guest_position
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
+import Layouts from "../module_bindings/layouts";
 
 interface IProps {
   setActivePage: Function;
@@ -64,7 +65,9 @@ export const Canvas = (props: IProps) => {
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
-  useFetchElement(props.canvasInitialized, props.setCanvasInitialized);
+  const [activeLayout, setActiveLayout] = useState<Layouts>();
+
+  useFetchElement(activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
   useElementsEvents(selectoRef, setSelected, setSelectoTargets, props.canvasInitialized, props.setCanvasInitialized);
@@ -77,23 +80,10 @@ export const Canvas = (props: IProps) => {
   useNotice(setNoticeMessage);
 
   useEffect(() => {
+    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+
     props.setActivePage(1);
-  }, [props]);
-
-  useEffect(() => {
-    if (props.canvasInitialized.canvasInitialized) return;
-
-    // INITIALIZE CANVAS
-    const canvasElements: CanvasElementType[] = [];
-
-    elements.forEach((element: Elements) => {
-      canvasElements.push(CreateElementComponent(element));
-    });
-
-    dispatch(initCanvasElements(canvasElements));
-
-    props.setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, canvasInitialized: true }));
-  }, [props, elements, dispatch]);
+  }, [props, activeLayout]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -112,8 +102,7 @@ export const Canvas = (props: IProps) => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if(disconnected)
-  {
+  if (disconnected) {
     return (
       <ErrorRefreshModal
         type="button"
