@@ -178,20 +178,18 @@ export const App: React.FC = () => {
 
   // Step 8) Load Pogly
   return (
-    <>
-      <SpacetimeContext.Provider value={spacetimeContext}>
-        <ConfigContext.Provider value={spacetime.InstanceConfig}>
-          <SettingsContext.Provider value={{ settings, setSettings }}>
-            <ModalContext.Provider value={{ modals, setModals, closeModal }}>
-              {modals.map((modal) => {
-                return modal;
-              })}
-              <RouterProvider router={router} />
-              <ToastContainer />
-            </ModalContext.Provider>
-          </SettingsContext.Provider>
-        </ConfigContext.Provider>
-      </SpacetimeContext.Provider>
-    </>
+    <SpacetimeContext.Provider value={spacetimeContext}>
+      <ConfigContext.Provider value={spacetime.InstanceConfig}>
+        <SettingsContext.Provider value={{ settings, setSettings }}>
+          <ModalContext.Provider value={{ modals, setModals, closeModal }}>
+            {modals.map((modal) => {
+              return modal;
+            })}
+            <RouterProvider router={router} />
+            <ToastContainer />
+          </ModalContext.Provider>
+        </SettingsContext.Provider>
+      </ConfigContext.Provider>
+    </SpacetimeContext.Provider>
   );
 };

@@ -32,6 +32,7 @@ import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
 import Layouts from "../module_bindings/layouts";
+import { LayoutContext } from "../Contexts/LayoutContext";
 
 interface IProps {
   setActivePage: Function;
@@ -117,7 +118,7 @@ export const Canvas = (props: IProps) => {
   return (
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) ? (
-        <>
+        <LayoutContext.Provider value={activeLayout}>
           <ElementSelectionMenu elementData={elementData} />
 
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
@@ -215,7 +216,7 @@ export const Canvas = (props: IProps) => {
             setSelected={setSelected}
             elements={elements}
           />
-        </>
+        </LayoutContext.Provider>
       ) : (
         <Loading text="Initializing Canvas" />
       )}
