@@ -1,19 +1,21 @@
 import AddElementReducer from "../../../module_bindings/add_element_reducer";
+import AddElementToLayoutReducer from "../../../module_bindings/add_element_to_layout_reducer";
 import DataType from "../../../module_bindings/data_type";
 import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElement from "../../../module_bindings/image_element";
 import ImageElementData from "../../../module_bindings/image_element_data";
+import Layouts from "../../../module_bindings/layouts";
 import TextElement from "../../../module_bindings/text_element";
 import WidgetElement from "../../../module_bindings/widget_element";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
   ViewportToStdbCoords,
-  ViewportToStdbFontSize,
 } from "../../../Utility/ConvertCoordinates";
 
 export const insertElement = (
   elementStruct: ElementStruct,
+  activeLayout: Layouts,
   transparency?: number,
   transform?: string,
   clip?: string
@@ -64,5 +66,11 @@ export const insertElement = (
       break;
   }
 
-  AddElementReducer.call(element, transparency || 100, newTransform, clip || "rect(0px, 0px, 0px, 0px)");
+  AddElementToLayoutReducer.call(
+    element,
+    transparency || 100,
+    newTransform,
+    clip || "rect(0px, 0px, 0px, 0px)",
+    activeLayout.id
+  );
 };

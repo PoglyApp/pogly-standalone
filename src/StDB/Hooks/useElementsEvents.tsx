@@ -37,7 +37,7 @@ export const useElementsEvents = (
     if (canvasInitialized.elementEventsInitialized) return;
 
     Elements.onInsert((element, reducerEvent) => {
-      if (reducerEvent && reducerEvent.reducerName !== "AddElement") return;
+      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 

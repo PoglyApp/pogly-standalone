@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useTenor } from "../../../Hooks/useTenor";
 import { Accordion, AccordionDetails, AccordionSummary, Button, SvgIcon } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -9,8 +9,11 @@ import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
 import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElementData from "../../../module_bindings/image_element_data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 export const TenorCategory = () => {
+  const layout = useContext(LayoutContext);
+
   const [tenorEmotes, setTenorEmotes] = useState<any>();
   const [searchEmotes, setSearchEmotes] = useState<string>("");
   const [searchIndex, setSearchIndex] = useState<string>("");
@@ -36,7 +39,8 @@ export const TenorCategory = () => {
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
-        })
+        }),
+        layout!
       );
     };
   };

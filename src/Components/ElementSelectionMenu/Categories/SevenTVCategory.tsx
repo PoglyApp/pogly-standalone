@@ -10,8 +10,11 @@ import SevenTVWrap from "../../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 export const SevenTVCategory = () => {
+  const layout = useContext(LayoutContext);
+
   const [sevenTVEmotes, setSevenTVEmotes] = useState<Emote[]>([]);
   const [searchEmote, setSearchEmote] = useState<string>("");
 
@@ -45,7 +48,8 @@ export const SevenTVCategory = () => {
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
-        })
+        }),
+        layout!
       );
     };
   };
