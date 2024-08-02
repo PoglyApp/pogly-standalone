@@ -47,7 +47,7 @@ export const InitialSetupModal = (props: IProp) => {
   const [error, setError] = useState<string>("");
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const badCharacters = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  const badCharacters = / `!@#$%^&*()_+-=\[\]{};':"\\|,.<>\/?~]/;
   const badCharError = "Special characters are not supported in Authentication Key at this time.";
 
   useGetDefaultElements(setDefaultElements);
@@ -66,16 +66,15 @@ export const InitialSetupModal = (props: IProp) => {
   }, [authKey, authentication, props.connectionConfig]);
 
   const handleAuthKeyChange = (text: any) => {
-    if(badCharacters.test(text))
-    {
+    if (badCharacters.test(text)) {
       setError(badCharError);
 
       return;
     }
 
-    if(error === badCharError) setError("");
+    if (error === badCharError) setError("");
 
-    setAuthKey(text)
+    setAuthKey(text);
   };
 
   const handleSave = () => {
@@ -277,7 +276,9 @@ export const InitialSetupModal = (props: IProp) => {
           </Typography>
         ) : (
           <Button
-            disabled={error !== "" || channel === "" || updateHz === "" || (authentication && authKey === "") ? true : false}
+            disabled={
+              error !== "" || channel === "" || updateHz === "" || (authentication && authKey === "") ? true : false
+            }
             variant="outlined"
             sx={{
               color: "#ffffffa6",
