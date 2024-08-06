@@ -41,5 +41,5 @@ export const useLayoutEvents = (setLayouts: Function) => {
     });
 
     setEventsInitialized(true);
-  }, []);
+  }, [eventsInitialized, setLayouts]);
 };

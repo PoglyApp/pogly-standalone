@@ -19,14 +19,19 @@ const useFetchElement = (
   const dispatch = useAppDispatch();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  useEffect(() => {
-    if (canvasInitialized.elementsFetchInitialized || !layout) return;
+  const [fetchedLayout, setFetchedLayout] = useState<Layouts>();
 
-    console.log("Fetching elements");
+  useEffect(() => {
+    if (!layout) return;
+
+    const refetch = fetchedLayout && fetchedLayout.id !== layout.id;
+    if (canvasInitialized.elementsFetchInitialized && !refetch) return;
 
     // Fetch ElementData
-    const datas = ElementData.all();
-    dispatch(initData(datas));
+    if (!refetch) {
+      const datas = ElementData.all();
+      dispatch(initData(datas));
+    }
 
     // Fetch Elements
     const elements = Array.from(Elements.filterByLayoutId(layout!.id));
@@ -45,6 +50,7 @@ const useFetchElement = (
 
     dispatch(initCanvasElements(canvasElements));
 
+    setFetchedLayout(layout);
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
   }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, setCanvasInitialized, dispatch]);
 };
