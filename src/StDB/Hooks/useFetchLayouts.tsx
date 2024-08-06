@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
 
-const useFetchLayours = () => {
-  const [layouts, setLayouts] = useState<Layouts[]>();
-
+const useFetchLayours = (setLayouts: Function) => {
   useEffect(() => {
     const fetchedLayouts = Layouts.all();
 
     setLayouts(fetchedLayouts);
   }, []);
-
-  return layouts;
 };
 
 export default useFetchLayours;
