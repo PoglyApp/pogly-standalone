@@ -192,7 +192,7 @@ export const useElementsEvents = (
     setCanvasInitialized,
     setSelected,
     setSelectoTargets,
-    layout?.id,
+    layout,
     dispatch,
   ]);
 };

@@ -43,8 +43,6 @@ interface IProps {
 export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
 
-  const dispatch = useAppDispatch();
-
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
@@ -126,7 +124,11 @@ export const Canvas = (props: IProps) => {
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) ? (
         <LayoutContext.Provider value={activeLayout}>
-          <ElementSelectionMenu elementData={elementData} />
+          <ElementSelectionMenu
+            elementData={elementData}
+            activeLayout={activeLayout!}
+            setActiveLayout={setActiveLayout}
+          />
 
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
