@@ -24,7 +24,8 @@ export const SelectoComponent = (props: IProp) => {
       toggleContinueSelect={["shift"]}
       ratio={0}
       onDragStart={(e) => {
-        if (e.inputEvent.target.id === "SelectionMenu") e.stop();
+        const selectionMenu = document.getElementById("SelectionMenu");
+        if (selectionMenu?.contains(e.inputEvent.target)) e.stop();
 
         const moveable = props.moveableRef.current!;
         const target = e.inputEvent.target;
