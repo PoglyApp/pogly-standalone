@@ -15,6 +15,7 @@ import { SettingsContext } from "../Contexts/SettingsContext";
 import { ModalContext } from "../Contexts/ModalContext";
 import DeleteAllElementsReducer from "../module_bindings/delete_all_elements_reducer";
 import DeleteAllElementDataReducer from "../module_bindings/delete_all_element_data_reducer";
+import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 
 interface IProps {
   activePage: Number;
@@ -55,6 +56,10 @@ export const Header = (props: IProps) => {
       ...oldModals,
       <SettingsModal key="settings_modal" setDebug={setDebug} onlineVersion={props.onlineVersion} />,
     ]);
+  };
+
+  const redirectToDocumentation = () => {
+    window.open("https://github.com/PoglyApp/pogly-documentation/blob/main/use/index.md", "_blank");
   };
 
   if (isOverlay) {
@@ -100,6 +105,12 @@ export const Header = (props: IProps) => {
                   onClick={() => changePage(1, "/canvas")}
                 />
                 <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
+                <StyledTab
+                  icon={<HelpCenterIcon />}
+                  iconPosition="start"
+                  label="Need help?"
+                  onClick={redirectToDocumentation}
+                />
 
                 {debug && (
                   <StyledTab
