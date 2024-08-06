@@ -20,7 +20,6 @@ const useFetchElement = (
 ) => {
   const dispatch = useAppDispatch();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config = useContext(ConfigContext);
 
   useEffect(() => {
     if (canvasInitialized.elementsFetchInitialized || !layout) return;
@@ -34,7 +33,7 @@ const useFetchElement = (
 
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
-      : elementOffsetForOverlay(elements, config);
+      : elementOffsetForOverlay(elements);
 
     dispatch(initElements(offsetElements));
 
@@ -47,7 +46,7 @@ const useFetchElement = (
     dispatch(initCanvasElements(canvasElements));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [layout, canvasInitialized.elementsFetchInitialized, config, isOverlay, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, setCanvasInitialized, dispatch]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {
@@ -60,7 +59,7 @@ const elementOffsetForCanvas = (elements: Elements[]) => {
   return newElementArray;
 };
 
-const elementOffsetForOverlay = (elements: Elements[], config: Config) => {
+const elementOffsetForOverlay = (elements: Elements[]) => {
   const newElementArray: Elements[] = [];
 
   elements.forEach((element: Elements) => {

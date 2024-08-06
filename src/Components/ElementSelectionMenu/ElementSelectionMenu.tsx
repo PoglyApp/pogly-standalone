@@ -13,9 +13,14 @@ import Permissions from "../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
+import Layouts from "../../module_bindings/layouts";
+import { LayoutCategory } from "./Categories/LayoutCategory";
+import { Divider, Typography } from "@mui/material";
 
 interface IProps {
   elementData: ElementData[];
+  activeLayout: Layouts;
+  setActiveLayout: Function;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
@@ -33,20 +38,39 @@ export const ElementSelectionMenu = (props: IProps) => {
     <>
       <SelectionMenuContainer id="SelectionMenu">
         <CategoryContainer>
+          <LayoutCategory activeLayout={props.activeLayout} setActiveLayout={props.setActiveLayout} />
+
+          <Divider
+            sx={{
+              ":before": { borderTopColor: "#ffffffa6" },
+              ":after": { borderTopColor: "#ffffffa6" },
+              marginBottom: "5px",
+              marginTop: "5px",
+            }}
+          >
+            <Typography sx={{ color: "#ffffffa6" }} variant="inherit">
+              Elements
+            </Typography>
+          </Divider>
+
           <TextCategory />
+
           <ImageCategory
             elementData={props.elementData}
             strictSettings={strictSettings}
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
           />
+
           <WidgetCategory
             elementData={props.elementData}
             strictSettings={strictSettings}
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
           />
+
           {config.streamingPlatform === "twitch" && <SevenTVCategory />}
+
           <TenorCategory />
         </CategoryContainer>
 
