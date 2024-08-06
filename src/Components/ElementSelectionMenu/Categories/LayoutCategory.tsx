@@ -40,11 +40,10 @@ export const LayoutCategory = (props: IProps) => {
           id="panel1-header"
           sx={{
             color: "#ffffffa6",
-            height: "2px !important",
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutTitle>Layouts {"(" + props.activeLayout.name + ")"}</LayoutTitle>
+          <LayoutName>Layouts {"(" + props.activeLayout.name + ")"}</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -101,11 +100,11 @@ export const LayoutCategory = (props: IProps) => {
   );
 };
 
-const LayoutTitle = styled.span`
+const LayoutName = styled.span`
   text-overflow: ellipsis;
   overflow: hidden;
-  width: 160px;
   height: 1.2em;
+  width: 130px;
   white-space: nowrap;
 
   line-height: 1.5;
