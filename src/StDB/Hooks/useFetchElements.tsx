@@ -1,13 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Elements from "../../module_bindings/elements";
 import ElementData from "../../module_bindings/element_data";
 import { initData } from "../../Store/Features/ElementDataSlice";
 import { initElements } from "../../Store/Features/ElementsSlice";
 import { useAppDispatch } from "../../Store/Features/store";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
-import Config from "../../module_bindings/config";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import Layouts from "../../module_bindings/layouts";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
@@ -24,12 +22,14 @@ const useFetchElement = (
   useEffect(() => {
     if (canvasInitialized.elementsFetchInitialized || !layout) return;
 
+    console.log("Fetching elements");
+
     // Fetch ElementData
     const datas = ElementData.all();
     dispatch(initData(datas));
 
     // Fetch Elements
-    const elements = Array.from(Elements.filterByLayoutId(layout.id));
+    const elements = Array.from(Elements.filterByLayoutId(layout!.id));
 
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
