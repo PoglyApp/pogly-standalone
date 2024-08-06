@@ -6,7 +6,7 @@ const useFetchLayours = (setLayouts: Function) => {
     const fetchedLayouts = Layouts.all();
 
     setLayouts(fetchedLayouts);
-  }, []);
+  }, [setLayouts]);
 };
 
 export default useFetchLayours;

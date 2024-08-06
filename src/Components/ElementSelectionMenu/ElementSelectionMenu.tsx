@@ -38,7 +38,7 @@ export const ElementSelectionMenu = (props: IProps) => {
     <>
       <SelectionMenuContainer id="SelectionMenu">
         <CategoryContainer>
-          <LayoutCategory setActiveLayout={props.setActiveLayout} />
+          <LayoutCategory activeLayout={props.activeLayout} setActiveLayout={props.setActiveLayout} />
 
           <Divider
             sx={{

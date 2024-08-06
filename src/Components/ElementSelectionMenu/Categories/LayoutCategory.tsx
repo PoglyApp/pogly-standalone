@@ -11,9 +11,10 @@ import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";
 import { HandleLayoutSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
-import { CanvasInitializedType } from "../../../Types/General/CanvasInitializedType";
+import styled from "styled-components";
 
 interface IProps {
+  activeLayout: Layouts;
   setActiveLayout: Function;
 }
 
@@ -43,7 +44,7 @@ export const LayoutCategory = (props: IProps) => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Layouts</span>
+          <LayoutTitle>Layouts {"(" + props.activeLayout.name + ")"}</LayoutTitle>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -99,3 +100,14 @@ export const LayoutCategory = (props: IProps) => {
     </>
   );
 };
+
+const LayoutTitle = styled.span`
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 160px;
+  height: 1.2em;
+  white-space: nowrap;
+
+  line-height: 1.5;
+  font-size: 15px;
+`;

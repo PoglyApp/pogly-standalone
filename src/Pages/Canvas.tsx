@@ -91,7 +91,7 @@ export const Canvas = (props: IProps) => {
 
   useEffect(() => {
     props.setActivePage(1);
-  }, [props.setActivePage]);
+  }, [props]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
