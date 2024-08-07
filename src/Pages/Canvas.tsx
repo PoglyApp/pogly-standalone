@@ -87,6 +87,8 @@ export const Canvas = (props: IProps) => {
 
   useEffect(() => {
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+    setSelected(undefined);
+    setSelectoTargets(() => []);
   }, [activeLayout]);
 
   useEffect(() => {
