@@ -13,14 +13,12 @@ import Permissions from "../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
-import Layouts from "../../module_bindings/layouts";
 import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
+import { LayoutContext, LayoutContextType } from "../../Contexts/LayoutContext";
 
 interface IProps {
   elementData: ElementData[];
-  activeLayout: Layouts;
-  setActiveLayout: Function;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
@@ -38,7 +36,7 @@ export const ElementSelectionMenu = (props: IProps) => {
     <>
       <SelectionMenuContainer id="SelectionMenu">
         <CategoryContainer>
-          <LayoutCategory activeLayout={props.activeLayout} setActiveLayout={props.setActiveLayout} />
+          <LayoutCategory />
 
           <Divider
             sx={{

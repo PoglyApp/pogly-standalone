@@ -125,12 +125,8 @@ export const Canvas = (props: IProps) => {
   return (
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) ? (
-        <LayoutContext.Provider value={activeLayout}>
-          <ElementSelectionMenu
-            elementData={elementData}
-            activeLayout={activeLayout!}
-            setActiveLayout={setActiveLayout}
-          />
+        <LayoutContext.Provider value={{ activeLayout: activeLayout!, setActiveLayout: setActiveLayout }}>
+          <ElementSelectionMenu elementData={elementData} />
 
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 

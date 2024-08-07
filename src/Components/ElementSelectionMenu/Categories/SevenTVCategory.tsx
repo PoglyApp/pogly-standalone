@@ -10,10 +10,10 @@ import SevenTVWrap from "../../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
 
 export const SevenTVCategory = () => {
-  const layout = useContext(LayoutContext);
+  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<Emote[]>([]);
   const [searchEmote, setSearchEmote] = useState<string>("");
@@ -49,7 +49,7 @@ export const SevenTVCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layout!
+        layoutContext!.activeLayout
       );
     };
   };
