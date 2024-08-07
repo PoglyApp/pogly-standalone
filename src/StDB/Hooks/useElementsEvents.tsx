@@ -29,19 +29,21 @@ export const useElementsEvents = (
   const dispatch = useAppDispatch();
 
   const elementData = useRef<ElementData[]>([]);
+  const activeLayout = useRef<Layouts>();
 
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
     elementData.current = elementDataStore;
-  }, [elementDataStore]);
+    activeLayout.current = layout;
+  }, [elementDataStore, layout]);
 
   useEffect(() => {
     if (canvasInitialized.elementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
-      if (element.layoutId !== layout?.id) return;
+      if (element.layoutId !== activeLayout.current!.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
@@ -50,7 +52,7 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
-      if (oldElement.layoutId !== layout?.id) return;
+      if (oldElement.layoutId !== activeLayout.current!.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -177,7 +179,7 @@ export const useElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
-      if (element.layoutId !== layout?.id) return;
+      if (element.layoutId !== activeLayout.current!.id) return;
 
       setSelected(null);
       dispatch(removeCanvasElement(element));
