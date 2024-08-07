@@ -23,7 +23,7 @@ import Elements from "../../module_bindings/elements";
 import { StdbToViewportFontSize, ViewportToStdbFontSize } from "../../Utility/ConvertCoordinates";
 import UpdateTextElementTextReducer from "../../module_bindings/update_text_element_text_reducer";
 import { updateTextElement } from "../../StDB/Reducers/Update/updateTextElement";
-import { LayoutContext } from "../../Contexts/LayoutContext";
+import { LayoutContext, LayoutContextType } from "../../Contexts/LayoutContext";
 
 interface IProps {
   editElementId?: number;
@@ -33,7 +33,7 @@ const fonts = ["Roboto", "Tiny5", "Lato", "Ubuntu", "Merriweather", "Bebas Neue"
 
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const layout = useContext(LayoutContext);
+  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
 
   const [text, setText] = useState<string>("");
   const [font, setFont] = useState<string>("Roboto");
@@ -117,7 +117,7 @@ export const TextCreationModal = (props: IProps) => {
     });
 
     if (!props.editElementId) {
-      insertElement(textElement, layout!);
+      insertElement(textElement, layoutContext!.activeLayout);
     } else {
       updateTextElement(props.editElementId!, textElement);
     }

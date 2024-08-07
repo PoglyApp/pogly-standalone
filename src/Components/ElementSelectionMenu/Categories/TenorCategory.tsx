@@ -9,10 +9,10 @@ import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
 import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElementData from "../../../module_bindings/image_element_data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
 
 export const TenorCategory = () => {
-  const layout = useContext(LayoutContext);
+  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
 
   const [tenorEmotes, setTenorEmotes] = useState<any>();
   const [searchEmotes, setSearchEmotes] = useState<string>("");
@@ -40,7 +40,7 @@ export const TenorCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layout!
+        layoutContext!.activeLayout
       );
     };
   };

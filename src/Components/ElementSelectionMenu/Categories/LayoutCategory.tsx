@@ -12,14 +12,12 @@ import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";
 import { HandleLayoutSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
+import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
 
-interface IProps {
-  activeLayout: Layouts;
-  setActiveLayout: Function;
-}
-
-export const LayoutCategory = (props: IProps) => {
+export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
+  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
+
   const [layouts, setLayouts] = useState<Layouts[]>([]);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
@@ -43,7 +41,7 @@ export const LayoutCategory = (props: IProps) => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutName>Layouts {"(" + props.activeLayout.name + ")"}</LayoutName>
+          <LayoutName>Layouts {"(" + layoutContext!.activeLayout.name + ")"}</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -80,7 +78,7 @@ export const LayoutCategory = (props: IProps) => {
                     justifyContent: "left",
                   }}
                   onClick={() => {
-                    props.setActiveLayout(layout);
+                    layoutContext!.setActiveLayout(layout);
                   }}
                 >
                   {layout.name}
