@@ -1,4 +1,5 @@
-﻿using static SpacetimeDB.Runtime;
+﻿using SpacetimeDB;
+using static SpacetimeDB.Runtime;
 
 public partial class Module
 {

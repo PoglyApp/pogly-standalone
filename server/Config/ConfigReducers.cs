@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices.JavaScript;
-using SpacetimeDB.Module;
+﻿using SpacetimeDB;
 using static SpacetimeDB.Runtime;
 
 public partial class Module
@@ -16,7 +13,13 @@ public partial class Module
                 ServerIdentity = ctx.Sender,
                 Tick = 0
             }.Insert();
-            
+
+            new KeepAliveWorker
+            {
+                ScheduledId = 0,
+                ScheduledAt = TimeSpan.FromSeconds(15)
+            }.Insert();
+
             new Config
             {
                 Version = 0,
@@ -104,7 +107,7 @@ public partial class Module
                 Key = authKey
             }.Insert();
 
-            if (config.Authentication) AuthenticateDoWork(ctx);
+            if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
             Config.UpdateByVersion(0, config);
             Log($"[SetConfig] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}");
         }
@@ -189,10 +192,9 @@ public partial class Module
             _currentPatience = 0;
             Log("[AuthDoWork] Max patience reached... pausing.");
             _identities.Clear();
+            //StopAuthWorker();
             return;
         }
-        
-        ScheduleAuthenticateDoWork(ctx.Time.AddMilliseconds(100));
 
         if (_identities.Count == 0) return;
 

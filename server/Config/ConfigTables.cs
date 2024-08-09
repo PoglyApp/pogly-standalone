@@ -1,10 +1,24 @@
 ﻿using System.Net;
 using System.Runtime.InteropServices.JavaScript;
-using SpacetimeDB.Module;
+using SpacetimeDB;
 using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
+    [SpacetimeDB.Table(Public = true)]
+    public partial struct Heartbeat
+    {
+        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        public uint Id;
+        
+        public Identity ServerIdentity;
+
+        public int Tick;
+    }
+
+    [SpacetimeDB.Table(Public = false, Scheduled = "KeepAlive")]
+    public partial struct KeepAliveWorker { }
+    
     [SpacetimeDB.Table(Public = true)]
     public partial struct Config
     {
@@ -30,6 +44,9 @@ public partial class Module
 
         public string Key;
     }
+    
+    [SpacetimeDB.Table(Public = false, Scheduled = "AuthenticateDoWork")]
+    public partial struct AuthenticationWorker { }
     
     [SpacetimeDB.Table(Public = false)]
     public partial struct ZIndex

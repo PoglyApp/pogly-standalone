@@ -1,4 +1,4 @@
-﻿using SpacetimeDB.Module;
+﻿using SpacetimeDB;
 
 public partial class Module
 {
