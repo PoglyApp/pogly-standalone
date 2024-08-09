@@ -24,9 +24,9 @@ export namespace ImageElementData {
 	}
 
 	export type ElementDataId = { tag: "ElementDataId", value: number };
-	export const ElementDataId = (value: number): ElementDataId => { return { tag: "ElementDataId", value } };
+	export const ElementDataId = (value: number): ElementDataId => ({ tag: "ElementDataId", value });
 	export type RawData = { tag: "RawData", value: string };
-	export const RawData = (value: string): RawData => { return { tag: "RawData", value } };
+	export const RawData = (value: string): RawData => ({ tag: "RawData", value });
 
 	export function fromValue(value: AlgebraicValue): ImageElementData {
 		let sumValue = value.asSumValue();
