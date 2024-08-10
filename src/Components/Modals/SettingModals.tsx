@@ -275,7 +275,7 @@ export const SettingsModal = (props: IProp) => {
               sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "280px" }}
             >
               You have an outdated Pogly version!{" "}
-              <a href="https://github.com/PoglyApp/pogly-standalone/Releases">Grab the new version here</a>.
+              <a href="https://github.com/PoglyApp/pogly-standalone/releases">Grab the new version here</a>.
             </Alert>
           )}
         </FormGroup>
