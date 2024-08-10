@@ -23,7 +23,7 @@ export const Overlay = () => {
   useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
 
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
-  useOverlayElementsEvents(canvasInitialized, setCanvasInitialized);
+  useOverlayElementsEvents(activeLayout!, canvasInitialized, setCanvasInitialized);
   useOverlayLayoutEvents(setActiveLayout);
 
   useHeartbeatEvents(canvasInitialized);
