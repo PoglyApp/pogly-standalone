@@ -12,11 +12,11 @@ import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";
 import { HandleLayoutSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
-import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
-  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
+  const layoutContext = useContext(LayoutContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
 

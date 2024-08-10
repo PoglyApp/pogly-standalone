@@ -15,7 +15,6 @@ import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
-import { LayoutContext, LayoutContextType } from "../../Contexts/LayoutContext";
 
 interface IProps {
   elementData: ElementData[];

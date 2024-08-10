@@ -29,6 +29,7 @@ import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_
 import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import Layouts from "./module_bindings/layouts";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -57,6 +58,7 @@ export const App: React.FC = () => {
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
   const [modals, setModals] = useState<ReactNode[]>([]);
+  const [activeLayout, setActiveLayout] = useState<Layouts>();
 
   const [spacetimeContext, setSpacetimeContext] = useState<SpacetimeContextType>();
 
@@ -86,6 +88,8 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
+
+    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
   }, [stdbInitialized, spacetime.Identity]);
 
   const router = createBrowserRouter(

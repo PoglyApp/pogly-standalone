@@ -10,10 +10,10 @@ import SevenTVWrap from "../../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 export const SevenTVCategory = () => {
-  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
+  const layoutContext = useContext(LayoutContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<Emote[]>([]);
   const [searchEmote, setSearchEmote] = useState<string>("");

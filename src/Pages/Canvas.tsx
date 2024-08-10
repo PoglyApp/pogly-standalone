@@ -86,7 +86,10 @@ export const Canvas = (props: IProps) => {
   useNotice(setNoticeMessage);
 
   useEffect(() => {
-    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+    if (!activeLayout) {
+      const layout = Layouts.filterByActive(true).next().value;
+    }
+
     setSelected(undefined);
     setSelectoTargets(() => []);
   }, [activeLayout]);
@@ -126,7 +129,7 @@ export const Canvas = (props: IProps) => {
 
   return (
     <>
-      {Object.values(props.canvasInitialized).every((init) => init === true) ? (
+      {Object.values(props.canvasInitialized).every((init) => init === true) && activeLayout ? (
         <LayoutContext.Provider value={{ activeLayout: activeLayout!, setActiveLayout: setActiveLayout }}>
           <ElementSelectionMenu elementData={elementData} />
 

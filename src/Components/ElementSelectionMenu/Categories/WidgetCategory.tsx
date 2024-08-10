@@ -11,7 +11,7 @@ import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
-import { LayoutContext, LayoutContextType } from "../../../Contexts/LayoutContext";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 interface IProps {
   elementData: ElementData[];
@@ -22,9 +22,7 @@ interface IProps {
 
 export const WidgetCategory = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const layoutContext: LayoutContextType | undefined = useContext(LayoutContext);
-
-  const layout = useContext(LayoutContext);
+  const layoutContext = useContext(LayoutContext);
 
   const showWidgetCreationModal = () => {
     setModals((oldModals: any) => [...oldModals, <WidgetCreationModal key="widgetCreation_modal" />]);
