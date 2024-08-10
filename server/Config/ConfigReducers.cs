@@ -176,7 +176,7 @@ public partial class Module
     private static int _currentPatience = 0;
     
     [SpacetimeDB.Reducer]
-    public static void AuthenticateDoWork(ReducerContext ctx)
+    public static void AuthenticateDoWork(ReducerContext ctx, AuthenticationWorker args)
     {
         if (Guests.Iter().Count() == 0 || _identities.Count == 0)
         {
@@ -192,7 +192,7 @@ public partial class Module
             _currentPatience = 0;
             Log("[AuthDoWork] Max patience reached... pausing.");
             _identities.Clear();
-            //StopAuthWorker();
+            StopAuthWorker();
             return;
         }
 
