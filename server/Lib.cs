@@ -1,19 +1,8 @@
-using SpacetimeDB.Module;
+using SpacetimeDB;
 using static SpacetimeDB.Runtime;
 
 static partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
-    public partial struct Heartbeat
-    {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
-        public uint Id;
-
-        public Identity ServerIdentity;
-
-        public int Tick;
-    }
-
     [SpacetimeDB.Reducer(ReducerKind.Init)]
     public static void Init(ReducerContext ctx)
     {
@@ -21,9 +10,7 @@ static partial class Module
         
         try
         {
-            KeepAlive(ctx);
-            
-            if (Config.FindByVersion(0)!.Value.Authentication) AuthenticateDoWork(ctx);
+            if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
             
             Log($"[Init] Server successfully started!",LogLevel.Info);
         }
@@ -36,7 +23,7 @@ static partial class Module
     [SpacetimeDB.Reducer(ReducerKind.Connect)]
     public static void OnConnect(ReducerContext ctx)
     {
-        if (Config.FindByVersion(0)!.Value.Authentication) AuthenticateDoWork(ctx); 
+        if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
         
         try
         {
@@ -83,12 +70,10 @@ static partial class Module
             Log($"[OnDisconnect] Error during disconnection with client {ctx.Sender}- they may not have been deleted from guests properly! " + e.Message,LogLevel.Error);
         }
     }
-
+    
     [SpacetimeDB.Reducer]
-    public static void KeepAlive(ReducerContext ctx)
+    public static void KeepAlive(ReducerContext ctx, KeepAliveWorker arg)
     {
-        ScheduleKeepAlive(ctx.Time.AddSeconds(15));
-
         try
         {
             var heartbeat = Heartbeat.FilterById(0).First();

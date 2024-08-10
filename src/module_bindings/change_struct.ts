@@ -43,15 +43,15 @@ export namespace ChangeStruct {
 	}
 
 	export type ElementDataChange = { tag: "ElementDataChange", value: __ElementDataChange };
-	export const ElementDataChange = (value: __ElementDataChange): ElementDataChange => { return { tag: "ElementDataChange", value } };
+	export const ElementDataChange = (value: __ElementDataChange): ElementDataChange => ({ tag: "ElementDataChange", value });
 	export type ElementChange = { tag: "ElementChange", value: __ElementChange };
-	export const ElementChange = (value: __ElementChange): ElementChange => { return { tag: "ElementChange", value } };
+	export const ElementChange = (value: __ElementChange): ElementChange => ({ tag: "ElementChange", value });
 	export type GuestChange = { tag: "GuestChange", value: __GuestChange };
-	export const GuestChange = (value: __GuestChange): GuestChange => { return { tag: "GuestChange", value } };
+	export const GuestChange = (value: __GuestChange): GuestChange => ({ tag: "GuestChange", value });
 	export type EmptyChange = { tag: "EmptyChange", value: __EmptyChange };
-	export const EmptyChange = (value: __EmptyChange): EmptyChange => { return { tag: "EmptyChange", value } };
+	export const EmptyChange = (value: __EmptyChange): EmptyChange => ({ tag: "EmptyChange", value });
 	export type ChatMessage = { tag: "ChatMessage", value: __ChatMessage };
-	export const ChatMessage = (value: __ChatMessage): ChatMessage => { return { tag: "ChatMessage", value } };
+	export const ChatMessage = (value: __ChatMessage): ChatMessage => ({ tag: "ChatMessage", value });
 
 	export function fromValue(value: AlgebraicValue): ChangeStruct {
 		let sumValue = value.asSumValue();
