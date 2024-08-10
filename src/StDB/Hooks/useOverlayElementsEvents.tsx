@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Elements from "../../module_bindings/elements";
-import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
+import { useAppDispatch } from "../../Store/Features/store";
 import { removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
@@ -9,22 +9,36 @@ import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import Layouts from "../../module_bindings/layouts";
 
-export const useOverlayElementsEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
+export const useOverlayElementsEvents = (
+  layout: Layouts,
+  canvasInitialized: CanvasInitializedType,
+  setCanvasInitialized: Function
+) => {
   const dispatch = useAppDispatch();
 
+  const activeLayout = useRef<Layouts>();
+
   useEffect(() => {
-    if (canvasInitialized.elementEventsInitialized) return;
+    activeLayout.current = layout;
+  }, [layout]);
+
+  useEffect(() => {
+    if (canvasInitialized.elementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
-      if (reducerEvent && reducerEvent.reducerName !== "AddElement") return;
+      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
+      if (element.layoutId !== activeLayout.current!.id) return;
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element);
 
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+    Elements.onUpdate((oldElement, newElement) => {
+      if (newElement.layoutId !== activeLayout.current!.id) return;
+
       const component = document.getElementById(oldElement.id.toString());
 
       if (!component) return;
@@ -123,11 +137,12 @@ export const useOverlayElementsEvents = (canvasInitialized: CanvasInitializedTyp
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
+      if (element.layoutId !== activeLayout.current!.id) return;
 
       dispatch(removeCanvasElement(element));
       dispatch(removeElement(element));
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [canvasInitialized.elementEventsInitialized, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.elementEventsInitialized, setCanvasInitialized, dispatch]);
 };

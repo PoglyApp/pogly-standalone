@@ -29,6 +29,8 @@ import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_
 import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import Layouts from "./module_bindings/layouts";
+import { LayoutContext } from "./Contexts/LayoutContext";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -57,6 +59,7 @@ export const App: React.FC = () => {
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
   const [modals, setModals] = useState<ReactNode[]>([]);
+  const [activeLayout, setActiveLayout] = useState<Layouts | undefined>(undefined);
 
   const [spacetimeContext, setSpacetimeContext] = useState<SpacetimeContextType>();
 
@@ -86,6 +89,8 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
+
+    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
   }, [stdbInitialized, spacetime.Identity]);
 
   const router = createBrowserRouter(
@@ -181,13 +186,15 @@ export const App: React.FC = () => {
     <SpacetimeContext.Provider value={spacetimeContext}>
       <ConfigContext.Provider value={spacetime.InstanceConfig}>
         <SettingsContext.Provider value={{ settings, setSettings }}>
-          <ModalContext.Provider value={{ modals, setModals, closeModal }}>
-            {modals.map((modal) => {
-              return modal;
-            })}
-            <RouterProvider router={router} />
-            <ToastContainer />
-          </ModalContext.Provider>
+          <LayoutContext.Provider value={{ activeLayout: activeLayout, setActiveLayout: setActiveLayout }}>
+            <ModalContext.Provider value={{ modals, setModals, closeModal }}>
+              {modals.map((modal) => {
+                return modal;
+              })}
+              <RouterProvider router={router} />
+              <ToastContainer />
+            </ModalContext.Provider>
+          </LayoutContext.Provider>
         </SettingsContext.Provider>
       </ConfigContext.Provider>
     </SpacetimeContext.Provider>

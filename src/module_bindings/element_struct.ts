@@ -33,11 +33,11 @@ export namespace ElementStruct {
 	}
 
 	export type TextElement = { tag: "TextElement", value: __TextElement };
-	export const TextElement = (value: __TextElement): TextElement => { return { tag: "TextElement", value } };
+	export const TextElement = (value: __TextElement): TextElement => ({ tag: "TextElement", value });
 	export type ImageElement = { tag: "ImageElement", value: __ImageElement };
-	export const ImageElement = (value: __ImageElement): ImageElement => { return { tag: "ImageElement", value } };
+	export const ImageElement = (value: __ImageElement): ImageElement => ({ tag: "ImageElement", value });
 	export type WidgetElement = { tag: "WidgetElement", value: __WidgetElement };
-	export const WidgetElement = (value: __WidgetElement): WidgetElement => { return { tag: "WidgetElement", value } };
+	export const WidgetElement = (value: __WidgetElement): WidgetElement => ({ tag: "WidgetElement", value });
 
 	export function fromValue(value: AlgebraicValue): ElementStruct {
 		let sumValue = value.asSumValue();

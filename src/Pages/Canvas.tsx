@@ -10,11 +10,9 @@ import { useElementsEvents } from "../StDB/Hooks/useElementsEvents";
 import useFetchElement from "../StDB/Hooks/useFetchElements";
 import useFetchGuests from "../StDB/Hooks/useFetchGuests";
 import { useGuestsEvents } from "../StDB/Hooks/useGuestsEvents";
-import { initCanvasElements } from "../Store/Features/CanvasElementSlice";
-import { useAppDispatch, useAppSelector } from "../Store/Features/store";
+import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
-import { CreateElementComponent } from "../Utility/CreateElementComponent";
 import Config from "../module_bindings/config";
 import ElementData from "../module_bindings/element_data";
 import { Loading } from "../Components/General/Loading";
@@ -42,6 +40,7 @@ interface IProps {
 
 export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
+  const layoutContext = useContext(LayoutContext);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -64,9 +63,7 @@ export const Canvas = (props: IProps) => {
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
-  const [activeLayout, setActiveLayout] = useState<Layouts>();
-
-  useFetchElement(activeLayout, props.canvasInitialized, props.setCanvasInitialized);
+  useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
   useElementsEvents(
@@ -75,7 +72,7 @@ export const Canvas = (props: IProps) => {
     setSelectoTargets,
     props.canvasInitialized,
     props.setCanvasInitialized,
-    activeLayout
+    layoutContext.activeLayout
   );
 
   const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
@@ -86,10 +83,13 @@ export const Canvas = (props: IProps) => {
   useNotice(setNoticeMessage);
 
   useEffect(() => {
-    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+    if (!layoutContext.activeLayout) {
+      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
+    }
+
     setSelected(undefined);
     setSelectoTargets(() => []);
-  }, [activeLayout]);
+  }, [layoutContext.activeLayout]);
 
   useEffect(() => {
     props.setActivePage(1);
@@ -126,8 +126,8 @@ export const Canvas = (props: IProps) => {
 
   return (
     <>
-      {Object.values(props.canvasInitialized).every((init) => init === true) ? (
-        <LayoutContext.Provider value={{ activeLayout: activeLayout!, setActiveLayout: setActiveLayout }}>
+      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
+        <>
           <ElementSelectionMenu elementData={elementData} />
 
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
@@ -225,7 +225,7 @@ export const Canvas = (props: IProps) => {
             setSelected={setSelected}
             elements={elements}
           />
-        </LayoutContext.Provider>
+        </>
       ) : (
         <Loading text="Initializing Canvas" />
       )}

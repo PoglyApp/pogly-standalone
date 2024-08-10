@@ -7,10 +7,13 @@ export const useOverlayLayoutEvents = (setActiveLayout: Function) => {
   useEffect(() => {
     if (eventsInitialized) return;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const layoutParam = urlParams.get("layout");
+
     Layouts.onInsert((newLayout) => {});
 
     Layouts.onUpdate((oldLayout, newLayout) => {
-      if (oldLayout.active === false && newLayout.active === true) {
+      if (oldLayout.active === false && newLayout.active === true && !layoutParam) {
         setActiveLayout(newLayout);
       }
     });
