@@ -30,5 +30,5 @@ export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setAct
     });
 
     setEventsInitialized(true);
-  }, [eventsInitialized]);
+  }, [eventsInitialized, setActiveLayout]);
 };

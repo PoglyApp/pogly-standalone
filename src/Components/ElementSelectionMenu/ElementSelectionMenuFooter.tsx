@@ -3,14 +3,18 @@ import { Badge, Button, Link, SvgIcon } from "@mui/material";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import UpdateIcon from "@mui/icons-material/Update";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { ChangelogModal } from "../Modals/ChangelogModal";
 import { ChangelogType } from "../../Types/General/ChangelogType";
 import { GetLatestChangelogVersion, useChangeLog } from "../../Hooks/useChangeLog";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const ElementSelectionMenuFooter = () => {
   const { setModals } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
 
   const [changelog, setChangelog] = useState<ChangelogType | undefined>(undefined);
   const [latestChangelogVersion, setLatestChangelogVersion] = useState<string>("");
@@ -34,6 +38,14 @@ export const ElementSelectionMenuFooter = () => {
         latestVersion={latestChangelogVersion}
       />,
     ]);
+  };
+
+  const onLogOut = () => {
+    localStorage.removeItem("stdbConnectDomain");
+    localStorage.removeItem("stdbConnectModule");
+    localStorage.removeItem("stdbConnectModuleAuthKey");
+    Client.disconnect();
+    window.location.reload();
   };
 
   return (
@@ -68,6 +80,18 @@ export const ElementSelectionMenuFooter = () => {
             <></>
           )}
         </Button>
+      </FooterLinkContainer>
+
+      <FooterLinkContainer>
+        <LibraryBooksIcon />
+        <Link
+          href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/index.md"
+          target="_blank"
+          underline="always"
+          sx={{ paddingTop: "3px", paddingLeft: "5px", color: "#ffffffa6" }}
+        >
+          Documentation
+        </Link>
       </FooterLinkContainer>
 
       <FooterLinkContainer>
@@ -107,6 +131,19 @@ export const ElementSelectionMenuFooter = () => {
           Discord
         </Link>
       </FooterLinkContainer>
+
+      <FooterLinkContainer>
+        <LogoutIcon sx={{ color: "#ff0000c8" }} />
+
+        <Button
+          variant="text"
+          sx={{ color: "#ff0000c8", textTransform: "initial", font: "inherit", padding: "0" }}
+          onClick={onLogOut}
+        >
+          Log Out
+        </Button>
+      </FooterLinkContainer>
+
       <p style={{ margin: "0", paddingLeft: "10px", paddingBottom: "10px", fontSize: "12px" }}>
         Version: {process.env.REACT_APP_VERSION}
       </p>

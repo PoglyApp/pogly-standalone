@@ -84,6 +84,7 @@ export const App: React.FC = () => {
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
+      Client: spacetime.Client!,
       Identity: guestWithNickname,
       Elements: [],
       ElementData: [],
@@ -91,7 +92,7 @@ export const App: React.FC = () => {
     });
 
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
-  }, [stdbInitialized, spacetime.Identity]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Client, activeLayout]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(

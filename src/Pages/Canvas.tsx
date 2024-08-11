@@ -89,7 +89,7 @@ export const Canvas = (props: IProps) => {
 
     setSelected(undefined);
     setSelectoTargets(() => []);
-  }, [layoutContext.activeLayout]);
+  }, [layoutContext]);
 
   useEffect(() => {
     props.setActivePage(1);

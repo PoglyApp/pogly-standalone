@@ -11,7 +11,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
 
   useEffect(() => {
     activeLayout.current = layoutContext.activeLayout;
-  }, [layoutContext.activeLayout]);
+  }, [layoutContext]);
 
   useEffect(() => {
     if (eventsInitialized) return;
@@ -53,5 +53,5 @@ export const useLayoutEvents = (setLayouts: Function) => {
     });
 
     setEventsInitialized(true);
-  }, [eventsInitialized, setLayouts]);
+  }, [eventsInitialized, setLayouts, layoutContext]);
 };
