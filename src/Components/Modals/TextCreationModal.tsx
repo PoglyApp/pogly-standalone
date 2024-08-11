@@ -117,7 +117,6 @@ export const TextCreationModal = (props: IProps) => {
     });
 
     if (!props.editElementId) {
-      console.log(layoutContext);
       insertElement(textElement, layoutContext!.activeLayout);
     } else {
       updateTextElement(props.editElementId!, textElement);

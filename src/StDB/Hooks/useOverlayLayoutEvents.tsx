@@ -1,8 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
 
-export const useOverlayLayoutEvents = (setActiveLayout: Function) => {
+export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setActiveLayout: Function) => {
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
+  const activeLayoutRef = useRef<Layouts | undefined>(activeLayout);
+
+  useEffect(() => {
+    activeLayoutRef.current = activeLayout;
+  }, [activeLayout]);
 
   useEffect(() => {
     if (eventsInitialized) return;
@@ -18,7 +23,11 @@ export const useOverlayLayoutEvents = (setActiveLayout: Function) => {
       }
     });
 
-    Layouts.onDelete((layout) => {});
+    Layouts.onDelete((layout) => {
+      if (layout.id !== activeLayoutRef.current!.id) return;
+
+      setActiveLayout(Layouts.filterByActive(true).next().value);
+    });
 
     setEventsInitialized(true);
   }, [eventsInitialized]);

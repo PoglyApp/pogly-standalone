@@ -24,7 +24,7 @@ export const Overlay = () => {
 
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
   useOverlayElementsEvents(activeLayout!, canvasInitialized, setCanvasInitialized);
-  useOverlayLayoutEvents(setActiveLayout);
+  useOverlayLayoutEvents(activeLayout, setActiveLayout);
 
   useHeartbeatEvents(canvasInitialized);
 

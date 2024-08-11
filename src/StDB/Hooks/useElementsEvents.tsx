@@ -56,6 +56,16 @@ export const useElementsEvents = (
 
       const component = document.getElementById(oldElement.id.toString());
 
+      // LAYOUT ID CHANGE (Layout has been deleted and is being preserved)
+      if (oldElement.layoutId !== newElement.layoutId) {
+        if (component) return;
+
+        const newCanvasElement: CanvasElementType | undefined = CreateOffsetElementComponent(newElement);
+
+        dispatch(addElement(newCanvasElement.Elements));
+        dispatch(addCanvasElement(newCanvasElement));
+      }
+
       if (!component) return;
 
       // ===== GENERAL =====
@@ -124,11 +134,6 @@ export const useElementsEvents = (
         case "WidgetElement":
           const oldWidgetElement: WidgetElement = oldElement.element.value as WidgetElement;
           const newWidgetElement: WidgetElement = newElement.element.value as WidgetElement;
-
-          // UPDATE TOGGLE
-          // if (oldWidgetElement.toggle !== newWidgetElement.toggle) {
-          //   component.setAttribute("data-toggle", newWidgetElement.toggle ? "true" : "false");
-          // }
 
           // UPDATE WIDTH
           if (oldWidgetElement.width !== newWidgetElement.width) {

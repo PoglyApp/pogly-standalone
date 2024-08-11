@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
 import { toast } from "react-toastify";
+import { LayoutContext } from "../../Contexts/LayoutContext";
 
 export const useLayoutEvents = (setLayouts: Function) => {
+  const layoutContext = useContext(LayoutContext);
+
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
+  const activeLayout = useRef<Layouts>(layoutContext.activeLayout);
+
+  useEffect(() => {
+    activeLayout.current = layoutContext.activeLayout;
+  }, [layoutContext.activeLayout]);
 
   useEffect(() => {
     if (eventsInitialized) return;
@@ -38,6 +46,10 @@ export const useLayoutEvents = (setLayouts: Function) => {
     Layouts.onDelete((layout) => {
       const menuItem = document.getElementById(layout.id + "_layout");
       menuItem?.remove();
+
+      if (layout.id !== activeLayout.current.id) return;
+
+      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
     });
 
     setEventsInitialized(true);

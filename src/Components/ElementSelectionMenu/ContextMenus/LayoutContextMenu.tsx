@@ -1,9 +1,10 @@
 import { Menu, MenuItem, Paper } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
-import DeleteLayoutReducer from "../../../module_bindings/delete_layout_reducer";
 import { toast } from "react-toastify";
 import SetLayoutActiveReducer from "../../../module_bindings/set_layout_active_reducer";
+import { ModalContext } from "../../../Contexts/ModalContext";
+import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
 
 interface IProps {
   contextMenu: any;
@@ -11,6 +12,8 @@ interface IProps {
 }
 
 export const LayoutContextMenu = (props: IProps) => {
+  const { setModals } = useContext(ModalContext);
+
   const [showExamine, setShowExamine] = useState(false);
 
   const handleSetActive = () => {
@@ -18,7 +21,7 @@ export const LayoutContextMenu = (props: IProps) => {
     handleClose();
   };
 
-  const handleDeleteLayout = () => {
+  const showConfirmationModal = () => {
     if (props.contextMenu.layout.createdBy === "Server") {
       return toast.warning("Default layout cannot be deleted.", {
         position: "bottom-right",
@@ -32,8 +35,10 @@ export const LayoutContextMenu = (props: IProps) => {
       });
     }
 
-    DeleteLayoutReducer.call(props.contextMenu.layout.id, false);
-    handleClose();
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <LayoutDeletionConfirmationModal key="layoutDeletionConfirmationModal_modal" layout={props.contextMenu.layout} />,
+    ]);
   };
 
   const handleClose = () => {
@@ -63,7 +68,7 @@ export const LayoutContextMenu = (props: IProps) => {
         </Paper>
       )}
 
-      <StyledDeleteMenuItem onClick={handleDeleteLayout}>Delete</StyledDeleteMenuItem>
+      <StyledDeleteMenuItem onClick={showConfirmationModal}>Delete</StyledDeleteMenuItem>
     </Menu>
   );
 };
