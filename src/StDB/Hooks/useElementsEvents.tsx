@@ -52,7 +52,7 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
-      if (oldElement.layoutId !== activeLayout.current!.id) return;
+      if (newElement.layoutId !== activeLayout.current!.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 

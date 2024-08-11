@@ -5,7 +5,11 @@ const useFetchLayours = (setLayouts: Function) => {
   useEffect(() => {
     const fetchedLayouts = Layouts.all();
 
-    setLayouts(fetchedLayouts);
+    setLayouts(
+      fetchedLayouts.sort((a: any, b: any) => {
+        return a.id - b.id;
+      })
+    );
   }, [setLayouts]);
 };
 
