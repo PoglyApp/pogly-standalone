@@ -90,9 +90,12 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
+  }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
 
+  useEffect(() => {
+    if (!stdbInitialized) return;
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
-  }, [stdbInitialized, spacetime.Identity, spacetime.Client, activeLayout]);
+  },[activeLayout])
 
   const router = createBrowserRouter(
     createRoutesFromElements(
