@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Elements from "../../module_bindings/elements";
-import ElementStruct from "../../module_bindings/element_struct";
-import WidgetElement from "../../module_bindings/widget_element";
 
 interface ElementsState {
   elements: Elements[];
@@ -40,5 +38,4 @@ export const ElementsSlice = createSlice({
 });
 
 export default ElementsSlice.reducer;
-export const { initElements, addElement, removeElement, updateElement } =
-  ElementsSlice.actions;
+export const { initElements, addElement, removeElement, updateElement } = ElementsSlice.actions;

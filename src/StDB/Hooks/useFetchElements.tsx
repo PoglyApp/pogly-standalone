@@ -45,6 +45,8 @@ const useFetchElement = (
     const canvasElements: CanvasElementType[] = [];
 
     offsetElements.forEach((element: Elements) => {
+      if (canvasElements.filter((e: CanvasElementType) => e.Elements.id === element.id).length > 0) return;
+
       canvasElements.push(CreateElementComponent(element));
     });
 
