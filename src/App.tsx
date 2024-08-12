@@ -95,7 +95,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!stdbInitialized) return;
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
-  },[activeLayout])
+  }, [activeLayout, stdbInitialized]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
