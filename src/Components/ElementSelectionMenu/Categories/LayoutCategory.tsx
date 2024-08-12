@@ -3,7 +3,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import Layouts from "../../../module_bindings/layouts";
-import useFetchLayours from "../../../StDB/Hooks/useFetchLayouts";
+import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../../Contexts/ModalContext";
@@ -22,7 +22,7 @@ export const LayoutCategory = () => {
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  useFetchLayours(setLayouts);
+  useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
 
   const showLayoutCreationModal = () => {

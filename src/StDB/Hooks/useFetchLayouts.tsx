@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
 
-const useFetchLayours = (setLayouts: Function) => {
+const useFetchLayouts = (setLayouts: Function) => {
   useEffect(() => {
     const fetchedLayouts = Layouts.all();
 
@@ -13,4 +13,4 @@ const useFetchLayours = (setLayouts: Function) => {
   }, [setLayouts]);
 };
 
-export default useFetchLayours;
+export default useFetchLayouts;
