@@ -31,6 +31,7 @@ import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
 import Layouts from "../module_bindings/layouts";
 import { LayoutContext } from "../Contexts/LayoutContext";
+import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 
 interface IProps {
   setActivePage: Function;
@@ -89,6 +90,8 @@ export const Canvas = (props: IProps) => {
 
     setSelected(undefined);
     setSelectoTargets(() => []);
+
+    UpdateGuestSelectedElementReducer.call(0);
   }, [layoutContext]);
 
   useEffect(() => {
