@@ -35,11 +35,10 @@ export const BackupModal = (props: IProps) => {
   const [downLayout, setDownLayout] = useState<boolean>(false);
 
   useEffect(() => {
-    if(!props.download) return;
+    if (!props.download) return;
 
-    if(downElement) setDownData(true);
-
-  },[downData,downElement,downLayout]);
+    if (downElement) setDownData(true);
+  }, [downData, downElement, downLayout, props.download]);
 
   const handleOnClose = () => {
     setFile(null);
@@ -68,11 +67,11 @@ export const BackupModal = (props: IProps) => {
 
   const handleDownload = () => {
     DownloadElementData(downData, downElement, downLayout, config, modals, setModals, closeModal);
-  }
+  };
 
-  if(isOverlay) return(<></>);
+  if (isOverlay) return <></>;
 
-  if(!props.download) {
+  if (!props.download) {
     return (
       <Dialog open={true} onClose={handleOnClose}>
         <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>Import Pogly Data</DialogTitle>
@@ -140,69 +139,69 @@ export const BackupModal = (props: IProps) => {
             Select data you wish to export:
           </Typography>
           <FormControlLabel
-              componentsProps={{
-                typography: { color: "#ffffffa6" },
-              }}
-              control={
-                <Checkbox
-                  onChange={() => setDownData(!downData)}
-                  checked={downData}
-                  disabled={downElement}
-                  sx={{
-                    color: "#ffffffa6",
-                    borderColor: "#ffffffa6",
-                    "&:hover": { borderColor: "white" },
-                    "&:disabled": {
-                      borderColor: "gray",
-                      color: "gray",
-                    },
-                  }}
-                />
-              }
-              label="ElementData"
-            />
-            <FormControlLabel
-              componentsProps={{
-                typography: { color: "#ffffffa6" },
-              }}
-              control={
-                <Checkbox
-                  onChange={() => setDownElement(!downElement)}
-                  checked={downElement}
-                  sx={{
-                    color: "#ffffffa6",
-                    borderColor: "#ffffffa6",
-                    "&:hover": { borderColor: "white" },
-                    "&:disabled": {
-                      borderColor: "gray",
-                      color: "gray",
-                    },
-                  }}
-                />
-              }
-              label="Elements"
-            />
-            <FormControlLabel
-              componentsProps={{
-                typography: { color: "#ffffffa6" },
-              }}
-              control={
-                <Checkbox
-                  onChange={() => setDownLayout(!downLayout)}
-                  checked={downLayout}
-                  sx={{
-                    color: "#ffffffa6",
-                    borderColor: "#ffffffa6",
-                    "&:hover": { borderColor: "white" },
-                    "&:disabled": {
-                      borderColor: "gray",
-                      color: "gray",
-                    },
-                  }}
-                />
-              }
-              label="Layouts"
-            />
+            componentsProps={{
+              typography: { color: "#ffffffa6" },
+            }}
+            control={
+              <Checkbox
+                onChange={() => setDownData(!downData)}
+                checked={downData}
+                disabled={downElement}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  "&:disabled": {
+                    borderColor: "gray",
+                    color: "gray",
+                  },
+                }}
+              />
+            }
+            label="ElementData"
+          />
+          <FormControlLabel
+            componentsProps={{
+              typography: { color: "#ffffffa6" },
+            }}
+            control={
+              <Checkbox
+                onChange={() => setDownElement(!downElement)}
+                checked={downElement}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  "&:disabled": {
+                    borderColor: "gray",
+                    color: "gray",
+                  },
+                }}
+              />
+            }
+            label="Elements"
+          />
+          <FormControlLabel
+            componentsProps={{
+              typography: { color: "#ffffffa6" },
+            }}
+            control={
+              <Checkbox
+                onChange={() => setDownLayout(!downLayout)}
+                checked={downLayout}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  "&:disabled": {
+                    borderColor: "gray",
+                    color: "gray",
+                  },
+                }}
+              />
+            }
+            label="Layouts"
+          />
           {error !== "" && (
             <Alert
               variant="filled"

@@ -19,6 +19,7 @@ import Layouts from "../../module_bindings/layouts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteLayoutReducer from "../../module_bindings/delete_layout_reducer";
 import styled from "styled-components";
+import { toast } from "react-toastify";
 
 interface IProp {
   layout: Layouts;
@@ -45,6 +46,21 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
   }, []);
 
   const handleDeleteLayout = () => {
+    const doesLayoutStillExist = Layouts.filterById(preserveTo).next().value;
+
+    if (!doesLayoutStillExist) {
+      return toast.error("Selected layout for preserve no longer exists, select a different one and try again.", {
+        position: "bottom-right",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+
     DeleteLayoutReducer.call(props.layout.id, preserveElements, preserveTo);
     handleOnClose();
   };

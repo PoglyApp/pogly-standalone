@@ -1,27 +1,26 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, FormGroup, Button, DialogActions, Alert } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
-import { LayoutContext } from "../../Contexts/LayoutContext";
-import Layouts from "../../module_bindings/layouts";
 import AddLayoutReducer from "../../module_bindings/add_layout_reducer";
 
-interface IProps {}
-
-export const LayoutCreationModal = (props: IProps) => {
+export const LayoutCreationModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const layout = useContext(LayoutContext);
 
   const [layoutName, setLayoutName] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const handleNameChange = (text: any) => {
     if (!/^[a-z0-9]+$/i.test(text) && text !== "") {
+      setLayoutName("");
       return setError("Layout name can only contain letters and numbers.");
-    } else {
-      setError("");
+    }
+    if (text.length > 20) {
+      setLayoutName("");
+      return setError("Layout name can be only 20 characters long.");
     }
 
+    setError("");
     setLayoutName(text);
   };
 

@@ -34,7 +34,12 @@ const useFetchElement = (
     }
 
     // Fetch Elements
-    const elements = Array.from(Elements.filterByLayoutId(layout!.id));
+
+    const fetchedElements = Array.from(Elements.filterByLayoutId(layout!.id));
+
+    // This is here to fix a weird bug with SpacetimeDB Typescript SDK that only happens with Firefox where the SpacetimeDB cache doesn't update properly
+    // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"
+    const elements = removeDuplicatesKeepLast(fetchedElements);
 
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
@@ -45,7 +50,6 @@ const useFetchElement = (
     const canvasElements: CanvasElementType[] = [];
 
     offsetElements.forEach((element: Elements) => {
-
       canvasElements.push(CreateElementComponent(element));
     });
 
@@ -75,5 +79,19 @@ const elementOffsetForOverlay = (elements: Elements[]) => {
 
   return newElementArray;
 };
+
+function removeDuplicatesKeepLast(arr: Elements[]): Elements[] {
+  const seen = new Set<number>();
+
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (seen.has(arr[i].id)) {
+      arr.splice(i, 1);
+    } else {
+      seen.add(arr[i].id);
+    }
+  }
+
+  return arr;
+}
 
 export default useFetchElement;
