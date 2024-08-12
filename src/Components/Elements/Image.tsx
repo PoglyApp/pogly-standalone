@@ -28,6 +28,8 @@ export const Image = (props: IProp) => {
     if (imageElement.imageElementData.tag === "ElementDataId") {
       const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
 
+      if(!eData) return;
+      
       setImageData(eData.data);
       setImageName(eData.name);
     } else {
