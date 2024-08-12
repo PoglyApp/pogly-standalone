@@ -41,9 +41,6 @@ const useFetchElement = (
     // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"
     const elements = removeDuplicatesKeepLast(fetchedElements);
 
-    if (layout.name === "Default") {
-    }
-
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
       : elementOffsetForOverlay(elements);
