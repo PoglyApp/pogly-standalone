@@ -20,6 +20,8 @@ export const TextCategory = () => {
         textTransform: "initial",
         paddingLeft: "20px",
         fontSize: "15px",
+        justifyContent: "left",
+        width: "100%",
       }}
       onClick={showTextCreationModal}
     >

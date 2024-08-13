@@ -103,6 +103,8 @@ export const SevenTVCategory = () => {
                         sx={{
                           color: "#ffffffa6",
                           textTransform: "initial",
+                          justifyContent: "left",
+                          width: "100%",
                         }}
                         title={e.name}
                         onClick={() => AddSevenTVElementToCanvas(e)}
@@ -127,6 +129,8 @@ export const SevenTVCategory = () => {
                       sx={{
                         color: "#ffffffa6",
                         textTransform: "initial",
+                        justifyContent: "left",
+                        width: "100%",
                       }}
                       title={e.name}
                       onClick={() => AddSevenTVElementToCanvas(e)}
@@ -145,6 +149,8 @@ export const SevenTVCategory = () => {
                     sx={{
                       color: "#ffffffa6",
                       textTransform: "initial",
+                      justifyContent: "left",
+                      width: "100%",
                     }}
                     startIcon={<AddCircleOutlineIcon />}
                     title="Load more"

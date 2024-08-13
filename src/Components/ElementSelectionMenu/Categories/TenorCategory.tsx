@@ -90,6 +90,8 @@ export const TenorCategory = () => {
                       sx={{
                         color: "#ffffffa6",
                         textTransform: "initial",
+                        justifyContent: "left",
+                        width: "100%",
                       }}
                       title={e.content_description}
                       onClick={() => {
@@ -114,6 +116,8 @@ export const TenorCategory = () => {
                 sx={{
                   color: "#ffffffa6",
                   textTransform: "initial",
+                  justifyContent: "left",
+                  width: "100%",
                 }}
                 startIcon={<AddCircleOutlineIcon />}
                 title="Load more"

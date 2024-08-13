@@ -81,6 +81,8 @@ export const ImageCategory = (props: IProps) => {
             sx={{
               color: "#ffffffa6",
               textTransform: "initial",
+              justifyContent: "left",
+              width: "100%",
             }}
             onClick={showImageUploadModal}
           >
@@ -107,6 +109,8 @@ export const ImageCategory = (props: IProps) => {
                     sx={{
                       color: "#ffffffa6",
                       textTransform: "initial",
+                      justifyContent: "left",
+                      width: "100%",
                     }}
                     onClick={() => AddElementToCanvas(elementData)}
                   >

@@ -41,7 +41,7 @@ export const LayoutCategory = () => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutName>Layouts {"(" + layoutContext!.activeLayout.name + ")"}</LayoutName>
+          <LayoutName>Layouts ({layoutContext!.activeLayout.name})</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -55,6 +55,8 @@ export const LayoutCategory = () => {
             sx={{
               color: "#ffffffa6",
               textTransform: "initial",
+              justifyContent: "left",
+              width: "100%",
             }}
             onClick={showLayoutCreationModal}
           >
@@ -76,6 +78,8 @@ export const LayoutCategory = () => {
                     color: "#ffffffa6",
                     textTransform: "initial",
                     justifyContent: "left",
+                    width: "100%",
+                    border: layoutContext!.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17"
                   }}
                   onClick={() => {
                     layoutContext!.setActiveLayout(layout);
@@ -85,6 +89,7 @@ export const LayoutCategory = () => {
                   <CheckIcon
                     id={layout.id + "_layout_icon"}
                     sx={{ color: "green", marginLeft: "3px", display: `${layout.active ? "unset" : "none"}` }}
+                    titleAccess="Active Layout"
                   />
                 </Button>
               </div>
