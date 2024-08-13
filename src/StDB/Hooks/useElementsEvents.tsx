@@ -45,6 +45,8 @@ export const useElementsEvents = (
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
       if (element.layoutId !== activeLayout.current!.id) return;
 
+      console.log(element);
+
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
       dispatch(addElement(newElement.Elements));

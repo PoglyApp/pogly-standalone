@@ -25,7 +25,7 @@ export const useOverlayElementsEvents = (
   }, [layout]);
 
   useEffect(() => {
-    if (canvasInitialized.elementEventsInitialized || !layout) return;
+    if (canvasInitialized.overlayElementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;

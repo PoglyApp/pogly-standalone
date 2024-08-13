@@ -118,7 +118,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
                 }}
               >
                 {layouts?.map((layout: Layouts) => {
-                  if (layout.id === props.layout.id) return;
+                  if (layout.id === props.layout.id) return <></>;
 
                   return (
                     <MenuItem key={layout.name + "_preserve_layout"} value={layout.id}>
