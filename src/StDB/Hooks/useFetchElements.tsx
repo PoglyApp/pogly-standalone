@@ -1,37 +1,63 @@
-import { useContext, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Elements from "../../module_bindings/elements";
 import ElementData from "../../module_bindings/element_data";
 import { initData } from "../../Store/Features/ElementDataSlice";
 import { initElements } from "../../Store/Features/ElementsSlice";
 import { useAppDispatch } from "../../Store/Features/store";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
-import Config from "../../module_bindings/config";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { ConfigContext } from "../../Contexts/ConfigContext";
+import Layouts from "../../module_bindings/layouts";
+import { CanvasElementType } from "../../Types/General/CanvasElementType";
+import { CreateElementComponent } from "../../Utility/CreateElementComponent";
+import { initCanvasElements } from "../../Store/Features/CanvasElementSlice";
 
-const useFetchElement = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
+const useFetchElement = (
+  layout: Layouts | undefined,
+  canvasInitialized: CanvasInitializedType,
+  setCanvasInitialized: Function
+) => {
   const dispatch = useAppDispatch();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config = useContext(ConfigContext);
+
+  const [fetchedLayout, setFetchedLayout] = useState<Layouts>();
 
   useEffect(() => {
-    if (canvasInitialized.elementsFetchInitialized) return;
+    if (!layout) return;
+
+    const refetch = fetchedLayout && fetchedLayout.id !== layout.id;
+    if (canvasInitialized.elementsFetchInitialized && !refetch) return;
 
     // Fetch ElementData
-    const datas = ElementData.all();
-    dispatch(initData(datas));
+    if (!refetch) {
+      const datas = ElementData.all();
+      dispatch(initData(datas));
+    }
 
     // Fetch Elements
-    const elements = Elements.all();
+
+    const fetchedElements = Array.from(Elements.filterByLayoutId(layout!.id));
+
+    // This is here to fix a weird bug with SpacetimeDB Typescript SDK that only happens with Firefox where the SpacetimeDB cache doesn't update properly
+    // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"
+    const elements = removeDuplicatesKeepLast(fetchedElements);
 
     const offsetElements: Elements[] = !isOverlay
       ? elementOffsetForCanvas(elements)
-      : elementOffsetForOverlay(elements, config);
+      : elementOffsetForOverlay(elements);
 
     dispatch(initElements(offsetElements));
 
+    const canvasElements: CanvasElementType[] = [];
+
+    offsetElements.forEach((element: Elements) => {
+      canvasElements.push(CreateElementComponent(element));
+    });
+
+    dispatch(initCanvasElements(canvasElements));
+
+    setFetchedLayout(layout);
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [canvasInitialized.elementsFetchInitialized, config, isOverlay, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {
@@ -44,7 +70,7 @@ const elementOffsetForCanvas = (elements: Elements[]) => {
   return newElementArray;
 };
 
-const elementOffsetForOverlay = (elements: Elements[], config: Config) => {
+const elementOffsetForOverlay = (elements: Elements[]) => {
   const newElementArray: Elements[] = [];
 
   elements.forEach((element: Elements) => {
@@ -53,5 +79,19 @@ const elementOffsetForOverlay = (elements: Elements[], config: Config) => {
 
   return newElementArray;
 };
+
+function removeDuplicatesKeepLast(arr: Elements[]): Elements[] {
+  const seen = new Set<number>();
+
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (seen.has(arr[i].id)) {
+      arr.splice(i, 1);
+    } else {
+      seen.add(arr[i].id);
+    }
+  }
+
+  return arr;
+}
 
 export default useFetchElement;

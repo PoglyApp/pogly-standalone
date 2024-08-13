@@ -20,13 +20,17 @@ import { Loading } from "./Components/General/Loading";
 import Guests from "./module_bindings/guests";
 import { ErrorRefreshModal } from "./Components/Modals/ErrorRefreshModal";
 import { SetSubscriptions } from "./Utility/SetSubscriptions";
-import { IdentityContext } from "./Contexts/IdentityContext";
+import { SpacetimeContext } from "./Contexts/SpacetimeContext";
 import { ConfigContext } from "./Contexts/ConfigContext";
 import { SettingsContext } from "./Contexts/SettingsContext";
 import { ModalContext } from "./Contexts/ModalContext";
 import { CanvasInitializedType } from "./Types/General/CanvasInitializedType";
 import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_reducer";
 import { NotFound } from "./Pages/NotFound";
+import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
+import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import Layouts from "./module_bindings/layouts";
+import { LayoutContext } from "./Contexts/LayoutContext";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -55,6 +59,9 @@ export const App: React.FC = () => {
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
   const [modals, setModals] = useState<ReactNode[]>([]);
+  const [activeLayout, setActiveLayout] = useState<Layouts | undefined>(undefined);
+
+  const [spacetimeContext, setSpacetimeContext] = useState<SpacetimeContextType>();
 
   useGetVersionNumber(setVersionNumber);
   useGetConnectionConfig(setConnectionConfig);
@@ -71,7 +78,24 @@ export const App: React.FC = () => {
 
       setNickname(nickname);
     }
-  }, [stdbInitialized]);
+
+    // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
+    const guest = Guests.findByIdentity(spacetime.Identity!);
+    const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
+
+    setSpacetimeContext({
+      Client: spacetime.Client!,
+      Identity: guestWithNickname,
+      Elements: [],
+      ElementData: [],
+      Guests: [],
+    });
+  }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
+
+  useEffect(() => {
+    if (!stdbInitialized) return;
+    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+  }, [activeLayout, stdbInitialized]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -109,6 +133,7 @@ export const App: React.FC = () => {
           buttonText="Reload"
           titleText="Error connecting to Pogly instance!"
           contentText="This means that either the domain or module name selected are invalid. Please try again!"
+          clearSettings={true}
         />
       );
     }
@@ -127,6 +152,7 @@ export const App: React.FC = () => {
           titleText="Authentication Required"
           contentText="This Pogly Standalone instance requires authentication.
                 You either did not provide an authentication key, or it was incorrect."
+          clearSettings={true}
         />
       );
     }
@@ -161,10 +187,10 @@ export const App: React.FC = () => {
 
   // Step 8) Load Pogly
   return (
-    <>
-      <IdentityContext.Provider value={{ identity: spacetime.Identity, nickname: nickname }}>
-        <ConfigContext.Provider value={spacetime.InstanceConfig}>
-          <SettingsContext.Provider value={{ settings, setSettings }}>
+    <SpacetimeContext.Provider value={spacetimeContext}>
+      <ConfigContext.Provider value={spacetime.InstanceConfig}>
+        <SettingsContext.Provider value={{ settings, setSettings }}>
+          <LayoutContext.Provider value={{ activeLayout: activeLayout, setActiveLayout: setActiveLayout }}>
             <ModalContext.Provider value={{ modals, setModals, closeModal }}>
               {modals.map((modal) => {
                 return modal;
@@ -172,9 +198,9 @@ export const App: React.FC = () => {
               <RouterProvider router={router} />
               <ToastContainer />
             </ModalContext.Provider>
-          </SettingsContext.Provider>
-        </ConfigContext.Provider>
-      </IdentityContext.Provider>
-    </>
+          </LayoutContext.Provider>
+        </SettingsContext.Provider>
+      </ConfigContext.Provider>
+    </SpacetimeContext.Provider>
   );
 };

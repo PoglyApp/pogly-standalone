@@ -10,11 +10,9 @@ import { useElementsEvents } from "../StDB/Hooks/useElementsEvents";
 import useFetchElement from "../StDB/Hooks/useFetchElements";
 import useFetchGuests from "../StDB/Hooks/useFetchGuests";
 import { useGuestsEvents } from "../StDB/Hooks/useGuestsEvents";
-import { initCanvasElements } from "../Store/Features/CanvasElementSlice";
-import { useAppDispatch, useAppSelector } from "../Store/Features/store";
+import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
-import { CreateElementComponent } from "../Utility/CreateElementComponent";
 import Config from "../module_bindings/config";
 import ElementData from "../module_bindings/element_data";
 import { Loading } from "../Components/General/Loading";
@@ -30,6 +28,10 @@ import { ConfigContext } from "../Contexts/ConfigContext";
 import UpdateGuestPositionReducer from "../module_bindings/update_guest_position_reducer";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
+import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
+import Layouts from "../module_bindings/layouts";
+import { LayoutContext } from "../Contexts/LayoutContext";
+import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 
 interface IProps {
   setActivePage: Function;
@@ -39,8 +41,7 @@ interface IProps {
 
 export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
-
-  const dispatch = useAppDispatch();
+  const layoutContext = useContext(LayoutContext);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -63,12 +64,19 @@ export const Canvas = (props: IProps) => {
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
-  useFetchElement(props.canvasInitialized, props.setCanvasInitialized);
+  useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
-  useElementsEvents(selectoRef, setSelected, setSelectoTargets, props.canvasInitialized, props.setCanvasInitialized);
+  useElementsEvents(
+    selectoRef,
+    setSelected,
+    setSelectoTargets,
+    props.canvasInitialized,
+    props.setCanvasInitialized,
+    layoutContext.activeLayout
+  );
 
-  useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
+  const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
   useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
 
   useHeartbeatEvents(props.canvasInitialized);
@@ -76,23 +84,19 @@ export const Canvas = (props: IProps) => {
   useNotice(setNoticeMessage);
 
   useEffect(() => {
-    props.setActivePage(1);
-  }, [props]);
+    if (!layoutContext.activeLayout) {
+      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
+    }
+
+    setSelected(undefined);
+    setSelectoTargets(() => []);
+
+    UpdateGuestSelectedElementReducer.call(0);
+  }, [layoutContext]);
 
   useEffect(() => {
-    if (props.canvasInitialized.canvasInitialized) return;
-
-    // INITIALIZE CANVAS
-    const canvasElements: CanvasElementType[] = [];
-
-    elements.forEach((element: Elements) => {
-      canvasElements.push(CreateElementComponent(element));
-    });
-
-    dispatch(initCanvasElements(canvasElements));
-
-    props.setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, canvasInitialized: true }));
-  }, [props, elements, dispatch]);
+    props.setActivePage(1);
+  }, [props]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -111,9 +115,21 @@ export const Canvas = (props: IProps) => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
+  if (disconnected) {
+    return (
+      <ErrorRefreshModal
+        type="button"
+        buttonText="Reload"
+        titleText="Disconnected"
+        contentText="You have been disconnected from the Pogly instance."
+        clearSettings={false}
+      />
+    );
+  }
+
   return (
     <>
-      {Object.values(props.canvasInitialized).every((init) => init === true) ? (
+      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <>
           <ElementSelectionMenu elementData={elementData} />
 

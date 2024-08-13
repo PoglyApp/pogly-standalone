@@ -17,11 +17,12 @@ import {
 import { StyledInput } from "../StyledComponents/StyledInput";
 import styled from "styled-components";
 import WarningIcon from "@mui/icons-material/Warning";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 
 export const ImageUploadModal = () => {
-  const identityContext = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
+
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -49,7 +50,7 @@ export const ImageUploadModal = () => {
       file.target.files[0].type === "image/png" ||
       file.target.files[0].type === "image/jpg" ||
       file.target.files[0].type === "image/jpeg" ||
-      file.target.files[0].type === "image/webp" || 
+      file.target.files[0].type === "image/webp" ||
       file.target.files[0].type === "image/gif";
 
     if (!isImage) {
@@ -84,14 +85,14 @@ export const ImageUploadModal = () => {
       DataType: DataType.ImageElement as DataType,
       Data: file,
       DataFileSize: file.size / 1024, //convert to KB's
-      CreatedBy: identityContext.nickname,
+      CreatedBy: Identity.nickname,
     };
 
     insertElementData(newElementData);
     handleOnClose();
   };
 
-  if (isOverlay) return(<></>);
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={true} onClose={handleOnClose}>

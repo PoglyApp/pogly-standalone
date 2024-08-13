@@ -24,7 +24,7 @@ import { StyledInput } from "../StyledComponents/StyledInput";
 import { ElementDataType } from "../../Types/General/ElementDataType";
 import DataType from "../../module_bindings/data_type";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import ElementData from "../../module_bindings/element_data";
 import { WidgetVariableTable } from "../General/WidgetVariableTable";
@@ -58,7 +58,7 @@ interface IProps {
 }
 
 export const WidgetCreationModal = (props: IProps) => {
-  const identityContext = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [widgetName, setWidgetName] = useState<string>("");
@@ -78,7 +78,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
     StrictMode: Config.findByVersion(0)!.strictMode,
-    Permission: Permissions.findByIdentity(identityContext.identity)?.permissionLevel,
+    Permission: Permissions.findByIdentity(Identity.identity)?.permissionLevel,
   };
 
   const loadByElementDataID = useCallback(() => {
@@ -177,7 +177,7 @@ export const WidgetCreationModal = (props: IProps) => {
       Data: widgetJson,
       DataWidth: widgetWidth,
       DataHeight: widgetHeight,
-      CreatedBy: identityContext.nickname,
+      CreatedBy: Identity.nickname,
     };
 
     if (!props.editElementDataId) {

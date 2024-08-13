@@ -11,6 +11,7 @@ import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 interface IProps {
   elementData: ElementData[];
@@ -21,6 +22,7 @@ interface IProps {
 
 export const WidgetCategory = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
+  const layoutContext = useContext(LayoutContext);
 
   const showWidgetCreationModal = () => {
     setModals((oldModals: any) => [...oldModals, <WidgetCreationModal key="widgetCreation_modal" />]);
@@ -33,7 +35,8 @@ export const WidgetCategory = (props: IProps) => {
         width: elementData.dataWidth,
         height: elementData.dataHeight,
         rawData: "",
-      })
+      }),
+      layoutContext!.activeLayout
     );
   };
 
@@ -74,6 +77,8 @@ export const WidgetCategory = (props: IProps) => {
             sx={{
               color: "#ffffffa6",
               textTransform: "initial",
+              justifyContent: "left",
+              width: "100%",
             }}
             onClick={showWidgetCreationModal}
           >
@@ -97,6 +102,8 @@ export const WidgetCategory = (props: IProps) => {
                   sx={{
                     color: "#ffffffa6",
                     textTransform: "initial",
+                    justifyContent: "left",
+                    width: "100%",
                   }}
                   onClick={() => AddElementToCanvas(elementData)}
                   data-widget-selection-button={elementData.id}

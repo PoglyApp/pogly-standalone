@@ -7,16 +7,18 @@ import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeEl
 export class DeleteLayoutReducer extends Reducer
 {
 	public static reducerName: string = "DeleteLayout";
-	public static call(_layoutId: number, _preserveElements: boolean) {
-		this.getReducer().call(_layoutId, _preserveElements);
+	public static call(_layoutId: number, _preserveElements: boolean, _preserveLayoutId: number) {
+		this.getReducer().call(_layoutId, _preserveElements, _preserveLayoutId);
 	}
 
-	public call(_layoutId: number, _preserveElements: boolean) {
+	public call(_layoutId: number, _preserveElements: boolean, _preserveLayoutId: number) {
 		const serializer = this.client.getSerializer();
 		let _layoutIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
 		serializer.write(_layoutIdType, _layoutId);
 		let _preserveElementsType = AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool);
 		serializer.write(_preserveElementsType, _preserveElements);
+		let _preserveLayoutIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		serializer.write(_preserveLayoutIdType, _preserveLayoutId);
 		this.client.call("DeleteLayout", serializer);
 	}
 
@@ -27,13 +29,16 @@ export class DeleteLayoutReducer extends Reducer
 		let preserveElementsType = AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool);
 		let preserveElementsValue = AlgebraicValue.deserialize(preserveElementsType, adapter.next())
 		let preserveElements = preserveElementsValue.asBoolean();
-		return [layoutId, preserveElements];
+		let preserveLayoutIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
+		let preserveLayoutIdValue = AlgebraicValue.deserialize(preserveLayoutIdType, adapter.next())
+		let preserveLayoutId = preserveLayoutIdValue.asNumber();
+		return [layoutId, preserveElements, preserveLayoutId];
 	}
 
-	public static on(callback: (reducerEvent: ReducerEvent, _layoutId: number, _preserveElements: boolean) => void) {
+	public static on(callback: (reducerEvent: ReducerEvent, _layoutId: number, _preserveElements: boolean, _preserveLayoutId: number) => void) {
 		this.getReducer().on(callback);
 	}
-	public on(callback: (reducerEvent: ReducerEvent, _layoutId: number, _preserveElements: boolean) => void)
+	public on(callback: (reducerEvent: ReducerEvent, _layoutId: number, _preserveElements: boolean, _preserveLayoutId: number) => void)
 	{
 		this.client.on("reducer:DeleteLayout", callback);
 	}

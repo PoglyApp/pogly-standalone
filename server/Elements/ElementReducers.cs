@@ -19,7 +19,7 @@ public partial class Module
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
                 if (Config.FindByVersion(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
@@ -66,7 +66,7 @@ public partial class Module
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
                 if (Config.FindByVersion(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
@@ -112,7 +112,7 @@ public partial class Module
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
                 if (Config.FindByVersion(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             
@@ -155,7 +155,7 @@ public partial class Module
             if (elementStruct is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
                 if (Config.FindByVersion(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             

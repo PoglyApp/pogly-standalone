@@ -99,7 +99,7 @@ public partial class Module
     }
 
     [SpacetimeDB.Reducer]
-    public static void DeleteLayout(ReducerContext ctx, uint layoutId, bool preserveElements = false)
+    public static void DeleteLayout(ReducerContext ctx, uint layoutId, bool preserveElements = false, uint preserveLayoutId = 1)
     {
         string func = "DeleteLayout";
 
@@ -127,7 +127,7 @@ public partial class Module
                 if (preserveElements)
                 {
                     var newE = e;
-                    newE.LayoutId = 1;
+                    newE.LayoutId = preserveLayoutId;
                     Elements.UpdateById(e.Id, newE);
                 }
                 else

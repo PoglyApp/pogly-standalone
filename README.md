@@ -23,7 +23,7 @@
     &nbsp;
     <a href="https://github.com/clockworklabs/spacetimedb"><img src="https://img.shields.io/badge/powered_by-SpacetimeDB-000000.svg?style=flat-square" /></a>
     &nbsp;
-	<img src="https://img.shields.io/badge/version-v0.1.0_beta-9f9f9f.svg?style=flat-square" />
+	<img src="https://img.shields.io/badge/version-v0.1.1_beta-9f9f9f.svg?style=flat-square" />
     &nbsp;
     <a href="https://github.com/PoglyApp/pogly-standalone/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-50C878.svg?style=flat-square" /></a>
 </p>
@@ -33,7 +33,7 @@
     &nbsp;
     <a href="https://www.twitch.tv/poglygg"><img height="25" src="./images/social/twitch.svg" alt="Twitch" /></a>
     &nbsp;
-    <a href="https://www.youtube.com/watch?v=c19tKRKa2ik"><img height="25" src="./images/social/youtube.svg" alt="YouTube" /></a>
+    <a href="https://www.youtube.com/@PoglyApp"><img height="25" src="./images/social/youtube.svg" alt="YouTube" /></a>
     &nbsp;
     <a href="https://x.com/PoglyApp"><img height="25" src="./images/social/twitter.svg" alt="Twitter" /></a>
 </p>

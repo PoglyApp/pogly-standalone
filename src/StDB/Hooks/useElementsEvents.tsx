@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Elements from "../../module_bindings/elements";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
@@ -8,36 +8,44 @@ import ElementData from "../../module_bindings/element_data";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
 import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import Layouts from "../../module_bindings/layouts";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
   setSelected: Function,
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
-  setCanvasInitialized: Function
+  setCanvasInitialized: Function,
+  layout: Layouts | undefined
 ) => {
-  const identityContext = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
+
   const dispatch = useAppDispatch();
 
   const elementData = useRef<ElementData[]>([]);
+  const activeLayout = useRef<Layouts>();
 
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
     elementData.current = elementDataStore;
-  }, [elementDataStore]);
+    activeLayout.current = layout;
+  }, [elementDataStore, layout]);
 
   useEffect(() => {
-    if (canvasInitialized.elementEventsInitialized) return;
+    if (canvasInitialized.elementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
-      if (reducerEvent && reducerEvent.reducerName !== "AddElement") return;
+      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
+      if (element.layoutId !== activeLayout.current!.id) return;
+
+      console.log(element);
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
@@ -46,7 +54,19 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+      if (newElement.layoutId !== activeLayout.current!.id) return;
+
       const component = document.getElementById(oldElement.id.toString());
+
+      // LAYOUT ID CHANGE (Layout has been deleted and is being preserved)
+      if (oldElement.layoutId !== newElement.layoutId) {
+        if (component) return;
+
+        const newCanvasElement: CanvasElementType | undefined = CreateOffsetElementComponent(newElement);
+
+        dispatch(addElement(newCanvasElement.Elements));
+        dispatch(addCanvasElement(newCanvasElement));
+      }
 
       if (!component) return;
 
@@ -117,11 +137,6 @@ export const useElementsEvents = (
           const oldWidgetElement: WidgetElement = oldElement.element.value as WidgetElement;
           const newWidgetElement: WidgetElement = newElement.element.value as WidgetElement;
 
-          // UPDATE TOGGLE
-          // if (oldWidgetElement.toggle !== newWidgetElement.toggle) {
-          //   component.setAttribute("data-toggle", newWidgetElement.toggle ? "true" : "false");
-          // }
-
           // UPDATE WIDTH
           if (oldWidgetElement.width !== newWidgetElement.width) {
             component.style.width = newWidgetElement.width.toString();
@@ -145,7 +160,7 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerIdentity.toHexString() === identityContext.identity.toHexString() || !component) return;
+      if (reducerEvent?.callerIdentity.toHexString() === Identity.identity.toHexString() || !component) return;
 
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
@@ -171,6 +186,7 @@ export const useElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
+      if (element.layoutId !== activeLayout.current!.id) return;
 
       setSelected(null);
       dispatch(removeCanvasElement(element));
@@ -180,11 +196,12 @@ export const useElementsEvents = (
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementEventsInitialized: true }));
   }, [
     canvasInitialized.elementEventsInitialized,
-    identityContext.identity,
+    Identity.identity,
     selectoRef,
     setCanvasInitialized,
     setSelected,
     setSelectoTargets,
+    layout,
     dispatch,
   ]);
 };

@@ -20,16 +20,18 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import Fingerprint from "@mui/icons-material/Fingerprint";
-import { ElementDataUploadModal } from "./ElementDataUploadModal";
+import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Permissions from "../../module_bindings/permissions";
 import { InstancePasswordModal } from "./InstancePasswordModal";
 import Config from "../../module_bindings/config";
+import Elements from "../../module_bindings/elements";
+import Layouts from "../../module_bindings/layouts";
 
 interface IProp {
   setDebug: Function;
@@ -38,8 +40,8 @@ interface IProp {
 
 export const SettingsModal = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
-  const identity = useContext(IdentityContext);
-  const permission = Permissions.findByIdentity(identity.identity)?.permissionLevel;
+  const { Identity } = useSpacetimeContext();
+  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -83,10 +85,6 @@ export const SettingsModal = (props: IProp) => {
     closeModal("settings_modal", modals, setModals);
   }
 
-  function downloadElementData() {
-    DownloadElementData(config);
-  }
-
   const showAuthToken = () => {
     setModals((oldModals: any) => [...oldModals, <AuthTokenModal key="authToken_modal" />]);
   };
@@ -96,8 +94,12 @@ export const SettingsModal = (props: IProp) => {
   };
 
   const showUploadModal = () => {
-    setModals((oldModals: any) => [...oldModals, <ElementDataUploadModal key="elementDataUpload_modal" />]);
+    setModals((oldModals: any) => [...oldModals, <BackupModal key="backup_modal" download={false} />]);
   };
+
+  const showDownloadModal = () => {
+    setModals((oldModals: any) => [...oldModals, <BackupModal key="backup_modal" download={true} />]);
+  }
 
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
@@ -197,33 +199,37 @@ export const SettingsModal = (props: IProp) => {
             label="Stream player interactable"
           />
 
-          <Button
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            sx={{
-              color: "#ffffffa6",
-              borderColor: "#ffffffa6",
-              "&:hover": { borderColor: "white" },
-              marginTop: "10px",
-            }}
-            onClick={showUploadModal}
-          >
-            Upload Element Data
-          </Button>
+          <div style={{display:"flex"}}>
+            <Button
+              variant="outlined"
+              startIcon={<UploadIcon />}
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+                marginTop: "10px",
+                marginRight: "10px",
+              }}
+              onClick={showUploadModal}
+            >
+              Import Data
+            </Button>
 
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            sx={{
-              color: "#ffffffa6",
-              borderColor: "#ffffffa6",
-              "&:hover": { borderColor: "white" },
-              marginTop: "10px",
-            }}
-            onClick={downloadElementData}
-          >
-            Download Element Data
-          </Button>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+                marginTop: "10px",
+              }}
+              onClick={showDownloadModal}
+            >
+              Export Data
+            </Button>
+          </div>
+          
 
           <Button
             variant="outlined"
@@ -275,7 +281,7 @@ export const SettingsModal = (props: IProp) => {
               sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "280px" }}
             >
               You have an outdated Pogly version!{" "}
-              <a href="https://github.com/PoglyApp/pogly-standalone/Releases">Grab the new version here</a>.
+              <a href="https://github.com/PoglyApp/pogly-standalone/releases">Grab the new version here</a>.
             </Alert>
           )}
         </FormGroup>

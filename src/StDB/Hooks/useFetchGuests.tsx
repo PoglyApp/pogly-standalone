@@ -1,27 +1,27 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
 import { initGuests } from "../../Store/Features/GuestSlice";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
-  const identity = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!identity || canvasInitialized.guestFetchInitialized) return;
+    if (!Identity.identity || canvasInitialized.guestFetchInitialized) return;
 
     const guests = Guests.all();
 
-    const guest = guests.findIndex((g) => g.identity.toHexString() === identity.identity.toHexString());
+    const guest = guests.findIndex((g) => g.identity.toHexString() === Identity.identity.toHexString());
 
-    guests[guest].nickname = identity.nickname;
+    guests[guest].nickname = Identity.nickname;
 
     dispatch(initGuests(guests));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestFetchInitialized: true }));
-  }, [identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch]);
+  }, [Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch]);
 };
 
 export default useFetchGuests;

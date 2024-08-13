@@ -14,6 +14,7 @@ import { StyledInput } from "../../StyledComponents/StyledInput";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
+import { LayoutContext } from "../../../Contexts/LayoutContext";
 
 interface IProps {
   elementData: ElementData[];
@@ -24,6 +25,7 @@ interface IProps {
 
 export const ImageCategory = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
+  const layoutContext = useContext(LayoutContext);
 
   const [searchimage, setSearchImage] = useState<string>("");
 
@@ -37,7 +39,8 @@ export const ImageCategory = (props: IProps) => {
         imageElementData: ImageElementData.ElementDataId(elementData.id),
         width: elementData.dataWidth,
         height: elementData.dataHeight,
-      })
+      }),
+      layoutContext?.activeLayout!
     );
   };
 
@@ -78,6 +81,8 @@ export const ImageCategory = (props: IProps) => {
             sx={{
               color: "#ffffffa6",
               textTransform: "initial",
+              justifyContent: "left",
+              width: "100%",
             }}
             onClick={showImageUploadModal}
           >
@@ -104,6 +109,8 @@ export const ImageCategory = (props: IProps) => {
                     sx={{
                       color: "#ffffffa6",
                       textTransform: "initial",
+                      justifyContent: "left",
+                      width: "100%",
                     }}
                     onClick={() => AddElementToCanvas(elementData)}
                   >

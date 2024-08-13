@@ -1,13 +1,9 @@
 import Elements from "../module_bindings/elements";
 import ElementData from "../module_bindings/element_data";
 import Guests from "../module_bindings/guests";
+import Layouts from "../module_bindings/layouts";
 
-export const HandleElementContextMenu = (
-  event: any, 
-  setContextMenu: Function, 
-  contextMenu: any, 
-  element: Elements
-) => {
+export const HandleElementContextMenu = (event: any, setContextMenu: Function, contextMenu: any, element: Elements) => {
   event.preventDefault();
 
   setContextMenu(
@@ -40,12 +36,26 @@ export const HandleElementSelectionContextMenu = (
   );
 };
 
-export const HandleGuestListContextMenu = (
+export const HandleLayoutSelectionContextMenu = (
   event: any,
   setContextMenu: Function,
   contextMenu: any,
-  guest: Guests
+  layout: Layouts
 ) => {
+  event.preventDefault();
+
+  setContextMenu(
+    contextMenu === null
+      ? {
+          layout: layout,
+          mouseX: event.clientX - 3,
+          mouseY: event.clientY - 2,
+        }
+      : null
+  );
+};
+
+export const HandleGuestListContextMenu = (event: any, setContextMenu: Function, contextMenu: any, guest: Guests) => {
   event.preventDefault();
 
   setContextMenu(

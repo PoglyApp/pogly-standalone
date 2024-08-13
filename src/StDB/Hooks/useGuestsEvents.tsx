@@ -1,11 +1,11 @@
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
 import { addGuest, removeGuest, updateGuest } from "../../Store/Features/GuestSlice";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { IdentityContext } from "../../Contexts/IdentityContext";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 
@@ -14,7 +14,9 @@ export const useGuestsEvents = (
   setCanvasInitialized: Function,
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
-  const identityContext = useContext(IdentityContext);
+  const { Identity } = useSpacetimeContext();
+  const [disconnected,setDisconnected] = useState<boolean>(false);
+
   const dispatch = useAppDispatch();
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -27,7 +29,7 @@ export const useGuestsEvents = (
     });
 
     Guests.onUpdate((oldGuest, newGuest) => {
-      if (newGuest.identity.toHexString() === identityContext.identity?.toHexString()) return;
+      if (newGuest.identity.toHexString() === Identity.identity.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
       if (oldGuest.nickname === "" && newGuest.nickname !== "") {
@@ -48,10 +50,10 @@ export const useGuestsEvents = (
       // IF SELECTED ELEMENT IS UPDATED
       if (oldGuest.selectedElementId !== newGuest.selectedElementId) {
         // Handle old element
-        handleElementBorder(identityContext.identity, oldGuest.selectedElementId.toString());
+        handleElementBorder(Identity.identity, oldGuest.selectedElementId.toString());
 
         // Handle new element
-        handleElementBorder(identityContext.identity, newGuest.selectedElementId.toString());
+        handleElementBorder(Identity.identity, newGuest.selectedElementId.toString());
       }
 
       // IF CURSOR POSITION IS UPDATED
@@ -87,18 +89,25 @@ export const useGuestsEvents = (
         theme: "dark",
       });
 
-      handleElementBorder(identityContext.identity, guest.selectedElementId.toString());
+      handleElementBorder(Identity.identity, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
+
+      if(guest.identity.toHexString() === Identity.identity.toHexString())
+      {
+        setDisconnected(true);
+      }
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestEventsInitialized: true }));
   }, [
     canvasInitialized.guestEventsInitialized,
-    identityContext.identity,
+    Identity.identity,
     isOverlay,
     transformRef,
     setCanvasInitialized,
     dispatch,
   ]);
+
+  return disconnected;
 };
