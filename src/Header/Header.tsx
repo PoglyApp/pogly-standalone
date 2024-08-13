@@ -35,6 +35,8 @@ export const Header = (props: IProps) => {
   const open = Boolean(anchorEl);
 
   const changePage = (pageIndex: number, path: string) => {
+    if(props.activePage === pageIndex) return; 
+    
     props.setActivePage(pageIndex);
     navigate(path);
   };
