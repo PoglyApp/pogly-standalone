@@ -9,8 +9,10 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
   useEffect(() => {
     if (!Identity || canvasInitialized.elementEventsInitialized) return;
 
+    let internalBeat = 0;
+
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
-      //console.log(newElement.tick);
+      internalBeat = newElement.tick;
     });
   }, [Identity, canvasInitialized.elementEventsInitialized]);
 };

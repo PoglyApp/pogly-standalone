@@ -17,7 +17,7 @@ public partial class Module
             new KeepAliveWorker
             {
                 ScheduledId = 0,
-                ScheduledAt = TimeSpan.FromSeconds(15)
+                ScheduledAt = TimeSpan.FromSeconds(5)
             }.Insert();
 
             new Config
@@ -219,6 +219,24 @@ public partial class Module
             {
                 Log("AuthDoWork Error: " + e.Message, LogLevel.Error);
             }
+        }
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void HardAdjustTimer(ReducerContext ctx, int seconds, string key)
+    {
+        if (key == "DynnySmellsFunny")
+        {
+            foreach (var timer in KeepAliveWorker.Iter())
+            {
+                KeepAliveWorker.DeleteByScheduledId(timer.ScheduledId);
+            }
+
+            new KeepAliveWorker
+            {
+                ScheduledAt = TimeSpan.FromSeconds(seconds)
+            }.Insert();
+            Log($"KeepAliveTimer adjusted to {seconds}!");
         }
     }
 }
