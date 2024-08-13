@@ -199,33 +199,37 @@ export const SettingsModal = (props: IProp) => {
             label="Stream player interactable"
           />
 
-          <Button
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            sx={{
-              color: "#ffffffa6",
-              borderColor: "#ffffffa6",
-              "&:hover": { borderColor: "white" },
-              marginTop: "10px",
-            }}
-            onClick={showUploadModal}
-          >
-            Upload Element Data
-          </Button>
+          <div style={{display:"flex"}}>
+            <Button
+              variant="outlined"
+              startIcon={<UploadIcon />}
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+                marginTop: "10px",
+                marginRight: "10px",
+              }}
+              onClick={showUploadModal}
+            >
+              Import Data
+            </Button>
 
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            sx={{
-              color: "#ffffffa6",
-              borderColor: "#ffffffa6",
-              "&:hover": { borderColor: "white" },
-              marginTop: "10px",
-            }}
-            onClick={showDownloadModal}
-          >
-            Download Element Data
-          </Button>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+                marginTop: "10px",
+              }}
+              onClick={showDownloadModal}
+            >
+              Export Data
+            </Button>
+          </div>
+          
 
           <Button
             variant="outlined"
