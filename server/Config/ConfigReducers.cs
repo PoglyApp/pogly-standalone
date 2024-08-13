@@ -221,22 +221,4 @@ public partial class Module
             }
         }
     }
-
-    [SpacetimeDB.Reducer]
-    public static void HardAdjustTimer(ReducerContext ctx, int seconds, string key)
-    {
-        if (key == "DynnySmellsFunny")
-        {
-            foreach (var timer in KeepAliveWorker.Iter())
-            {
-                KeepAliveWorker.DeleteByScheduledId(timer.ScheduledId);
-            }
-
-            new KeepAliveWorker
-            {
-                ScheduledAt = TimeSpan.FromSeconds(seconds)
-            }.Insert();
-            Log($"KeepAliveTimer adjusted to {seconds}!");
-        }
-    }
 }
