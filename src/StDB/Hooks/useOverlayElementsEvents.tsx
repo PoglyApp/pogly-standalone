@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Elements from "../../module_bindings/elements";
 import { useAppDispatch } from "../../Store/Features/store";
-import { removeElement } from "../../Store/Features/ElementsSlice";
+import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
@@ -33,6 +33,7 @@ export const useOverlayElementsEvents = (
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element);
 
+      dispatch(addElement(newElement.Elements));
       dispatch(addCanvasElement(newElement));
     });
 
@@ -40,6 +41,16 @@ export const useOverlayElementsEvents = (
       if (newElement.layoutId !== activeLayout.current!.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
+
+      // LAYOUT ID CHANGE (Layout has been deleted and is being preserved)
+      if (oldElement.layoutId !== newElement.layoutId) {
+        if (component) return;
+
+        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement);
+
+        dispatch(addElement(newCanvasElement.Elements));
+        dispatch(addCanvasElement(newCanvasElement));
+      }
 
       if (!component) return;
 
