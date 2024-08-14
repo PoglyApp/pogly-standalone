@@ -86,4 +86,38 @@ static partial class Module
             Log("Encountered error with heartbeat: " + e.Message, LogLevel.Error);
         }
     }
+
+    //Dirty workaround - forgive me jesus
+    [SpacetimeDB.Reducer]
+    public static void RefreshOverlay(ReducerContext ctx)
+    {
+        try
+        {
+            new Heartbeat
+            {
+                ServerIdentity = ctx.Sender,
+                Tick = 1337
+            }.Insert();
+        }
+        catch (Exception e)
+        {
+            Log("Encountered an error forcing an overlay Refresh: " + e.Message, LogLevel.Error);
+        }
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void ClearRefreshOverlayRequests(ReducerContext ctx)
+    {
+        try
+        {
+            foreach (var request in Heartbeat.Iter())
+            {
+                if (request.Tick == 1337) Heartbeat.DeleteById(request.Id);
+            }
+        }
+        catch (Exception e)
+        {
+            Log("Encountered an error clearing overlay requests: " + e.Message, LogLevel.Error);
+        }
+    }
 }
