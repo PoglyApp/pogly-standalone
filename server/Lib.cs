@@ -95,6 +95,7 @@ static partial class Module
         {
             new Heartbeat
             {
+                Id = (uint) ctx.Time.ToUnixTimeSeconds(),
                 ServerIdentity = ctx.Sender,
                 Tick = 1337
             }.Insert();
