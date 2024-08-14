@@ -9,6 +9,7 @@ import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
 import Layouts from "../module_bindings/layouts";
 import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
+import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 
 export const Overlay = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -31,6 +32,8 @@ export const Overlay = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");
+
+    ClearRefreshOverlayRequestsReducer.call();
 
     if (layoutParam) {
       setActiveLayout(Layouts.filterByName(layoutParam).next().value);
