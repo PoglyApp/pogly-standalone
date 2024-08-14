@@ -11,10 +11,12 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import BuildIcon from "@mui/icons-material/Build";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Toolbar from "@mui/material/Toolbar";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { ModalContext } from "../Contexts/ModalContext";
 import DeleteAllElementsReducer from "../module_bindings/delete_all_elements_reducer";
 import DeleteAllElementDataReducer from "../module_bindings/delete_all_element_data_reducer";
+import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 
 interface IProps {
   activePage: Number;
@@ -35,8 +37,8 @@ export const Header = (props: IProps) => {
   const open = Boolean(anchorEl);
 
   const changePage = (pageIndex: number, path: string) => {
-    if(props.activePage === pageIndex) return; 
-    
+    if (props.activePage === pageIndex) return;
+
     props.setActivePage(pageIndex);
     navigate(path);
   };
@@ -127,6 +129,13 @@ export const Header = (props: IProps) => {
                   <DeleteIcon fontSize="small" color="error" />
                 </ListItemIcon>
                 Delete all Element Data
+              </StyledMenuItem>
+
+              <StyledMenuItem onClick={() => RefreshOverlayReducer.call()}>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" color="success" />
+                </ListItemIcon>
+                Force refresh overlay
               </StyledMenuItem>
             </Menu>
 

@@ -11,6 +11,12 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
 
     let internalBeat = 0;
 
+    Heartbeat.onInsert((beat: Heartbeat) => {
+      const isOverlay: Boolean = window.location.href.includes("/overlay");
+
+      if (isOverlay && beat.tick === 1337) window.location.reload();
+    });
+
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
       internalBeat = newElement.tick;
     });

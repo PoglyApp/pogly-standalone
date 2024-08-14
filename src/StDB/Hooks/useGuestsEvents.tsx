@@ -97,7 +97,7 @@ export const useGuestsEvents = (
 
       dispatch(removeGuest(guest));
 
-      if (guest.identity.toHexString() === Identity.identity.toHexString()) {
+      if (!isOverlay && guest.identity.toHexString() === Identity.identity.toHexString()) {
         setDisconnected(true);
       }
     });
