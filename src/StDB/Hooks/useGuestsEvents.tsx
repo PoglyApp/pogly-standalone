@@ -15,7 +15,7 @@ export const useGuestsEvents = (
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
   const { Identity } = useSpacetimeContext();
-  const [disconnected,setDisconnected] = useState<boolean>(false);
+  const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -78,6 +78,10 @@ export const useGuestsEvents = (
     });
 
     Guests.onDelete((guest, reducerEvent) => {
+      const isOverlay: Boolean = window.location.href.includes("/overlay");
+
+      if (isOverlay) window.location.reload();
+
       toast.success(`${guest.nickname === "" ? "Streamer" : guest.nickname} disconnected!`, {
         position: "bottom-right",
         autoClose: 2000,
@@ -93,8 +97,7 @@ export const useGuestsEvents = (
 
       dispatch(removeGuest(guest));
 
-      if(guest.identity.toHexString() === Identity.identity.toHexString())
-      {
+      if (guest.identity.toHexString() === Identity.identity.toHexString()) {
         setDisconnected(true);
       }
     });
