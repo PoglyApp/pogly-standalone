@@ -10,11 +10,13 @@ import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
 import Layouts from "../module_bindings/layouts";
 import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
+import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 
 export const Overlay = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
     overlayElementDataEventsInitialized: false,
     overlayElementEventsInitialized: false,
+    overlayGuestEventsInitialized: false,
   });
 
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
@@ -26,6 +28,7 @@ export const Overlay = () => {
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
   useOverlayElementsEvents(activeLayout!, canvasInitialized, setCanvasInitialized);
   useOverlayLayoutEvents(activeLayout, setActiveLayout);
+  useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
 
   useHeartbeatEvents(canvasInitialized);
 
