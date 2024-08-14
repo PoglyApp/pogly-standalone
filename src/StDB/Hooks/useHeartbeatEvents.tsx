@@ -9,8 +9,16 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
   useEffect(() => {
     if (!Identity || canvasInitialized.elementEventsInitialized) return;
 
+    let internalBeat = 0;
+
+    Heartbeat.onInsert((beat: Heartbeat) => {
+      const isOverlay: Boolean = window.location.href.includes("/overlay");
+
+      if (isOverlay && beat.tick === 1337) window.location.reload();
+    });
+
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
-      //console.log(newElement.tick);
+      internalBeat = newElement.tick;
     });
   }, [Identity, canvasInitialized.elementEventsInitialized]);
 };

@@ -28,7 +28,6 @@ import { CanvasInitializedType } from "./Types/General/CanvasInitializedType";
 import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_reducer";
 import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
-import { Identity } from "@clockworklabs/spacetimedb-sdk";
 import Layouts from "./module_bindings/layouts";
 import { LayoutContext } from "./Contexts/LayoutContext";
 

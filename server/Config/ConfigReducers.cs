@@ -17,7 +17,7 @@ public partial class Module
             new KeepAliveWorker
             {
                 ScheduledId = 0,
-                ScheduledAt = TimeSpan.FromSeconds(15)
+                ScheduledAt = TimeSpan.FromSeconds(5)
             }.Insert();
 
             new Config

@@ -9,6 +9,7 @@ export type CanvasInitializedType = {
 
   overlayElementDataEventsInitialized?: boolean;
   overlayElementEventsInitialized?: boolean;
+  overlayGuestEventsInitialized?: boolean;
 
   canvasInitialized?: boolean;
 };

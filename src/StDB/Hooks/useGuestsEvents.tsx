@@ -15,7 +15,7 @@ export const useGuestsEvents = (
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
   const { Identity } = useSpacetimeContext();
-  const [disconnected,setDisconnected] = useState<boolean>(false);
+  const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -93,8 +93,7 @@ export const useGuestsEvents = (
 
       dispatch(removeGuest(guest));
 
-      if(guest.identity.toHexString() === Identity.identity.toHexString())
-      {
+      if (guest.identity.toHexString() === Identity.identity.toHexString()) {
         setDisconnected(true);
       }
     });
