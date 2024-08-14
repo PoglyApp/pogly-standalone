@@ -80,7 +80,7 @@ export const useGuestsEvents = (
     Guests.onDelete((guest, reducerEvent) => {
       const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-      if (isOverlay) window.location.reload();
+      if (isOverlay && guest.identity.toHexString() === Identity.identity.toHexString()) window.location.reload();
 
       toast.success(`${guest.nickname === "" ? "Streamer" : guest.nickname} disconnected!`, {
         position: "bottom-right",
