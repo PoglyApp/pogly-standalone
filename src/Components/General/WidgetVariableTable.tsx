@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
@@ -7,6 +7,7 @@ import { VariableValueType } from "../../Types/General/WidgetVariableType";
 import Checkbox from "@mui/material/Checkbox";
 import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { HexColorPicker } from "react-colorful";
 
 interface Row {
   variableName: string;
@@ -21,6 +22,8 @@ interface IProps {
 
 export const WidgetVariableTable = (props: IProps) => {
   const [rows, setRows] = useState<Row[]>(props.variables);
+  const [showPickers, setShowPickers] = useState<{ [key: number]: boolean }>({});
+  const colorPickerRef = useRef<any>();
 
   useEffect(() => {
     props.setVariables(() => rows);
@@ -49,18 +52,28 @@ export const WidgetVariableTable = (props: IProps) => {
     setRows(() => newRows);
   };
 
-  const handleVariableValueChange = (index: number, event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { value, type } = event.target;
+  const handleVariableValueChange = (
+    index: number,
+    event?: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    color?: string
+  ) => {
     const newRows = [...rows];
 
-    if (event.target instanceof HTMLInputElement && type === "checkbox") {
-      newRows[index] = { ...newRows[index], variableValue: event.target.checked };
-    } else {
-      newRows[index] = { ...newRows[index], variableValue: value };
+    if (color) {
+      newRows[index] = { ...newRows[index], variableValue: color };
+    } else if (event) {
+      const { value, type } = event.target;
+
+      if (event.target instanceof HTMLInputElement && type === "checkbox") {
+        newRows[index] = { ...newRows[index], variableValue: event.target.checked };
+      } else {
+        newRows[index] = { ...newRows[index], variableValue: value };
+      }
     }
 
-    setRows(() => newRows);
+    setRows(newRows);
   };
+
   const addRow = () => {
     setRows([...rows, { variableName: "", variableType: VariableValueType.string, variableValue: "" }]);
   };
@@ -78,6 +91,13 @@ export const WidgetVariableTable = (props: IProps) => {
     newRows[targetIndex] = newRows[index];
     newRows[index] = temp;
     setRows(newRows);
+  };
+
+  const toggleColorPicker = (index: number) => {
+    setShowPickers((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
   };
 
   return (
@@ -117,6 +137,7 @@ export const WidgetVariableTable = (props: IProps) => {
                     <option value={VariableValueType.string}>String</option>
                     <option value={VariableValueType.boolean}>Boolean</option>
                     <option value={VariableValueType.toggle}>Toggle</option>
+                    <option value={VariableValueType.color}>Color</option>
                   </StyledSelect>
                 </StyledTd>
                 <StyledTd>
@@ -149,6 +170,32 @@ export const WidgetVariableTable = (props: IProps) => {
                       checked={(row.variableValue as boolean) || false}
                       onChange={(event) => handleVariableValueChange(index, event)}
                     />
+                  )}
+
+                  {row.variableType === VariableValueType.color && (
+                    <div style={{ display: "flex" }}>
+                      <ColorBox
+                        color={row.variableValue as string}
+                        onClick={() => toggleColorPicker(index)}
+                        style={{ backgroundColor: row.variableValue as string, marginRight: "10px" }}
+                      />
+                      <StyledInput
+                        type="text"
+                        name="variableValue"
+                        value={row.variableValue as string}
+                        onChange={(event) => handleVariableValueChange(index, undefined, event.target.value)}
+                        style={{ width: "125px", height: " 29px", alignSelf: "center" }}
+                      />
+                      {showPickers[index] && (
+                        <Popover>
+                          <Cover onClick={() => toggleColorPicker(index)} />
+                          <HexColorPicker
+                            color={row.variableValue as string}
+                            onChange={(color) => handleVariableValueChange(index, undefined, color)}
+                          />
+                        </Popover>
+                      )}
+                    </div>
                   )}
                 </StyledTd>
                 <StyledTd>
@@ -283,4 +330,26 @@ const ArrowContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 8px;
+`;
+
+const ColorBox = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+`;
+
+const Popover = styled.div`
+  position: absolute;
+  z-index: 2;
+`;
+
+const Cover = styled.div`
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
 `;

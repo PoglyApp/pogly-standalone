@@ -27,10 +27,17 @@ export const Widget = (props: IProp) => {
   }, [widgetElement.elementDataId, widgetElement.rawData]);
 
   const showWidgetCreationModal = () => {
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <WidgetCreationModal key="widgetCreation_modal" editElementDataId={widgetElement.elementDataId} />,
-    ]);
+    if (widgetElement.rawData !== "") {
+      setModals((oldModals: any) => [
+        ...oldModals,
+        <WidgetCreationModal key="widgetCreation_modal" editElementId={props.elements.id} />,
+      ]);
+    } else {
+      setModals((oldModals: any) => [
+        ...oldModals,
+        <WidgetCreationModal key="widgetCreation_modal" editElementDataId={widgetElement.elementDataId} />,
+      ]);
+    }
   };
 
   return (
