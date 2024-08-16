@@ -22,8 +22,9 @@ interface IProps {
 
 export const WidgetVariableTable = (props: IProps) => {
   const [rows, setRows] = useState<Row[]>(props.variables);
+
   const [showPickers, setShowPickers] = useState<{ [key: number]: boolean }>({});
-  const colorPickerRef = useRef<any>();
+  const colorInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   useEffect(() => {
     props.setVariables(() => rows);
@@ -61,6 +62,7 @@ export const WidgetVariableTable = (props: IProps) => {
 
     if (color) {
       newRows[index] = { ...newRows[index], variableValue: color };
+      colorInputRefs.current[index]!.value = color;
     } else if (event) {
       const { value, type } = event.target;
 
@@ -180,9 +182,10 @@ export const WidgetVariableTable = (props: IProps) => {
                         style={{ backgroundColor: row.variableValue as string, marginRight: "10px" }}
                       />
                       <StyledInput
+                        ref={(el) => (colorInputRefs.current[index] = el)}
                         type="text"
                         name="variableValue"
-                        value={row.variableValue as string}
+                        defaultValue={row.variableValue as string}
                         onChange={(event) => handleVariableValueChange(index, undefined, event.target.value)}
                         style={{ width: "125px", height: " 29px", alignSelf: "center" }}
                       />

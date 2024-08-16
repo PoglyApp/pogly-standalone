@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Typography,
 } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import ElementStruct from "../../module_bindings/element_struct";
@@ -24,6 +25,8 @@ import { StdbToViewportFontSize, ViewportToStdbFontSize } from "../../Utility/Co
 import UpdateTextElementTextReducer from "../../module_bindings/update_text_element_text_reducer";
 import { updateTextElement } from "../../StDB/Reducers/Update/updateTextElement";
 import { LayoutContext } from "../../Contexts/LayoutContext";
+import styled from "styled-components";
+import { HexColorPicker } from "react-colorful";
 
 interface IProps {
   editElementId?: number;
@@ -40,6 +43,9 @@ export const TextCreationModal = (props: IProps) => {
   const [fontSize, setFontSize] = useState<string>("12");
   const [color, setColor] = useState<string>("#FFFFFF");
   const [autoUpdate, setAutoUpdate] = useState<boolean>(true);
+
+  const [showPicker, setShowPicker] = useState<boolean>(false);
+  const colorInput = useRef<any>();
 
   const [error, setError] = useState<string>("");
 
@@ -96,12 +102,12 @@ export const TextCreationModal = (props: IProps) => {
 
   const handleColorChange = (color: any) => {
     if (color.length < 3) {
-      setColor("");
-      return setError("Color hex has to be at least 2 characters long.");
+      setError("Color hex has to be at least 3 characters long.");
+    } else {
+      setError("");
     }
 
     setColor(color);
-    setError("");
   };
 
   const handleOnClose = () => {
@@ -130,7 +136,7 @@ export const TextCreationModal = (props: IProps) => {
   return (
     <>
       {showModal && (
-        <Dialog open={true} onClose={handleOnClose}>
+        <Dialog open={true} onClose={handleOnClose} sx={{ "* > .MuiPaper-root": { overflow: "visible" } }}>
           <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
             {props.editElementId ? "Edit text" : "Add text"}
           </DialogTitle>
@@ -203,13 +209,31 @@ export const TextCreationModal = (props: IProps) => {
                 onChange={(text: any) => HandleFontSizeChange(text)}
                 defaultValue={fontSize}
               />
-              <StyledInput
-                focused={false}
-                label="Color"
-                color="#ffffffa6"
-                onChange={(text: any) => handleColorChange(text)}
-                defaultValue={color}
-              />
+
+              <div style={{ display: "flex" }}>
+                <ColorBox
+                  color={color}
+                  onClick={() => setShowPicker(!showPicker)}
+                  style={{ backgroundColor: color, marginRight: "10px" }}
+                />
+                <div>
+                  <Typography variant="subtitle2" color="#ffffffa6">
+                    Color
+                  </Typography>
+                  <StyledColorInput
+                    type="text"
+                    name="variableValue"
+                    value={color}
+                    onChange={(event) => handleColorChange(event.target.value)}
+                  />
+                </div>
+                {showPicker && (
+                  <Popover>
+                    <Cover onClick={() => setShowPicker(!showPicker)} />
+                    <HexColorPicker color={color} onChange={(color) => handleColorChange(color)} />
+                  </Popover>
+                )}
+              </div>
             </FormGroup>
 
             {error !== "" && (
@@ -236,7 +260,7 @@ export const TextCreationModal = (props: IProps) => {
               Cancel
             </Button>
             <Button
-              disabled={text === "" || fontSize === "" || color === "" ? true : false}
+              disabled={text === "" || fontSize === "" || color === "" || error !== "" ? true : false}
               variant="outlined"
               sx={{
                 color: "#ffffffa6",
@@ -259,3 +283,36 @@ export const TextCreationModal = (props: IProps) => {
     </>
   );
 };
+
+const StyledColorInput = styled.input`
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  background-color: #0a2a47;
+  color: #b0bec5;
+  border: 1px solid #ffffffa6;
+  border-width: 2px;
+  border-radius: 5px;
+`;
+
+const ColorBox = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ffffffa6;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+`;
+
+const Popover = styled.div`
+  position: absolute;
+  z-index: 2;
+`;
+
+const Cover = styled.div`
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+`;
