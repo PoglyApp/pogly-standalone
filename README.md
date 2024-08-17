@@ -59,6 +59,7 @@ Pogly Standalone user documentation and installation instructions are available 
 
 ## Streamers using Pogly
 - [Graycen](https://www.twitch.tv/graycen)
+- [Siormax](https://www.twitch.tv/siormax)
 - [Ashlynn](https://www.twitch.tv/ashlynn)
 - [Ssaab](https://www.twitch.tv/ssaab)
 
