@@ -12,6 +12,7 @@ import {
   AccordionDetails,
   Typography,
   Link,
+  Alert,
 } from "@mui/material";
 
 import Editor from "react-simple-code-editor";
@@ -74,6 +75,9 @@ export const WidgetCreationModal = (props: IProps) => {
   const [scriptCode, setScriptCode] = useState<string>("");
 
   const [showModal, setShowModal] = useState<Boolean>(false);
+
+  const [error, setError] = useState<string>("");
+
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
@@ -364,7 +368,16 @@ export const WidgetCreationModal = (props: IProps) => {
               <StyledAccordionDetails>
                 <StyledEditor
                   value={scriptCode}
-                  onValueChange={(code) => setScriptCode(code)}
+                  onValueChange={(code) => {
+                    if (code.includes("while(") && error === "") {
+                      setError(
+                        "WARNING! While loop detected, make sure you do NOT make a while loop that loops infinitely!"
+                      );
+                    } else {
+                      setError("");
+                    }
+                    setScriptCode(code);
+                  }}
                   highlight={(code) => hightlightWithLineNumbers(code, languages.javascript, "javascript")}
                   padding={10}
                   textareaId="codeArea"
@@ -372,6 +385,23 @@ export const WidgetCreationModal = (props: IProps) => {
                 />
               </StyledAccordionDetails>
             </StyledAccordion>
+
+            {error !== "" && (
+              <Alert
+                variant="filled"
+                severity="warning"
+                sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px" }}
+              >
+                {error}
+                <a
+                  style={{ paddingLeft: "5px" }}
+                  href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/widgetElement.md#while-dont--"
+                  target="_blank"
+                >
+                  Click here for more information
+                </a>
+              </Alert>
+            )}
           </DialogContent>
 
           <DialogActions
