@@ -27,6 +27,7 @@ import { updateTextElement } from "../../StDB/Reducers/Update/updateTextElement"
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import styled from "styled-components";
 import { HexColorPicker } from "react-colorful";
+import { GetFontFamily } from "../../Utility/GetFontFamily";
 
 interface IProps {
   editElementId?: number;
@@ -39,13 +40,16 @@ export const TextCreationModal = (props: IProps) => {
   const layoutContext = useContext(LayoutContext);
 
   const [text, setText] = useState<string>("");
-  const [font, setFont] = useState<string>("Roboto");
+
+  const [selectedFont, setSelectedFont] = useState<string>("Roboto");
+  const [useCustomFont, setUseCustomFont] = useState<boolean>(false);
+  const [customFont, setCustomFont] = useState<string>("");
   const [fontSize, setFontSize] = useState<string>("12");
+
   const [color, setColor] = useState<string>("#FFFFFF");
   const [autoUpdate, setAutoUpdate] = useState<boolean>(true);
 
   const [showPicker, setShowPicker] = useState<boolean>(false);
-  const colorInput = useRef<any>();
 
   const [error, setError] = useState<string>("");
 
@@ -64,7 +68,15 @@ export const TextCreationModal = (props: IProps) => {
     setText(textStruct.text);
     setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
     setColor(textStruct.color);
-    setFont(textStruct.font);
+
+    try {
+      const fontJson = JSON.parse(textStruct.font);
+
+      setCustomFont(fontJson.fontUrl);
+      setUseCustomFont(true);
+    } catch (error) {
+      setSelectedFont(textStruct.font);
+    }
 
     setShowModal(true);
   }, [props.editElementId]);
@@ -83,7 +95,18 @@ export const TextCreationModal = (props: IProps) => {
     }
   };
 
-  const HandleFontSizeChange = (size: any) => {
+  const handleCustomFontChange = (newFont: any) => {
+    const validUrl =
+      /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(
+        newFont
+      );
+
+    if (!validUrl) return;
+
+    setCustomFont(newFont);
+  };
+
+  const handleFontSizeChange = (size: any) => {
     const regex = new RegExp("^[0-9]+$");
 
     if (size.length < 1) {
@@ -114,12 +137,22 @@ export const TextCreationModal = (props: IProps) => {
     closeModal("textCreation_modal", modals, setModals);
   };
 
-  const handleSave = (close: boolean) => {
+  const handleSave = async (close: boolean) => {
+    let useFont = selectedFont;
+
+    if (useCustomFont) {
+      const fontFamily = await GetFontFamily(customFont);
+
+      if (!fontFamily) return setError("Could not get font family. Please make sure you provide a direct CDN URL.");
+
+      useFont = JSON.stringify({ fontUrl: customFont, fontFamily: fontFamily });
+    }
+
     const textElement: ElementStruct = ElementStruct.TextElement({
       text: text,
       size: ViewportToStdbFontSize(parseInt(fontSize)).fontSize,
       color: color,
-      font: font,
+      font: useFont,
     });
 
     if (!props.editElementId) {
@@ -150,63 +183,69 @@ export const TextCreationModal = (props: IProps) => {
                 defaultValue={text}
               />
 
-              {props.editElementId ? (
+              <FormControl fullWidth sx={{ "&:hover": { borderColor: "#ffffffa6 !important" } }}>
+                {!useCustomFont ? (
+                  <>
+                    <InputLabel id="fontSelectLabel" sx={{ color: "#ffffffa6" }}>
+                      Font
+                    </InputLabel>
+                    <Select
+                      labelId="fontSelectLabel"
+                      id="fontSelectLabel"
+                      value={selectedFont}
+                      label="Font"
+                      onChange={(event) => setSelectedFont(event.target.value)}
+                      variant="outlined"
+                      sx={{
+                        "label + &": { color: "#ffffffa6" },
+                        ".MuiOutlinedInput-notchedOutline ": { borderColor: "#ffffffa6", borderWidth: "2px" },
+                        ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+                        "&:hover": {
+                          "&& fieldset": {
+                            borderColor: "#ffffffa6",
+                          },
+                        },
+                      }}
+                    >
+                      {fonts.map((_font: string) => {
+                        return (
+                          <MenuItem key={_font} value={_font}>
+                            {_font}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </>
+                ) : (
+                  <StyledInput
+                    focused={false}
+                    label="Font URL"
+                    color="#ffffffa6"
+                    defaultValue={customFont}
+                    onChange={(text: any) => handleCustomFontChange(text)}
+                  />
+                )}
+
                 <FormControlLabel
                   componentsProps={{
                     typography: { color: "#ffffffa6" },
                   }}
                   control={
                     <Checkbox
-                      sx={{ color: "#ffffffa6", height: "20px" }}
-                      onChange={() => {
-                        setAutoUpdate((autoUpdate) => !autoUpdate);
-                      }}
-                      defaultChecked={autoUpdate}
-                      value={autoUpdate}
+                      onChange={() => setUseCustomFont(!useCustomFont)}
+                      checked={useCustomFont}
+                      sx={{ color: "#ffffffa6" }}
                     />
                   }
-                  label="Live update"
+                  label="Use custom font"
                 />
-              ) : (
-                <></>
-              )}
-
-              <FormControl fullWidth sx={{ "&:hover": { borderColor: "#ffffffa6 !important" } }}>
-                <InputLabel id="fontSelectLabel" sx={{ color: "#ffffffa6" }}>
-                  Font
-                </InputLabel>
-                <Select
-                  labelId="fontSelectLabel"
-                  id="fontSelectLabel"
-                  value={font}
-                  label="Font"
-                  onChange={(event) => setFont(event.target.value)}
-                  variant="outlined"
-                  sx={{
-                    "label + &": { color: "#ffffffa6" },
-                    ".MuiOutlinedInput-notchedOutline ": { borderColor: "#ffffffa6", borderWidth: "2px" },
-                    ".MuiSvgIcon-root": { fill: "#ffffffa6" },
-                    "&:hover": {
-                      "&& fieldset": {
-                        borderColor: "#ffffffa6",
-                      },
-                    },
-                  }}
-                >
-                  {fonts.map((_font: string) => {
-                    return (
-                      <MenuItem key={_font} value={_font}>
-                        {_font}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
               </FormControl>
+
               <StyledInput
                 focused={false}
                 label="Font size"
                 color="#ffffffa6"
-                onChange={(text: any) => HandleFontSizeChange(text)}
+                onChange={(text: any) => handleFontSizeChange(text)}
                 defaultValue={fontSize}
               />
 
@@ -248,6 +287,25 @@ export const TextCreationModal = (props: IProps) => {
           </DialogContent>
 
           <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
+            {props.editElementId && (
+              <FormControlLabel
+                componentsProps={{
+                  typography: { color: "#ffffffa6", width: "84px" },
+                }}
+                control={
+                  <Checkbox
+                    sx={{ color: "#ffffffa6", height: "20px", width: "30px", paddingLeft: "10px", marginLeft: "20px" }}
+                    onChange={() => {
+                      setAutoUpdate((autoUpdate) => !autoUpdate);
+                    }}
+                    defaultChecked={autoUpdate}
+                    value={autoUpdate}
+                  />
+                }
+                label="Live update"
+              />
+            )}
+
             <Button
               variant="outlined"
               sx={{

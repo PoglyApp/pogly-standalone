@@ -1,8 +1,9 @@
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import Elements from "../../module_bindings/elements";
 import TextElement from "../../module_bindings/text_element";
 import { TextCreationModal } from "../Modals/TextCreationModal";
+import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 
 interface IProp {
   Tag: string;
@@ -18,6 +19,13 @@ export const Text = (props: IProp) => {
   const textElement: TextElement = props.elements.element.value as TextElement;
 
   const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const fontJSON = JSON.parse(textElement.font);
+      ApplyCustomFont(fontJSON, targetRef.current);
+    } catch (error) {}
+  }, [textElement.font]);
 
   const showTextCreationModal = () => {
     setModals((oldModals: any) => [

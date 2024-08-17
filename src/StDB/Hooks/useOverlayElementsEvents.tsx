@@ -10,6 +10,7 @@ import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
+import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 
 export const useOverlayElementsEvents = (
   layout: Layouts,
@@ -95,7 +96,12 @@ export const useOverlayElementsEvents = (
 
           // UPDATE FONT
           if (oldTextElement.font !== newTextElement.font) {
-            component.style.fontFamily = newTextElement.font;
+            try {
+              const fontJSON = JSON.parse(newTextElement.font);
+              ApplyCustomFont(fontJSON, component);
+            } catch (error) {
+              component.style.fontFamily = newTextElement.font;
+            }
           }
           break;
 

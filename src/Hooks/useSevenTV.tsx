@@ -6,7 +6,12 @@ import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import { ConfigContext } from "../Contexts/ConfigContext";
 import SevenTVUserType from "../Types/SevenTVTypes/SevenTVUserType";
 
-export const useSevenTV = (setEmotes: Function, setTwitchId: Function, sevenTVInitialized: boolean, setSevenTVInitialized: Function) => {
+export const useSevenTV = (
+  setEmotes: Function,
+  setTwitchId: Function,
+  sevenTVInitialized: boolean,
+  setSevenTVInitialized: Function
+) => {
   const config: Config = useContext(ConfigContext);
 
   const [streamerIdPromise, setStreamerIdPromise] = useState<Promise<UserId>>();
@@ -15,13 +20,13 @@ export const useSevenTV = (setEmotes: Function, setTwitchId: Function, sevenTVIn
   const [streamerEmotePromise, setStreamerEmotePromise] = useState<Promise<Emote[]>>();
   const [streamerEmotes, setStreamerEmotes] = useState<Emote[]>();
 
-  useEffect(() => {    
-    if(sevenTVInitialized) return;
+  useEffect(() => {
+    if (sevenTVInitialized) return;
     setStreamerIdPromise(SevenTVWrap.GetSevenTVId(config.streamName));
   }, [sevenTVInitialized, setStreamerIdPromise, config.streamName]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
+    if (sevenTVInitialized) return;
     streamerIdPromise?.then((p) => {
       if (!p.data) return;
       setStreamerId(p.data.users[0].id);
@@ -30,7 +35,7 @@ export const useSevenTV = (setEmotes: Function, setTwitchId: Function, sevenTVIn
   }, [sevenTVInitialized, streamerIdPromise]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
+    if (sevenTVInitialized) return;
     if (!streamerId) return;
 
     if (streamerId === "000000000000000000000000") {
@@ -45,7 +50,7 @@ export const useSevenTV = (setEmotes: Function, setTwitchId: Function, sevenTVIn
   }, [sevenTVInitialized, setSevenTVInitialized, streamerId]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
+    if (sevenTVInitialized) return;
     streamerEmotePromise?.then((p) => {
       if (!p) return;
 
@@ -54,25 +59,27 @@ export const useSevenTV = (setEmotes: Function, setTwitchId: Function, sevenTVIn
   }, [sevenTVInitialized, streamerEmotePromise]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
+    if (sevenTVInitialized) return;
     twitchIdPromise?.then((p) => {
       if (!p) return;
 
+      if ((p as any).status_code === 404 || !p.connections) return;
+
       setTwitchId(p.connections.find((c) => c.platform === "TWITCH")?.id);
     });
-  }, [setTwitchId, sevenTVInitialized, twitchIdPromise])
+  }, [setTwitchId, sevenTVInitialized, twitchIdPromise]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
+    if (sevenTVInitialized) return;
     if (!streamerEmotes) return;
 
     setEmotes(streamerEmotes);
   }, [sevenTVInitialized, streamerEmotes, setEmotes]);
 
   useEffect(() => {
-    if(sevenTVInitialized) return;
-    if(streamerId && streamerEmotes) {
+    if (sevenTVInitialized) return;
+    if (streamerId && streamerEmotes) {
       setSevenTVInitialized(true);
     }
-  },[setSevenTVInitialized, sevenTVInitialized, streamerId,streamerEmotes]);
+  }, [setSevenTVInitialized, sevenTVInitialized, streamerId, streamerEmotes]);
 };

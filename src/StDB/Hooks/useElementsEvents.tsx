@@ -15,6 +15,7 @@ import Selecto from "react-selecto";
 import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
+import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -127,8 +128,14 @@ export const useElementsEvents = (
 
           // UPDATE FONT
           if (oldTextElement.font !== newTextElement.font) {
-            component.style.fontFamily = newTextElement.font;
+            try {
+              const fontJSON = JSON.parse(newTextElement.font);
+              ApplyCustomFont(fontJSON, component);
+            } catch (error) {
+              component.style.fontFamily = newTextElement.font;
+            }
           }
+
           break;
 
         case "WidgetElement":
