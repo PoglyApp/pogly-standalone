@@ -59,7 +59,7 @@ public partial class Module
         public int Ceiling;
     }
 
-    private const string SEVEN_TV_TENOR_REGEX = @"^https?:\/\/(www\.)?cdn\.7tv\.app(?:\/.*)?$|^https?:\/\/(www\.)?media\.tenor\.com(?:\/.*)?$";
+    private const string SEVEN_TV_TENOR_REGEX = @"^https?:\/\/(www\.)?cdn\.7tv\.app(?:\/.*)?$|^https?:\/\/(www\.)?media\.tenor\.com(?:\/.*)?$|^https?:\/\/(www\.)?cdn\.betterttv\.net(?:\/.*)?$";
 
     private const string HTML_TAG_REGEX = @"<[^>]*>";
 }

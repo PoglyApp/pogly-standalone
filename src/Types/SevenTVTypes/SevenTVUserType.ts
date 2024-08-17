@@ -1,3 +1,5 @@
+import SevenTVConnections from "./SevenTVConnections";
+
 export default interface SevenTVUserType {
   id: string;
   username: string;
@@ -14,5 +16,5 @@ export default interface SevenTVUserType {
   }[];
   editors: any[];
   roles: any[];
-  connections: any[];
+  connections: SevenTVConnections[];
 }

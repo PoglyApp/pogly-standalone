@@ -1,6 +1,6 @@
-import Emote from "./EmoteType";
+import Emote from "./SevenTVEmoteType";
 
-export default interface EmoteSetType {
+export default interface SevenTVEmoteSetType {
   id: string;
   name: string;
   flags: number;

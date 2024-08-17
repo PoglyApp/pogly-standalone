@@ -1,5 +1,4 @@
-import { ReactNode } from "react";
-import Emote from "../Types/SevenTVTypes/EmoteType";
+import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import User from "../Types/SevenTVTypes/SevenTVUserType";
 import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
 
@@ -60,7 +59,7 @@ export class SevenTVWrapper {
     };
   }
 
-  public async GetTwitchId(username: string): Promise<UserId> {
+  public async GetSevenTVId(username: string): Promise<UserId> {
     const data = this.GqlApiPOST({
       operationName: "SearchUsers",
       variables: {
