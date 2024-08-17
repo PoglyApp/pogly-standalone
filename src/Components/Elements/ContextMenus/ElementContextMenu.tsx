@@ -44,7 +44,8 @@ export const ElementContextMenu = (props: IProps) => {
   const [widgetVariables, setWidgetVariables] = useState<WidgetVariableType[] | null>(null);
   const locked = document.getElementById(selectedElement?.id.toString() || "null")?.getAttribute("data-locked");
 
-  const element = Elements.findById(selectedElement?.id || -1);
+  let element: Elements | undefined;
+  if(selectedElement) element = Elements.findById(selectedElement.id);
 
   useEffect(() => {
     if (selectedElement?.element.tag !== "WidgetElement") return;
@@ -242,7 +243,7 @@ export const ElementContextMenu = (props: IProps) => {
               <StyledMenuItem value={"Vertical"}>
                 <Slider
                   size="small"
-                  defaultValue={element!.transparency * 100}
+                  defaultValue={selectedElement.transparency}
                   aria-label="Small"
                   valueLabelDisplay="on"
                   onChange={(event, number) => handleTransparency(selectedElement, number)}
