@@ -81,6 +81,10 @@ export const TextCreationModal = (props: IProps) => {
     setShowModal(true);
   }, [props.editElementId]);
 
+  useEffect(() => {
+    setError("");
+  }, [useCustomFont]);
+
   const handleTextChange = (newText: any) => {
     if (newText.length < 1) {
       setText("");
