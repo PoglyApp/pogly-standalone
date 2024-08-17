@@ -76,7 +76,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const [showModal, setShowModal] = useState<Boolean>(false);
 
-  const [error, setError] = useState<string>("");
+  const [showWarning, setShowWarning] = useState<boolean>(false);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -369,12 +369,10 @@ export const WidgetCreationModal = (props: IProps) => {
                 <StyledEditor
                   value={scriptCode}
                   onValueChange={(code) => {
-                    if (code.includes("while(") && error === "") {
-                      setError(
-                        "WARNING! While loop detected, make sure you do NOT make a while loop that loops infinitely!"
-                      );
+                    if (code.includes("while")) {
+                      setShowWarning(true);
                     } else {
-                      setError("");
+                      setShowWarning(false);
                     }
                     setScriptCode(code);
                   }}
@@ -386,13 +384,13 @@ export const WidgetCreationModal = (props: IProps) => {
               </StyledAccordionDetails>
             </StyledAccordion>
 
-            {error !== "" && (
+            {showWarning && (
               <Alert
                 variant="filled"
                 severity="warning"
                 sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px" }}
               >
-                {error}
+                WARNING! While loop detected, make sure you do NOT make a while loop that loops infinitely!
                 <a
                   style={{ paddingLeft: "5px" }}
                   href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/widgetElement.md#while-dont--"
