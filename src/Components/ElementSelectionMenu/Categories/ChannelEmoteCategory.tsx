@@ -32,26 +32,28 @@ export const ChannelEmoteCategory = () => {
   const [maxDisplayed, setMaxDisplayed] = useState<number>(10);
 
   useSevenTV(setSevenTVEmotes, setTwitchId, sevenTVInitialized, setSevenTVInitialized);
-  useBetterTV(twitchId,setBetterTVEmotes, betterTVInitialized, setBetterTVInitialized);
+  useBetterTV(twitchId, setBetterTVEmotes, betterTVInitialized, setBetterTVInitialized);
 
   useEffect(() => {
     if (sevenTVEmotes.length < 1) return;
     setShownEmotes(() => []);
 
     const selectedChannelEmotes: ChannelEmote[] = [];
-    const range: number = maxDisplayed - 1 > sevenTVEmotes.length + betterTVEmotes.length ? sevenTVEmotes.length + betterTVEmotes.length : maxDisplayed - 1;
+    const range: number =
+      maxDisplayed - 1 > sevenTVEmotes.length + betterTVEmotes.length
+        ? sevenTVEmotes.length + betterTVEmotes.length
+        : maxDisplayed - 1;
 
     for (let i = 0; i < range; i++) {
-      if(i <= sevenTVEmotes.length - 1)
-      {
+      if (i <= sevenTVEmotes.length - 1) {
         selectedChannelEmotes.push({
           type: "7tv",
-          emote: sevenTVEmotes[i]
+          emote: sevenTVEmotes[i],
         });
       } else {
         selectedChannelEmotes.push({
           type: "bttv",
-          emote: betterTVEmotes[i-sevenTVEmotes.length]
+          emote: betterTVEmotes[i - sevenTVEmotes.length],
         });
       }
     }
@@ -103,9 +105,7 @@ export const ChannelEmoteCategory = () => {
           color: "#ffffffa6",
         }}
       >
-        <SvgIcon sx={{ marginRight: "5px" }}>
-          {SevenTVIcon(true)}
-        </SvgIcon>
+        <SvgIcon sx={{ marginRight: "5px" }}>{SevenTVIcon(true)}</SvgIcon>
         <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Channel Emotes</span>
       </AccordionSummary>
       <AccordionDetails
@@ -137,7 +137,7 @@ export const ChannelEmoteCategory = () => {
                         onClick={() => AddSevenTVElementToCanvas(e)}
                       >
                         <ElementIcon src={"https://cdn.7tv.app/emote/" + e.id + "/3x.webp"} alt={e.name} />
-                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px"}}>
+                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
                           {SevenTVIcon(true)}
                         </SvgIcon>
                         {e.name.length > 10 ? e.name.substring(0, 10) + "..." : e.name}
@@ -164,10 +164,8 @@ export const ChannelEmoteCategory = () => {
                         onClick={() => AddBetterTVElementToCanvas(e)}
                       >
                         <ElementIcon src={"https://cdn.betterttv.net/emote/" + e.id + "/3x.webp"} alt={e.code} />
-                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px"}}>
-                          {BetterTVIcon()}
-                        </SvgIcon>
-                        {e.code.length > 10 ? e.code.substring(0,10) + "..." : e.code}
+                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>{BetterTVIcon()}</SvgIcon>
+                        {e.code.length > 10 ? e.code.substring(0, 10) + "..." : e.code}
                       </Button>
                       <br />
                     </div>
@@ -180,7 +178,7 @@ export const ChannelEmoteCategory = () => {
           ) : (
             <>
               {shownEmotes.map((e) => {
-                switch(e.type) {
+                switch (e.type) {
                   case "7tv":
                     return (
                       <div key={(e.emote as SevenTVEmote).id}>
@@ -194,16 +192,20 @@ export const ChannelEmoteCategory = () => {
                           title={(e.emote as SevenTVEmote).name}
                           onClick={() => AddSevenTVElementToCanvas(e.emote as SevenTVEmote)}
                         >
-                          <ElementIcon src={"https://cdn.7tv.app/emote/" + (e.emote as SevenTVEmote).id + "/3x.webp"} alt={(e.emote as SevenTVEmote).name} />
-                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px"}}>
-                              {SevenTVIcon(false)}
+                          <ElementIcon
+                            src={"https://cdn.7tv.app/emote/" + (e.emote as SevenTVEmote).id + "/3x.webp"}
+                            alt={(e.emote as SevenTVEmote).name}
+                          />
+                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
+                            {SevenTVIcon(false)}
                           </SvgIcon>
-                          {(e.emote as SevenTVEmote).name.length > 10 ? (e.emote as SevenTVEmote).name.substring(0, 10) + "..." : (e.emote as SevenTVEmote).name}
+                          {(e.emote as SevenTVEmote).name.length > 10
+                            ? (e.emote as SevenTVEmote).name.substring(0, 10) + "..."
+                            : (e.emote as SevenTVEmote).name}
                         </Button>
                         <br />
                       </div>
                     );
-                    break;
                   case "bttv":
                     return (
                       <div key={(e.emote as BetterTVEmote).id}>
@@ -217,16 +219,20 @@ export const ChannelEmoteCategory = () => {
                           title={(e.emote as BetterTVEmote).code}
                           onClick={() => AddBetterTVElementToCanvas(e.emote as BetterTVEmote)}
                         >
-                          <ElementIcon src={"https://cdn.betterttv.net/emote/" + (e.emote as BetterTVEmote).id + "/3x.webp"} alt={(e.emote as BetterTVEmote).code} />
-                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px"}}>
-                              {BetterTVIcon()}
-                          </SvgIcon>
-                          {(e.emote as BetterTVEmote).code.length > 10 ? " " + (e.emote as BetterTVEmote).code.substring(0,10) + "..." : " " + (e.emote as BetterTVEmote).code}
+                          <ElementIcon
+                            src={"https://cdn.betterttv.net/emote/" + (e.emote as BetterTVEmote).id + "/3x.webp"}
+                            alt={(e.emote as BetterTVEmote).code}
+                          />
+                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>{BetterTVIcon()}</SvgIcon>
+                          {(e.emote as BetterTVEmote).code.length > 10
+                            ? " " + (e.emote as BetterTVEmote).code.substring(0, 10) + "..."
+                            : " " + (e.emote as BetterTVEmote).code}
                         </Button>
                         <br />
                       </div>
                     );
-                    break;
+                  default:
+                    return <></>;
                 }
               })}
               {maxDisplayed - 1 < sevenTVEmotes.length + betterTVEmotes.length && (

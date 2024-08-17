@@ -32,6 +32,8 @@ import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
 import Layouts from "../module_bindings/layouts";
 import { LayoutContext } from "../Contexts/LayoutContext";
 import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
+import { useHotkeys } from "reakeys";
+import { UserInputHandler } from "../Utility/UserInputHandler";
 
 interface IProps {
   setActivePage: Function;
@@ -82,6 +84,8 @@ export const Canvas = (props: IProps) => {
   useHeartbeatEvents(props.canvasInitialized);
 
   useNotice(setNoticeMessage);
+
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {

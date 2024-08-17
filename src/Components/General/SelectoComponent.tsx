@@ -55,6 +55,8 @@ export const SelectoComponent = (props: IProp) => {
 
         const anyLockedElements = e.selected.length - unlockedElements.length;
 
+        if (e.selected.length === 0) props.setSelected(undefined);
+
         if (e.selected.length === 1) {
           const selectedElement = props.elements.filter(
             (element: Elements) => element.id === parseInt(e.selected[0].id)
