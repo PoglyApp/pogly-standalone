@@ -288,7 +288,7 @@ export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVa
     elementDataJson.variables[variableIndex].variableValue = !elementDataJson.variables[variableIndex].variableValue;
 
     UpdateWidgetElementRawDataReducer.call(selectedElementId, JSON.stringify(elementDataJson));
-    UpdateWidgetElementDataIdReducer.call(selectedElementId, -1);
+    UpdateWidgetElementDataIdReducer.call(selectedElementId, elementData.id);
   }
 
   handleClose();

@@ -162,7 +162,6 @@ export const WidgetCreationModal = (props: IProps) => {
       );
 
       (widgetStruct.value as WidgetElement).rawData = widgetJson;
-      (widgetStruct.value as WidgetElement).elementDataId = -1;
 
       updateElementStruct(props.editElementId, widgetStruct);
 
