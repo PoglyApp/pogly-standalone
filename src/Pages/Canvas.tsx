@@ -37,7 +37,6 @@ import { UserInputHandler } from "../Utility/UserInputHandler";
 import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
-import { Backdrop } from "@mui/material";
 
 interface IProps {
   setActivePage: Function;
@@ -143,7 +142,7 @@ export const Canvas = (props: IProps) => {
       {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <>
           <Dropzone
-            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals, false)}
+            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
             noClick={true}
             onDragEnter={() => setisDroppingSelectionMenu(true)}
             onDragLeave={() => setisDroppingSelectionMenu(false)}
