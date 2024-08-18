@@ -13,7 +13,7 @@ export const GetFontFamily = async (fontURL: string) => {
       return null;
     }
   } catch (error) {
-    console.log("Failed to get font famnily:", error);
+    console.log("Failed to get font family:", error);
     return null;
   }
 };
