@@ -59,6 +59,7 @@ import UpdateWidgetElementWidthReducer from "../module_bindings/update_widget_el
 import UpdateAuthenticationKeyReducer from "../module_bindings/update_authentication_key_reducer";
 import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
+import KickGuestReducer from "../module_bindings/kick_guest_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -126,7 +127,8 @@ const useStDB = (
       AddElementToLayoutReducer,
       UpdateAuthenticationKeyReducer,
       RefreshOverlayReducer,
-      ClearRefreshOverlayRequestsReducer
+      ClearRefreshOverlayRequestsReducer,
+      KickGuestReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";

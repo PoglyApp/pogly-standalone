@@ -15,9 +15,12 @@ import Selecto from "react-selecto";
 import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
+import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
+import { SelectedType } from "../../Types/General/SelectedType";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
+  selected: SelectedType | undefined,
   setSelected: Function,
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
@@ -30,13 +33,15 @@ export const useElementsEvents = (
 
   const elementData = useRef<ElementData[]>([]);
   const activeLayout = useRef<Layouts>();
+  const selectedElement = useRef<SelectedType | undefined>();
 
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
     elementData.current = elementDataStore;
     activeLayout.current = layout;
-  }, [elementDataStore, layout]);
+    selectedElement.current = selected;
+  }, [elementDataStore, layout, selected]);
 
   useEffect(() => {
     if (canvasInitialized.elementEventsInitialized || !layout) return;
@@ -127,8 +132,14 @@ export const useElementsEvents = (
 
           // UPDATE FONT
           if (oldTextElement.font !== newTextElement.font) {
-            component.style.fontFamily = newTextElement.font;
+            try {
+              const fontJSON = JSON.parse(newTextElement.font);
+              ApplyCustomFont(fontJSON, component);
+            } catch (error) {
+              component.style.fontFamily = newTextElement.font;
+            }
           }
+
           break;
 
         case "WidgetElement":
@@ -149,7 +160,6 @@ export const useElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("data-widget-element-data-id", "-1");
             component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
           }
           break;
@@ -186,7 +196,8 @@ export const useElementsEvents = (
       if (!reducerEvent) return;
       if (element.layoutId !== activeLayout.current!.id) return;
 
-      setSelected(null);
+      if (selectedElement.current && selectedElement.current.Elements.id === element.id) setSelected(null);
+
       dispatch(removeCanvasElement(element));
       dispatch(removeElement(element));
     });

@@ -159,6 +159,7 @@ const SelectionMenuFooterContainer = styled.div`
   align-content: end;
 
   padding-top: 15px;
+  z-index: 2;
 
   color: #ffffffa6;
   background-color: #001529;

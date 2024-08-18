@@ -27,10 +27,10 @@ export const Widget = (props: IProp) => {
   }, [widgetElement.elementDataId, widgetElement.rawData]);
 
   const showWidgetCreationModal = () => {
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <WidgetCreationModal key="widgetCreation_modal" editElementDataId={widgetElement.elementDataId} />,
-    ]);
+      setModals((oldModals: any) => [
+        ...oldModals,
+        <WidgetCreationModal key="widgetCreation_modal" editElementId={props.elements.id} />,
+      ]);
   };
 
   return (
@@ -57,7 +57,7 @@ export const Widget = (props: IProp) => {
         scrolling="no"
         width="100%"
         height="100%"
-        data-widget-element-data-id={widgetElement.rawData === "" ? widgetElement.elementDataId : -1}
+        data-widget-element-data-id={widgetElement.elementDataId}
         title="widget"
       />
     </div>

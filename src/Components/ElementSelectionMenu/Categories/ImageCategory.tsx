@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Button, Tooltip } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Button, Skeleton, Tooltip } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ImageIcon from "@mui/icons-material/Image";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -124,6 +124,14 @@ export const ImageCategory = (props: IProps) => {
 
           return null;
         })}
+
+        <Skeleton
+          id="imageSkeleton"
+          variant="rounded"
+          width={186}
+          height={44}
+          sx={{ bgcolor: "#393434", display: "none" }}
+        />
       </AccordionDetails>
     </Accordion>
   );

@@ -36,11 +36,11 @@ export const StyledInput = (props: IProps) => {
               color: props.color,
             },
           },
-          zIndex: "20000",
         },
       }}
       onChange={(event: any) => props.onChange(event.target.value)}
       type={props.password ? "password" : "text"}
+      autoComplete="one-time-code"
     />
   );
 };

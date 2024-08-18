@@ -1,4 +1,4 @@
-export default interface EmoteType {
+export default interface SevenTVEmoteType {
   id: string;
   name: string;
   flags: number;

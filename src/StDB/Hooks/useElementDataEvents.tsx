@@ -14,6 +14,9 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
     ElementData.onInsert((element, reducerEvent) => {
       if (!reducerEvent) return;
 
+      const imageSkeleton = document.getElementById("imageSkeleton");
+      imageSkeleton!.style.display = "none";
+
       dispatch(addElementData(element));
     });
 

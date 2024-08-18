@@ -16,7 +16,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
 
   switch (elements.element.tag) {
     case "TextElement":
-      canvasElement.Component = <Text Tag="p" elements={newElement} />;
+      canvasElement.Component = <Text elements={newElement} />;
       break;
 
     case "ImageElement":
@@ -35,7 +35,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
 export const CreateElementComponent = (elements: Elements) => {
   const newElement: Elements = {
     id: elements.id,
-    element: {...elements.element},
+    element: { ...elements.element },
     transparency: elements.transparency,
     transform: elements.transform,
     clip: elements.clip,
@@ -43,7 +43,7 @@ export const CreateElementComponent = (elements: Elements) => {
     layoutId: elements.layoutId,
     placedBy: elements.placedBy,
     lastEditedBy: elements.lastEditedBy,
-    zIndex: elements.zIndex
+    zIndex: elements.zIndex,
   };
 
   const canvasElement: CanvasElementType = {
@@ -54,7 +54,7 @@ export const CreateElementComponent = (elements: Elements) => {
 
   switch (elements.element.tag) {
     case "TextElement":
-      canvasElement.Component = <Text Tag="p" elements={newElement} />;
+      canvasElement.Component = <Text elements={newElement} />;
       break;
 
     case "ImageElement":

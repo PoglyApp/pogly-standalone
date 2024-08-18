@@ -8,4 +8,5 @@ export enum VariableValueType {
   string = 1,
   boolean = 2,
   toggle = 3,
+  color = 4,
 }

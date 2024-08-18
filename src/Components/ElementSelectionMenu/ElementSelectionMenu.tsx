@@ -2,10 +2,10 @@ import ElementData from "../../module_bindings/element_data";
 import { styled } from "styled-components";
 import { TextCategory } from "./Categories/TextCategory";
 import { ImageCategory } from "./Categories/ImageCategory";
-import { SevenTVCategory } from "./Categories/SevenTVCategory";
+import { ChannelEmoteCategory } from "./Categories/ChannelEmoteCategory";
 import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
 import PermissionLevel from "../../module_bindings/permission_level";
 import Config from "../../module_bindings/config";
@@ -18,6 +18,7 @@ import { Divider, Typography } from "@mui/material";
 
 interface IProps {
   elementData: ElementData[];
+  isDropping: boolean;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
@@ -52,12 +53,14 @@ export const ElementSelectionMenu = (props: IProps) => {
 
           <TextCategory />
 
-          <ImageCategory
-            elementData={props.elementData}
-            strictSettings={strictSettings}
-            contextMenu={contextMenu}
-            setContextMenu={setContextMenu}
-          />
+          <div style={{ borderStyle: `${props.isDropping ? "dashed" : "none"}`, borderColor: "green" }}>
+            <ImageCategory
+              elementData={props.elementData}
+              strictSettings={strictSettings}
+              contextMenu={contextMenu}
+              setContextMenu={setContextMenu}
+            />
+          </div>
 
           <WidgetCategory
             elementData={props.elementData}
@@ -66,7 +69,7 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {config.streamingPlatform === "twitch" && <SevenTVCategory />}
+          {config.streamingPlatform === "twitch" && <ChannelEmoteCategory />}
 
           <TenorCategory />
         </CategoryContainer>
@@ -83,7 +86,7 @@ const SelectionMenuContainer = styled.div`
   background-color: #001529;
 
   width: 218px;
-  height: 100%;
+  height: 95vh;
 
   position: fixed;
   overflow-y: auto;

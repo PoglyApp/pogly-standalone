@@ -2,48 +2,84 @@ import { useContext, useEffect, useState } from "react";
 import SevenTVWrap from "../Utility/SevenTVWrap";
 import Config from "../module_bindings/config";
 import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
-import Emote from "../Types/SevenTVTypes/EmoteType";
+import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import { ConfigContext } from "../Contexts/ConfigContext";
+import SevenTVUserType from "../Types/SevenTVTypes/SevenTVUserType";
 
-export const useSevenTV = (setEmotes: Function) => {
+export const useSevenTV = (
+  setEmotes: Function,
+  setTwitchId: Function,
+  sevenTVInitialized: boolean,
+  setSevenTVInitialized: Function
+) => {
   const config: Config = useContext(ConfigContext);
 
   const [streamerIdPromise, setStreamerIdPromise] = useState<Promise<UserId>>();
+  const [twitchIdPromise, setTwitchIdPromise] = useState<Promise<SevenTVUserType>>();
   const [streamerId, setStreamerId] = useState<string>();
   const [streamerEmotePromise, setStreamerEmotePromise] = useState<Promise<Emote[]>>();
   const [streamerEmotes, setStreamerEmotes] = useState<Emote[]>();
 
   useEffect(() => {
-    setStreamerIdPromise(SevenTVWrap.GetTwitchId(config.streamName));
-  }, [setStreamerIdPromise, config.streamName]);
+    if (sevenTVInitialized) return;
+    setStreamerIdPromise(SevenTVWrap.GetSevenTVId(config.streamName));
+  }, [sevenTVInitialized, setStreamerIdPromise, config.streamName]);
 
   useEffect(() => {
+    if (sevenTVInitialized) return;
     streamerIdPromise?.then((p) => {
       if (!p.data) return;
       setStreamerId(p.data.users[0].id);
+      setTwitchIdPromise(SevenTVWrap.GetUserById(p.data.users[0].id));
     });
-  }, [streamerIdPromise]);
+  }, [sevenTVInitialized, streamerIdPromise]);
 
   useEffect(() => {
+    if (sevenTVInitialized) return;
     if (!streamerId) return;
-    if (streamerId === "000000000000000000000000") return;
+
+    if (streamerId === "000000000000000000000000") {
+      setSevenTVInitialized(true);
+      return;
+    }
 
     // what we do now
     SevenTVWrap.GetEmoteSetId(streamerId).then((id) => {
       setStreamerEmotePromise(SevenTVWrap.GetEmoteSetEmotes(id));
     });
-  }, [streamerId]);
+  }, [sevenTVInitialized, setSevenTVInitialized, streamerId]);
 
   useEffect(() => {
+    if (sevenTVInitialized) return;
     streamerEmotePromise?.then((p) => {
       if (!p) return;
 
       setStreamerEmotes(p);
     });
-  }, [streamerEmotePromise]);
+  }, [sevenTVInitialized, streamerEmotePromise]);
 
   useEffect(() => {
+    if (sevenTVInitialized) return;
+    twitchIdPromise?.then((p) => {
+      if (!p) return;
+
+      if ((p as any).status_code === 404 || !p.connections) return;
+
+      setTwitchId(p.connections.find((c) => c.platform === "TWITCH")?.id);
+    });
+  }, [setTwitchId, sevenTVInitialized, twitchIdPromise]);
+
+  useEffect(() => {
+    if (sevenTVInitialized) return;
     if (!streamerEmotes) return;
+
     setEmotes(streamerEmotes);
-  }, [streamerEmotes, setEmotes]);
+  }, [sevenTVInitialized, streamerEmotes, setEmotes]);
+
+  useEffect(() => {
+    if (sevenTVInitialized) return;
+    if (streamerId && streamerEmotes) {
+      setSevenTVInitialized(true);
+    }
+  }, [setSevenTVInitialized, sevenTVInitialized, streamerId, streamerEmotes]);
 };

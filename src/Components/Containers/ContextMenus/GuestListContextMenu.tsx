@@ -6,6 +6,7 @@ import Permissions from "../../../module_bindings/permissions";
 import styled from "styled-components";
 import SetIdentityPermissionModeratorReducer from "../../../module_bindings/set_identity_permission_moderator_reducer";
 import ClearIdentityPermissionReducer from "../../../module_bindings/clear_identity_permission_reducer";
+import KickGuestReducer from "../../../module_bindings/kick_guest_reducer";
 
 interface IProps {
   contextMenu: any;
@@ -51,25 +52,36 @@ export const GuestListContextMenu = (props: IProps) => {
           </Paper>
 
           {!selectedGuest.identity.isEqual(Identity.identity) && identityPermission?.tag === "Owner" ? (
-            selectedGuestPermission?.tag === "Moderator" ? (
-              <StyledMenuItem
-                onClick={() => {
-                  ClearIdentityPermissionReducer.call(selectedGuest.identity);
-                  handleClose();
-                }}
-              >
-                Revoke Moderator
-              </StyledMenuItem>
-            ) : (
-              <StyledMenuItem
-                onClick={() => {
-                  SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
-                  handleClose();
-                }}
-              >
-                Grant Moderator
-              </StyledMenuItem>
-            )
+            <>
+              {selectedGuestPermission?.tag === "Moderator" ? (
+                <StyledMenuItemOrange
+                  onClick={() => {
+                    ClearIdentityPermissionReducer.call(selectedGuest.identity);
+                    handleClose();
+                  }}
+                  sx={{color:"#008205"}}
+                >
+                  Revoke Moderator
+                </StyledMenuItemOrange>
+              ) : (
+                <StyledMenuItemGreen
+                  onClick={() => {
+                    SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
+                    handleClose();
+                  }}
+                >
+                  Grant Moderator
+                </StyledMenuItemGreen>
+              )}
+                <StyledMenuItemRed
+                  onClick={() => {
+                    KickGuestReducer.call(selectedGuest.identity);
+                    handleClose();
+                  }}
+                >
+                  Kick Guest
+                </StyledMenuItemRed>
+              </>
           ) : (
             <></>
           )}
@@ -81,10 +93,38 @@ export const GuestListContextMenu = (props: IProps) => {
   );
 };
 
-const StyledMenuItem = styled(MenuItem)`
+const StyledMenuItemGreen = styled(MenuItem)`
   &:hover {
     background-color: #001529;
   }
+
+  color: #008205;
+
+  padding-left: 5px;
+
+  margin-left: 5px;
+  margin-right: 5px;
+`;
+
+const StyledMenuItemOrange = styled(MenuItem)`
+  &:hover {
+    background-color: #001529;
+  }
+
+  color: #CC5500;
+
+  padding-left: 5px;
+
+  margin-left: 5px;
+  margin-right: 5px;
+`;
+
+const StyledMenuItemRed = styled(MenuItem)`
+  &:hover {
+    background-color: #001529;
+  }
+
+  color: #800000;
 
   padding-left: 5px;
 

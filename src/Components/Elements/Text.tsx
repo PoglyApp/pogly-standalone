@@ -1,11 +1,11 @@
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import Elements from "../../module_bindings/elements";
 import TextElement from "../../module_bindings/text_element";
 import { TextCreationModal } from "../Modals/TextCreationModal";
+import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 
 interface IProp {
-  Tag: string;
   elements: Elements;
 }
 
@@ -14,10 +14,15 @@ export const Text = (props: IProp) => {
 
   const { setModals } = useContext(ModalContext);
 
-  const CustomTag = props.Tag as keyof JSX.IntrinsicElements;
   const textElement: TextElement = props.elements.element.value as TextElement;
-
   const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const fontJSON = JSON.parse(textElement.font);
+      ApplyCustomFont(fontJSON, targetRef.current);
+    } catch (error) {}
+  }, [textElement.font]);
 
   const showTextCreationModal = () => {
     setModals((oldModals: any) => [
@@ -44,7 +49,7 @@ export const Text = (props: IProp) => {
       }}
       onDoubleClick={showTextCreationModal}
     >
-      <CustomTag>{textElement.text}</CustomTag>
+      {textElement.text}
     </div>
   );
 };
