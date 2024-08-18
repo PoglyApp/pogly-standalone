@@ -18,3 +18,16 @@ export const updateElementTransform = (elementId: number, transform: string) => 
 
   UpdateElementTransformReducer.call(elementId, newTransform);
 };
+
+export const updateElementTransformNoViewportAdjustment = (elementId: number, transform: string) => {
+  const transformCoords = GetCoordsFromTransform(transform);
+  const newTransform = GetTransformFromCoords(
+    transformCoords.x,
+    transformCoords.y,
+    transformCoords.rotation,
+    transformCoords.scaleX,
+    transformCoords.scaleY
+  );
+
+  UpdateElementTransformReducer.call(elementId, newTransform);
+};

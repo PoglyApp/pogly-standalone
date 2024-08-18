@@ -1,11 +1,13 @@
 import DeleteElementReducer from "../module_bindings/delete_element_reducer";
 import ElementStruct from "../module_bindings/element_struct";
+import Elements from "../module_bindings/elements";
 import ImageElementData from "../module_bindings/image_element_data";
 import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
+import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import { ViewportToStdbFontSize } from "./ConvertCoordinates";
-import { getTransformValues } from "./GetTransformValues";
+import { GetCoordsFromTransform, GetTransformFromCoords, StdbToViewportCoords, ViewportToStdbFontSize } from "./ConvertCoordinates";
+import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 
 export const UserInputHandler = (activeLayout: Layouts, selectedElement: SelectedType | undefined): any => {
   const userInputs = [];
@@ -18,13 +20,17 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: (event: any) => {
       event!.preventDefault();
 
-      if (!selectedElement) return;
+      try {
+        if (!selectedElement) return;
 
-      DeleteElementReducer.call(selectedElement.Elements.id);
+        DeleteElementReducer.call(selectedElement.Elements.id);
+      } catch (error) {
+        console.log("Pogly encountered an issue when attempting to Delete an element!");
+      }
     },
   });
 
-  // DELETE SELECTED ELEMENT WITH CTRL + X
+  // CUT SELECTED ELEMENT WITH CTRL + X
   userInputs.push({
     name: "deleteElement",
     keys: "ctrl+x",
@@ -32,9 +38,17 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: (event: any) => {
       event!.preventDefault();
 
-      if (!selectedElement) return;
+      try {
+        if (!selectedElement) return;
 
-      DeleteElementReducer.call(selectedElement.Elements.id);
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(element) navigator.clipboard.writeText(JSON.stringify(element));
+
+        DeleteElementReducer.call(selectedElement.Elements.id);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Cut an element!");
+      }
     },
   });
 
@@ -46,9 +60,15 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: (event: any) => {
       event!.preventDefault();
 
-      if (!selectedElement) return;
+      try {
+        if (!selectedElement) return;
 
-      insertElement(selectedElement.Elements.element, activeLayout);
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(element) insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Duplicate an element!");
+      }
     },
   });
 
@@ -60,9 +80,15 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: (event: any) => {
       event!.preventDefault();
 
-      if (!selectedElement) return;
+      try {
+        if (!selectedElement) return;
 
-      navigator.clipboard.writeText(JSON.stringify(selectedElement.Elements));
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(element) navigator.clipboard.writeText(JSON.stringify(element));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Copy an element!");
+      }
     },
   });
 
@@ -74,48 +100,53 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: async (event: any) => {
       event!.preventDefault();
 
-      const text = await navigator.clipboard.readText();
-      const clipboard = await navigator.clipboard.read();
+      try {
+        const text = await navigator.clipboard.readText();
+        const clipboard = await navigator.clipboard.read();
 
-      for (let i = 0; i < clipboard.length; i++) {
-        const isImage = clipboard[i].types.find((element) => element.includes("image"));
-
-        if (isImage) {
-          const blob = await clipboard[i].getType(clipboard[i].types[1]);
-          const base64 = await blobToBase64(blob);
-
-          insertElement(
-            ElementStruct.ImageElement({
-              imageElementData: ImageElementData.RawData(base64 as string),
-              width: 512,
-              height: 512,
-            }),
-            activeLayout
-          );
+        for (let i = 0; i < clipboard.length; i++) {
+          const isImage = clipboard[i].types.find((element) => element.includes("image"));
+  
+          if (isImage) {
+            const type = clipboard[i].types.findIndex((t) => t.includes("image"));
+            const blob = await clipboard[i].getType(clipboard[i].types[type]);
+            blobToBase64(blob, (result: { r: any, w: number; h: number }) => {
+              insertElement(
+                ElementStruct.ImageElement({
+                  imageElementData: ImageElementData.RawData(result.r as string),
+                  width: result.w,
+                  height: result.h,
+                }),
+                activeLayout
+              );
+            });
+          }
         }
-      }
-
-      if (text !== "") {
-        try {
-          const json = JSON.parse(text);
-          if (!json.element.tag) return;
-
-          insertElement(json.element as ElementStruct, activeLayout);
-        } catch (error) {
-          const textElement: ElementStruct = ElementStruct.TextElement({
-            text: text,
-            size: ViewportToStdbFontSize(12).fontSize,
-            color: "#FFFFFF",
-            font: "Roboto",
-          });
-
-          insertElement(textElement, activeLayout);
+  
+        if (text !== "") {
+          try {
+            const json = JSON.parse(text);
+            if (!json.element.tag) return;
+  
+            insertElement(json.element as ElementStruct, activeLayout, json.transparency, OffsetElementForCanvas(json as Elements).transform);
+          } catch (error) {
+            const textElement: ElementStruct = ElementStruct.TextElement({
+              text: text,
+              size: ViewportToStdbFontSize(12).fontSize,
+              color: "#FFFFFF",
+              font: "Roboto",
+            });
+  
+            insertElement(textElement, activeLayout);
+          }
         }
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Paste an element!");
       }
     },
   });
 
-  // NUDGE ELEMENT TO RIGHT RIGHT RIGHT ARROW
+  // NUDGE ELEMENT - RIGHT ARROW
   userInputs.push({
     name: "nudgeRight",
     keys: "right",
@@ -123,26 +154,253 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     callback: (event: any) => {
       event!.preventDefault();
 
-      if (!selectedElement) return;
+      try {
+        if (!selectedElement) return;
 
-      const transformValues = getTransformValues(selectedElement.Elements.transform);
-      console.log(transformValues);
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.x += 2.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT W/ SHIFT - RIGHT ARROW
+  userInputs.push({
+    name: "nudgeRightShift",
+    keys: "shift+right",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.x += 7.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT - LEFT ARROW
+  userInputs.push({
+    name: "nudgeLeft",
+    keys: "left",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.x -= 2.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT W/ SHIFT - LEFT ARROW
+  userInputs.push({
+    name: "nudgeLeftShift",
+    keys: "shift+left",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.x -= 7.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT - UP ARROW
+  userInputs.push({
+    name: "nudgeUp",
+    keys: "up",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.y -= 2.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT W/ SHIFT - UP ARROW
+  userInputs.push({
+    name: "nudgeUpShift",
+    keys: "shift+up",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.y -= 7.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT - DOWN ARROW
+  userInputs.push({
+    name: "nudgeDown",
+    keys: "down",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.y += 2.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // NUDGE ELEMENT W/ SHIFT - UP ARROW
+  userInputs.push({
+    name: "nudgeDownShift",
+    keys: "shift+down",
+    action: "keydown",
+    callback: (event: any) => {
+      event!.preventDefault();
+
+      try {
+        if (!selectedElement) return;
+
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if(!element) return;
+
+        let coords = GetCoordsFromTransform(element.transform);
+        coords.y += 7.5;
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
+        
+        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+
+        const newCoords = StdbToViewportCoords(coords.x, coords.y);
+        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+      } catch {
+        console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
     },
   });
 
   return userInputs;
 };
 
-const blobToBase64 = (blob: any) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+const blobToBase64 = (file: any, cb: any) => {
+  let reader = new FileReader();
 
-    reader.readAsDataURL(blob);
+  reader.readAsDataURL(file);
 
-    reader.onloadend = () => {
-      resolve(reader.result);
+  reader.onload = function () {
+    var image = new Image();
+    if (!reader.result) return;
+    image.src = reader.result.toString();
+    image.onload = function () {
+      cb({
+        r: reader.result,
+        w: image.width,
+        h: image.height,
+      });
+      image.remove();
     };
+  };
 
-    reader.onerror = reject;
-  });
+  reader.onerror = function (error) {
+    console.log("Error uploading Image to Pogly: ", error);
+  };
 };
