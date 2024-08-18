@@ -105,6 +105,30 @@ public partial class Module
                 LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void KickGuest(ReducerContext ctx, Identity identity)
+    {
+        string func = "KickGuest";
+        
+        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx.Sender)) return;
+
+        try
+        {
+            var g = Guests.FindByIdentity(identity);
+            if (g is not null)
+            {
+                Guests.DeleteByIdentity(identity);
+            }
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Encountered error kicking Guest, requested by {ctx.Sender}. " + e.Message,
+                LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void SetIdentityPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel)
