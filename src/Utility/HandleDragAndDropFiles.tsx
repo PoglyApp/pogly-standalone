@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { ImageUploadModal } from "../Components/Modals/ImageUploadModal";
 
-export const HandleDragAndDropFiles = (acceptedFiles: any, setModals: Function, isCanvas: boolean) => {
+export const HandleDragAndDropFiles = (acceptedFiles: any, setModals: Function) => {
   const isImage =
     acceptedFiles[0].type === "image/png" ||
     acceptedFiles[0].type === "image/jpg" ||
@@ -22,12 +22,8 @@ export const HandleDragAndDropFiles = (acceptedFiles: any, setModals: Function, 
     });
   }
 
-  if (!isCanvas) {
-    return setModals((oldModals: any) => [
-      ...oldModals,
-      <ImageUploadModal key="imageUpload_modal" dragnAndDropFile={acceptedFiles[0]} />,
-    ]);
-  }
-
-  console.log("dragging");
+  setModals((oldModals: any) => [
+    ...oldModals,
+    <ImageUploadModal key="imageUpload_modal" dragnAndDropFile={acceptedFiles[0]} />,
+  ]);
 };
