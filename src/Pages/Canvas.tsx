@@ -71,6 +71,7 @@ export const Canvas = (props: IProps) => {
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
   useElementsEvents(
     selectoRef,
+    selected,
     setSelected,
     setSelectoTargets,
     props.canvasInitialized,

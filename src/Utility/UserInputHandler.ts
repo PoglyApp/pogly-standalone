@@ -6,7 +6,12 @@ import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import { GetCoordsFromTransform, GetTransformFromCoords, StdbToViewportCoords, ViewportToStdbFontSize } from "./ConvertCoordinates";
+import {
+  GetCoordsFromTransform,
+  GetTransformFromCoords,
+  StdbToViewportCoords,
+  ViewportToStdbFontSize,
+} from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 
 export const UserInputHandler = (activeLayout: Layouts, selectedElement: SelectedType | undefined): any => {
@@ -43,7 +48,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(element) navigator.clipboard.writeText(JSON.stringify(element));
+        if (element) navigator.clipboard.writeText(JSON.stringify(element));
 
         DeleteElementReducer.call(selectedElement.Elements.id);
       } catch {
@@ -65,7 +70,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(element) insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
+        if (element)
+          insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
       } catch {
         console.log("Pogly encountered an issue when attempting to Duplicate an element!");
       }
@@ -85,7 +91,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(element) navigator.clipboard.writeText(JSON.stringify(element));
+        if (element) navigator.clipboard.writeText(JSON.stringify(element));
       } catch {
         console.log("Pogly encountered an issue when attempting to Copy an element!");
       }
@@ -106,11 +112,11 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         for (let i = 0; i < clipboard.length; i++) {
           const isImage = clipboard[i].types.find((element) => element.includes("image"));
-  
+
           if (isImage) {
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
             const blob = await clipboard[i].getType(clipboard[i].types[type]);
-            blobToBase64(blob, (result: { r: any, w: number; h: number }) => {
+            blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
               insertElement(
                 ElementStruct.ImageElement({
                   imageElementData: ImageElementData.RawData(result.r as string),
@@ -122,17 +128,22 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
             });
           }
         }
-  
+
         if (text !== "") {
           try {
             const json = JSON.parse(text);
             if (!json.element.tag) return;
-  
-            insertElement(json.element as ElementStruct, activeLayout, json.transparency, OffsetElementForCanvas(json as Elements).transform);
+
+            insertElement(
+              json.element as ElementStruct,
+              activeLayout,
+              json.transparency,
+              OffsetElementForCanvas(json as Elements).transform
+            );
           } catch (error) {
             const isImageUrl = /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg|webp))/i.test(text);
-            
-            if(isImageUrl) {
+
+            if (isImageUrl) {
               const image = new Image();
               image.src = text;
 
@@ -154,7 +165,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
                 color: "#FFFFFF",
                 font: "Roboto",
               });
-    
+
               insertElement(textElement, activeLayout);
             }
           }
@@ -178,16 +189,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 2.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -207,16 +221,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 7.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -236,16 +253,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 2.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -265,16 +285,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 7.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -294,16 +317,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 2.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -323,16 +349,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 7.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -352,16 +381,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 2.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }
@@ -381,16 +413,19 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if(!element) return;
+        if (!element) return;
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 7.5;
         const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, null, null);
-        
+
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         const newCoords = StdbToViewportCoords(coords.x, coords.y);
-        selectedElement.Component.style.setProperty("transform", GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null));
+        selectedElement.Component.style.setProperty(
+          "transform",
+          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, null, null)
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
       }

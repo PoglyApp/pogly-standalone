@@ -16,9 +16,11 @@ import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/Conver
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
+import { SelectedType } from "../../Types/General/SelectedType";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
+  selected: SelectedType | undefined,
   setSelected: Function,
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
@@ -31,13 +33,15 @@ export const useElementsEvents = (
 
   const elementData = useRef<ElementData[]>([]);
   const activeLayout = useRef<Layouts>();
+  const selectedElement = useRef<SelectedType | undefined>();
 
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
     elementData.current = elementDataStore;
     activeLayout.current = layout;
-  }, [elementDataStore, layout]);
+    selectedElement.current = selected;
+  }, [elementDataStore, layout, selected]);
 
   useEffect(() => {
     if (canvasInitialized.elementEventsInitialized || !layout) return;
@@ -192,7 +196,8 @@ export const useElementsEvents = (
       if (!reducerEvent) return;
       if (element.layoutId !== activeLayout.current!.id) return;
 
-      setSelected(null);
+      if (selectedElement.current && selectedElement.current.Elements.id === element.id) setSelected(null);
+
       dispatch(removeCanvasElement(element));
       dispatch(removeElement(element));
     });
