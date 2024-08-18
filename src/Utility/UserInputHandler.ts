@@ -130,14 +130,33 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
   
             insertElement(json.element as ElementStruct, activeLayout, json.transparency, OffsetElementForCanvas(json as Elements).transform);
           } catch (error) {
-            const textElement: ElementStruct = ElementStruct.TextElement({
-              text: text,
-              size: ViewportToStdbFontSize(12).fontSize,
-              color: "#FFFFFF",
-              font: "Roboto",
-            });
-  
-            insertElement(textElement, activeLayout);
+            const isImageUrl = /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg|webp))/i.test(text);
+            
+            if(isImageUrl) {
+              const image = new Image();
+              image.src = text;
+
+              image.onload = async function () {
+                insertElement(
+                  ElementStruct.ImageElement({
+                    imageElementData: ImageElementData.RawData(text as string),
+                    width: image.width,
+                    height: image.height,
+                  }),
+                  activeLayout
+                );
+              };
+              image.remove();
+            } else {
+              const textElement: ElementStruct = ElementStruct.TextElement({
+                text: text,
+                size: ViewportToStdbFontSize(12).fontSize,
+                color: "#FFFFFF",
+                font: "Roboto",
+              });
+    
+              insertElement(textElement, activeLayout);
+            }
           }
         }
       } catch {

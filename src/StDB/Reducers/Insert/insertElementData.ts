@@ -27,6 +27,7 @@ export const insertElementData = (elementData: ElementDataType) => {
             image.width || 128,
             image.height || 128
           );
+          image.remove();
         };
       } else {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
