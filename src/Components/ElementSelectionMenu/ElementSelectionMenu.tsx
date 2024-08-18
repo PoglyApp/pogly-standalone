@@ -18,6 +18,7 @@ import { Divider, Typography } from "@mui/material";
 
 interface IProps {
   elementData: ElementData[];
+  isDropping: boolean;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
@@ -52,12 +53,14 @@ export const ElementSelectionMenu = (props: IProps) => {
 
           <TextCategory />
 
-          <ImageCategory
-            elementData={props.elementData}
-            strictSettings={strictSettings}
-            contextMenu={contextMenu}
-            setContextMenu={setContextMenu}
-          />
+          <div style={{ borderStyle: `${props.isDropping ? "dashed" : "none"}`, borderColor: "green" }}>
+            <ImageCategory
+              elementData={props.elementData}
+              strictSettings={strictSettings}
+              contextMenu={contextMenu}
+              setContextMenu={setContextMenu}
+            />
+          </div>
 
           <WidgetCategory
             elementData={props.elementData}
@@ -83,7 +86,7 @@ const SelectionMenuContainer = styled.div`
   background-color: #001529;
 
   width: 218px;
-  height: 100%;
+  height: 95vh;
 
   position: fixed;
   overflow-y: auto;

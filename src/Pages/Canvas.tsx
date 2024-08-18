@@ -34,6 +34,10 @@ import { LayoutContext } from "../Contexts/LayoutContext";
 import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 import { useHotkeys } from "reakeys";
 import { UserInputHandler } from "../Utility/UserInputHandler";
+import Dropzone from "react-dropzone";
+import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
+import { ModalContext } from "../Contexts/ModalContext";
+import { Backdrop } from "@mui/material";
 
 interface IProps {
   setActivePage: Function;
@@ -44,6 +48,7 @@ interface IProps {
 export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
+  const { setModals } = useContext(ModalContext);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -61,6 +66,7 @@ export const Canvas = (props: IProps) => {
   });
 
   const [noticeMessage, setNoticeMessage] = useState<any>();
+  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
@@ -136,7 +142,20 @@ export const Canvas = (props: IProps) => {
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <>
-          <ElementSelectionMenu elementData={elementData} />
+          <Dropzone
+            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals, false)}
+            noClick={true}
+            onDragEnter={() => setisDroppingSelectionMenu(true)}
+            onDragLeave={() => setisDroppingSelectionMenu(false)}
+            onDropAccepted={() => setisDroppingSelectionMenu(false)}
+            onDropRejected={() => setisDroppingSelectionMenu(false)}
+          >
+            {({ getRootProps }) => (
+              <div {...getRootProps()}>
+                <ElementSelectionMenu elementData={elementData} isDropping={isDroppingSelectionMenu} />
+              </div>
+            )}
+          </Dropzone>
 
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
