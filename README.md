@@ -58,15 +58,12 @@ You can [publish your own Pogly module](https://github.com/PoglyApp/pogly-docume
 Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md). 
 
 ## Used by
-<!-- <a href="https://www.twitch.tv/shroud"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/7ed5e0c6-0191-4eef-8328-4af6e4ea5318-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/esfandtv"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/476ee93d-66a6-4e57-b3a9-db1ceb168ad8-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a> -->
-<a href="https://www.twitch.tv/graycen"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/fa4ee5e3-4531-44e8-98a8-d60e6143f6b8-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/siormax"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/733bc5e0-aedf-4b2c-ae6a-4d6047a27720-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/brain"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/692a3084-12b5-45bb-9d24-0b3f4e310e84-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/ashlynn"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/704378f5-335f-4525-9ee8-f10ec3b7b3f7-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/ssaab"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/82fc1ad3-380b-471e-b24c-cba4235b0785-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<a href="https://www.twitch.tv/justagameoverscreen"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/ef425972-86c1-45f6-8ea9-a5214335d899-profile_image-50x50.png" style="border-radius: 50%;margin:2px" /></a>
-<!-- <a href="https://www.twitch.tv/campinonline"><img src="https://static-cdn.jtvnw.net/jtv_user_pictures/9b1fa501-4e57-4478-a39f-2b5475fe9216-profile_image-50x50.jpeg" style="border-radius: 50%;margin:2px" /></a> -->
+<a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank"><img src="./images/streamers/graycen.svg" /></a>
+<a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank"><img src="./images/streamers/siormax.svg" /></a>
+<a href="https://www.twitch.tv/brain" rel="noreferrer" target="_blank"><img src="./images/streamers/brain.svg" /></a>
+<a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank"><img src="./images/streamers/ashlynn.svg" /></a>
+<a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank"><img src="./images/streamers/ssaab.svg" /></a>
+<a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank"><img src="./images/streamers/justagameoverscreen.svg" /></a>
 
 ## Contributing
 Check out our [contribution guidelines](https://github.com/PoglyApp/pogly-standalone/blob/main/CONTRIBUTING.md).
