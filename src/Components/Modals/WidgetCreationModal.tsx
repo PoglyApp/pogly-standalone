@@ -241,6 +241,7 @@ export const WidgetCreationModal = (props: IProps) => {
                 <Link
                   href="https://discord.gg/uPQsBaVdB7"
                   target="_blank"
+                  rel="noreferrer"
                   underline="always"
                   sx={{ color: "#ffffffa6" }}
                 >
@@ -395,6 +396,7 @@ export const WidgetCreationModal = (props: IProps) => {
                   style={{ paddingLeft: "5px" }}
                   href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/widgetElement.md#while-dont--"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Click here for more information
                 </a>
