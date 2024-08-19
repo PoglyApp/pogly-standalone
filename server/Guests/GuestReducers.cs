@@ -118,14 +118,30 @@ public partial class Module
         try
         {
             var g = Guests.FindByIdentity(identity);
-            if (g is not null)
-            {
-                Guests.DeleteByIdentity(identity);
-            }
+            if (g is not null) Guests.DeleteByIdentity(g.Value.Identity);
         }
         catch (Exception e)
         {
             Log($"[{func}] Encountered error kicking Guest, requested by {ctx.Sender}. " + e.Message,
+                LogLevel.Error);
+        }
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void KickSelf(ReducerContext ctx)
+    {
+        string func = "KickSelf";
+
+        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        try
+        {
+            var g = Guests.FindByIdentity(guest.Identity);
+            if (g is not null) Guests.DeleteByIdentity(g.Value.Identity);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Encountered error kicking Self, requested by {ctx.Sender}. " + e.Message,
                 LogLevel.Error);
         }
     }
