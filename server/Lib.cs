@@ -23,14 +23,13 @@ static partial class Module
     [SpacetimeDB.Reducer(ReducerKind.Connect)]
     public static void OnConnect(ReducerContext ctx)
     {
+        if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
         Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
     }
 
     [SpacetimeDB.Reducer]
     public static void Connect(ReducerContext ctx)
     {
-        if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
-        
         try
         {
             var random = new Random();

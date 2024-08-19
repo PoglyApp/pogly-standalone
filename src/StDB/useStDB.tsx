@@ -61,10 +61,13 @@ import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import KickGuestReducer from "../module_bindings/kick_guest_reducer";
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
+import KickSelfReducer from "../module_bindings/kick_self_reducer";
+import ConnectReducer from "../module_bindings/connect_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
   setStdbConnected: Function,
+  setStdbAuthenticated: Function,
   setStdbInitialized: Function,
   setInstanceConfigured: Function
 ) => {
@@ -129,7 +132,9 @@ const useStDB = (
       UpdateAuthenticationKeyReducer,
       RefreshOverlayReducer,
       ClearRefreshOverlayRequestsReducer,
-      KickGuestReducer
+      KickGuestReducer,
+      KickSelfReducer,
+      ConnectReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
@@ -170,14 +175,11 @@ const useStDB = (
             return;
           }
 
-          if (fetchedConfig.authentication) AuthenticateReducer.call(connectionConfig.authKey);
           if (fetchedConfig.configInit) setInstanceConfigured(true);
 
           setConfig(fetchedConfig);
 
-          if (!fetchedConfig.authentication) setStdbConnected(true);
-
-          SetStdbConnected(client, setStdbConnected, setError);
+          SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
@@ -190,7 +192,7 @@ const useStDB = (
     });
 
     client?.connect();
-  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized]);
+  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
   return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error };
 };
