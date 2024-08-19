@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SpacetimeDBClient, Identity } from "@clockworklabs/spacetimedb-sdk";
 import Heartbeat from "../module_bindings/heartbeat";
 import Guests from "../module_bindings/guests";
@@ -60,6 +60,7 @@ import UpdateAuthenticationKeyReducer from "../module_bindings/update_authentica
 import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import KickGuestReducer from "../module_bindings/kick_guest_reducer";
+import { SetStdbConnected } from "../Utility/SetStdbConnected";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -174,29 +175,13 @@ const useStDB = (
 
           setConfig(fetchedConfig);
 
-          //Looking for setStdbConnected(true) if Auth is enabled? See below...
           if (!fetchedConfig.authentication) setStdbConnected(true);
+
+          SetStdbConnected(client, setStdbConnected, setError);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
       }
-    });
-
-    Guests.onUpdate((oldGuest, newGuest) => {
-      // SET STDB CONNECTED TO TRUE IF AUTH COMES THRU
-      if (newGuest.identity.toHexString() !== client.identity?.toHexString()) return;
-      if (oldGuest.authenticated === newGuest.authenticated) return;
-
-      const fetchedConfig = Config.findByVersion(0);
-
-      if (!fetchedConfig) {
-        setError(true);
-        return;
-      }
-
-      console.log("setting connected!");
-
-      if(fetchedConfig.authentication && newGuest.authenticated) setStdbConnected(true);
     });
 
     client?.onError((...args: any[]) => {
