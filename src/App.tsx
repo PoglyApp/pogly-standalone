@@ -213,9 +213,46 @@ export const App: React.FC = () => {
     return <Loading text="Connecting to Instance" />;
   }
 
+  // Step 3) Check that spacetime properties got initialized properly, avoid null exceptions
+  if (!spacetime.Client) {
+    return (
+      <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving starting SpacetimeDB Client!"
+          contentText="The standalone client encountered an issue starting the SpacetimeDB Client. Please check console logs and send to a developer!"
+          clearSettings={true}
+        />
+    );
+  }
+  if (!spacetime.Identity) {
+    return (
+      <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving SpacetimeDB Identity!"
+          contentText="There was an issue connecting and receiving your StDB identity. Please try again. If this error persists, you may have to clear your LocalStorage AuthToken."
+          clearSettings={true}
+        />
+    );
+  }
+  if (!spacetime.InstanceConfig) {
+    return (
+      <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error loading Pogly configuration!"
+          contentText="There was an error loading Pogly configuration. This happens when the standalone client is unable to access the database, or if your are having connection issues."
+          clearSettings={true}
+        /> 
+    );
+  }
+
   // Step 4) If Authentication is required, are we Authenticated?
   if (spacetime.InstanceConfig.authentication) {
-    if(stdbAuthTimeout) {
+    const guest = Guests.findByIdentity(spacetime.Identity);
+
+    if (!guest || !guest.authenticated) {
       return (
         <ErrorRefreshModal
           type="timer"
