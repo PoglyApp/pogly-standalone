@@ -698,6 +698,7 @@ public partial class Module
     
     private static void UpdateElementZIndex(ReducerContext ctx, uint elementId)
     {
+        if (elementId == 0) return;
         string func = "UpdateElementZIndex";
         try
         {
