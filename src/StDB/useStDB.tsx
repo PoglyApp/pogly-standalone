@@ -133,7 +133,6 @@ const useStDB = (
       UpdateAuthenticationKeyReducer,
       RefreshOverlayReducer,
       ClearRefreshOverlayRequestsReducer,
-      RefreshOverlayClearStorageReducer,
       KickGuestReducer,
       KickSelfReducer,
       ConnectReducer
@@ -186,9 +185,6 @@ const useStDB = (
           setConfig(fetchedConfig);
 
           SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
-          //Looking for setStdbConnected(true) if Auth is enabled? See below...
-          if (!fetchedConfig.authentication) setStdbConnected(true);
-
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
