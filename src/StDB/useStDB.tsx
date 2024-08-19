@@ -180,13 +180,29 @@ const useStDB = (
 
           setConfig(fetchedConfig);
 
-          setTimeout(function () {
-            setStdbConnected(true);
-          }, 1000);
+          //Looking for setStdbConnected(true) if Auth is enabled? See below...
+          if (!fetchedConfig.authentication) setStdbConnected(true);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
       }
+    });
+
+    Guests.onUpdate((oldGuest, newGuest) => {
+      // SET STDB CONNECTED TO TRUE IF AUTH COMES THRU
+      if (newGuest.identity.toHexString() !== client.identity?.toHexString()) return;
+      if (oldGuest.authenticated === newGuest.authenticated) return;
+
+      const fetchedConfig = Config.findByVersion(0);
+
+      if (!fetchedConfig) {
+        setError(true);
+        return;
+      }
+
+      console.log("setting connected!");
+
+      if(fetchedConfig.authentication && newGuest.authenticated) setStdbConnected(true);
     });
 
     client?.onError((...args: any[]) => {
