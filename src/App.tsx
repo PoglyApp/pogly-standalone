@@ -1,7 +1,7 @@
 import "react-toastify/dist/ReactToastify.css";
 
 import { createBrowserRouter, Route, createRoutesFromElements, RouterProvider } from "react-router-dom";
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import { Canvas } from "./Pages/Canvas";
 import { Header } from "./Header/Header";
@@ -29,6 +29,8 @@ import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import Layouts from "./module_bindings/layouts";
 import { LayoutContext } from "./Contexts/LayoutContext";
+import ConnectReducer from "./module_bindings/connect_reducer";
+import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -47,6 +49,9 @@ export const App: React.FC = () => {
 
   // STDB
   const [stdbConnected, setStdbConnected] = useState<boolean>(false);
+  const stdbAuthenticatedRef = useRef<boolean>(false);
+  const [stdbAuthenticated, setStdbAuthenticated] = useState<boolean>(false);
+  const [stdbAuthTimeout, setStdbAuthTimeout] = useState<boolean>(false);
   const [stdbInitialized, setStdbInitialized] = useState<boolean>(false);
 
   // CONFIGS
@@ -64,7 +69,7 @@ export const App: React.FC = () => {
   useGetVersionNumber(setVersionNumber);
   useGetConnectionConfig(setConnectionConfig);
 
-  const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbInitialized, setInstanceConfigured);
+  const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setStdbInitialized, setInstanceConfigured);
 
   useEffect(() => {
     if (!stdbInitialized) return;
@@ -91,6 +96,10 @@ export const App: React.FC = () => {
       Guests: [],
     });
   }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
+
+  useEffect(() => {
+    stdbAuthenticatedRef.current = stdbAuthenticated;
+  },[stdbAuthenticated])
 
   useEffect(() => {
     if (!stdbInitialized) return;
@@ -182,17 +191,31 @@ export const App: React.FC = () => {
         />
       );
     }
+
+    const alreadyLogged = Guests.findByIdentity(spacetime.Identity);
+
+    if(alreadyLogged) {
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Clear Connections & Reload"
+          titleText="Multiple Connections Detected"
+          contentText="Pogly only supports a single connection from each identity at this time.
+                Either multiple tabs are open, or an error occurred and your identity is still signed in."
+          clearSettings={false}
+          kickSelf={true}
+        />
+      );
+    }
+
+    ConnectReducer.call();
+
     return <Loading text="Connecting to Instance" />;
   }
 
-  // Step 4) Connect 
-
-
-  // Step 5) If Authentication is required, are we Authenticated?
+  // Step 4) If Authentication is required, are we Authenticated?
   if (spacetime.InstanceConfig.authentication) {
-    const guest = Guests.findByIdentity(spacetime.Identity);
-
-    if (!guest || !guest.authenticated) {
+    if(stdbAuthTimeout) {
       return (
         <ErrorRefreshModal
           type="timer"
@@ -204,14 +227,26 @@ export const App: React.FC = () => {
         />
       );
     }
+
+    let timeout = null;
+
+    if(!stdbAuthenticated) {
+      if (spacetime.InstanceConfig.authentication) AuthenticateReducer.call(connectionConfig.authKey);
+      if(timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {setStdbAuthTimeout(!stdbAuthenticatedRef.current)}, 2500);
+
+      return <Loading text="Authenticating..." />;
+    }
+
+    if(timeout) clearTimeout(timeout);
   }
 
-  // Step 6) Redo final subscriptions ONLY ONCE
+  // Step 5) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
     SetSubscriptions(spacetime.Client);
   }
 
-  // Step 7) Is SpacetimeDB fully initialized?
+  // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
     return <Loading text="Loading Data" />;
   }

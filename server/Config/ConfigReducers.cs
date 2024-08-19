@@ -172,7 +172,7 @@ public partial class Module
     }
     
     
-    private static int _maxPatience = 10;
+    private static int _maxPatience = 25;
     private static int _currentPatience = 0;
     
     [SpacetimeDB.Reducer]
