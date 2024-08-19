@@ -23,6 +23,12 @@ static partial class Module
     [SpacetimeDB.Reducer(ReducerKind.Connect)]
     public static void OnConnect(ReducerContext ctx)
     {
+        Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void Connect(ReducerContext ctx)
+    {
         if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
         
         try
@@ -42,7 +48,7 @@ static partial class Module
             };
             guest.Insert();
             
-            Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
+            Log($"[Connect] New guest {ctx.Sender} inserted into Guest table!", LogLevel.Info);
             LogAudit(ctx,"OnConnect",GetEmptyStruct(),GetChangeStructFromGuest(guest), Config.FindByVersion(0)!.Value.DebugMode);
         }
         catch (Exception e)
