@@ -10,7 +10,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@clockworklabs/spacetimedb-sdk": "https://pkg.pr.new/@clockworklabs/spacetimedb-sdk@6fd97d7",
+		"@clockworklabs/spacetimedb-sdk": "https://pkg.pr.new/@clockworklabs/spacetimedb-sdk@22b27e2",
 		"@emotion/react": "^11.13.0",
 		"@emotion/styled": "^11.13.0",
 		"@mui/icons-material": "^5.16.7",
