@@ -185,7 +185,10 @@ export const App: React.FC = () => {
     return <Loading text="Connecting to Instance" />;
   }
 
-  // Step 4) If Authentication is required, are we Authenticated?
+  // Step 4) Connect 
+
+
+  // Step 5) If Authentication is required, are we Authenticated?
   if (spacetime.InstanceConfig.authentication) {
     const guest = Guests.findByIdentity(spacetime.Identity);
 
@@ -203,12 +206,12 @@ export const App: React.FC = () => {
     }
   }
 
-  // Step 5) Redo final subscriptions ONLY ONCE
+  // Step 6) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
     SetSubscriptions(spacetime.Client);
   }
 
-  // Step 6) Is SpacetimeDB fully initialized?
+  // Step 7) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
     return <Loading text="Loading Data" />;
   }
