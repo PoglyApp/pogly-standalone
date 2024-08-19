@@ -3,7 +3,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { createBrowserRouter, Route, createRoutesFromElements, RouterProvider } from "react-router-dom";
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 
-import { Home } from "./Pages/Home";
 import { Canvas } from "./Pages/Canvas";
 import { Header } from "./Header/Header";
 
