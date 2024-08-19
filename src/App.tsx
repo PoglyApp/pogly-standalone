@@ -173,7 +173,10 @@ export const App: React.FC = () => {
     );
   }
 
-  // Step 4) If Authentication is required, are we Authenticated?
+  // Step 4) Connect 
+
+
+  // Step 5) If Authentication is required, are we Authenticated?
   if (spacetime.InstanceConfig.authentication) {
     const guest = Guests.findByIdentity(spacetime.Identity);
 
@@ -191,22 +194,22 @@ export const App: React.FC = () => {
     }
   }
 
-  // Step 5) Redo final subscriptions ONLY ONCE
+  // Step 6) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
     SetSubscriptions(spacetime.Client);
   }
 
-  // Step 6) Is SpacetimeDB fully initialized?
+  // Step 7) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
     return <Loading text="Loading Data" />;
   }
 
-  // Step 7) Has nickname been set?
+  // Step 8) Has nickname been set?
   if (!nickname) {
     return <SetNicknameModal identity={spacetime.Identity} setNickname={setNickname} />;
   }
 
-  // Step 8) Has the Pogly Instance been configured?
+  // Step 9) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     return (
       <InitialSetupModal
@@ -218,7 +221,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Step 9) Load Pogly
+  // Step 10) Load Pogly
   return (
     <SpacetimeContext.Provider value={spacetimeContext}>
       <ConfigContext.Provider value={spacetime.InstanceConfig}>
