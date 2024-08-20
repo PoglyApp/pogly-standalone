@@ -119,6 +119,10 @@ export const MoveableComponent = (props: IProp) => {
     //setIsResize(false);
     if (!event.isDrag || !props.selected) return;
 
+    if (!event) return;
+
+    if (!event.lastEvent) return;
+
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
         const imageSize = ViewportToStdbSize(event.lastEvent.width, event.lastEvent.height);
@@ -141,6 +145,8 @@ export const MoveableComponent = (props: IProp) => {
   const onResize = (event: any) => {
     //setIsResize(true);
     if (!props.selected) return;
+
+    if (!event) return;
 
     if (Date.now() < resizeWaitUntil) return;
 
