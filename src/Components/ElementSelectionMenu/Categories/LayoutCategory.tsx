@@ -41,7 +41,7 @@ export const LayoutCategory = () => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutName>Layouts ({layoutContext!.activeLayout.name})</LayoutName>
+          <LayoutName>Layouts ({layoutContext.activeLayout.name})</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -63,7 +63,7 @@ export const LayoutCategory = () => {
             Add Layout
           </Button>
 
-          {layouts!.map((layout: Layouts) => {
+          {layouts.map((layout: Layouts) => {
             return (
               <div
                 id={layout.id + "_layout"}
@@ -79,10 +79,10 @@ export const LayoutCategory = () => {
                     textTransform: "initial",
                     justifyContent: "left",
                     width: "100%",
-                    border: layoutContext!.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17"
+                    border: layoutContext.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17"
                   }}
                   onClick={() => {
-                    layoutContext!.setActiveLayout(layout);
+                    layoutContext.setActiveLayout(layout);
                   }}
                 >
                   {layout.name}

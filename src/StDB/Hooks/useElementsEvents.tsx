@@ -47,8 +47,9 @@ export const useElementsEvents = (
     if (canvasInitialized.elementEventsInitialized || !layout) return;
 
     Elements.onInsert((element, reducerEvent) => {
+      if (!activeLayout.current) return;
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
@@ -57,7 +58,8 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
-      if (newElement.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (newElement.layoutId !== activeLayout.current.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -194,7 +196,8 @@ export const useElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       if (selectedElement.current && selectedElement.current.Elements.id === element.id) setSelected(null);
 

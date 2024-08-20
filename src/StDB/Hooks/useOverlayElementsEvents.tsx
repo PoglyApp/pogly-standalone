@@ -13,7 +13,7 @@ import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 
 export const useOverlayElementsEvents = (
-  layout: Layouts,
+  layout: Layouts | undefined,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function
 ) => {
@@ -22,6 +22,7 @@ export const useOverlayElementsEvents = (
   const activeLayout = useRef<Layouts>();
 
   useEffect(() => {
+    if(!layout) return;
     activeLayout.current = layout;
   }, [layout]);
 
@@ -30,7 +31,8 @@ export const useOverlayElementsEvents = (
 
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element);
 
@@ -39,7 +41,8 @@ export const useOverlayElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement) => {
-      if (newElement.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (newElement.layoutId !== activeLayout.current.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -153,7 +156,8 @@ export const useOverlayElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       dispatch(removeCanvasElement(element));
       dispatch(removeElement(element));

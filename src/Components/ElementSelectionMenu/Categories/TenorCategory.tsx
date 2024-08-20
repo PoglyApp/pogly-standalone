@@ -40,7 +40,7 @@ export const TenorCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext!.activeLayout
+        layoutContext.activeLayout
       );
     };
   };

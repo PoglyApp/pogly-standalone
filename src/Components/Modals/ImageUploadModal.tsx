@@ -104,7 +104,7 @@ export const ImageUploadModal = (props: IProps) => {
     };
 
     const imageSkeleton = document.getElementById("imageSkeleton");
-    imageSkeleton!.style.display = "block";
+    if(imageSkeleton) imageSkeleton.style.display = "block";
 
     insertElementData(newElementData);
     handleOnClose();

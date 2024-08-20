@@ -35,7 +35,7 @@ const useFetchElement = (
 
     // Fetch Elements
 
-    const fetchedElements = Array.from(Elements.filterByLayoutId(layout!.id));
+    const fetchedElements = Array.from(Elements.filterByLayoutId(layout.id));
 
     // This is here to fix a weird bug with SpacetimeDB Typescript SDK that only happens with Firefox where the SpacetimeDB cache doesn't update properly
     // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"

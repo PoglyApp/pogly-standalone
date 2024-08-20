@@ -42,7 +42,7 @@ export const CursorComponent = (props: IProp) => {
     <>
       <div
         id={`${props.guest.nickname}_cursor`}
-        style={{ position: "fixed", zIndex: 20000000, scale: `${1 / scale! || 1}` }}
+        style={{ position: "fixed", zIndex: 20000000, scale: `${1 / scale || 1}` }}
       >
         <img
           ref={mouse}

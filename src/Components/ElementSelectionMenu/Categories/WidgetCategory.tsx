@@ -36,7 +36,7 @@ export const WidgetCategory = (props: IProps) => {
         height: elementData.dataHeight,
         rawData: "",
       }),
-      layoutContext!.activeLayout
+      layoutContext.activeLayout
     );
   };
 

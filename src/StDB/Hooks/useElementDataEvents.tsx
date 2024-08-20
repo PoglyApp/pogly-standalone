@@ -15,7 +15,7 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
       if (!reducerEvent) return;
 
       const imageSkeleton = document.getElementById("imageSkeleton");
-      imageSkeleton!.style.display = "none";
+      if (imageSkeleton) imageSkeleton.style.display = "none";
 
       dispatch(addElementData(element));
     });

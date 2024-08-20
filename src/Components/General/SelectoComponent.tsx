@@ -27,8 +27,11 @@ export const SelectoComponent = (props: IProp) => {
         const selectionMenu = document.getElementById("SelectionMenu");
         if (selectionMenu?.contains(e.inputEvent.target)) e.stop();
 
-        const moveable = props.moveableRef.current!;
+        const moveable = props.moveableRef.current;
         const target = e.inputEvent.target;
+
+        if (!moveable) return;
+        if (!target) return;
 
         if (
           moveable.isMoveableElement(target) ||
@@ -40,7 +43,9 @@ export const SelectoComponent = (props: IProp) => {
       onSelectEnd={(e) => {
         if (e.selected.length === 0 && props.selectoTargets.length === 0) return;
 
-        const moveable = props.moveableRef.current!;
+        const moveable = props.moveableRef.current;
+
+        if (!moveable) return;
 
         if (e.isDragStart) {
           e.inputEvent.preventDefault();
