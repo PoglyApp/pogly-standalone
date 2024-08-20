@@ -24,7 +24,8 @@ export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setAct
     });
 
     Layouts.onDelete((layout) => {
-      if (layout.id !== activeLayoutRef.current!.id) return;
+      if (!activeLayoutRef.current) return;
+      if (layout.id !== activeLayoutRef.current.id) return;
 
       setActiveLayout(Layouts.filterByActive(true).next().value);
     });

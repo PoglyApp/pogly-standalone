@@ -40,7 +40,7 @@ export const ImageCategory = (props: IProps) => {
         width: elementData.dataWidth,
         height: elementData.dataHeight,
       }),
-      layoutContext?.activeLayout!
+      layoutContext.activeLayout
     );
   };
 

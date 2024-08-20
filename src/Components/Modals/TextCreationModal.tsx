@@ -160,9 +160,9 @@ export const TextCreationModal = (props: IProps) => {
     });
 
     if (!props.editElementId) {
-      insertElement(textElement, layoutContext!.activeLayout);
+      insertElement(textElement, layoutContext.activeLayout);
     } else {
-      updateTextElement(props.editElementId!, textElement);
+      updateTextElement(props.editElementId, textElement);
     }
 
     if (close) handleOnClose();

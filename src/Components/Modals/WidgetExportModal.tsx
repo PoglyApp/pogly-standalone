@@ -24,7 +24,8 @@ export const WidgetExportModal = (props: IProps) => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(props.widgetString!);
+    if(!props.widgetString) return;
+    navigator.clipboard.writeText(props.widgetString);
 
     setCopied(true);
 
@@ -34,9 +35,9 @@ export const WidgetExportModal = (props: IProps) => {
   };
 
   const handleImport = () => {
-    if (props.loadByWidgetString) {
+    if (props.loadByWidgetString && widgetCode) {
       try {
-        JSON.parse(widgetCode!);
+        JSON.parse(widgetCode);
         setError("");
       } catch (error) {
         return setError("Widget JSON does not parse.");

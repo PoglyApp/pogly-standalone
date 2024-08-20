@@ -54,13 +54,15 @@ export const ElementSelectionContextMenu = (props: IProps) => {
         </Paper>
       )}
 
-      <StyledDeleteMenuItem
-        onClick={() => {
-          handleDeleteElementData(selectedElementData!, handleClose);
-        }}
-      >
-        Delete
-      </StyledDeleteMenuItem>
+      {selectedElementData && (
+        <StyledDeleteMenuItem
+          onClick={() => {
+            handleDeleteElementData(selectedElementData, handleClose);
+          }}
+        >
+          Delete
+        </StyledDeleteMenuItem>
+      )}
     </Menu>
   );
 };

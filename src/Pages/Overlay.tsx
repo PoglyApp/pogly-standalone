@@ -26,7 +26,7 @@ export const Overlay = () => {
   useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
 
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
-  useOverlayElementsEvents(activeLayout!, canvasInitialized, setCanvasInitialized);
+  useOverlayElementsEvents(activeLayout, canvasInitialized, setCanvasInitialized);
   useOverlayLayoutEvents(activeLayout, setActiveLayout);
   useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
 
