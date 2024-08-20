@@ -23,7 +23,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
     Layouts.onUpdate((oldLayout, newLayout) => {
       if (oldLayout.active === false && newLayout.active === true) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
-        layoutIcon!.style.display = "unset";
+        if (layoutIcon) layoutIcon.style.display = "unset";
 
         toast.success(`${newLayout.name} has been made active.`, {
           position: "bottom-right",
@@ -39,7 +39,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
 
       if (oldLayout.active === true && newLayout.active === false) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
-        layoutIcon!.style.display = "none";
+        if (layoutIcon) layoutIcon.style.display = "none";
       }
     });
 

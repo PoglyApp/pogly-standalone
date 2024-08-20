@@ -3,13 +3,13 @@ import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 
 export const GetWidgetCodeJsonByElementDataID = (elementDataId: number) => {
   const widgetData = ElementData.findById(elementDataId);
-
-  const jsonObject = JSON.parse(widgetData!.data);
+  if(!widgetData) return;
+  const jsonObject = JSON.parse(widgetData.data);
 
   return {
-    widgetName: widgetData?.name,
-    widgetWidth: widgetData?.dataWidth,
-    widgetHeight: widgetData?.dataHeight,
+    widgetName: widgetData.name || "",
+    widgetWidth: widgetData.dataWidth || "",
+    widgetHeight: widgetData.dataHeight || "",
     headerTag: jsonObject.headerTag || "",
     bodyTag: jsonObject.bodyTag || "",
     styleTag: jsonObject.styleTag || "",

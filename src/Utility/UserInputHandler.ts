@@ -24,7 +24,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "delete",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -42,7 +42,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+x",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -64,7 +64,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+d",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -85,7 +85,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+c",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -105,7 +105,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+v",
     action: "keydown",
     callback: async (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         const text = await navigator.clipboard.readText();
@@ -199,7 +199,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "right",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -231,7 +231,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+right",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -263,7 +263,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "left",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -295,7 +295,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+left",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -327,7 +327,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "up",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -359,7 +359,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+up",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -391,7 +391,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "down",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -423,7 +423,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+down",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;

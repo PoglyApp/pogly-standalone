@@ -86,7 +86,8 @@ export const WidgetCreationModal = (props: IProps) => {
   };
 
   const loadByElementDataID = useCallback(() => {
-    const elementData = ElementData.findById(props.editElementDataId!);
+    if (!props.editElementDataId) return;
+    const elementData = ElementData.findById(props.editElementDataId);
     if (!elementData) return;
 
     const jsonObject = JSON.parse(elementData.data);
@@ -105,7 +106,9 @@ export const WidgetCreationModal = (props: IProps) => {
   }, [props]);
 
   const loadByElementID = useCallback(() => {
-    const element: Elements = Elements.findById(props.editElementId!)!;
+    if (!props.editElementId) return;
+    const element = Elements.findById(props.editElementId);
+    if (!element) return;
     const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
     let widgetData: any = null;
@@ -113,15 +116,15 @@ export const WidgetCreationModal = (props: IProps) => {
     if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(widgetStruct.elementDataId);
     else widgetData = JSON.parse(widgetStruct.rawData);
 
-    setWidgetName(widgetData.widgetName!);
-    setWidgetWidth(widgetData.widgetWidth!);
-    setWidgetHeight(widgetData.widgetHeight!);
+    setWidgetName(widgetData.widgetName || "");
+    setWidgetWidth(widgetData.widgetWidth || "");
+    setWidgetHeight(widgetData.widgetHeight || "");
 
-    setHeaderCode(widgetData.headerTag);
-    setBodyCode(widgetData.bodyTag);
-    setStyleCode(widgetData.styleTag);
-    setScriptCode(widgetData.scriptTag);
-    setVariables(() => widgetData.variables);
+    setHeaderCode(widgetData.headerTag || "");
+    setBodyCode(widgetData.bodyTag || "");
+    setStyleCode(widgetData.styleTag || "");
+    setScriptCode(widgetData.scriptTag || "");
+    setVariables(() => widgetData.variables || "");
 
     setShowModal(true);
   }, [props]);
@@ -151,7 +154,8 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const handleSave = () => {
     if (props.editElementId) {
-      const element: Elements = Elements.findById(props.editElementId!)!;
+      const element = Elements.findById(props.editElementId);
+      if(!element) return;
       const widgetStruct: ElementStruct = element.element as ElementStruct;
 
       const widgetJson = StringifyRawDataWidgetCode(

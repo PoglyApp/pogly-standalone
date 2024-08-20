@@ -137,7 +137,8 @@ export const ElementContextMenu = (props: IProps) => {
         </FormControl>
       </StyledMenuItem> */}
 
-      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
+      {selectedElement && ( 
+        <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
           <StyledSelect
             value={"Reset transform"}
@@ -157,33 +158,34 @@ export const ElementContextMenu = (props: IProps) => {
             </MenuItem>
             <StyledMenuItem
               value={"Scale"}
-              onClick={() => handleResetTransform(selectedElement!, TransformType.Scale, handleClose)}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Scale, handleClose)}
             >
               Scale
             </StyledMenuItem>
             <StyledMenuItem
               value={"Rotation"}
-              onClick={() => handleResetTransform(selectedElement!, TransformType.Rotation, handleClose)}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Rotation, handleClose)}
             >
               Rotation
             </StyledMenuItem>
             {/* <StyledMenuItem
               value={"Warp"}
-              onClick={() => handleResetTransform(selectedElement!, TransformType.Warp, handleClose)}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
             >
               Warp
             </StyledMenuItem>
             <StyledMenuItem
               value={"Clip"}
-              onClick={() => handleResetTransform(selectedElement!, TransformType.Clip, handleClose)}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Clip, handleClose)}
             >
               Clip
             </StyledMenuItem> */}
           </StyledSelect>
         </FormControl>
       </StyledMenuItem>
+      )}
 
-      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
+      {selectedElement && ( <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
           <StyledSelect
             value={"Flip"}
@@ -204,7 +206,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Vertical"}
               onClick={() => {
-                handleFlipElement(true, selectedElement!, handleClose);
+                handleFlipElement(true, selectedElement, handleClose);
               }}
             >
               Vertical
@@ -212,7 +214,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Horizontal"}
               onClick={() => {
-                handleFlipElement(false, selectedElement!, handleClose);
+                handleFlipElement(false, selectedElement, handleClose);
               }}
             >
               Horizontal
@@ -220,6 +222,7 @@ export const ElementContextMenu = (props: IProps) => {
           </StyledSelect>
         </FormControl>
       </StyledMenuItem>
+      )}
 
       {selectedElement && (
         <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
@@ -322,13 +325,15 @@ export const ElementContextMenu = (props: IProps) => {
 
       <Divider component="li" variant="fullWidth" sx={{ border: "solid 1px #001529e6" }} />
 
-      <StyledDeleteMenuItem
+      {selectedElement && (
+        <StyledDeleteMenuItem
         onClick={() => {
-          handleDelete(selectedElement!, props.setSelected, props.setSelectoTargets, handleClose);
+          handleDelete(selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
         }}
       >
         Delete
       </StyledDeleteMenuItem>
+      )}
     </Menu>
   );
 };

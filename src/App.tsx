@@ -73,6 +73,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (!stdbInitialized) return;
+    if (!spacetime.Identity) return;
+    if (!spacetime.Client) return;
 
     const nickname: string = localStorage.getItem("nickname") || "";
 
@@ -83,11 +85,11 @@ export const App: React.FC = () => {
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = Guests.findByIdentity(spacetime.Identity!);
+    const guest = Guests.findByIdentity(spacetime.Identity);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
-      Client: spacetime.Client!,
+      Client: spacetime.Client,
       Identity: guestWithNickname,
       Elements: [],
       ElementData: [],
@@ -258,7 +260,7 @@ export const App: React.FC = () => {
   if (!instanceConfigured) {
     return (
       <InitialSetupModal
-        config={spacetime.InstanceConfig!}
+        config={spacetime.InstanceConfig}
         connectionConfig={connectionConfig}
         setInstanceConfigured={setInstanceConfigured}
         versionNumber={versionNumber}

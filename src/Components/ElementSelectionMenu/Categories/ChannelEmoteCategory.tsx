@@ -73,7 +73,7 @@ export const ChannelEmoteCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext!.activeLayout
+        layoutContext.activeLayout
       );
     };
   };
@@ -90,7 +90,7 @@ export const ChannelEmoteCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext!.activeLayout
+        layoutContext.activeLayout
       );
     };
   };
