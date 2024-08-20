@@ -118,7 +118,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
             const blob = await clipboard[i].getType(clipboard[i].types[type]);
 
-            if (blob.size / 1024 > 400) {
+            if (blob.size / 1024 > 150) {
               return toast.error("File size too large to paste. Consider pasting an image URL instead.", {
                 position: "bottom-right",
                 autoClose: 2000,
