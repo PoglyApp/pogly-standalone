@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import DeleteElementReducer from "../module_bindings/delete_element_reducer";
 import ElementStruct from "../module_bindings/element_struct";
 import Elements from "../module_bindings/elements";
@@ -116,6 +117,22 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
           if (isImage) {
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
             const blob = await clipboard[i].getType(clipboard[i].types[type]);
+
+            if (blob.size / 1024 > 400) {
+              return toast.error("File size too large to paste. Consider pasting an image URL instead.", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            }
+
+            console.log(blob);
+
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
               insertElement(
                 ElementStruct.ImageElement({
