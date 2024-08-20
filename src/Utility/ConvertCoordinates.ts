@@ -7,8 +7,8 @@
 
 export const ViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
   return {
-    x: x * 4,
-    y: y * 4,
+    x: (x+0.75) * 4,
+    y: (y+0.75) * 4,
   };
 };
 
@@ -40,8 +40,8 @@ export const ViewportToStdbFontSize = (fontSize: number): { fontSize: number } =
 
 export const StdbToViewportCoords = (x: number, y: number): { x: number; y: number } => {
   return {
-    x: x / 4,
-    y: y / 4,
+    x: (x / 4)-0.75,
+    y: (y / 4)-0.75,
   };
 };
 
