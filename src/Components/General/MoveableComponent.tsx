@@ -176,7 +176,6 @@ export const MoveableComponent = (props: IProp) => {
   return (
     <Moveable
       ref={props.moveableRef}
-      //target={props.selected?.Component}
       target={props.selectoTargets}
       onClickGroup={(e) => {
         if (!props.selectoRef.current) return;

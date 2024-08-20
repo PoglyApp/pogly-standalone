@@ -28,8 +28,8 @@ export const Image = (props: IProp) => {
     if (imageElement.imageElementData.tag === "ElementDataId") {
       const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
 
-      if(!eData) return;
-      
+      if (!eData) return;
+
       setImageData(eData.data);
       setImageName(eData.name);
     } else {
@@ -52,6 +52,8 @@ export const Image = (props: IProp) => {
       style={{
         width: imageElement.width,
         height: imageElement.height,
+        minWidth: "16px",
+        minHeight: "16px",
         transform: props.elements.transform,
         opacity: props.elements.transparency / 100 <= 0.2 && !isOverlay ? 0.2 : props.elements.transparency / 100,
         clipPath: props.elements.clip,
