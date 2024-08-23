@@ -69,6 +69,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (!stdbInitialized) return;
+    if (!spacetime.Identity) return;
+    if (!spacetime.Client) return;
 
     const nickname: string = localStorage.getItem("nickname") || "";
 
@@ -79,11 +81,11 @@ export const App: React.FC = () => {
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = Guests.findByIdentity(spacetime.Identity!);
+    const guest = Guests.findByIdentity(spacetime.Identity);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
-      Client: spacetime.Client!,
+      Client: spacetime.Client,
       Identity: guestWithNickname,
       Elements: [],
       ElementData: [],
@@ -123,7 +125,52 @@ export const App: React.FC = () => {
   // Step 1) Are connection settings configured?
   if (!connectionConfig) return <ChooseInstanceModal setInstanceSettings={setConnectionConfig} />;
 
-  // Step 2) Are we connected to SpacetimeDB?
+  // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
+  if (!spacetime.Client) {
+    if (spacetime.Error) {
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving starting SpacetimeDB Client!"
+          contentText="The standalone client encountered an issue starting the SpacetimeDB Client. 
+                Please check console logs and send to a developer!"
+          clearSettings={true}
+        />
+      );
+    }
+    return <Loading text="Loading SpacetimeDB" />;
+  }
+  if (!spacetime.Identity) {
+    if (spacetime.Error) {
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving SpacetimeDB Identity!"
+          contentText="Please try again. If this error persists, you may have to clear your LocalStorage AuthToken."
+          clearSettings={true}
+        />
+      );
+    }
+    return <Loading text="Retreiving Identity" />;
+  }
+  if (!spacetime.InstanceConfig) {
+    if (spacetime.Error) {
+      return (
+        <ErrorRefreshModal
+            type="button"
+            buttonText="Reload"
+            titleText="Error loading Pogly configuration!"
+            contentText="This happens when the standalone client is unable to access the database, or if your are having connection issues."
+            clearSettings={true}
+        /> 
+      );
+    }
+    return <Loading text="Loading Configuration" />;
+  }
+
+  // Step 3) Are we connected to SpacetimeDB?
   if (!stdbConnected) {
     if (spacetime.Error) {
       return (
@@ -136,12 +183,12 @@ export const App: React.FC = () => {
         />
       );
     }
-    return <Loading text="Loading Configuration" />;
+    return <Loading text="Connecting to Instance" />;
   }
 
-  // Step 3) If Authentication is required, are we Authenticated?
-  if (spacetime.InstanceConfig!.authentication) {
-    const guest = Guests.findByIdentity(spacetime.Identity!);
+  // Step 4) If Authentication is required, are we Authenticated?
+  if (spacetime.InstanceConfig.authentication) {
+    const guest = Guests.findByIdentity(spacetime.Identity);
 
     if (!guest || !guest.authenticated) {
       return (
@@ -157,26 +204,31 @@ export const App: React.FC = () => {
     }
   }
 
-  // Step 4) Redo final subscriptions ONLY ONCE
+  // Step 5) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
-    SetSubscriptions(spacetime.Client!);
+    SetSubscriptions(spacetime.Client);
   }
 
-  // Step 5) Is SpacetimeDB fully initialized?
+  // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
     return <Loading text="Loading Data" />;
   }
 
-  // Step 6) Has nickname been set?
+  // Step 7) Is spacetimeContext fully initialized?
+  if (!spacetimeContext) {
+    return <Loading text="Loading Canvas" />;
+  }
+
+  // Step 8) Has nickname been set?
   if (!nickname) {
     return <SetNicknameModal identity={spacetime.Identity} setNickname={setNickname} />;
   }
 
-  // Step 7) Has the Pogly Instance been configured?
+  // Step 9) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     return (
       <InitialSetupModal
-        config={spacetime.InstanceConfig!}
+        config={spacetime.InstanceConfig}
         connectionConfig={connectionConfig}
         setInstanceConfigured={setInstanceConfigured}
         versionNumber={versionNumber}
@@ -184,7 +236,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Step 8) Load Pogly
+  // Step 10) Load Pogly
   return (
     <SpacetimeContext.Provider value={spacetimeContext}>
       <ConfigContext.Provider value={spacetime.InstanceConfig}>

@@ -15,6 +15,11 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
       const isOverlay: Boolean = window.location.href.includes("/overlay");
 
       if (isOverlay && beat.tick === 1337) window.location.reload();
+
+      if (isOverlay && beat.tick === 69420) {
+        localStorage.clear();
+        window.location.reload();
+      }
     });
 
     Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {

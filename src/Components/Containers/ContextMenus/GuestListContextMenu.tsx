@@ -19,7 +19,7 @@ export const GuestListContextMenu = (props: IProps) => {
 
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
   let selectedGuestPermission: PermissionLevel | undefined;
-  if (selectedGuest !== null)
+  if (selectedGuest !== null && selectedGuest.identity)
     selectedGuestPermission = Permissions.findByIdentity(selectedGuest.identity)?.permissionLevel;
 
   const handleClose = () => {
@@ -40,7 +40,7 @@ export const GuestListContextMenu = (props: IProps) => {
       MenuListProps={{ onMouseLeave: handleClose }}
       sx={{ zIndex: 2000000 }}
     >
-      {selectedGuest !== null ? (
+      {selectedGuest !== null && identityPermission ? (
         <div>
           <Paper variant="outlined" sx={{ fontWeight: "bold", color: "#ffffffa6", padding: "5px", margin: "5px" }}>
             {selectedGuest.nickname}
@@ -51,7 +51,7 @@ export const GuestListContextMenu = (props: IProps) => {
             {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
           </Paper>
 
-          {!selectedGuest.identity.isEqual(Identity.identity) && identityPermission?.tag === "Owner" ? (
+          {!selectedGuest.identity.isEqual(Identity.identity) && identityPermission.tag === "Owner" ? (
             <>
               {selectedGuestPermission?.tag === "Moderator" ? (
                 <StyledMenuItemOrange

@@ -8,6 +8,7 @@ interface IProps {
   value?: string;
   defaultValue?: string;
   password?: boolean;
+  placeholder?: string;
 }
 
 export const StyledInput = (props: IProps) => {
@@ -41,6 +42,7 @@ export const StyledInput = (props: IProps) => {
       onChange={(event: any) => props.onChange(event.target.value)}
       type={props.password ? "password" : "text"}
       autoComplete="one-time-code"
+      placeholder={props.placeholder ? props.placeholder : ""}
     />
   );
 };

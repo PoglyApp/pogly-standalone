@@ -17,6 +17,7 @@ import { ModalContext } from "../Contexts/ModalContext";
 import DeleteAllElementsReducer from "../module_bindings/delete_all_elements_reducer";
 import DeleteAllElementDataReducer from "../module_bindings/delete_all_element_data_reducer";
 import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
+import RefreshOverlayClearStorageReducer from "../module_bindings/refresh_overlay_clear_storage_reducer";
 
 interface IProps {
   activePage: Number;
@@ -136,6 +137,13 @@ export const Header = (props: IProps) => {
                   <RefreshIcon fontSize="small" color="success" />
                 </ListItemIcon>
                 Force refresh overlay
+              </StyledMenuItem>
+
+              <StyledMenuItem onClick={() => RefreshOverlayClearStorageReducer.call()}>
+                <ListItemIcon>
+                  <RefreshIcon fontSize="small" color="success" />
+                </ListItemIcon>
+                Force refresh overlay & Delete LocalStorage
               </StyledMenuItem>
             </Menu>
 
