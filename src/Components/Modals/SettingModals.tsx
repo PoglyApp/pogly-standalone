@@ -34,9 +34,6 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Permissions from "../../module_bindings/permissions";
 import { InstancePasswordModal } from "./InstancePasswordModal";
 import Config from "../../module_bindings/config";
-import Elements from "../../module_bindings/elements";
-import Layouts from "../../module_bindings/layouts";
-import { SettingsPanel } from "../Settings/SettingsPanel";
 import { SettingsTabPanel } from "../Settings/SettingsTabPanel";
 
 interface IProp {
