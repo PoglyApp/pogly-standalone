@@ -60,6 +60,7 @@ import UpdateAuthenticationKeyReducer from "../module_bindings/update_authentica
 import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import KickGuestReducer from "../module_bindings/kick_guest_reducer";
+import RefreshOverlayClearStorageReducer from "../module_bindings/refresh_overlay_clear_storage_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -128,6 +129,7 @@ const useStDB = (
       UpdateAuthenticationKeyReducer,
       RefreshOverlayReducer,
       ClearRefreshOverlayRequestsReducer,
+      RefreshOverlayClearStorageReducer,
       KickGuestReducer
     );
 
@@ -141,7 +143,11 @@ const useStDB = (
         setStdbClient(client);
         localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + Identity.toHexString() + "]");
-        client?.subscribe(["SELECT * FROM Guests", "SELECT * FROM Config"]);
+        client?.subscribe([
+          "SELECT * FROM Heartbeat",
+          "SELECT * FROM Guests",
+          "SELECT * FROM Config", 
+          "SELECT * FROM Permissions"]);
       } catch (error) {
         console.log("SpacetimeDB connect failed:", error);
       }
@@ -176,7 +182,7 @@ const useStDB = (
 
           setTimeout(function () {
             setStdbConnected(true);
-          }, 500);
+          }, 1000);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);

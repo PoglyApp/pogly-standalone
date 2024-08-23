@@ -40,7 +40,7 @@ export const ChooseInstanceModal = (props: IProp) => {
         domain = "ws://127.0.0.1:3000";
         break;
       case "Custom":
-        domain = "ws://" + customDomain;
+        domain = customDomain;
         break;
     }
 
@@ -101,6 +101,7 @@ export const ChooseInstanceModal = (props: IProp) => {
               color="#ffffffa6"
               onChange={(text: any) => setCustomDomain(text)}
               defaultValue={""}
+              placeholder="ws(s)://127.0.0.1"
             />
           )}
 

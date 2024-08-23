@@ -105,6 +105,24 @@ static partial class Module
             Log("Encountered an error forcing an overlay Refresh: " + e.Message, LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void RefreshOverlayClearStorage(ReducerContext ctx)
+    {
+        try
+        {
+            new Heartbeat
+            {
+                Id = (uint) ctx.Time.ToUnixTimeSeconds(),
+                ServerIdentity = ctx.Sender,
+                Tick = 69420
+            }.Insert();
+        }
+        catch (Exception e)
+        {
+            Log("Encountered an error forcing an overlay Refresh: " + e.Message, LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void ClearRefreshOverlayRequests(ReducerContext ctx)
@@ -114,6 +132,7 @@ static partial class Module
             foreach (var request in Heartbeat.Iter())
             {
                 if (request.Tick == 1337) Heartbeat.DeleteById(request.Id);
+                if (request.Tick == 69420) Heartbeat.DeleteById(request.Id);
             }
         }
         catch (Exception e)
