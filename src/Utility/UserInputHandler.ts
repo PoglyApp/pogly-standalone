@@ -14,6 +14,7 @@ import {
   ViewportToStdbFontSize,
 } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
+import { CompressImage } from "./CompressImage";
 
 export const UserInputHandler = (activeLayout: Layouts, selectedElement: SelectedType | undefined): any => {
   const userInputs = [];
@@ -116,7 +117,15 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
           if (isImage) {
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
-            const blob = await clipboard[i].getType(clipboard[i].types[type]);
+            let blob: any = await clipboard[i].getType(clipboard[i].types[type]);
+
+            console.log("Before compress", Math.floor(blob.size / 1024) + " KB");
+
+            if (blob.type !== "image/gif") {
+              blob = await CompressImage(blob);
+            }
+
+            console.log("After compress", Math.floor(blob.size / 1024) + " KB");
 
             if (blob.size / 1024 > 150) {
               return toast.error("File size too large to paste. Consider pasting an image URL instead.", {
@@ -130,8 +139,6 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
                 theme: "dark",
               });
             }
-
-            console.log(blob);
 
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
               insertElement(
