@@ -31,6 +31,9 @@ jobs:
   delete_old_packages:
     name: "Delete old Packages"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/delete-package-versions@v5
         with:
