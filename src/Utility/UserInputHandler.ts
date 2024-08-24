@@ -16,7 +16,11 @@ import {
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 
-export const UserInputHandler = (activeLayout: Layouts, selectedElement: SelectedType | undefined): any => {
+export const UserInputHandler = (
+  activeLayout: Layouts,
+  selectedElement: SelectedType | undefined,
+  compressPaste: boolean | undefined
+): any => {
   const userInputs = [];
 
   // DELETE SELECTED ELEMENT WITH DELETE
@@ -119,13 +123,9 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
             let blob: any = await clipboard[i].getType(clipboard[i].types[type]);
 
-            console.log("Before compress", Math.floor(blob.size / 1024) + " KB");
-
-            if (blob.type !== "image/gif") {
+            if (blob.type !== "image/gif" && compressPaste) {
               blob = await CompressImage(blob);
             }
-
-            console.log("After compress", Math.floor(blob.size / 1024) + " KB");
 
             if (blob.size / 1024 > 150) {
               return toast.error("File size too large to paste. Consider pasting an image URL instead.", {

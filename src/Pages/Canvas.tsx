@@ -37,6 +37,7 @@ import { UserInputHandler } from "../Utility/UserInputHandler";
 import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
+import { SettingsContext } from "../Contexts/SettingsContext";
 
 interface IProps {
   setActivePage: Function;
@@ -48,6 +49,7 @@ export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { setModals } = useContext(ModalContext);
+  const { settings } = useContext(SettingsContext);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -91,7 +93,7 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected));
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {

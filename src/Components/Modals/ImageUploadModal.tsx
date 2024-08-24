@@ -20,6 +20,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { CompressImage } from "../../Utility/CompressImage";
+import { SettingsContext } from "../../Contexts/SettingsContext";
 
 interface IProps {
   dragnAndDropFile?: any;
@@ -27,6 +28,7 @@ interface IProps {
 
 export const ImageUploadModal = (props: IProps) => {
   const { Identity } = useSpacetimeContext();
+  const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -80,14 +82,13 @@ export const ImageUploadModal = (props: IProps) => {
       return;
     }
 
+    const isGif = changedFile.type === "image/gif";
+    setIsFileGif(isGif);
+
+    if (settings.compressUpload && !isGif) await handleImageCompression(changedFile);
+
     if (changedFile.size / 1024 > 3000)
       setError("Large files can increase load time. Consider compressing the image or uploading with an URL instead.");
-
-    if (changedFile.type === "image/gif") {
-      setIsFileGif(true);
-    } else {
-      setIsFileGif(false);
-    }
 
     setFile(changedFile);
   };
@@ -124,9 +125,7 @@ export const ImageUploadModal = (props: IProps) => {
     handleOnClose();
   };
 
-  const handleImageCompression = async () => {
-    if (!file) return setError("Cannot compress file, file not found.");
-
+  const handleImageCompression = async (file: any) => {
     setCompressing(true);
 
     const newFile = await CompressImage(file);
@@ -224,34 +223,24 @@ export const ImageUploadModal = (props: IProps) => {
                       File compression
                     </Typography>
 
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        color: "#ffffffa6",
-                        borderColor: "#ffffffa6",
-                        "&:hover": { borderColor: "white" },
-                        "&:disabled": {
-                          borderColor: "gray",
-                          color: "gray",
-                        },
-                      }}
-                      onClick={handleImageCompression}
-                    >
-                      Compress
-                    </Button>
+                    {!settings.compressUpload && (
+                      <Typography variant="body1" color="#ffffffa6" sx={{ alignSelf: "center" }}>
+                        Image compression disabled in Settings.
+                      </Typography>
+                    )}
+
+                    {compressedFile && (
+                      <div style={{ alignContent: "end" }}>
+                        <Typography variant="body1" color="red" sx={{ alignSelf: "center" }}>
+                          Before: {Math.floor(file.size / 1024)} KB
+                        </Typography>
+
+                        <Typography variant="body1" color="green" sx={{ alignSelf: "center" }}>
+                          After: {Math.floor(compressedFile.size / 1024)} KB
+                        </Typography>
+                      </div>
+                    )}
                   </div>
-
-                  {compressedFile && (
-                    <div style={{ alignContent: "end", marginLeft: "20px" }}>
-                      <Typography variant="body1" color="red" sx={{ alignSelf: "center" }}>
-                        Before: {Math.floor(file.size / 1024)} KB
-                      </Typography>
-
-                      <Typography variant="body1" color="green" sx={{ alignSelf: "center" }}>
-                        After: {Math.floor(compressedFile.size / 1024)} KB
-                      </Typography>
-                    </div>
-                  )}
                 </div>
               )}
 
