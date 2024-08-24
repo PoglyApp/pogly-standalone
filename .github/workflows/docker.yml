@@ -7,7 +7,7 @@ on:
 jobs:
   docker:
     name: "Build and Push"
-    runs-on: [linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: lowercase repo owner
         run: |
@@ -27,7 +27,7 @@ jobs:
           tags: ghcr.io/${{ env.GITHUB_OWNER_LC }}/pogly:latest
   delete_old_packages:
     name: "Delete old Packages"
-    runs-on: [linux]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/delete-package-versions@v5
         with:
