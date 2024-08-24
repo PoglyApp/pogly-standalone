@@ -1,12 +1,13 @@
 :80 {
     @spacetime {
-        path /identity/*
-        path /database/*
-        path /energy/*
+        path /identity*
+        path /database*
+        path /energy*
     }
 
     reverse_proxy @spacetime localhost:3000
 
     root * /usr/share/caddy
+    try_files {path} /index.html
     file_server
 }

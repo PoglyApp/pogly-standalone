@@ -14,7 +14,7 @@ jobs:
           echo "GITHUB_OWNER_LC=${GITHUB_OWNER,,}" >>${GITHUB_ENV}
         env:
           GITHUB_OWNER: '${{ github.repository_owner }}'
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -22,14 +22,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./docker
+          context: .
           push: true
           tags: ghcr.io/${{ env.GITHUB_OWNER_LC }}/pogly:latest
   delete_old_packages:
     name: "Delete old Packages"
     runs-on: [linux]
     steps:
-      - uses: actions/delete-package-versions@v4
+      - uses: actions/delete-package-versions@v5
         with:
           package-name: 'pogly'
           package-type: 'container'
