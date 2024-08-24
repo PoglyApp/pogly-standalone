@@ -8,6 +8,9 @@ jobs:
   docker:
     name: "Build and Push"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: lowercase repo owner
         run: |
