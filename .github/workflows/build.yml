@@ -1,12 +1,16 @@
-name: Build Project
+name: Build
 
 on:
   push:
-  pull_request:
+    branches-ignore:
+      - refs/tags/v*
+  release:
+    types:
+      - created
 
 jobs:
   backend:
-    name: "Build SpacetimeDB Module"
+    name: "SpacetimeDB Module"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +36,7 @@ jobs:
           overwrite: true
 
   frontend:
-    name: "Build Web"
+    name: "Web"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,5 +59,16 @@ jobs:
   deploy:
     name: "Deploy"
     needs: frontend
+    if: >
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/dev' ||
+      startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  release:
+    name: "Release"
+    needs: [ backend, frontend ]
+    if: github.event_name == 'release'
+    uses: ./.github/workflows/release.yml
     secrets: inherit

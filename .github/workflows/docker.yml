@@ -1,13 +1,13 @@
-name: Build Docker Images
+name: Docker
 
 on:
   push:
-    branches: [main, gh_actions]
+    branches: [main]
     tags: ['v*']
 
 jobs:
   docker:
-    name: "Build Docker image"
+    name: "Build Image"
     runs-on: ubuntu-latest
     permissions:
       contents: read

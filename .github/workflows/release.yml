@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  workflow_call:
+
+jobs:
+  upload_assets:
+    name: "Upload Assets"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - run: |
+          mkdir assets
+          cd web-files
+          tar -czf ../assets/pogly-web.tar.gz *
+          cd ..
+          mv spacetimedb-module/pogly.wasm assets/pogly-spacetimedb-module.wasm
+      - uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: assets/*
