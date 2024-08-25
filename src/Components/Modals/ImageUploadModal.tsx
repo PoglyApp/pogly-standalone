@@ -82,7 +82,7 @@ export const ImageUploadModal = (props: IProps) => {
       return;
     }
 
-    const isGif = changedFile.type === "image/gif";
+    const isGif = changedFile.type === "image/gif" || changedFile.type === "image/webp";
     setIsFileGif(isGif);
 
     if (settings.compressUpload && !isGif) await handleImageCompression(changedFile);
@@ -250,7 +250,7 @@ export const ImageUploadModal = (props: IProps) => {
                     File compression
                   </Typography>
                   <Typography variant="body2" color="#ffffffa6">
-                    Unavailable for GIFS.
+                    Unavailable for Webp or GIFs.
                   </Typography>
                 </div>
               )}
