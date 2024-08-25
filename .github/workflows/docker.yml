@@ -1,33 +1,49 @@
-name: Build and Push Docker Images
+name: Build Docker Images
 
 on:
   push:
-    branches: [main]
+    branches: [main, gh_actions]
+    tags: ['v*']
 
 jobs:
   docker:
-    name: "Build and Push"
+    name: "Build Docker image"
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
     steps:
-      - name: lowercase repo owner
+      - name: "lowercase repo owner"
         run: |
           echo "GITHUB_OWNER_LC=${GITHUB_OWNER,,}" >>${GITHUB_ENV}
         env:
           GITHUB_OWNER: '${{ github.repository_owner }}'
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
-          username: ${{ env.GITHUB_OWNER_LC }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v3
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ghcr.io/${{ env.GITHUB_OWNER_LC }}/pogly
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ env.GITHUB_OWNER_LC }}/pogly:latest
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=registry,ref=user/app:latest
+          cache-to: type=inline
+
   delete_old_packages:
     name: "Delete old Packages"
     runs-on: ubuntu-latest

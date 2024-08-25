@@ -1,0 +1,59 @@
+name: Build Project
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: "Build SpacetimeDB Module"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Setup .NET"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8'
+      - name: "Setup build env"
+        run: |
+          sudo apt-get update && sudo apt-get install -y binaryen
+          dotnet workload install wasi-experimental
+          curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/latest/download/spacetime.linux-amd64.tar.gz | sudo tar -xzC /usr/bin/
+          sudo chmod +x /usr/bin/spacetime
+      - name: "Build module"
+        run: |
+          spacetime build -p server
+          mv server/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: spacetimedb-module
+          path: pogly.wasm
+          overwrite: true
+
+  frontend:
+    name: "Build Web"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Setup node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: "Build web"
+        run: |
+          npm install
+          npm run build
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-files
+          path: build/
+          overwrite: true
+
+  deploy:
+    name: "Deploy"
+    needs: frontend
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
