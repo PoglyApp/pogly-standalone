@@ -57,7 +57,12 @@ export const App: React.FC = () => {
   // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
-  const [settings, setSettings] = useState<any>(JSON.parse(localStorage.getItem("settings")!) || {});
+  const [settings, setSettings] = useState<any>(JSON.parse(localStorage.getItem("settings")!) || {
+    "debug":false,
+    "cursorName":true,
+    "compressUpload":true,
+    "compressPaste":true
+  });
 
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
@@ -249,6 +254,10 @@ export const App: React.FC = () => {
   // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
     return <Loading text="Loading Data" />;
+  }
+
+  if (!spacetimeContext) {
+    return <Loading text="Loading Canvas" />;
   }
 
   // Step 7) Has nickname been set?

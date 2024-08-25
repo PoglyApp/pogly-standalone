@@ -147,7 +147,12 @@ const useStDB = (
         setStdbClient(client);
         localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + Identity.toHexString() + "]");
-        client?.subscribe(["SELECT * FROM Guests", "SELECT * FROM Config"]);
+        client?.subscribe([
+          "SELECT * FROM Guests",
+          "SELECT * FROM Config", 
+          "SELECT * FROM Permissions", 
+          "SELECT * FROM Heartbeat"
+        ]);
       } catch (error) {
         console.log("SpacetimeDB connect failed:", error);
       }
