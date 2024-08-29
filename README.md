@@ -59,8 +59,10 @@ Pogly Standalone user documentation and installation instructions are available 
 
 ## Used by
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
+<a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
 <a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
 <a href="https://www.twitch.tv/brain" rel="noreferrer" target="_blank" title="Brain"><img src="./images/streamers/brain.svg" /></a>
+<a href="https://www.twitch.tv/buttsoap" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/buttsoap.svg" /></a>
 <a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank" title="Ashlynn"><img src="./images/streamers/ashlynn.svg" /></a>
 <a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank" title="Ssaab"><img src="./images/streamers/ssaab.svg" /></a>
 <a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank" title="JustAGameOverScreen"><img src="./images/streamers/justagameoverscreen.svg" /></a>

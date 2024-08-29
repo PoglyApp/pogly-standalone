@@ -191,6 +191,9 @@ public partial class Module
             if (!GetGuest(func, ctx.Sender, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
+            
+            if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
+                return;
 
             var oldElement = Elements.FilterById(elementId).First();
 
