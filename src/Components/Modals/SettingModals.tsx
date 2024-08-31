@@ -37,7 +37,6 @@ import DeleteAllElementDataReducer from "../../module_bindings/delete_all_elemen
 import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
 
 interface IProp {
-  setDebug: Function;
   onlineVersion: string;
 }
 
@@ -87,7 +86,6 @@ export const SettingsModal = (props: IProp) => {
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
 
-    props.setDebug(debugCheckbox);
     closeModal("settings_modal", modals, setModals);
   };
 
