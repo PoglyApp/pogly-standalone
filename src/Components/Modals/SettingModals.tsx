@@ -35,6 +35,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
 import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
 import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
+import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
 
 interface IProp {
   setDebug: Function;
@@ -422,6 +423,20 @@ export const SettingsModal = (props: IProp) => {
                 onClick={() => RefreshOverlayReducer.call()}
               >
                 Force refresh canvas
+              </Button>
+
+              <Button
+                variant="outlined"
+                startIcon={<RefreshIcon fontSize="small" sx={{ color: "5cb85c" }} />}
+                sx={{
+                  color: "#5cb85c",
+                  borderColor: "#53a653",
+                  "&:hover": { borderColor: "#376e37" },
+                  marginTop: "10px",
+                }}
+                onClick={() => RefreshOverlayClearStorageReducer.call()}
+              >
+                Force hard refresh canvas
               </Button>
             </div>
           </SettingsTabPanel>
