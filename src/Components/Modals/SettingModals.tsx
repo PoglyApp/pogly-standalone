@@ -363,7 +363,7 @@ export const SettingsModal = (props: IProp) => {
                 label="Enable debug mode"
               />
 
-              <FormControlLabel
+              {/* <FormControlLabel
                 componentsProps={{
                   typography: { color: "#ffffffa6", paddingTop: "1px" },
                 }}
@@ -371,12 +371,12 @@ export const SettingsModal = (props: IProp) => {
                 control={
                   <Checkbox
                     onChange={() => setDebugCheckbox(!debugCheckbox)}
-                    checked={compressPaste}
+                    checked={debugCheckbox}
                     sx={{ color: "#ffffffa6", paddingTop: "0px" }}
                   />
                 }
                 label="Log EVERYTHING"
-              />
+              /> */}
             </div>
 
             <div style={{ display: "grid", marginTop: "10px" }}>
