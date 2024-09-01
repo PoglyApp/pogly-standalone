@@ -19,14 +19,18 @@ export const Widget = (props: IProp) => {
   const [iframeSrc, setIframeSrc] = useState<string>("");
 
   useEffect(() => {
-    let htmlCode: string = "";
+    try {
+      let htmlCode: string = "";
 
-    if (widgetElement.rawData === "") htmlCode = WidgetCodeCompiler(widgetElement.elementDataId);
-    else htmlCode = WidgetCodeCompiler(undefined, widgetElement.rawData);
+      if (widgetElement.rawData === "") htmlCode = WidgetCodeCompiler(widgetElement.elementDataId);
+      else htmlCode = WidgetCodeCompiler(undefined, widgetElement.rawData);
 
-    DebugLogger("Creating widget");
+      DebugLogger("Creating widget");
 
-    setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
+      setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
+    } catch (error) {
+      console.log("ERROR WHILE SPAWNING WIDGET", error);
+    }
   }, [widgetElement.elementDataId, widgetElement.rawData]);
 
   const showWidgetCreationModal = () => {

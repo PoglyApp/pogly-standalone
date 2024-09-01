@@ -26,31 +26,38 @@ export const WidgetExportModal = (props: IProps) => {
 
   const handleCopy = () => {
     if (!props.widgetString) return;
+    try {
+      DebugLogger("Copying widget code");
 
-    DebugLogger("Copying widget code");
+      navigator.clipboard.writeText(props.widgetString);
 
-    navigator.clipboard.writeText(props.widgetString);
+      setCopied(true);
 
-    setCopied(true);
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 1000);
+      setTimeout(() => {
+        setCopied(false);
+      }, 1000);
+    } catch (error) {
+      console.log("ERROR WHILE TRYING TO COPY WIDGET STRING", error);
+    }
   };
 
   const handleImport = () => {
-    DebugLogger("Importing widget code");
-    if (props.loadByWidgetString && widgetCode) {
-      try {
-        JSON.parse(widgetCode);
-        setError("");
-      } catch (error) {
-        return setError("Widget JSON does not parse.");
+    try {
+      DebugLogger("Importing widget code");
+      if (props.loadByWidgetString && widgetCode) {
+        try {
+          JSON.parse(widgetCode);
+          setError("");
+        } catch (error) {
+          return setError("Widget JSON does not parse.");
+        }
+
+        closeModal("widgetImport_modal", modals, setModals);
+
+        props.loadByWidgetString(widgetCode);
       }
-
-      closeModal("widgetImport_modal", modals, setModals);
-
-      props.loadByWidgetString(widgetCode);
+    } catch (error) {
+      console.log("ERROR WHILE TRYING TO IMPORT WIDGET", error);
     }
   };
 
