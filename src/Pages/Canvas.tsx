@@ -38,6 +38,7 @@ import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 interface IProps {
   setActivePage: Function;
@@ -97,8 +98,11 @@ export const Canvas = (props: IProps) => {
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {
+      DebugLogger("Setting active layout");
       layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
     }
+
+    DebugLogger("Layout context updated");
 
     setSelected(undefined);
     setSelectoTargets(() => []);
@@ -107,8 +111,9 @@ export const Canvas = (props: IProps) => {
   }, [layoutContext]);
 
   useEffect(() => {
+    DebugLogger("Setting active page");
     props.setActivePage(1);
-  }, [props]);
+  }, [props.setActivePage]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -128,6 +133,7 @@ export const Canvas = (props: IProps) => {
   };
 
   if (disconnected) {
+    DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
         type="button"

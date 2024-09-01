@@ -1,13 +1,15 @@
 import ElementData from "../module_bindings/element_data";
+import { DebugLogger } from "./DebugLogger";
 
 // "Compiler" is a very generous term for what this method does
 export const WidgetCodeCompiler = (elementDataId?: number, rawData?: string) => {
+  DebugLogger("'Compiling' widget");
   let widgetData: any = rawData ? JSON.parse(rawData) : null;
 
   if (!widgetData) {
-    if(!elementDataId) return "";
+    if (!elementDataId) return "";
     const elementData = ElementData.findById(elementDataId);
-    if(!elementData) return "";
+    if (!elementData) return "";
     const data = elementData.data;
 
     widgetData = JSON.parse(data);

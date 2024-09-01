@@ -13,6 +13,7 @@ import { HandleLayoutSelectionContextMenu } from "../../../Utility/HandleContext
 import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
@@ -26,6 +27,7 @@ export const LayoutCategory = () => {
   useLayoutEvents(setLayouts);
 
   const showLayoutCreationModal = () => {
+    DebugLogger("Opening layout creation modal");
     setModals((oldModals: any) => [...oldModals, <LayoutCreationModal key="layoutCreation_modal" />]);
   };
 
@@ -79,7 +81,7 @@ export const LayoutCategory = () => {
                     textTransform: "initial",
                     justifyContent: "left",
                     width: "100%",
-                    border: layoutContext.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17"
+                    border: layoutContext.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17",
                   }}
                   onClick={() => {
                     layoutContext.setActiveLayout(layout);

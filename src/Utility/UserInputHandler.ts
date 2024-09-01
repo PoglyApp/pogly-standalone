@@ -15,6 +15,7 @@ import {
 } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
+import { DebugLogger } from "./DebugLogger";
 
 export const UserInputHandler = (
   activeLayout: Layouts,
@@ -29,10 +30,13 @@ export const UserInputHandler = (
     keys: "delete",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed DELETE");
       event.preventDefault();
 
       try {
         if (!selectedElement) return;
+
+        DebugLogger("Deleting element");
 
         DeleteElementReducer.call(selectedElement.Elements.id);
       } catch (error) {
@@ -47,6 +51,7 @@ export const UserInputHandler = (
     keys: "ctrl+x",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed CTRL + X");
       event.preventDefault();
 
       try {
@@ -55,6 +60,7 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
+        DebugLogger("Deleting and copying element");
 
         DeleteElementReducer.call(selectedElement.Elements.id);
       } catch {
@@ -69,11 +75,12 @@ export const UserInputHandler = (
     keys: "ctrl+d",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed CTRL + D");
       event.preventDefault();
 
       try {
         if (!selectedElement) return;
-
+        DebugLogger("Duplicating element");
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element)
@@ -90,11 +97,12 @@ export const UserInputHandler = (
     keys: "ctrl+c",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed CTRL + C");
       event.preventDefault();
 
       try {
         if (!selectedElement) return;
-
+        DebugLogger("Copying element");
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
@@ -110,6 +118,7 @@ export const UserInputHandler = (
     keys: "ctrl+v",
     action: "keydown",
     callback: async (event: any) => {
+      DebugLogger("User pressed CTRL + V");
       event.preventDefault();
 
       try {
@@ -124,10 +133,12 @@ export const UserInputHandler = (
             let blob: any = await clipboard[i].getType(clipboard[i].types[type]);
 
             if (blob.type !== "image/gif" && compressPaste) {
+              DebugLogger("Compressing image");
               blob = await CompressImage(blob);
             }
 
             if (blob.size / 1024 > 150) {
+              DebugLogger("Image size too large");
               return toast.error("File size too large to paste. Consider pasting an image URL instead.", {
                 position: "bottom-right",
                 autoClose: 2000,
@@ -141,6 +152,7 @@ export const UserInputHandler = (
             }
 
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
+              DebugLogger("Inserting new element");
               insertElement(
                 ElementStruct.ImageElement({
                   imageElementData: ImageElementData.RawData(result.r as string),
@@ -157,6 +169,8 @@ export const UserInputHandler = (
           try {
             const json = JSON.parse(text);
             if (!json.element.tag) return;
+
+            DebugLogger("Inserting new text");
 
             insertElement(
               json.element as ElementStruct,
@@ -206,6 +220,7 @@ export const UserInputHandler = (
     keys: "right",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed right arrow");
       event.preventDefault();
 
       try {
@@ -214,6 +229,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 2;
@@ -238,6 +255,7 @@ export const UserInputHandler = (
     keys: "shift+right",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed SHIFRT + right arrow");
       event.preventDefault();
 
       try {
@@ -246,6 +264,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 7;
@@ -270,6 +290,7 @@ export const UserInputHandler = (
     keys: "left",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed left arrow");
       event.preventDefault();
 
       try {
@@ -278,6 +299,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 2;
@@ -302,6 +325,7 @@ export const UserInputHandler = (
     keys: "shift+left",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed SHIFT + left arrow");
       event.preventDefault();
 
       try {
@@ -310,6 +334,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 7;
@@ -334,6 +360,7 @@ export const UserInputHandler = (
     keys: "up",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed up arrow");
       event.preventDefault();
 
       try {
@@ -342,6 +369,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 2;
@@ -366,6 +395,8 @@ export const UserInputHandler = (
     keys: "shift+up",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed SHIFT + up arrow");
+
       event.preventDefault();
 
       try {
@@ -374,6 +405,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 7;
@@ -398,6 +431,7 @@ export const UserInputHandler = (
     keys: "down",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed down arrow");
       event.preventDefault();
 
       try {
@@ -406,6 +440,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 2;
@@ -430,6 +466,7 @@ export const UserInputHandler = (
     keys: "shift+down",
     action: "keydown",
     callback: (event: any) => {
+      DebugLogger("User pressed SHIFT + down arrow");
       event.preventDefault();
 
       try {
@@ -438,6 +475,8 @@ export const UserInputHandler = (
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 7;
@@ -460,6 +499,7 @@ export const UserInputHandler = (
 };
 
 const blobToBase64 = (file: any, cb: any) => {
+  DebugLogger("Converting image to Base64");
   let reader = new FileReader();
 
   reader.readAsDataURL(file);

@@ -15,6 +15,7 @@ import {
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   identity?: Identity;
@@ -31,16 +32,19 @@ export const SetNicknameModal = (props: IProps) => {
 
   useEffect(() => {
     if (isOverlay) {
+      DebugLogger("Is overlay, setting nickname to overlay");
       props.setNickname("Overlay");
     }
   }, [props, isOverlay]);
 
   const handleLogin = () => {
+    DebugLogger("Handling log in");
     if (!props.identity || !nickname || nickname === "") return;
 
     const alreadyExists = Array.from(Guests.filterByNickname(nickname));
 
     if (alreadyExists.length > 0) {
+      DebugLogger("Nickname taken");
       return setError("That nickname is taken.");
     } else {
       setError("");

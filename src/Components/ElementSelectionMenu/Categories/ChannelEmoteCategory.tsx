@@ -16,6 +16,7 @@ import BetterTVEmote from "../../../Types/BetterTVTypes/BetterTVEmoteType";
 import BetterTVWrap from "../../../Utility/BetterTVWrap";
 import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const ChannelEmoteCategory = () => {
   const layoutContext = useContext(LayoutContext);
@@ -37,6 +38,8 @@ export const ChannelEmoteCategory = () => {
   useEffect(() => {
     if (sevenTVEmotes.length < 1) return;
     setShownEmotes(() => []);
+
+    DebugLogger("Initializing channel emotes category");
 
     const selectedChannelEmotes: ChannelEmote[] = [];
     const range: number =
@@ -62,6 +65,7 @@ export const ChannelEmoteCategory = () => {
   }, [sevenTVEmotes, betterTVEmotes, maxDisplayed]);
 
   const AddSevenTVElementToCanvas = (emote: SevenTVEmote) => {
+    DebugLogger("Adding 7TV emote to canvas");
     var blob = SevenTVWrap.GetURLFromEmote(emote);
 
     var image = new Image();
@@ -79,6 +83,7 @@ export const ChannelEmoteCategory = () => {
   };
 
   const AddBetterTVElementToCanvas = (emote: BetterTVEmote) => {
+    DebugLogger("Adding BetterTV emote to canvas");
     var blob = BetterTVWrap.GetURLFromEmote(emote);
 
     var image = new Image();

@@ -11,6 +11,7 @@ import WidgetElement from "../../module_bindings/widget_element";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -22,12 +23,15 @@ export const useOverlayElementsEvents = (
   const activeLayout = useRef<Layouts>();
 
   useEffect(() => {
-    if(!layout) return;
+    if (!layout) return;
+    DebugLogger("Updating overlay elements events refs");
     activeLayout.current = layout;
   }, [layout]);
 
   useEffect(() => {
     if (canvasInitialized.overlayElementEventsInitialized || !layout) return;
+
+    DebugLogger("Initializing overlay element events");
 
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;

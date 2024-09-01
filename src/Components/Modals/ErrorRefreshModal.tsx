@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ClearConnectionSettings } from "../../Utility/ClearConnectionSettings";
 import KickSelfReducer from "../../module_bindings/kick_self_reducer";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   type: string; //should be "timer" or "button"
@@ -19,12 +20,14 @@ export const ErrorRefreshModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   //Clear out connection settings to prevent getting stuck
-  if(props.clearSettings) ClearConnectionSettings();
+  if (props.clearSettings) ClearConnectionSettings();
 
   useEffect(() => {
     if (isOverlay) return;
 
     if (props.type !== "timer") return;
+
+    DebugLogger("Initializing refresh");
 
     if (timer === 0) window.location.reload();
 
@@ -34,10 +37,11 @@ export const ErrorRefreshModal = (props: IProp) => {
   }, [timer, isOverlay, props.type]);
 
   const handleClick = () => {
-    if(props.kickSelf) KickSelfReducer.call();
+    DebugLogger("Handling refresh click");
+    if (props.kickSelf) KickSelfReducer.call();
 
     window.location.reload();
-  }
+  };
 
   if (isOverlay) return <></>;
 

@@ -1,6 +1,9 @@
 import imageCompression from "browser-image-compression";
+import { DebugLogger } from "./DebugLogger";
 
 export const CompressImage = async (file: any) => {
+  DebugLogger("Compressing image");
+
   try {
     const options = {
       useWebWorker: true, // Use multi-threading for faster compression

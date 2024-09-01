@@ -28,6 +28,7 @@ import { LayoutContext } from "../../Contexts/LayoutContext";
 import styled from "styled-components";
 import { HexColorPicker } from "react-colorful";
 import { GetFontFamily } from "../../Utility/GetFontFamily";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   editElementId?: number;
@@ -58,6 +59,7 @@ export const TextCreationModal = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   useEffect(() => {
+    DebugLogger("Initializing text creation modal");
     if (!props.editElementId) return setShowModal(true);
 
     const textElement = Elements.findById(props.editElementId);
@@ -70,11 +72,13 @@ export const TextCreationModal = (props: IProps) => {
     setColor(textStruct.color);
 
     try {
+      DebugLogger("Using custom font");
       const fontJson = JSON.parse(textStruct.font);
 
       setCustomFont(fontJson.fontUrl);
       setUseCustomFont(true);
     } catch (error) {
+      DebugLogger("Using pre-added fonts");
       setSelectedFont(textStruct.font);
     }
 
@@ -83,10 +87,13 @@ export const TextCreationModal = (props: IProps) => {
 
   useEffect(() => {
     setError("");
+    DebugLogger("Resetting text creation error");
   }, [useCustomFont]);
 
   const handleTextChange = (newText: any) => {
+    DebugLogger("Text updated");
     if (newText.length < 1) {
+      DebugLogger("Text too short");
       setText("");
       return setError("Text has to be at least 1 characters long.");
     }
@@ -100,6 +107,7 @@ export const TextCreationModal = (props: IProps) => {
   };
 
   const handleCustomFontChange = (newFont: any) => {
+    DebugLogger("Custom font updated");
     const validUrl =
       /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(
         newFont
@@ -111,14 +119,17 @@ export const TextCreationModal = (props: IProps) => {
   };
 
   const handleFontSizeChange = (size: any) => {
+    DebugLogger("Font size updated");
     const regex = new RegExp("^[0-9]+$");
 
     if (size.length < 1) {
+      DebugLogger("Font field empty");
       setFontSize("");
       return setError("Font size cannot be blank.");
     }
 
     if (!regex.test(size)) {
+      DebugLogger("Fomt size not a number");
       setFontSize("");
       return setError("Font size has to be a number.");
     }
@@ -128,7 +139,9 @@ export const TextCreationModal = (props: IProps) => {
   };
 
   const handleColorChange = (color: any) => {
+    DebugLogger("Color updated");
     if (color.length < 3) {
+      DebugLogger("Color hex not long enough");
       setError("Color hex has to be at least 3 characters long.");
     } else {
       setError("");
@@ -138,13 +151,16 @@ export const TextCreationModal = (props: IProps) => {
   };
 
   const handleOnClose = () => {
+    DebugLogger("Closing text creation modal");
     closeModal("textCreation_modal", modals, setModals);
   };
 
   const handleSave = async (close: boolean) => {
+    DebugLogger("Saving new text");
     let useFont = selectedFont;
 
     if (useCustomFont) {
+      DebugLogger("Using custom font");
       const fontFamily = await GetFontFamily(customFont);
 
       if (!fontFamily) return setError("Could not get font family. Please make sure you provide a direct CDN URL.");
@@ -160,8 +176,10 @@ export const TextCreationModal = (props: IProps) => {
     });
 
     if (!props.editElementId) {
+      DebugLogger("Inserting new text");
       insertElement(textElement, layoutContext.activeLayout);
     } else {
+      DebugLogger("Updating old text");
       updateTextElement(props.editElementId, textElement);
     }
 

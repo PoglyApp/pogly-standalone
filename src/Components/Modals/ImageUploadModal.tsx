@@ -21,6 +21,7 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { CompressImage } from "../../Utility/CompressImage";
 import { SettingsContext } from "../../Contexts/SettingsContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   dragnAndDropFile?: any;
@@ -47,6 +48,7 @@ export const ImageUploadModal = (props: IProps) => {
 
   useEffect(() => {
     if (!props.dragnAndDropFile) return setFieldsInitialized(true);
+    DebugLogger("Initializing image upload modal");
 
     handleFileChange(props.dragnAndDropFile);
     handleNameChange(props.dragnAndDropFile.name.substr(0, props.dragnAndDropFile.name.lastIndexOf(".")));
@@ -55,7 +57,9 @@ export const ImageUploadModal = (props: IProps) => {
   }, [props.dragnAndDropFile]);
 
   const handleNameChange = (name: any) => {
+    DebugLogger("Handling image name change");
     if (name.length < 2) {
+      DebugLogger("File name wrong length");
       setError("File name has to be between 2-10 characters long.");
       setImageName("");
       return;
@@ -67,6 +71,7 @@ export const ImageUploadModal = (props: IProps) => {
   };
 
   const handleFileChange = async (changedFile: any) => {
+    DebugLogger("Handling file change");
     setError("");
 
     const isImage =
@@ -77,6 +82,7 @@ export const ImageUploadModal = (props: IProps) => {
       changedFile.type === "image/gif";
 
     if (!isImage) {
+      DebugLogger("File not an image");
       setError("Incorrect file format. File must be an image. (png, jpg, jpeg, webp, or gif)");
       setFile(null);
       return;
@@ -94,6 +100,7 @@ export const ImageUploadModal = (props: IProps) => {
   };
 
   const handleURLChange = async (url: any) => {
+    DebugLogger("Handling image URL change");
     setError("");
 
     if (url.length === 0) {
@@ -104,10 +111,12 @@ export const ImageUploadModal = (props: IProps) => {
   };
 
   const handleOnClose = () => {
+    DebugLogger("Handling image upload modal close");
     closeModal("imageUpload_modal", modals, setModals);
   };
 
   const handleSave = () => {
+    DebugLogger("Saving image");
     const usedFile = compressedFile ? compressedFile : file;
 
     const newElementData: ElementDataType = {
@@ -126,6 +135,7 @@ export const ImageUploadModal = (props: IProps) => {
   };
 
   const handleImageCompression = async (file: any) => {
+    DebugLogger("Compressing image");
     setCompressing(true);
 
     const newFile = await CompressImage(file);

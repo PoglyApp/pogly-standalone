@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useNotice = (setNoticeMessage: Function) => {
   const isPoglyOrDevInstance: Boolean =
@@ -8,6 +9,8 @@ export const useNotice = (setNoticeMessage: Function) => {
 
   useEffect(() => {
     if (!isPoglyOrDevInstance) return;
+
+    DebugLogger("Fetching notice");
 
     (async () => {
       const response = await fetch("https://raw.githubusercontent.com/PoglyApp/.github/main/beacons/notice");

@@ -3,11 +3,13 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { TextCreationModal } from "../../Modals/TextCreationModal";
 import { useContext } from "react";
 import { ModalContext } from "../../../Contexts/ModalContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const TextCategory = () => {
   const { setModals } = useContext(ModalContext);
 
   const showTextCreationModal = () => {
+    DebugLogger("Opening text creation modal");
     setModals((oldModals: any) => [...oldModals, <TextCreationModal key="textCreation_modal" />]);
   };
 

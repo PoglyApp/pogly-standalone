@@ -12,6 +12,7 @@ import {
   GetTransformFromCoords,
   ViewportToStdbCoords,
 } from "../../../Utility/ConvertCoordinates";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const insertElement = (
   elementStruct: ElementStruct,
@@ -20,6 +21,8 @@ export const insertElement = (
   transform?: string,
   clip?: string
 ) => {
+  DebugLogger("Inserting new element");
+
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 285px)");
   const coords = ViewportToStdbCoords(transformCoords.x, transformCoords.y);
   const newTransform = GetTransformFromCoords(

@@ -8,6 +8,7 @@ import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useGuestsEvents = (
   canvasInitialized: CanvasInitializedType,
@@ -23,6 +24,8 @@ export const useGuestsEvents = (
 
   useEffect(() => {
     if (isOverlay || canvasInitialized.guestEventsInitialized) return;
+
+    DebugLogger("Initializing guest events");
 
     Guests.onInsert((newGuest) => {
       dispatch(addGuest(newGuest));

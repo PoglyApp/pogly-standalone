@@ -5,6 +5,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   widgetString?: string;
@@ -24,7 +25,10 @@ export const WidgetExportModal = (props: IProps) => {
   };
 
   const handleCopy = () => {
-    if(!props.widgetString) return;
+    if (!props.widgetString) return;
+
+    DebugLogger("Copying widget code");
+
     navigator.clipboard.writeText(props.widgetString);
 
     setCopied(true);
@@ -35,6 +39,7 @@ export const WidgetExportModal = (props: IProps) => {
   };
 
   const handleImport = () => {
+    DebugLogger("Importing widget code");
     if (props.loadByWidgetString && widgetCode) {
       try {
         JSON.parse(widgetCode);
@@ -49,7 +54,7 @@ export const WidgetExportModal = (props: IProps) => {
     }
   };
 
-  if(isOverlay) return(<></>);
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={true} onClose={handleOnClose}>

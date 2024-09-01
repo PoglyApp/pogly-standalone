@@ -11,6 +11,7 @@ import Layouts from "../module_bindings/layouts";
 import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const Overlay = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -39,8 +40,10 @@ export const Overlay = () => {
     ClearRefreshOverlayRequestsReducer.call();
 
     if (layoutParam) {
+      DebugLogger("Getting layout by name");
       setActiveLayout(Layouts.filterByName(layoutParam).next().value);
     } else {
+      DebugLogger("Getting layout by active ID");
       setActiveLayout(Layouts.filterByActive(true).next().value);
     }
   }, []);

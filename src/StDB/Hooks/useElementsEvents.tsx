@@ -17,6 +17,7 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -38,6 +39,7 @@ export const useElementsEvents = (
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
+    DebugLogger("Updating element event refs");
     elementData.current = elementDataStore;
     activeLayout.current = layout;
     selectedElement.current = selected;
@@ -45,6 +47,8 @@ export const useElementsEvents = (
 
   useEffect(() => {
     if (canvasInitialized.elementEventsInitialized || !layout) return;
+
+    DebugLogger("Initializing element events");
 
     Elements.onInsert((element, reducerEvent) => {
       if (!activeLayout.current) return;

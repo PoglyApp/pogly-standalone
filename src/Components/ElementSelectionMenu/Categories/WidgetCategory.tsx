@@ -12,6 +12,7 @@ import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContex
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   elementData: ElementData[];
@@ -25,10 +26,12 @@ export const WidgetCategory = (props: IProps) => {
   const layoutContext = useContext(LayoutContext);
 
   const showWidgetCreationModal = () => {
+    DebugLogger("Opening widget creation modal");
     setModals((oldModals: any) => [...oldModals, <WidgetCreationModal key="widgetCreation_modal" />]);
   };
 
   const AddElementToCanvas = (elementData: ElementData) => {
+    DebugLogger("Adding widget to canvas");
     insertElement(
       ElementStruct.WidgetElement({
         elementDataId: elementData.id,

@@ -1,9 +1,11 @@
 import ElementData from "../module_bindings/element_data";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
+import { DebugLogger } from "./DebugLogger";
 
 export const GetWidgetCodeJsonByElementDataID = (elementDataId: number) => {
+  DebugLogger("Getting widget code JSON by element data ID");
   const widgetData = ElementData.findById(elementDataId);
-  if(!widgetData) return;
+  if (!widgetData) return;
   const jsonObject = JSON.parse(widgetData.data);
 
   return {
@@ -25,6 +27,8 @@ export const StringifyWidgetCode = (
   scriptCode: string,
   variables: WidgetVariableType[]
 ) => {
+  DebugLogger("Stringifying widget code");
+
   const jsonString: string = JSON.stringify({
     headerTag: headerCode,
     bodyTag: bodyCode,
@@ -46,6 +50,7 @@ export const StringifyRawDataWidgetCode = (
   scriptCode: string,
   variables: WidgetVariableType[]
 ) => {
+  DebugLogger("Stringifying raw data widget code");
   const jsonString: string = JSON.stringify({
     widgetName: widgetName,
     widgetWidth: widgetWidth,

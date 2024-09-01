@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setActiveLayout: Function) => {
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
   const activeLayoutRef = useRef<Layouts | undefined>(activeLayout);
 
   useEffect(() => {
+    DebugLogger("Updating overlay layout event refs");
     activeLayoutRef.current = activeLayout;
   }, [activeLayout]);
 
   useEffect(() => {
     if (eventsInitialized) return;
+
+    DebugLogger("Initializing overlay layout events");
 
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");

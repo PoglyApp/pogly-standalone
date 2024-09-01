@@ -46,6 +46,7 @@ import Elements from "../../module_bindings/elements";
 import WidgetElement from "../../module_bindings/widget_element";
 import ElementStruct from "../../module_bindings/element_struct";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -87,6 +88,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const loadByElementDataID = useCallback(() => {
     if (!props.editElementDataId) return;
+    DebugLogger("Loading widget by element data ID");
     const elementData = ElementData.findById(props.editElementDataId);
     if (!elementData) return;
 
@@ -107,6 +109,8 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const loadByElementID = useCallback(() => {
     if (!props.editElementId) return;
+    DebugLogger("Loading widget by element ID");
+
     const element = Elements.findById(props.editElementId);
     if (!element) return;
     const widgetStruct: WidgetElement = element.element.value as WidgetElement;
@@ -130,6 +134,7 @@ export const WidgetCreationModal = (props: IProps) => {
   }, [props]);
 
   const loadByWidgetString = (widgetString: string) => {
+    DebugLogger("Loading widget by widget string");
     const jsonObject = JSON.parse(widgetString);
 
     setWidgetName(jsonObject.widgetName || "");
@@ -149,13 +154,15 @@ export const WidgetCreationModal = (props: IProps) => {
   };
 
   const handleOnClose = () => {
+    DebugLogger("Closing widget modal");
     closeModal("widgetCreation_modal", modals, setModals);
   };
 
   const handleSave = () => {
+    DebugLogger("Saving widget");
     if (props.editElementId) {
       const element = Elements.findById(props.editElementId);
-      if(!element) return;
+      if (!element) return;
       const widgetStruct: ElementStruct = element.element as ElementStruct;
 
       const widgetJson = StringifyRawDataWidgetCode(
@@ -197,6 +204,7 @@ export const WidgetCreationModal = (props: IProps) => {
   };
 
   const openExportModal = () => {
+    DebugLogger("Opening widget export modal");
     const widgetJson = StringifyRawDataWidgetCode(
       widgetName,
       widgetWidth,
@@ -215,6 +223,7 @@ export const WidgetCreationModal = (props: IProps) => {
   };
 
   const openImportModal = () => {
+    DebugLogger("Opening widget import modal");
     setModals((oldModals: any) => [
       ...oldModals,
       <WidgetExportModal key="widgetImport_modal" importing={true} loadByWidgetString={loadByWidgetString} />,
@@ -224,6 +233,7 @@ export const WidgetCreationModal = (props: IProps) => {
   useEffect(() => {
     if (props.editElementDataId) return loadByElementDataID();
     if (props.editElementId) return loadByElementID();
+    DebugLogger("Initializing widget creation modal");
 
     return setShowModal(true);
   }, [props, loadByElementDataID, loadByElementID]);

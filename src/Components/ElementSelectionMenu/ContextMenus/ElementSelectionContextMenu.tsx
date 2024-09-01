@@ -5,6 +5,7 @@ import { handleDeleteElementData } from "../../../Utility/ContextMenuMethods";
 import ElementData from "../../../module_bindings/element_data";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   contextMenu: any;
@@ -19,10 +20,12 @@ export const ElementSelectionContextMenu = (props: IProps) => {
   const [showExamine, setShowExamine] = useState(false);
 
   const handleClose = () => {
+    DebugLogger("Handling close context menu");
     props.setContextMenu(null);
   };
 
   const handleEditWidget = () => {
+    DebugLogger("Opening edit widget modal");
     setModals((oldModals: any) => [
       ...oldModals,
       <WidgetCreationModal key="widgetCreation_modal" editElementDataId={selectedElementData?.id} />,

@@ -15,6 +15,7 @@ import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContex
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   elementData: ElementData[];
@@ -30,10 +31,12 @@ export const ImageCategory = (props: IProps) => {
   const [searchimage, setSearchImage] = useState<string>("");
 
   const showImageUploadModal = () => {
+    DebugLogger("Opening image upload modal");
     setModals((oldModals: any) => [...oldModals, <ImageUploadModal key="imageUpload_modal" />]);
   };
 
   const AddElementToCanvas = (elementData: ElementData) => {
+    DebugLogger("Adding element to canvas");
     insertElement(
       ElementStruct.ImageElement({
         imageElementData: ImageElementData.ElementDataId(elementData.id),

@@ -5,6 +5,7 @@ import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
 import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import { ConfigContext } from "../Contexts/ConfigContext";
 import SevenTVUserType from "../Types/SevenTVTypes/SevenTVUserType";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useSevenTV = (
   setEmotes: Function,
@@ -22,11 +23,15 @@ export const useSevenTV = (
 
   useEffect(() => {
     if (sevenTVInitialized) return;
+    DebugLogger("Get 7TV streamer ID");
+
     setStreamerIdPromise(SevenTVWrap.GetSevenTVId(config.streamName));
   }, [sevenTVInitialized, setStreamerIdPromise, config.streamName]);
 
   useEffect(() => {
     if (sevenTVInitialized) return;
+    DebugLogger("Get Twitch user by ID");
+
     streamerIdPromise?.then((p) => {
       if (!p.data) return;
       setStreamerId(p.data.users[0].id);

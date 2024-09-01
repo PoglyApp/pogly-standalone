@@ -5,6 +5,7 @@ import Elements from "../../module_bindings/elements";
 import ImageElement from "../../module_bindings/image_element";
 import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   elements: Elements;
@@ -24,6 +25,7 @@ export const Image = (props: IProp) => {
 
   useEffect(() => {
     handleElementBorder(Identity.identity, props.elements.id.toString());
+    DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
       const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];

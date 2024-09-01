@@ -64,6 +64,7 @@ import RefreshOverlayClearStorageReducer from "../module_bindings/refresh_overla
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
 import KickSelfReducer from "../module_bindings/kick_self_reducer";
 import ConnectReducer from "../module_bindings/connect_reducer";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -79,6 +80,7 @@ const useStDB = (
 
   useEffect(() => {
     if (!connectionConfig) return;
+    DebugLogger("Initializing SpacetimeDB");
 
     SpacetimeDBClient.registerTables(Heartbeat, Guests, Elements, ElementData, Config, Permissions, Layouts);
     SpacetimeDBClient.registerReducers(
@@ -151,8 +153,9 @@ const useStDB = (
         client?.subscribe([
           "SELECT * FROM Heartbeat",
           "SELECT * FROM Guests",
-          "SELECT * FROM Config", 
-          "SELECT * FROM Permissions"]);
+          "SELECT * FROM Config",
+          "SELECT * FROM Permissions",
+        ]);
       } catch (error) {
         console.log("SpacetimeDB connect failed:", error);
       }

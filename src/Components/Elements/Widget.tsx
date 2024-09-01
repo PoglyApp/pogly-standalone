@@ -4,6 +4,7 @@ import WidgetElement from "../../module_bindings/widget_element";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../Modals/WidgetCreationModal";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   elements: Elements;
@@ -23,14 +24,16 @@ export const Widget = (props: IProp) => {
     if (widgetElement.rawData === "") htmlCode = WidgetCodeCompiler(widgetElement.elementDataId);
     else htmlCode = WidgetCodeCompiler(undefined, widgetElement.rawData);
 
+    DebugLogger("Creating widget");
+
     setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
   }, [widgetElement.elementDataId, widgetElement.rawData]);
 
   const showWidgetCreationModal = () => {
-      setModals((oldModals: any) => [
-        ...oldModals,
-        <WidgetCreationModal key="widgetCreation_modal" editElementId={props.elements.id} />,
-      ]);
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <WidgetCreationModal key="widgetCreation_modal" editElementId={props.elements.id} />,
+    ]);
   };
 
   return (

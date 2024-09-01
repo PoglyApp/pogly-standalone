@@ -18,6 +18,7 @@ import {
 import { ChangelogType } from "../../Types/General/ChangelogType";
 import { ChangeType } from "../../Types/General/ChangeType";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   changelog: ChangelogType | undefined;
@@ -34,10 +35,13 @@ export const ChangelogModal = (props: IProps) => {
     if (!props.changelog) return;
     if (showModal) return;
 
+    DebugLogger("Initializing change log modal");
+
     setShowModal(true);
   }, [props, showModal]);
 
   const handleOnClose = () => {
+    DebugLogger("Handling close change log modal close");
     localStorage.setItem("changelog", props.latestVersion);
     closeModal("changelog_modal", modals, setModals);
   };

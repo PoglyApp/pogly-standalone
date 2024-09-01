@@ -38,7 +38,6 @@ import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer
 import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
 
 interface IProp {
-  setDebug: Function;
   onlineVersion: string;
 }
 
@@ -88,7 +87,6 @@ export const SettingsModal = (props: IProp) => {
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
 
-    props.setDebug(debugCheckbox);
     closeModal("settings_modal", modals, setModals);
   };
 
@@ -133,10 +131,6 @@ export const SettingsModal = (props: IProp) => {
       setStreamPlayerInteractable(false);
       stream.style.pointerEvents = "none";
     }
-  };
-
-  const openInNewTab = (url: string) => {
-    window.open(url, "_blank", "noreferrer");
   };
 
   if (isOverlay) return <></>;
@@ -363,20 +357,22 @@ export const SettingsModal = (props: IProp) => {
                 label="Enable debug mode"
               />
 
-              {/* <FormControlLabel
+              <FormControlLabel
                 componentsProps={{
                   typography: { color: "#ffffffa6", paddingTop: "1px" },
                 }}
                 sx={{ alignItems: "start" }}
                 control={
                   <Checkbox
-                    onChange={() => setDebugCheckbox(!debugCheckbox)}
-                    checked={debugCheckbox}
+                    onChange={(event) => localStorage.setItem("debuglogger", event.target.checked.toString())}
+                    defaultChecked={
+                      localStorage.getItem("debuglogger") ? JSON.parse(localStorage.getItem("debuglogger")!) : false
+                    }
                     sx={{ color: "#ffffffa6", paddingTop: "0px" }}
                   />
                 }
-                label="Log EVERYTHING"
-              /> */}
+                label="Debug logger"
+              />
             </div>
 
             <div style={{ display: "grid", marginTop: "10px" }}>

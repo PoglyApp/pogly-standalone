@@ -13,6 +13,7 @@ import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GetCoordsFromTransform, ViewportToStdbSize } from "../../Utility/ConvertCoordinates";
 import UpdateWidgetElementSizeReducer from "../../module_bindings/update_widget_element_size_reducer";
 import UpdateImageElementSizeReducer from "../../module_bindings/update_image_element_size_reducer";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   transformSelect: any;
@@ -35,12 +36,14 @@ export const MoveableComponent = (props: IProp) => {
   useEffect(() => {
     const handleKeyDown = (event: any) => {
       if (event.key === "Shift") {
+        DebugLogger("Shift is being pressed");
         setIsShiftPressed(true);
       }
     };
 
     const handleKeyUp = (event: any) => {
       if (event.key === "Shift") {
+        DebugLogger("Shift is let go");
         setIsShiftPressed(false);
       }
     };
@@ -59,14 +62,18 @@ export const MoveableComponent = (props: IProp) => {
     if (!debugText) return;
 
     if (!settings.debug) {
+      DebugLogger("Hide debug text");
       debugText.style.display = "none";
     } else {
+      DebugLogger("Show debug text");
       debugText.style.display = "Inline";
     }
   }, [settings.debug, debugText]);
 
   const onTransformStop = (event: any) => {
     if (!event.isDrag || !props.selected) return;
+
+    DebugLogger("Updating element transform");
 
     updateElementTransform(props.selected.Elements.id, event.lastEvent.style.transform);
   };
@@ -122,6 +129,8 @@ export const MoveableComponent = (props: IProp) => {
     if (!event) return;
 
     if (!event.lastEvent) return;
+
+    DebugLogger("Updating element size");
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
