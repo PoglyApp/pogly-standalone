@@ -54,6 +54,7 @@ export const App: React.FC = () => {
   const [stdbAuthenticated, setStdbAuthenticated] = useState<boolean>(false);
   const [stdbAuthTimeout, setStdbAuthTimeout] = useState<boolean>(false);
   const [stdbInitialized, setStdbInitialized] = useState<boolean>(false);
+  const [stdbSubscriptions, setStdbSubscriptions] = useState<boolean>(false);
 
   // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
@@ -281,8 +282,9 @@ export const App: React.FC = () => {
 
   // Step 5) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
+    if (stdbInitialized || stdbSubscriptions) return <Loading text="Loading data..." />;
     DebugLogger("Redoing subscriptions");
-    SetSubscriptions(spacetime.Client);
+    SetSubscriptions(spacetime.Client, setStdbSubscriptions);
   }
 
   // Step 6) Is SpacetimeDB fully initialized?
