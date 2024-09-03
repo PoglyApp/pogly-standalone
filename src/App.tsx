@@ -139,6 +139,7 @@ export const App: React.FC = () => {
               setActivePage={setActivePage}
               canvasInitialized={canvasInitialized}
               setCanvasInitialized={setCanvasInitialized}
+              disconnected={spacetime.Disconnected}
             />
           }
         />

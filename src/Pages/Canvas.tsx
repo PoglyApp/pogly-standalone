@@ -39,11 +39,13 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { Identity, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 
 interface IProps {
   setActivePage: Function;
   canvasInitialized: CanvasInitializedType;
   setCanvasInitialized: Function;
+  disconnected: boolean;
 }
 
 export const Canvas = (props: IProps) => {
@@ -132,7 +134,7 @@ export const Canvas = (props: IProps) => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (disconnected) {
+  if (disconnected || props.disconnected) {
     DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal

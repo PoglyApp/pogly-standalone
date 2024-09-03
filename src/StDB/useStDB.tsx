@@ -76,6 +76,7 @@ const useStDB = (
   const [identity, setIdentity] = useState<Identity>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
+  const [disconnected, setDisconnected] = useState<boolean>(false);
   const [stdbClient, setStdbClient] = useState<SpacetimeDBClient>();
 
   useEffect(() => {
@@ -195,6 +196,11 @@ const useStDB = (
     });
 
     client?.onError((...args: any[]) => {
+      if(args[0].type === "close") {
+        setDisconnected(true);
+        return;
+      }
+
       setError(true);
       console.log("Error with SpacetimeDB: ", args);
     });
@@ -202,7 +208,7 @@ const useStDB = (
     client?.connect();
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
-  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error };
+  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error, Disconnected: disconnected };
 };
 
 export default useStDB;
