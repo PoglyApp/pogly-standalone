@@ -235,7 +235,7 @@ export const App: React.FC = () => {
           titleText="Multiple Connections Detected"
           contentText="Pogly only supports a single connection from each identity at this time.
                 Either multiple tabs are open, or an error occurred and your identity is still signed in."
-          clearSettings={false}
+          clearSettings={true}
           kickSelf={true}
         />
       );
