@@ -1,9 +1,8 @@
 import "react-toastify/dist/ReactToastify.css";
 
 import { createBrowserRouter, Route, createRoutesFromElements, RouterProvider } from "react-router-dom";
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { Home } from "./Pages/Home";
 import { Canvas } from "./Pages/Canvas";
 import { Header } from "./Header/Header";
 
@@ -30,6 +29,9 @@ import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import Layouts from "./module_bindings/layouts";
 import { LayoutContext } from "./Contexts/LayoutContext";
+import ConnectReducer from "./module_bindings/connect_reducer";
+import AuthenticateReducer from "./module_bindings/authenticate_reducer";
+import { DebugLogger } from "./Utility/DebugLogger";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -48,12 +50,22 @@ export const App: React.FC = () => {
 
   // STDB
   const [stdbConnected, setStdbConnected] = useState<boolean>(false);
+  const stdbAuthenticatedRef = useRef<boolean>(false);
+  const [stdbAuthenticated, setStdbAuthenticated] = useState<boolean>(false);
+  const [stdbAuthTimeout, setStdbAuthTimeout] = useState<boolean>(false);
   const [stdbInitialized, setStdbInitialized] = useState<boolean>(false);
 
   // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
-  const [settings, setSettings] = useState<any>(JSON.parse(localStorage.getItem("settings")!) || {});
+  const [settings, setSettings] = useState<any>(
+    JSON.parse(localStorage.getItem("settings")!) || {
+      debug: false,
+      cursorName: true,
+      compressUpload: true,
+      compressPaste: true,
+    }
+  );
 
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
@@ -65,12 +77,20 @@ export const App: React.FC = () => {
   useGetVersionNumber(setVersionNumber);
   useGetConnectionConfig(setConnectionConfig);
 
-  const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbInitialized, setInstanceConfigured);
+  const spacetime = useStDB(
+    connectionConfig,
+    setStdbConnected,
+    setStdbAuthenticated,
+    setStdbInitialized,
+    setInstanceConfigured
+  );
 
   useEffect(() => {
     if (!stdbInitialized) return;
     if (!spacetime.Identity) return;
     if (!spacetime.Client) return;
+
+    DebugLogger("Setting nickname and Spacetime context");
 
     const nickname: string = localStorage.getItem("nickname") || "";
 
@@ -94,7 +114,13 @@ export const App: React.FC = () => {
   }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
 
   useEffect(() => {
+    DebugLogger("Setting SpacetimeDB authenticated ref");
+    stdbAuthenticatedRef.current = stdbAuthenticated;
+  }, [stdbAuthenticated]);
+
+  useEffect(() => {
     if (!stdbInitialized) return;
+    DebugLogger("Setting active layout");
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
   }, [activeLayout, stdbInitialized]);
 
@@ -113,6 +139,7 @@ export const App: React.FC = () => {
               setActivePage={setActivePage}
               canvasInitialized={canvasInitialized}
               setCanvasInitialized={setCanvasInitialized}
+              disconnected={spacetime.Disconnected}
             />
           }
         />
@@ -123,11 +150,16 @@ export const App: React.FC = () => {
   );
 
   // Step 1) Are connection settings configured?
-  if (!connectionConfig) return <ChooseInstanceModal setInstanceSettings={setConnectionConfig} />;
+  if (!connectionConfig) {
+    DebugLogger("Connection config not configured");
+    return <ChooseInstanceModal setInstanceSettings={setConnectionConfig} />;
+  }
 
   // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
   if (!spacetime.Client) {
+    DebugLogger("Waiting for SpacetimeDB client");
     if (spacetime.Error) {
+      DebugLogger("Failed to load SpacetimeDB client");
       return (
         <ErrorRefreshModal
           type="button"
@@ -141,8 +173,11 @@ export const App: React.FC = () => {
     }
     return <Loading text="Loading SpacetimeDB" />;
   }
+
   if (!spacetime.Identity) {
+    DebugLogger("Waiting for SpacetimeDB identity");
     if (spacetime.Error) {
+      DebugLogger("Failed to load SpacetimeDB identity");
       return (
         <ErrorRefreshModal
           type="button"
@@ -155,16 +190,19 @@ export const App: React.FC = () => {
     }
     return <Loading text="Retreiving Identity" />;
   }
+
   if (!spacetime.InstanceConfig) {
+    DebugLogger("Waiting for instance config ");
     if (spacetime.Error) {
+      DebugLogger("Failed to load instance config");
       return (
         <ErrorRefreshModal
-            type="button"
-            buttonText="Reload"
-            titleText="Error loading Pogly configuration!"
-            contentText="This happens when the standalone client is unable to access the database, or if your are having connection issues."
-            clearSettings={true}
-        /> 
+          type="button"
+          buttonText="Reload"
+          titleText="Error loading Pogly configuration!"
+          contentText="This happens when the standalone client is unable to access the database, or if your are having connection issues."
+          clearSettings={true}
+        />
       );
     }
     return <Loading text="Loading Configuration" />;
@@ -172,7 +210,9 @@ export const App: React.FC = () => {
 
   // Step 3) Are we connected to SpacetimeDB?
   if (!stdbConnected) {
+    DebugLogger("Waiting for SpacetimeDB connection");
     if (spacetime.Error) {
+      DebugLogger("Failed to connect to Pogly instance");
       return (
         <ErrorRefreshModal
           type="button"
@@ -183,14 +223,34 @@ export const App: React.FC = () => {
         />
       );
     }
+
+    const alreadyLogged = Guests.findByIdentity(spacetime.Identity);
+
+    if (alreadyLogged) {
+      DebugLogger("Guest already logged in");
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Clear Connections & Reload"
+          titleText="Multiple Connections Detected"
+          contentText="Pogly only supports a single connection from each identity at this time.
+                Either multiple tabs are open, or an error occurred and your identity is still signed in."
+          clearSettings={false}
+          kickSelf={true}
+        />
+      );
+    }
+
+    ConnectReducer.call();
+
     return <Loading text="Connecting to Instance" />;
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
   if (spacetime.InstanceConfig.authentication) {
-    const guest = Guests.findByIdentity(spacetime.Identity);
-
-    if (!guest || !guest.authenticated) {
+    DebugLogger("Is guest authenticated");
+    if (stdbAuthTimeout) {
+      DebugLogger("Authentication required but authentication failed");
       return (
         <ErrorRefreshModal
           type="timer"
@@ -202,30 +262,49 @@ export const App: React.FC = () => {
         />
       );
     }
+
+    let timeout = null;
+
+    if (!stdbAuthenticated) {
+      DebugLogger("Not authenticated");
+      if (spacetime.InstanceConfig.authentication) AuthenticateReducer.call(connectionConfig.authKey);
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setStdbAuthTimeout(!stdbAuthenticatedRef.current);
+      }, 2500);
+
+      return <Loading text="Authenticating..." />;
+    }
+
+    if (timeout) clearTimeout(timeout);
   }
 
   // Step 5) Redo final subscriptions ONLY ONCE
   if (!stdbInitialized) {
+    DebugLogger("Redoing subscriptions");
     SetSubscriptions(spacetime.Client);
   }
 
   // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbInitialized) {
+    DebugLogger("Waiting for SpacetimeDB to fully initialize");
     return <Loading text="Loading Data" />;
   }
 
-  // Step 7) Is spacetimeContext fully initialized?
   if (!spacetimeContext) {
+    DebugLogger("Waiting for SpacetimeDB context");
     return <Loading text="Loading Canvas" />;
   }
 
-  // Step 8) Has nickname been set?
+  // Step 7) Has nickname been set?
   if (!nickname) {
+    DebugLogger("Nickname has not been set");
     return <SetNicknameModal identity={spacetime.Identity} setNickname={setNickname} />;
   }
 
-  // Step 9) Has the Pogly Instance been configured?
+  // Step 8) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
+    DebugLogger("Pogly Instance is not configured");
     return (
       <InitialSetupModal
         config={spacetime.InstanceConfig}
@@ -236,7 +315,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Step 10) Load Pogly
+  // Step 9) Load Pogly
   return (
     <SpacetimeContext.Provider value={spacetimeContext}>
       <ConfigContext.Provider value={spacetime.InstanceConfig}>

@@ -1,6 +1,8 @@
 import { SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
+import { DebugLogger } from "./DebugLogger";
 
 export const SetSubscriptions = (client: SpacetimeDBClient) => {
+  DebugLogger("Subscribing to tables");
   client.subscribe([
     "SELECT * FROM Heartbeat",
     "SELECT * FROM Guests",

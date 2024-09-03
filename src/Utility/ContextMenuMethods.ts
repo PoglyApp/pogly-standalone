@@ -14,6 +14,7 @@ import UpdateElementTransparencyReducer from "../module_bindings/update_element_
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import UpdateWidgetElementRawDataReducer from "../module_bindings/update_widget_element_raw_data_reducer";
 import UpdateWidgetElementDataIdReducer from "../module_bindings/update_widget_element_data_id_reducer";
+import { DebugLogger } from "./DebugLogger";
 
 interface TransformObject {
   transformFunction: string;
@@ -28,6 +29,8 @@ export enum TransformType {
 }
 
 export const handleEditTransform = (type: TransformType, setTransformType: Function) => {
+  DebugLogger("Handling transform edit");
+
   switch (type) {
     case TransformType.Scale:
       setTransformType({
@@ -56,6 +59,7 @@ export const handleEditTransform = (type: TransformType, setTransformType: Funct
 };
 
 export const handleFlipElement = (vertical: boolean, selectedElement: Elements, handleClose: Function) => {
+  DebugLogger("Handling element flip");
   const element = document.getElementById(selectedElement.id.toString());
 
   if (!element) return;
@@ -88,6 +92,7 @@ export const handleFlipElement = (vertical: boolean, selectedElement: Elements, 
 };
 
 export const handleResetTransform = (elements: Elements, type: TransformType, handleClose: Function) => {
+  DebugLogger("Handling transform reset");
   const element = document.getElementById(elements.id.toString());
 
   if (!element) return;
@@ -217,6 +222,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
 
 export const handleLocked = (selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement) return;
+  DebugLogger("Handling locked");
   const lockedBool = document.getElementById(selectedElement.id.toString())?.getAttribute("data-locked") === "true";
 
   UpdateElementLockedReducer.call(selectedElement.id, !lockedBool);
@@ -226,6 +232,7 @@ export const handleLocked = (selectedElement: Elements, handleClose: Function) =
 
 export const handleToggle = (selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
+  DebugLogger("Handling toggle");
 
   //const size = ViewportToStdbSize(selectedElement.element.value.width,selectedElement.element.value.height);
   const element = Elements.findById(selectedElement.id);
@@ -249,6 +256,7 @@ export const handleDelete = (
   setSelectoTargets: Function,
   handleClose: Function
 ) => {
+  DebugLogger("Handling element deletion");
   DeleteElementReducer.call(selectedElement.id);
   setSelected(undefined);
   setSelectoTargets([]);
@@ -256,15 +264,18 @@ export const handleDelete = (
 };
 
 export const handleDeleteElementData = (selectedElementData: ElementData, handleClose: Function) => {
+  DebugLogger("Handling element data deletion");
   DeleteElementDataByIdReducer.call(selectedElementData.id);
   handleClose();
 };
 
 export const handleTransparency = (selectedElement: Elements, value: any) => {
+  DebugLogger("Handling element transparency");
   UpdateElementTransparencyReducer.call(selectedElement.id, value);
 };
 
 export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVariableType, handleClose: Function) => {
+  DebugLogger("Handling widget toggle");
   const widgetElement: WidgetElement = Elements.findById(selectedElementId)?.element.value as WidgetElement;
 
   if (widgetElement.rawData) {

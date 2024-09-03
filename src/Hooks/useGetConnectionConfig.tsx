@@ -1,9 +1,11 @@
 import { useEffect } from "react";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useGetConnectionConfig = (setConnectionConfig: Function) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   useEffect(() => {
+    DebugLogger("Getting connection config");
     const urlParams = new URLSearchParams(window.location.search);
 
     if (isOverlay || (urlParams.get("domain") && urlParams.get("module"))) {

@@ -1,17 +1,19 @@
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
 import Guests from "../module_bindings/guests";
+import { DebugLogger } from "./DebugLogger";
 
 const handleElementBorder = (identity: Identity, elementID: string) => {
+  DebugLogger("Handling element border");
   const element = document.getElementById(elementID);
 
   if (!element) return;
 
-  const guestsWithElementSelected = Array.from(
-    Guests.filterBySelectedElementId(parseInt(elementID))
-  ).filter((g: Guests) => g.identity.toHexString() !== identity.toHexString());
+  const guestsWithElementSelected = Array.from(Guests.filterBySelectedElementId(parseInt(elementID))).filter(
+    (g: Guests) => g.identity.toHexString() !== identity.toHexString()
+  );
 
   element.style.borderStyle = "solid";
-  element.style.borderColor = "transparent"
+  element.style.borderColor = "transparent";
   element.style.borderWidth = "1px";
 
   if (!window.location.href.includes("/overlay")) {
@@ -20,12 +22,12 @@ const handleElementBorder = (identity: Identity, elementID: string) => {
       case guestsWithElementSelected.length === 0:
         element.style.borderColor = "transparent";
         break;
-  
+
       // If 1 person has the element selected
       case guestsWithElementSelected.length === 1:
         element.style.borderColor = guestsWithElementSelected[0].color;
         break;
-  
+
       // If more than 1 has the element selected
       case guestsWithElementSelected.length > 1:
         const gradient = guestsWithElementSelected
@@ -33,7 +35,7 @@ const handleElementBorder = (identity: Identity, elementID: string) => {
             return g.color;
           })
           .join(",");
-  
+
         element.style.borderColor = "";
         element.style.borderImage = `linear-gradient(to bottom right, ${gradient}) 1`;
         break;

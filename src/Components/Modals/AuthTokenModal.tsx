@@ -3,6 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const AuthTokenModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -12,16 +13,18 @@ export const AuthTokenModal = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const handleSetToken = () => {
+    DebugLogger("Setting auth token");
     localStorage.setItem("stdbToken", token);
     closeModal("authToken_modal", modals, setModals);
   };
 
   const handleOnClose = () => {
+    DebugLogger("Handling close auth token modal close");
     setToken("");
     closeModal("authToken_modal", modals, setModals);
   };
 
-  if(isOverlay) return(<></>);
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={true} onClose={handleOnClose}>

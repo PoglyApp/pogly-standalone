@@ -1,9 +1,12 @@
+import { DebugLogger } from "./DebugLogger";
+
 interface TransformValue {
   transformFunction: string;
   transformValue: string;
 }
 
 export const getTransformValues = (transform: string) => {
+  DebugLogger("Getting transform values");
   const regex = /(?<transformFunction>\w+)\((?<transformValue>[^)]+)\)|matrix3d\((?<matrix3dValue>[^)]+)\)/g;
   const values: TransformValue[] = [];
 

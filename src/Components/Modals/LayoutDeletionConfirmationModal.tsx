@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteLayoutReducer from "../../module_bindings/delete_layout_reducer";
 import styled from "styled-components";
 import { toast } from "react-toastify";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   layout: Layouts;
@@ -37,6 +38,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
 
   useEffect(() => {
     const fetchedLayouts = Layouts.all();
+    DebugLogger("Fetching layouts for deletion");
 
     setLayouts(() =>
       fetchedLayouts.sort((a: any, b: any) => {
@@ -46,9 +48,11 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
   }, []);
 
   const handleDeleteLayout = () => {
+    DebugLogger("Deleting layout");
     const doesLayoutStillExist = Layouts.filterById(preserveTo).next().value;
 
     if (!doesLayoutStillExist) {
+      DebugLogger("Layout no longer exists");
       return toast.error("Selected layout for preserve no longer exists, select a different one and try again.", {
         position: "bottom-right",
         autoClose: 1500,
@@ -66,6 +70,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
   };
 
   const handleOnClose = () => {
+    DebugLogger("Closing layout deletion confirmation modal");
     closeModal("layoutDeletionConfirmationModal_modal", modals, setModals);
   };
 

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SpacetimeDBClient, Identity } from "@clockworklabs/spacetimedb-sdk";
 import Heartbeat from "../module_bindings/heartbeat";
 import Guests from "../module_bindings/guests";
@@ -61,20 +61,27 @@ import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import KickGuestReducer from "../module_bindings/kick_guest_reducer";
 import RefreshOverlayClearStorageReducer from "../module_bindings/refresh_overlay_clear_storage_reducer";
+import { SetStdbConnected } from "../Utility/SetStdbConnected";
+import KickSelfReducer from "../module_bindings/kick_self_reducer";
+import ConnectReducer from "../module_bindings/connect_reducer";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
   setStdbConnected: Function,
+  setStdbAuthenticated: Function,
   setStdbInitialized: Function,
   setInstanceConfigured: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
+  const [disconnected, setDisconnected] = useState<boolean>(false);
   const [stdbClient, setStdbClient] = useState<SpacetimeDBClient>();
 
   useEffect(() => {
     if (!connectionConfig) return;
+    DebugLogger("Initializing SpacetimeDB");
 
     SpacetimeDBClient.registerTables(Heartbeat, Guests, Elements, ElementData, Config, Permissions, Layouts);
     SpacetimeDBClient.registerReducers(
@@ -129,8 +136,9 @@ const useStDB = (
       UpdateAuthenticationKeyReducer,
       RefreshOverlayReducer,
       ClearRefreshOverlayRequestsReducer,
-      RefreshOverlayClearStorageReducer,
-      KickGuestReducer
+      KickGuestReducer,
+      KickSelfReducer,
+      ConnectReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
@@ -146,8 +154,9 @@ const useStDB = (
         client?.subscribe([
           "SELECT * FROM Heartbeat",
           "SELECT * FROM Guests",
-          "SELECT * FROM Config", 
-          "SELECT * FROM Permissions"]);
+          "SELECT * FROM Config",
+          "SELECT * FROM Permissions",
+        ]);
       } catch (error) {
         console.log("SpacetimeDB connect failed:", error);
       }
@@ -175,14 +184,11 @@ const useStDB = (
             return;
           }
 
-          if (fetchedConfig.authentication) AuthenticateReducer.call(connectionConfig.authKey);
           if (fetchedConfig.configInit) setInstanceConfigured(true);
 
           setConfig(fetchedConfig);
 
-          setTimeout(function () {
-            setStdbConnected(true);
-          }, 1000);
+          SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
@@ -190,14 +196,19 @@ const useStDB = (
     });
 
     client?.onError((...args: any[]) => {
+      if(args[0].type === "close") {
+        setDisconnected(true);
+        return;
+      }
+
       setError(true);
       console.log("Error with SpacetimeDB: ", args);
     });
 
     client?.connect();
-  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized]);
+  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
-  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error };
+  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error, Disconnected: disconnected };
 };
 
 export default useStDB;

@@ -1,5 +1,9 @@
+import { DebugLogger } from "./DebugLogger";
+
 export const ApplyCustomFont = async (fontJson: any, component: any) => {
   try {
+    DebugLogger("Applying custom font");
+
     const doesFontAlreadyExist = document.documentElement.innerHTML.includes(fontJson.fontUrl);
 
     if (!doesFontAlreadyExist) {

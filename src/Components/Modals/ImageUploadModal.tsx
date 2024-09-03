@@ -19,6 +19,9 @@ import styled from "styled-components";
 import WarningIcon from "@mui/icons-material/Warning";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
+import { CompressImage } from "../../Utility/CompressImage";
+import { SettingsContext } from "../../Contexts/SettingsContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   dragnAndDropFile?: any;
@@ -26,19 +29,26 @@ interface IProps {
 
 export const ImageUploadModal = (props: IProps) => {
   const { Identity } = useSpacetimeContext();
+  const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [imageName, setImageName] = useState<string>("");
   const [isUrl, setIsUrl] = useState<boolean>(false);
+
   const [file, setFile] = useState<any>(null);
+  const [isFileGif, setIsFileGif] = useState<boolean>(false);
+  const [compressedFile, setCompressedFile] = useState<any>(null);
+  const [compressing, setCompressing] = useState<boolean>(false);
+
   const [error, setError] = useState<string>("");
 
   const [fieldsInitialized, setFieldsInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.dragnAndDropFile) return setFieldsInitialized(true);
+    DebugLogger("Initializing image upload modal");
 
     handleFileChange(props.dragnAndDropFile);
     handleNameChange(props.dragnAndDropFile.name.substr(0, props.dragnAndDropFile.name.lastIndexOf(".")));
@@ -47,7 +57,9 @@ export const ImageUploadModal = (props: IProps) => {
   }, [props.dragnAndDropFile]);
 
   const handleNameChange = (name: any) => {
+    DebugLogger("Handling image name change");
     if (name.length < 2) {
+      DebugLogger("File name wrong length");
       setError("File name has to be between 2-10 characters long.");
       setImageName("");
       return;
@@ -58,29 +70,37 @@ export const ImageUploadModal = (props: IProps) => {
     setImageName(name);
   };
 
-  const handleFileChange = (file: any) => {
+  const handleFileChange = async (changedFile: any) => {
+    DebugLogger("Handling file change");
     setError("");
 
     const isImage =
-      file.type === "image/png" ||
-      file.type === "image/jpg" ||
-      file.type === "image/jpeg" ||
-      file.type === "image/webp" ||
-      file.type === "image/gif";
+      changedFile.type === "image/png" ||
+      changedFile.type === "image/jpg" ||
+      changedFile.type === "image/jpeg" ||
+      changedFile.type === "image/webp" ||
+      changedFile.type === "image/gif";
 
     if (!isImage) {
+      DebugLogger("File not an image");
       setError("Incorrect file format. File must be an image. (png, jpg, jpeg, webp, or gif)");
       setFile(null);
       return;
     }
 
-    if (file.size / 1024 > 3000)
+    const isGif = changedFile.type === "image/gif" || changedFile.type === "image/webp";
+    setIsFileGif(isGif);
+
+    if (settings.compressUpload && !isGif) await handleImageCompression(changedFile);
+
+    if (changedFile.size / 1024 > 3000)
       setError("Large files can increase load time. Consider compressing the image or uploading with an URL instead.");
 
-    setFile(file);
+    setFile(changedFile);
   };
 
   const handleURLChange = async (url: any) => {
+    DebugLogger("Handling image URL change");
     setError("");
 
     if (url.length === 0) {
@@ -91,23 +111,39 @@ export const ImageUploadModal = (props: IProps) => {
   };
 
   const handleOnClose = () => {
+    DebugLogger("Handling image upload modal close");
     closeModal("imageUpload_modal", modals, setModals);
   };
 
   const handleSave = () => {
+    DebugLogger("Saving image");
+    const usedFile = compressedFile ? compressedFile : file;
+
     const newElementData: ElementDataType = {
       Name: imageName,
       DataType: DataType.ImageElement as DataType,
-      Data: file,
-      DataFileSize: file.size / 1024, //convert to KB's
+      Data: usedFile,
+      DataFileSize: usedFile.size / 1024, //convert to KB's
       CreatedBy: Identity.nickname,
     };
 
     const imageSkeleton = document.getElementById("imageSkeleton");
-    imageSkeleton!.style.display = "block";
+    if (imageSkeleton) imageSkeleton.style.display = "block";
 
     insertElementData(newElementData);
     handleOnClose();
+  };
+
+  const handleImageCompression = async (file: any) => {
+    DebugLogger("Compressing image");
+    setCompressing(true);
+
+    const newFile = await CompressImage(file);
+
+    if (!newFile) return setError("Failed to compress file. Check console and send error to @Dynny.");
+
+    setCompressedFile(newFile);
+    setCompressing(false);
   };
 
   if (isOverlay) return <></>;
@@ -126,6 +162,7 @@ export const ImageUploadModal = (props: IProps) => {
                 onChange={(text: any) => handleNameChange(text)}
                 defaultValue={imageName}
               />
+
               <Typography variant="subtitle1" color="#ffffffa6" sx={{ paddingTop: "15px" }}>
                 {props.dragnAndDropFile ? "Selected file" : "Select a file"}
                 <Tooltip title="Please be aware, all images uploaded to Pogly are publicly accessible. This is a limitation of SpacetimeDB, until they add Row-Level Security.">
@@ -140,6 +177,7 @@ export const ImageUploadModal = (props: IProps) => {
                   />
                 </Tooltip>
               </Typography>
+
               {!props.dragnAndDropFile ? (
                 <>
                   <ButtonGroup
@@ -188,6 +226,45 @@ export const ImageUploadModal = (props: IProps) => {
                 />
               )}
 
+              {file && !isFileGif && (
+                <div style={{ display: "flex" }}>
+                  <div>
+                    <Typography variant="subtitle1" color="#ffffffa6" sx={{ paddingTop: "15px" }}>
+                      File compression
+                    </Typography>
+
+                    {!settings.compressUpload && (
+                      <Typography variant="body1" color="#ffffffa6" sx={{ alignSelf: "center" }}>
+                        Image compression disabled in Settings.
+                      </Typography>
+                    )}
+
+                    {compressedFile && (
+                      <div style={{ alignContent: "end" }}>
+                        <Typography variant="body1" color="red" sx={{ alignSelf: "center" }}>
+                          Before: {Math.floor(file.size / 1024)} KB
+                        </Typography>
+
+                        <Typography variant="body1" color="green" sx={{ alignSelf: "center" }}>
+                          After: {Math.floor(compressedFile.size / 1024)} KB
+                        </Typography>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {isFileGif && (
+                <div>
+                  <Typography variant="subtitle1" color="#ffffffa6" sx={{ paddingTop: "15px" }}>
+                    File compression
+                  </Typography>
+                  <Typography variant="body2" color="#ffffffa6">
+                    Unavailable for Webp or GIFs.
+                  </Typography>
+                </div>
+              )}
+
               {error !== "" && (
                 <Alert
                   variant="filled"
@@ -213,7 +290,7 @@ export const ImageUploadModal = (props: IProps) => {
               Cancel
             </Button>
             <Button
-              disabled={imageName === "" || file === null ? true : false}
+              disabled={imageName === "" || file === null || compressing ? true : false}
               variant="outlined"
               sx={{
                 color: "#ffffffa6",

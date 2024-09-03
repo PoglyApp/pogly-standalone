@@ -4,6 +4,7 @@ import Elements from "../../module_bindings/elements";
 import TextElement from "../../module_bindings/text_element";
 import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   elements: Elements;
@@ -18,6 +19,7 @@ export const Text = (props: IProp) => {
   const targetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    DebugLogger("Creating text");
     try {
       const fontJSON = JSON.parse(textElement.font);
       ApplyCustomFont(fontJSON, targetRef.current);
@@ -25,6 +27,7 @@ export const Text = (props: IProp) => {
   }, [textElement.font]);
 
   const showTextCreationModal = () => {
+    DebugLogger("Opening text creation modal");
     setModals((oldModals: any) => [
       ...oldModals,
       <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />,

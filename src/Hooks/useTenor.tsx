@@ -1,8 +1,10 @@
 import { useCallback, useEffect } from "react";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useTenor = (apiKey: string | null, searchQuery: string, searchIndex: string, setEmotes: Function) => {
   const callbackSearch = useCallback(
     (responseText: any) => {
+      DebugLogger("Tenor callback search");
       var responseObj = JSON.parse(responseText);
 
       setEmotes(responseObj);
@@ -11,6 +13,7 @@ export const useTenor = (apiKey: string | null, searchQuery: string, searchIndex
   );
 
   const tenorSearch = useCallback(() => {
+    DebugLogger("Tenor search");
     var searchURL =
       "https://tenor.googleapis.com/v2/search?q=" + searchQuery + "&key=" + apiKey + "&limit=10&pos=" + searchIndex;
 
@@ -30,6 +33,8 @@ export const useTenor = (apiKey: string | null, searchQuery: string, searchIndex
   }, [searchIndex, apiKey, searchQuery, tenorSearch]);
 
   const httpGetAsync = async (url: string, callback: any) => {
+    DebugLogger("Tenor GET query");
+
     const xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function () {

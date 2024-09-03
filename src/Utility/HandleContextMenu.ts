@@ -2,8 +2,10 @@ import Elements from "../module_bindings/elements";
 import ElementData from "../module_bindings/element_data";
 import Guests from "../module_bindings/guests";
 import Layouts from "../module_bindings/layouts";
+import { DebugLogger } from "./DebugLogger";
 
 export const HandleElementContextMenu = (event: any, setContextMenu: Function, contextMenu: any, element: Elements) => {
+  DebugLogger("Handling element context menu");
   event.preventDefault();
 
   setContextMenu(
@@ -23,6 +25,7 @@ export const HandleElementSelectionContextMenu = (
   contextMenu: any,
   elementData: ElementData
 ) => {
+  DebugLogger("Handling element selection context menu");
   event.preventDefault();
 
   setContextMenu(
@@ -42,6 +45,7 @@ export const HandleLayoutSelectionContextMenu = (
   contextMenu: any,
   layout: Layouts
 ) => {
+  DebugLogger("Handling layout selection context menu");
   event.preventDefault();
 
   setContextMenu(

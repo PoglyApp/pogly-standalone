@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Layouts from "../../module_bindings/layouts";
 import { toast } from "react-toastify";
 import { LayoutContext } from "../../Contexts/LayoutContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useLayoutEvents = (setLayouts: Function) => {
   const layoutContext = useContext(LayoutContext);
@@ -10,11 +11,14 @@ export const useLayoutEvents = (setLayouts: Function) => {
   const activeLayout = useRef<Layouts>(layoutContext.activeLayout);
 
   useEffect(() => {
+    DebugLogger("Updating layout refs");
     activeLayout.current = layoutContext.activeLayout;
   }, [layoutContext]);
 
   useEffect(() => {
     if (eventsInitialized) return;
+
+    DebugLogger("Initializing layout events");
 
     Layouts.onInsert((newLayout) => {
       setLayouts((oldLayouts: any) => [...oldLayouts, newLayout]);
@@ -23,7 +27,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
     Layouts.onUpdate((oldLayout, newLayout) => {
       if (oldLayout.active === false && newLayout.active === true) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
-        layoutIcon!.style.display = "unset";
+        if (layoutIcon) layoutIcon.style.display = "unset";
 
         toast.success(`${newLayout.name} has been made active.`, {
           position: "bottom-right",
@@ -39,7 +43,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
 
       if (oldLayout.active === true && newLayout.active === false) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
-        layoutIcon!.style.display = "none";
+        if (layoutIcon) layoutIcon.style.display = "none";
       }
     });
 

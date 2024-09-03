@@ -7,6 +7,7 @@ import styled from "styled-components";
 import SetIdentityPermissionModeratorReducer from "../../../module_bindings/set_identity_permission_moderator_reducer";
 import ClearIdentityPermissionReducer from "../../../module_bindings/clear_identity_permission_reducer";
 import KickGuestReducer from "../../../module_bindings/kick_guest_reducer";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   contextMenu: any;
@@ -23,6 +24,7 @@ export const GuestListContextMenu = (props: IProps) => {
     selectedGuestPermission = Permissions.findByIdentity(selectedGuest.identity)?.permissionLevel;
 
   const handleClose = () => {
+    DebugLogger("Handling close context");
     props.setContextMenu(null);
   };
 
@@ -59,7 +61,7 @@ export const GuestListContextMenu = (props: IProps) => {
                     ClearIdentityPermissionReducer.call(selectedGuest.identity);
                     handleClose();
                   }}
-                  sx={{color:"#008205"}}
+                  sx={{ color: "#008205" }}
                 >
                   Revoke Moderator
                 </StyledMenuItemOrange>
@@ -73,15 +75,15 @@ export const GuestListContextMenu = (props: IProps) => {
                   Grant Moderator
                 </StyledMenuItemGreen>
               )}
-                <StyledMenuItemRed
-                  onClick={() => {
-                    KickGuestReducer.call(selectedGuest.identity);
-                    handleClose();
-                  }}
-                >
-                  Kick Guest
-                </StyledMenuItemRed>
-              </>
+              <StyledMenuItemRed
+                onClick={() => {
+                  KickGuestReducer.call(selectedGuest.identity);
+                  handleClose();
+                }}
+              >
+                Kick Guest
+              </StyledMenuItemRed>
+            </>
           ) : (
             <></>
           )}
@@ -111,7 +113,7 @@ const StyledMenuItemOrange = styled(MenuItem)`
     background-color: #001529;
   }
 
-  color: #CC5500;
+  color: #cc5500;
 
   padding-left: 5px;
 

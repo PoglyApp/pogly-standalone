@@ -17,6 +17,7 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -38,6 +39,7 @@ export const useElementsEvents = (
   const elementDataStore = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
+    DebugLogger("Updating element event refs");
     elementData.current = elementDataStore;
     activeLayout.current = layout;
     selectedElement.current = selected;
@@ -46,9 +48,12 @@ export const useElementsEvents = (
   useEffect(() => {
     if (canvasInitialized.elementEventsInitialized || !layout) return;
 
+    DebugLogger("Initializing element events");
+
     Elements.onInsert((element, reducerEvent) => {
+      if (!activeLayout.current) return;
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
 
@@ -57,7 +62,8 @@ export const useElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement, reducerEvent) => {
-      if (newElement.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (newElement.layoutId !== activeLayout.current.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -194,7 +200,8 @@ export const useElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       if (selectedElement.current && selectedElement.current.Elements.id === element.id) setSelected(null);
 

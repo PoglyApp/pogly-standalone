@@ -19,6 +19,7 @@ import { StyledInput } from "../StyledComponents/StyledInput";
 import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigType";
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   config: Config;
@@ -53,6 +54,7 @@ export const InitialSetupModal = (props: IProp) => {
   useGetDefaultElements(setDefaultElements);
 
   useEffect(() => {
+    DebugLogger("Creating overlay URL");
     let baseUrl =
       window.location.origin +
       "/overlay?domain=" +
@@ -66,6 +68,7 @@ export const InitialSetupModal = (props: IProp) => {
   }, [authKey, authentication, props.connectionConfig]);
 
   const handleAuthKeyChange = (text: any) => {
+    DebugLogger("Handling auth key change");
     if (badCharacters.test(text)) {
       setError(badCharError);
 
@@ -78,9 +81,11 @@ export const InitialSetupModal = (props: IProp) => {
   };
 
   const handleSave = () => {
+    DebugLogger("Saving instance settings");
     const regex = new RegExp("^[0-9]+$");
 
     if (!regex.test(updateHz)) {
+      DebugLogger("Hz has to be a number");
       setUpdateHz("");
       return setError("Update Hz has to be a number.");
     }

@@ -15,6 +15,7 @@ import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContex
 import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   elementData: ElementData[];
@@ -30,17 +31,19 @@ export const ImageCategory = (props: IProps) => {
   const [searchimage, setSearchImage] = useState<string>("");
 
   const showImageUploadModal = () => {
+    DebugLogger("Opening image upload modal");
     setModals((oldModals: any) => [...oldModals, <ImageUploadModal key="imageUpload_modal" />]);
   };
 
   const AddElementToCanvas = (elementData: ElementData) => {
+    DebugLogger("Adding element to canvas");
     insertElement(
       ElementStruct.ImageElement({
         imageElementData: ImageElementData.ElementDataId(elementData.id),
         width: elementData.dataWidth,
         height: elementData.dataHeight,
       }),
-      layoutContext?.activeLayout!
+      layoutContext.activeLayout
     );
   };
 
@@ -72,9 +75,9 @@ export const ImageCategory = (props: IProps) => {
           paddingBottom: "5px",
         }}
       >
-        {!props.strictSettings.StrictMode ||
-        props.strictSettings.Permission?.tag === "Owner" ||
-        props.strictSettings.Permission?.tag === "Moderator" ? (
+        {(!props.strictSettings.StrictMode ||
+          props.strictSettings.Permission?.tag === "Owner" ||
+          props.strictSettings.Permission?.tag === "Moderator") && (
           <Button
             variant="text"
             startIcon={<AddCircleOutlineIcon />}
@@ -83,47 +86,48 @@ export const ImageCategory = (props: IProps) => {
               textTransform: "initial",
               justifyContent: "left",
               width: "100%",
+              paddingBottom: "10px",
             }}
             onClick={showImageUploadModal}
           >
             Add Image
           </Button>
-        ) : (
-          <></>
         )}
 
         <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchImage} defaultValue={""} />
 
-        {props.elementData.map((elementData: ElementData) => {
-          if (elementData.dataType.tag === "ImageElement")
-            if (searchimage === "" || elementData.name.toLocaleLowerCase().includes(searchimage.toLowerCase())) {
-              return (
-                <div
-                  key={elementData.id}
-                  onContextMenu={(event: any) => {
-                    HandleElementSelectionContextMenu(event, props.setContextMenu, props.contextMenu, elementData);
-                  }}
-                >
-                  <Button
-                    variant="text"
-                    sx={{
-                      color: "#ffffffa6",
-                      textTransform: "initial",
-                      justifyContent: "left",
-                      width: "100%",
+        <div style={{ paddingTop: "10px" }}>
+          {props.elementData.map((elementData: ElementData) => {
+            if (elementData.dataType.tag === "ImageElement")
+              if (searchimage === "" || elementData.name.toLocaleLowerCase().includes(searchimage.toLowerCase())) {
+                return (
+                  <div
+                    key={elementData.id}
+                    onContextMenu={(event: any) => {
+                      HandleElementSelectionContextMenu(event, props.setContextMenu, props.contextMenu, elementData);
                     }}
-                    onClick={() => AddElementToCanvas(elementData)}
                   >
-                    <ElementIcon src={elementData.data} />
-                    {elementData.name}
-                  </Button>
-                  <br />
-                </div>
-              );
-            }
+                    <Button
+                      variant="text"
+                      sx={{
+                        color: "#ffffffa6",
+                        textTransform: "initial",
+                        justifyContent: "left",
+                        width: "100%",
+                      }}
+                      onClick={() => AddElementToCanvas(elementData)}
+                    >
+                      <ElementIcon src={elementData.data} />
+                      {elementData.name}
+                    </Button>
+                    <br />
+                  </div>
+                );
+              }
 
-          return null;
-        })}
+            return null;
+          })}
+        </div>
 
         <Skeleton
           id="imageSkeleton"

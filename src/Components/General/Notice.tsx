@@ -1,6 +1,7 @@
 import { Alert, IconButton } from "@mui/material";
 import styled from "styled-components";
 import CloseIcon from "@mui/icons-material/Close";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   noticeMessage: any;
@@ -9,6 +10,7 @@ interface IProps {
 
 export const Notice = (props: IProps) => {
   const handleNoticeClose = () => {
+    DebugLogger("Handling close notice");
     props.setNoticeMessage(null);
     localStorage.setItem("notice_id", props.noticeMessage.noticeId);
   };

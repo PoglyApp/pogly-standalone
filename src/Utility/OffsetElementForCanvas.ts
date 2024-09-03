@@ -11,24 +11,26 @@ import {
   StdbToViewportFontSize,
   StdbToViewportSize,
 } from "./ConvertCoordinates";
+import { DebugLogger } from "./DebugLogger";
 
 export const OffsetElementForCanvas = (element: Elements) => {
+  DebugLogger("Offsetting element for canvas");
 
   // This disgusting mess below is to "deep copy" the Element, so we don't accidentally mutate the StDB cache'd Element
   let newElementStruct: ElementStruct;
 
-  switch(element.element.tag) {
+  switch (element.element.tag) {
     case "TextElement":
       newElementStruct = ElementStruct.TextElement({
         text: element.element.value.text,
         size: element.element.value.size,
         color: element.element.value.color,
-        font: element.element.value.font
+        font: element.element.value.font,
       });
       break;
     case "ImageElement":
       let eData: ImageElementData;
-      switch(element.element.value.imageElementData.tag) {
+      switch (element.element.value.imageElementData.tag) {
         case "ElementDataId":
           eData = ImageElementData.ElementDataId(element.element.value.imageElementData.value);
           break;
@@ -39,16 +41,16 @@ export const OffsetElementForCanvas = (element: Elements) => {
       newElementStruct = ElementStruct.ImageElement({
         imageElementData: eData,
         width: element.element.value.width,
-        height: element.element.value.height
-      })
+        height: element.element.value.height,
+      });
       break;
     case "WidgetElement":
       newElementStruct = ElementStruct.WidgetElement({
         elementDataId: element.element.value.elementDataId,
         width: element.element.value.width,
         height: element.element.value.height,
-        rawData: element.element.value.rawData
-      })
+        rawData: element.element.value.rawData,
+      });
       break;
   }
 
@@ -62,7 +64,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
     layoutId: element.layoutId,
     placedBy: element.placedBy,
     lastEditedBy: element.lastEditedBy,
-    zIndex: element.zIndex
+    zIndex: element.zIndex,
   };
 
   const transformCoords = GetCoordsFromTransform(newElement.transform);
@@ -109,7 +111,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
         elementDataId: widgetElement.elementDataId,
         width: widgetSize.width,
         height: widgetSize.height,
-        rawData: widgetElement.rawData
+        rawData: widgetElement.rawData,
       });
       break;
   }

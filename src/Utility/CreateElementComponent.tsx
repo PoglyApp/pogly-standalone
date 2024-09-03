@@ -4,8 +4,10 @@ import { Text } from "../Components/Elements/Text";
 import { Image } from "../Components/Elements/Image";
 import { Widget } from "../Components/Elements/Widget";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
+import { DebugLogger } from "./DebugLogger";
 
 export const CreateOffsetElementComponent = (elements: Elements) => {
+  DebugLogger("Creating offset element component");
   const newElement: Elements = OffsetElementForCanvas(elements);
 
   const canvasElement: CanvasElementType = {
@@ -33,6 +35,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
 };
 
 export const CreateElementComponent = (elements: Elements) => {
+  DebugLogger("Creating element component");
   const newElement: Elements = {
     id: elements.id,
     element: { ...elements.element },
