@@ -5,6 +5,8 @@
 import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeElement, SumType, SumTypeVariant, DatabaseTable, AlgebraicValue, ReducerEvent, Identity, Address, ClientDB, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 // @ts-ignore
 import { ChangeStruct } from "./change_struct";
+// @ts-ignore
+import { ChangeStruct } from "./change_struct";
 
 export class AuditLog extends DatabaseTable
 {
