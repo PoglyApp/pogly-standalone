@@ -10,6 +10,7 @@ import Layouts from "../../module_bindings/layouts";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 import { initCanvasElements } from "../../Store/Features/CanvasElementSlice";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 const useFetchElement = (
   layout: Layouts | undefined,
@@ -24,18 +25,20 @@ const useFetchElement = (
   useEffect(() => {
     if (!layout) return;
 
+    DebugLogger("Fetching elements");
+
     const refetch = fetchedLayout && fetchedLayout.id !== layout.id;
     if (canvasInitialized.elementsFetchInitialized && !refetch) return;
 
     // Fetch ElementData
     if (!refetch) {
+      DebugLogger("Fetching element data");
       const datas = ElementData.all();
       dispatch(initData(datas));
     }
 
     // Fetch Elements
-
-    const fetchedElements = Array.from(Elements.filterByLayoutId(layout!.id));
+    const fetchedElements = Array.from(Elements.filterByLayoutId(layout.id));
 
     // This is here to fix a weird bug with SpacetimeDB Typescript SDK that only happens with Firefox where the SpacetimeDB cache doesn't update properly
     // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"
@@ -63,6 +66,8 @@ const useFetchElement = (
 const elementOffsetForCanvas = (elements: Elements[]) => {
   const newElementArray: Elements[] = [];
 
+  DebugLogger("Offsetting elements for canvas");
+
   elements.forEach((element: Elements) => {
     newElementArray.push(OffsetElementForCanvas(element));
   });
@@ -73,6 +78,8 @@ const elementOffsetForCanvas = (elements: Elements[]) => {
 const elementOffsetForOverlay = (elements: Elements[]) => {
   const newElementArray: Elements[] = [];
 
+  DebugLogger("Offsetting elements for overlay");
+
   elements.forEach((element: Elements) => {
     newElementArray.push(element);
   });
@@ -82,6 +89,7 @@ const elementOffsetForOverlay = (elements: Elements[]) => {
 
 function removeDuplicatesKeepLast(arr: Elements[]): Elements[] {
   const seen = new Set<number>();
+  DebugLogger("Removing duplicate elements");
 
   for (let i = arr.length - 1; i >= 0; i--) {
     if (seen.has(arr[i].id)) {

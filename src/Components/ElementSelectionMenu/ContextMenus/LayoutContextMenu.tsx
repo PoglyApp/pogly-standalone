@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import SetLayoutActiveReducer from "../../../module_bindings/set_layout_active_reducer";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
   contextMenu: any;
@@ -17,12 +18,14 @@ export const LayoutContextMenu = (props: IProps) => {
   const [showExamine, setShowExamine] = useState(false);
 
   const handleSetActive = () => {
+    DebugLogger("Changing active layout");
     SetLayoutActiveReducer.call(props.contextMenu.layout.id);
     handleClose();
   };
 
   const showConfirmationModal = () => {
     if (props.contextMenu.layout.createdBy === "Server") {
+      DebugLogger("Attempting to delete default layout");
       return toast.warning("Default layout cannot be deleted.", {
         position: "bottom-right",
         autoClose: 1500,
@@ -35,6 +38,8 @@ export const LayoutContextMenu = (props: IProps) => {
       });
     }
 
+    DebugLogger("Opening delete layout confirmation modal");
+
     setModals((oldModals: any) => [
       ...oldModals,
       <LayoutDeletionConfirmationModal key="layoutDeletionConfirmationModal_modal" layout={props.contextMenu.layout} />,
@@ -42,6 +47,7 @@ export const LayoutContextMenu = (props: IProps) => {
   };
 
   const handleClose = () => {
+    DebugLogger("Handling close context menu");
     props.setContextMenu(null);
   };
 

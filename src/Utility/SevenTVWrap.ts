@@ -1,6 +1,7 @@
 import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import User from "../Types/SevenTVTypes/SevenTVUserType";
 import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
+import { DebugLogger } from "./DebugLogger";
 
 interface SevenTVResponse {
   data: any;
@@ -9,6 +10,7 @@ interface SevenTVResponse {
 
 export class SevenTVWrapper {
   public async ApiGET(route: string): Promise<SevenTVResponse> {
+    DebugLogger("7TV GET request");
     const request = await fetch("https://7tv.io/v3/" + route, {
       method: "GET",
       referrerPolicy: "no-referrer",
@@ -21,6 +23,7 @@ export class SevenTVWrapper {
   }
 
   public async GqlApiPOST(data: any): Promise<SevenTVResponse> {
+    DebugLogger("7TV GQL POST request");
     try {
       const request = await fetch("https://7tv.io/v3/gql", {
         method: "POST",
@@ -43,6 +46,7 @@ export class SevenTVWrapper {
   }
 
   public async ApiPOST(route: string, data: any): Promise<SevenTVResponse> {
+    DebugLogger("7TV POST request");
     const request = await fetch("https://7tv.io/v3/" + route, {
       method: "POST",
       headers: {
@@ -60,6 +64,7 @@ export class SevenTVWrapper {
   }
 
   public async GetSevenTVId(username: string): Promise<UserId> {
+    DebugLogger("Getting 7TV ID");
     const data = this.GqlApiPOST({
       operationName: "SearchUsers",
       variables: {
@@ -72,24 +77,28 @@ export class SevenTVWrapper {
   }
 
   public async GetUserById(userId: string): Promise<User> {
+    DebugLogger("Getting 7TV user ID");
     const { data, status } = await this.ApiGET("users/" + userId);
 
     return data as User;
   }
 
   public async GetEmoteSetId(userId: string): Promise<string> {
+    DebugLogger("Getting 7TV emote set ID");
     const userObj = await this.GetUserById(userId);
 
     return userObj.emote_sets[0].id;
   }
 
   public async GetEmoteSetEmotes(emoteSetId: string): Promise<Emote[]> {
+    DebugLogger("Getting 7TV emote set emotes");
     const { data, status } = await this.ApiGET("emote-sets/" + emoteSetId);
 
     return data.emotes as Emote[];
   }
 
   public GetURLFromEmote(emote: Emote): string {
+    DebugLogger("Getting 7TV emote URL");
     return "https://cdn.7tv.app/emote/" + emote.id + "/3x.webp";
   }
 }

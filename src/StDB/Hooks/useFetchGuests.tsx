@@ -4,6 +4,7 @@ import { useAppDispatch } from "../../Store/Features/store";
 import { initGuests } from "../../Store/Features/GuestSlice";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const { Identity } = useSpacetimeContext();
@@ -11,6 +12,8 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
 
   useEffect(() => {
     if (!Identity.identity || canvasInitialized.guestFetchInitialized) return;
+
+    DebugLogger("Fetching guests");
 
     const guests = Guests.all();
 

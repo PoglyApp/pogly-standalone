@@ -5,14 +5,18 @@
   Chippy: Nah but I'll write something about it. Just like in general how StDB should be 1080p and the client is downscaled 4x
 */
 
+import { DebugLogger } from "./DebugLogger";
+
 export const ViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
+  DebugLogger("Converting viewport coordinates to SpacetimeDB coordinates");
   return {
-    x: x * 4,
-    y: y * 4,
+    x: (x + 0.75) * 4,
+    y: (y + 0.75) * 4,
   };
 };
 
 export const MouseViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
+  DebugLogger("Converting mouse viewport coordinates to SpacetimeDB coordinates");
   let vh = window.innerHeight;
   let vw = window.innerWidth;
 
@@ -26,6 +30,7 @@ export const MouseViewportToStdbCoords = (x: number, y: number): { x: number; y:
 };
 
 export const ViewportToStdbSize = (width: number, height: number): { width: number; height: number } => {
+  DebugLogger("Converting viewport to SpacetimeDB");
   return {
     width: width * 4,
     height: height * 4,
@@ -33,19 +38,22 @@ export const ViewportToStdbSize = (width: number, height: number): { width: numb
 };
 
 export const ViewportToStdbFontSize = (fontSize: number): { fontSize: number } => {
+  DebugLogger("Converting viewport font size to SpacetimeDB font size");
   return {
     fontSize: fontSize * 4,
   };
 };
 
 export const StdbToViewportCoords = (x: number, y: number): { x: number; y: number } => {
+  DebugLogger("Converting SpacetimeDB coordinates to viewport coordinates");
   return {
-    x: x / 4,
-    y: y / 4,
+    x: x / 4 - 0.75,
+    y: y / 4 - 0.75,
   };
 };
 
 export const MouseStdbToViewportCoords = (x: number, y: number): { x: number; y: number } => {
+  DebugLogger("Converting SpacetimeDB mouse coordinates to viewport coordinates");
   let vh = window.innerHeight;
   let vw = window.innerWidth;
 
@@ -59,6 +67,7 @@ export const MouseStdbToViewportCoords = (x: number, y: number): { x: number; y:
 };
 
 export const StdbToViewportSize = (width: number, height: number): { width: number; height: number } => {
+  DebugLogger("Converting SpacetimeDB size to viewport size");
   return {
     width: width / 4,
     height: height / 4,
@@ -66,6 +75,7 @@ export const StdbToViewportSize = (width: number, height: number): { width: numb
 };
 
 export const StdbToViewportFontSize = (fontSize: number): { fontSize: number } => {
+  DebugLogger("Converting SpacetimeDB font size to viewport font size");
   return {
     fontSize: fontSize / 4,
   };
@@ -74,6 +84,7 @@ export const StdbToViewportFontSize = (fontSize: number): { fontSize: number } =
 export const GetCoordsFromTransform = (
   transform: string
 ): { x: number; y: number; rotation: number; scaleX: number | null; scaleY?: number | null } => {
+  DebugLogger("Getting coordinates from transform");
   const translate = transform.substring(transform.indexOf("translate(") + 10, transform.indexOf(")"));
   const newX = parseFloat(translate.substring(0, translate.indexOf("px, ")));
   const newY = parseFloat(translate.substring(translate.indexOf(" ") + 1, translate.length - 2));
@@ -116,6 +127,7 @@ export const GetTransformFromCoords = (
   scaleX: number | null | undefined,
   scaleY: number | null | undefined
 ): string => {
+  DebugLogger("Getting transform from coordinates");
   let rotate = "";
   let scaleXString = "";
   let scaleYString = "";
@@ -128,6 +140,7 @@ export const GetTransformFromCoords = (
 };
 
 export const StdbToOverlayCoords = (x: number, y: number): { x: number; y: number } => {
+  DebugLogger("Getting SpacetimeDB coordinates to Overlay coordinates");
   let vh = window.innerHeight;
 
   let newX,

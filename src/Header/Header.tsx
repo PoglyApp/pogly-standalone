@@ -1,5 +1,5 @@
-import { AppBar, Box, ListItemIcon, Menu, MenuItem, Tab, Tabs, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
+import { useContext } from "react";
 import styled from "styled-components";
 import { Outlet, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
@@ -8,16 +8,9 @@ import { SettingsModal } from "../Components/Modals/SettingModals";
 import HomeIcon from "@mui/icons-material/Home";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SettingsIcon from "@mui/icons-material/Settings";
-import BuildIcon from "@mui/icons-material/Build";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Toolbar from "@mui/material/Toolbar";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { SettingsContext } from "../Contexts/SettingsContext";
 import { ModalContext } from "../Contexts/ModalContext";
-import DeleteAllElementsReducer from "../module_bindings/delete_all_elements_reducer";
-import DeleteAllElementDataReducer from "../module_bindings/delete_all_element_data_reducer";
-import RefreshOverlayReducer from "../module_bindings/refresh_overlay_reducer";
-import RefreshOverlayClearStorageReducer from "../module_bindings/refresh_overlay_clear_storage_reducer";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 interface IProps {
   activePage: Number;
@@ -29,36 +22,22 @@ export const Header = (props: IProps) => {
   const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const { settings } = useContext(SettingsContext);
   const { setModals } = useContext(ModalContext);
-
-  const [debug, setDebug] = useState<Boolean>(settings.debug || false);
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
 
   const changePage = (pageIndex: number, path: string) => {
     if (props.activePage === pageIndex) return;
+
+    DebugLogger("Changing page");
 
     props.setActivePage(pageIndex);
     navigate(path);
   };
 
-  const handleDeleteAllElements = () => {
-    DeleteAllElementsReducer.call();
-    setAnchorEl(null);
-  };
-
-  const handleDeleteAllElementData = () => {
-    DeleteAllElementsReducer.call();
-    DeleteAllElementDataReducer.call();
-    setAnchorEl(null);
-  };
-
   const showSettingsMenu = () => {
+    DebugLogger("Opening settings modal");
     setModals((oldModals: any) => [
       ...oldModals,
-      <SettingsModal key="settings_modal" setDebug={setDebug} onlineVersion={props.onlineVersion} />,
+      <SettingsModal key="settings_modal" onlineVersion={props.onlineVersion} />,
     ]);
   };
 
@@ -105,47 +84,8 @@ export const Header = (props: IProps) => {
                   onClick={() => changePage(1, "/canvas")}
                 />
                 <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
-
-                {debug && (
-                  <StyledTab
-                    icon={<BuildIcon />}
-                    iconPosition="start"
-                    label="Debug"
-                    onClick={(event: any) => setAnchorEl(event.currentTarget)}
-                  />
-                )}
               </Tabs>
             </Box>
-
-            <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
-              <StyledMenuItem onClick={handleDeleteAllElements}>
-                <ListItemIcon>
-                  <DeleteIcon fontSize="small" color="error" />
-                </ListItemIcon>
-                Delete all Elements
-              </StyledMenuItem>
-
-              <StyledMenuItem onClick={handleDeleteAllElementData}>
-                <ListItemIcon>
-                  <DeleteIcon fontSize="small" color="error" />
-                </ListItemIcon>
-                Delete all Element Data
-              </StyledMenuItem>
-
-              <StyledMenuItem onClick={() => RefreshOverlayReducer.call()}>
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" color="success" />
-                </ListItemIcon>
-                Force refresh overlay
-              </StyledMenuItem>
-
-              <StyledMenuItem onClick={() => RefreshOverlayClearStorageReducer.call()}>
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" color="success" />
-                </ListItemIcon>
-                Force refresh overlay & Delete LocalStorage
-              </StyledMenuItem>
-            </Menu>
 
             <GuestListContainer />
           </Toolbar>

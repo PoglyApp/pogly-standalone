@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { StyledInput } from "../StyledComponents/StyledInput";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -30,6 +31,7 @@ export const ChooseInstanceModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const handleSave = () => {
+    DebugLogger("Handling instance save");
     let domain: string = "";
 
     switch (type) {
@@ -52,6 +54,7 @@ export const ChooseInstanceModal = (props: IProp) => {
     });
 
     if (remember) {
+      DebugLogger("Saving instance values");
       localStorage.setItem("stdbConnectDomain", domain);
       localStorage.setItem("stdbConnectModule", moduleName);
       localStorage.setItem("stdbConnectModuleAuthKey", authKey);
@@ -60,7 +63,7 @@ export const ChooseInstanceModal = (props: IProp) => {
     setIsModalOpen(false);
   };
 
-  if(isOverlay) return (<></>);
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={isModalOpen}>

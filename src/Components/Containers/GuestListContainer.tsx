@@ -7,6 +7,7 @@ import { Avatar, Menu, MenuItem } from "@mui/material";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const GuestListContainer = () => {
   const config: Config = useContext(ConfigContext);
@@ -25,20 +26,25 @@ export const GuestListContainer = () => {
     if (guestStore.length > 5) {
       const guestsArray = [...guestStore];
 
+      DebugLogger("Initializing more than 5 guests");
+
       setDisplayedGuests(() => [...guestsArray.slice(0, 5)]);
       setHiddenGuests(() => [...guestsArray.slice(5, guestStore.length)]);
     } else {
+      DebugLogger("Initializing fewer than 5 guests");
       setDisplayedGuests(() => guestStore);
       setHiddenGuests(() => []);
     }
   }, [guestStore]);
 
   const showHiddenGuests = (event: any) => {
+    DebugLogger("Handle show hidden guests");
     if (!hidenGuestsAnchor) setHidenGuestsAnchor(event.currentTarget);
     else setHidenGuestsAnchor(null);
   };
 
   const easterEgg = (event: any) => {
+    DebugLogger("Show easter egg");
     if (event.detail === 2) {
       setShowPedro(!showPedro);
     }

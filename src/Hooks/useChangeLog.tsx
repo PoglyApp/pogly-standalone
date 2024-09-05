@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { ChangelogType } from "../Types/General/ChangelogType";
+import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useChangeLog = async (setChangelog: Function) => {
   useEffect(() => {
     (async () => {
+      DebugLogger("Fetching change log");
+
       const response = await fetch("https://raw.githubusercontent.com/PoglyApp/.github/main/beacons/changelog");
 
       const responseJson = await response.json();

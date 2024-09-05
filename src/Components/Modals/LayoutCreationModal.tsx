@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, FormGroup, Button, DialogActions, A
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
 import AddLayoutReducer from "../../module_bindings/add_layout_reducer";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const LayoutCreationModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -11,11 +12,14 @@ export const LayoutCreationModal = () => {
   const [error, setError] = useState<string>("");
 
   const handleNameChange = (text: any) => {
+    DebugLogger("Handling layout name change");
     if (!/^[a-z0-9]+$/i.test(text) && text !== "") {
+      DebugLogger("Layout name contains unsupported characters");
       setLayoutName("");
       return setError("Layout name can only contain letters and numbers.");
     }
     if (text.length > 20) {
+      DebugLogger("Layout name too long");
       setLayoutName("");
       return setError("Layout name can be only 20 characters long.");
     }
@@ -25,11 +29,13 @@ export const LayoutCreationModal = () => {
   };
 
   const saveLayout = () => {
+    DebugLogger("Saving layout");
     AddLayoutReducer.call(layoutName, false);
     handleOnClose();
   };
 
   const handleOnClose = () => {
+    DebugLogger("Closing layout creation modal");
     closeModal("layoutCreation_modal", modals, setModals);
   };
 

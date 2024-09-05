@@ -8,6 +8,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { HexColorPicker } from "react-colorful";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface Row {
   variableName: string;
@@ -27,10 +28,12 @@ export const WidgetVariableTable = (props: IProps) => {
   const colorInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   useEffect(() => {
+    DebugLogger("Setting widget variables");
     props.setVariables(() => rows);
   }, [rows, props]);
 
   const handleVariableNameChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+    DebugLogger("Handling widget variable name change");
     const { value } = event.target;
     const newRows = [...rows];
 
@@ -39,6 +42,7 @@ export const WidgetVariableTable = (props: IProps) => {
   };
 
   const handleVariableTypeChange = (index: number, event: ChangeEvent<HTMLSelectElement>) => {
+    DebugLogger("Handling widget variable type change");
     const { value } = event.target;
     const newRows = [...rows];
 
@@ -58,6 +62,7 @@ export const WidgetVariableTable = (props: IProps) => {
     event?: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     color?: string
   ) => {
+    DebugLogger("Handling widget variable value change");
     const newRows = [...rows];
 
     if (color) {
@@ -77,15 +82,18 @@ export const WidgetVariableTable = (props: IProps) => {
   };
 
   const addRow = () => {
+    DebugLogger("Adding new widget variable row");
     setRows([...rows, { variableName: "", variableType: VariableValueType.string, variableValue: "" }]);
   };
 
   const deleteRow = (index: number) => {
+    DebugLogger("Deleting widget variable row");
     const newRows = rows.filter((_, rowIndex) => rowIndex !== index);
     setRows(() => newRows);
   };
 
   const moveRow = (index: number, direction: "up" | "down") => {
+    DebugLogger("Moving widget variable row");
     const newRows = [...rows];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= rows.length) return;
@@ -96,6 +104,7 @@ export const WidgetVariableTable = (props: IProps) => {
   };
 
   const toggleColorPicker = (index: number) => {
+    DebugLogger("Toggling color picker");
     setShowPickers((prev) => ({
       ...prev,
       [index]: !prev[index],

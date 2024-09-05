@@ -4,6 +4,7 @@ import { addElementData, removeElementData, updateElementData } from "../../Stor
 import { useAppDispatch } from "../../Store/Features/store";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useOverlayElementDataEvents = (
   canvasInitialized: CanvasInitializedType,
@@ -12,6 +13,8 @@ export const useOverlayElementDataEvents = (
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    DebugLogger("Initializing overlay element data events");
+
     ElementData.onInsert((element, reducerEvent) => {
       if (!reducerEvent) return;
 

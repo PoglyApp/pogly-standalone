@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import DeleteElementReducer from "../module_bindings/delete_element_reducer";
 import ElementStruct from "../module_bindings/element_struct";
 import Elements from "../module_bindings/elements";
@@ -13,8 +14,14 @@ import {
   ViewportToStdbFontSize,
 } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
+import { CompressImage } from "./CompressImage";
+import { DebugLogger } from "./DebugLogger";
 
-export const UserInputHandler = (activeLayout: Layouts, selectedElement: SelectedType | undefined): any => {
+export const UserInputHandler = (
+  activeLayout: Layouts,
+  selectedElement: SelectedType | undefined,
+  compressPaste: boolean | undefined
+): any => {
   const userInputs = [];
 
   // DELETE SELECTED ELEMENT WITH DELETE
@@ -23,10 +30,13 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "delete",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed DELETE");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
+
+        DebugLogger("Deleting element");
 
         DeleteElementReducer.call(selectedElement.Elements.id);
       } catch (error) {
@@ -41,7 +51,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+x",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed CTRL + X");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -49,6 +60,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
+        DebugLogger("Deleting and copying element");
 
         DeleteElementReducer.call(selectedElement.Elements.id);
       } catch {
@@ -63,11 +75,12 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+d",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed CTRL + D");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
-
+        DebugLogger("Duplicating element");
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element)
@@ -84,11 +97,12 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+c",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed CTRL + C");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
-
+        DebugLogger("Copying element");
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
@@ -104,7 +118,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "ctrl+v",
     action: "keydown",
     callback: async (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed CTRL + V");
+      event.preventDefault();
 
       try {
         const text = await navigator.clipboard.readText();
@@ -115,8 +130,29 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 
           if (isImage) {
             const type = clipboard[i].types.findIndex((t) => t.includes("image"));
-            const blob = await clipboard[i].getType(clipboard[i].types[type]);
+            let blob: any = await clipboard[i].getType(clipboard[i].types[type]);
+
+            if (blob.type !== "image/gif" && compressPaste) {
+              DebugLogger("Compressing image");
+              blob = await CompressImage(blob);
+            }
+
+            if (blob.size / 1024 > 150) {
+              DebugLogger("Image size too large");
+              return toast.error("File size too large to paste. Consider pasting an image URL instead.", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            }
+
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
+              DebugLogger("Inserting new element");
               insertElement(
                 ElementStruct.ImageElement({
                   imageElementData: ImageElementData.RawData(result.r as string),
@@ -133,6 +169,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
           try {
             const json = JSON.parse(text);
             if (!json.element.tag) return;
+
+            DebugLogger("Inserting new text");
 
             insertElement(
               json.element as ElementStruct,
@@ -182,7 +220,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "right",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed right arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -190,6 +229,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 2;
@@ -214,7 +255,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+right",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed SHIFRT + right arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -222,6 +264,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 7;
@@ -246,7 +290,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "left",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed left arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -254,6 +299,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 2;
@@ -278,7 +325,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+left",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed SHIFT + left arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -286,6 +334,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 7;
@@ -310,7 +360,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "up",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed up arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -318,6 +369,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 2;
@@ -342,7 +395,9 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+up",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed SHIFT + up arrow");
+
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -350,6 +405,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 7;
@@ -374,7 +431,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "down",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed down arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -382,6 +440,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 2;
@@ -406,7 +466,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
     keys: "shift+down",
     action: "keydown",
     callback: (event: any) => {
-      event!.preventDefault();
+      DebugLogger("User pressed SHIFT + down arrow");
+      event.preventDefault();
 
       try {
         if (!selectedElement) return;
@@ -414,6 +475,8 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
         const element = Elements.findById(selectedElement.Elements.id);
 
         if (!element) return;
+
+        DebugLogger("Nudging element");
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 7;
@@ -436,6 +499,7 @@ export const UserInputHandler = (activeLayout: Layouts, selectedElement: Selecte
 };
 
 const blobToBase64 = (file: any, cb: any) => {
+  DebugLogger("Converting image to Base64");
   let reader = new FileReader();
 
   reader.readAsDataURL(file);

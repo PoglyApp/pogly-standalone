@@ -37,17 +37,22 @@ import { UserInputHandler } from "../Utility/UserInputHandler";
 import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
+import { SettingsContext } from "../Contexts/SettingsContext";
+import { DebugLogger } from "../Utility/DebugLogger";
+import { Identity, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 
 interface IProps {
   setActivePage: Function;
   canvasInitialized: CanvasInitializedType;
   setCanvasInitialized: Function;
+  disconnected: boolean;
 }
 
 export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { setModals } = useContext(ModalContext);
+  const { settings } = useContext(SettingsContext);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -91,12 +96,15 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected));
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {
+      DebugLogger("Setting active layout");
       layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
     }
+
+    DebugLogger("Layout context updated");
 
     setSelected(undefined);
     setSelectoTargets(() => []);
@@ -105,8 +113,9 @@ export const Canvas = (props: IProps) => {
   }, [layoutContext]);
 
   useEffect(() => {
+    DebugLogger("Setting active page");
     props.setActivePage(1);
-  }, [props]);
+  }, [props.setActivePage]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -125,7 +134,8 @@ export const Canvas = (props: IProps) => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (disconnected) {
+  if (disconnected || props.disconnected) {
+    DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
         type="button"

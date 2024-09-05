@@ -1,4 +1,8 @@
+import { DebugLogger } from "./DebugLogger";
+
 export const GetFontFamily = async (fontURL: string) => {
+  DebugLogger("Getting font family");
+
   try {
     const request = await fetch(fontURL, {
       method: "GET",

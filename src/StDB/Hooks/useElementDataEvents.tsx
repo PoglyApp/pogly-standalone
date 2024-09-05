@@ -4,6 +4,7 @@ import { addElementData, removeElementData, updateElementData } from "../../Stor
 import { useAppDispatch } from "../../Store/Features/store";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const dispatch = useAppDispatch();
@@ -11,11 +12,13 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
   useEffect(() => {
     if (canvasInitialized.elementDataEventsInitialized) return;
 
+    DebugLogger("Initializing element data events");
+
     ElementData.onInsert((element, reducerEvent) => {
       if (!reducerEvent) return;
 
       const imageSkeleton = document.getElementById("imageSkeleton");
-      imageSkeleton!.style.display = "none";
+      if (imageSkeleton) imageSkeleton.style.display = "none";
 
       dispatch(addElementData(element));
     });

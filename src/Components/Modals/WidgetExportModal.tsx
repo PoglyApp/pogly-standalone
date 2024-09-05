@@ -5,6 +5,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   widgetString?: string;
@@ -24,31 +25,43 @@ export const WidgetExportModal = (props: IProps) => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(props.widgetString!);
+    if (!props.widgetString) return;
+    try {
+      DebugLogger("Copying widget code");
 
-    setCopied(true);
+      navigator.clipboard.writeText(props.widgetString);
 
-    setTimeout(() => {
-      setCopied(false);
-    }, 1000);
-  };
+      setCopied(true);
 
-  const handleImport = () => {
-    if (props.loadByWidgetString) {
-      try {
-        JSON.parse(widgetCode!);
-        setError("");
-      } catch (error) {
-        return setError("Widget JSON does not parse.");
-      }
-
-      closeModal("widgetImport_modal", modals, setModals);
-
-      props.loadByWidgetString(widgetCode);
+      setTimeout(() => {
+        setCopied(false);
+      }, 1000);
+    } catch (error) {
+      console.log("ERROR WHILE TRYING TO COPY WIDGET STRING", error);
     }
   };
 
-  if(isOverlay) return(<></>);
+  const handleImport = () => {
+    try {
+      DebugLogger("Importing widget code");
+      if (props.loadByWidgetString && widgetCode) {
+        try {
+          JSON.parse(widgetCode);
+          setError("");
+        } catch (error) {
+          return setError("Widget JSON does not parse.");
+        }
+
+        closeModal("widgetImport_modal", modals, setModals);
+
+        props.loadByWidgetString(widgetCode);
+      }
+    } catch (error) {
+      console.log("ERROR WHILE TRYING TO IMPORT WIDGET", error);
+    }
+  };
+
+  if (isOverlay) return <></>;
 
   return (
     <Dialog open={true} onClose={handleOnClose}>

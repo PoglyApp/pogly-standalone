@@ -46,6 +46,7 @@ import Elements from "../../module_bindings/elements";
 import WidgetElement from "../../module_bindings/widget_element";
 import ElementStruct from "../../module_bindings/element_struct";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -86,74 +87,142 @@ export const WidgetCreationModal = (props: IProps) => {
   };
 
   const loadByElementDataID = useCallback(() => {
-    const elementData = ElementData.findById(props.editElementDataId!);
-    if (!elementData) return;
+    if (!props.editElementDataId) return;
 
-    const jsonObject = JSON.parse(elementData.data);
+    try {
+      DebugLogger("Loading widget by element data ID");
+      const elementData = ElementData.findById(props.editElementDataId);
+      if (!elementData) return;
 
-    setWidgetName(elementData.name);
-    setWidgetWidth(elementData.dataWidth);
-    setWidgetHeight(elementData.dataHeight);
+      const jsonObject = JSON.parse(elementData.data);
 
-    setHeaderCode(jsonObject.headerTag);
-    setBodyCode(jsonObject.bodyTag);
-    setStyleCode(jsonObject.styleTag);
-    setScriptCode(jsonObject.scriptTag);
-    setVariables(() => jsonObject.variables);
+      setWidgetName(elementData.name);
+      setWidgetWidth(elementData.dataWidth);
+      setWidgetHeight(elementData.dataHeight);
 
-    setShowModal(true);
+      setHeaderCode(jsonObject.headerTag);
+      setBodyCode(jsonObject.bodyTag);
+      setStyleCode(jsonObject.styleTag);
+      setScriptCode(jsonObject.scriptTag);
+      setVariables(() => jsonObject.variables);
+
+      setShowModal(true);
+    } catch (error) {
+      console.log("ERROR WHILE LOADING WIDGET BY ELEMENT DATA ID", error);
+    }
   }, [props]);
 
   const loadByElementID = useCallback(() => {
-    const element: Elements = Elements.findById(props.editElementId!)!;
-    const widgetStruct: WidgetElement = element.element.value as WidgetElement;
+    if (!props.editElementId) return;
+    try {
+      DebugLogger("Loading widget by element ID");
 
-    let widgetData: any = null;
+      const element = Elements.findById(props.editElementId);
+      if (!element) return;
+      const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
-    if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(widgetStruct.elementDataId);
-    else widgetData = JSON.parse(widgetStruct.rawData);
+      let widgetData: any = null;
 
-    setWidgetName(widgetData.widgetName!);
-    setWidgetWidth(widgetData.widgetWidth!);
-    setWidgetHeight(widgetData.widgetHeight!);
+      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(widgetStruct.elementDataId);
+      else widgetData = JSON.parse(widgetStruct.rawData);
 
-    setHeaderCode(widgetData.headerTag);
-    setBodyCode(widgetData.bodyTag);
-    setStyleCode(widgetData.styleTag);
-    setScriptCode(widgetData.scriptTag);
-    setVariables(() => widgetData.variables);
+      setWidgetName(widgetData.widgetName || "");
+      setWidgetWidth(widgetData.widgetWidth || "");
+      setWidgetHeight(widgetData.widgetHeight || "");
 
-    setShowModal(true);
+      setHeaderCode(widgetData.headerTag || "");
+      setBodyCode(widgetData.bodyTag || "");
+      setStyleCode(widgetData.styleTag || "");
+      setScriptCode(widgetData.scriptTag || "");
+      setVariables(() => widgetData.variables || "");
+
+      setShowModal(true);
+    } catch (error) {
+      console.log("ERROR WHILE LOADING WIDGET BY ELEMENT ID", error);
+    }
   }, [props]);
 
   const loadByWidgetString = (widgetString: string) => {
-    const jsonObject = JSON.parse(widgetString);
+    try {
+      DebugLogger("Loading widget by widget string");
+      const jsonObject = JSON.parse(widgetString);
 
-    setWidgetName(jsonObject.widgetName || "");
-    setWidgetWidth(jsonObject.widgetWidth || "");
-    setWidgetHeight(jsonObject.widgetHeight || "");
+      setWidgetName(jsonObject.widgetName || "");
+      setWidgetWidth(jsonObject.widgetWidth || "");
+      setWidgetHeight(jsonObject.widgetHeight || "");
 
-    setHeaderCode(jsonObject.headerTag || "");
-    setBodyCode(jsonObject.bodyTag || "");
-    setStyleCode(jsonObject.styleTag || "");
-    setScriptCode(jsonObject.scriptTag || "");
-    if (jsonObject.variables && jsonObject.variables.length > 0) setVariables(() => jsonObject.variables);
+      setHeaderCode(jsonObject.headerTag || "");
+      setBodyCode(jsonObject.bodyTag || "");
+      setStyleCode(jsonObject.styleTag || "");
+      setScriptCode(jsonObject.scriptTag || "");
+      if (jsonObject.variables && jsonObject.variables.length > 0) setVariables(() => jsonObject.variables);
 
-    // A very stupid way to force the variabels component to re-render but fuck it
-    setVariablesKey("variablesKey_updated");
+      // A very stupid way to force the variabels component to re-render but fuck it
+      setVariablesKey("variablesKey_updated");
 
-    setShowModal(true);
+      setShowModal(true);
+    } catch (error) {
+      console.log("ERROR WHILE LOADING WIDGET BY STRING", error);
+    }
   };
 
   const handleOnClose = () => {
+    DebugLogger("Closing widget modal");
     closeModal("widgetCreation_modal", modals, setModals);
   };
 
   const handleSave = () => {
-    if (props.editElementId) {
-      const element: Elements = Elements.findById(props.editElementId!)!;
-      const widgetStruct: ElementStruct = element.element as ElementStruct;
+    try {
+      DebugLogger("Saving widget");
+      if (props.editElementId) {
+        const element = Elements.findById(props.editElementId);
+        if (!element) return;
+        const widgetStruct: ElementStruct = element.element as ElementStruct;
 
+        const widgetJson = StringifyRawDataWidgetCode(
+          widgetName,
+          widgetWidth,
+          widgetHeight,
+          headerCode,
+          bodyCode,
+          styleCode,
+          scriptCode,
+          variables
+        );
+
+        (widgetStruct.value as WidgetElement).rawData = widgetJson;
+
+        updateElementStruct(props.editElementId, widgetStruct);
+
+        return handleOnClose();
+      }
+
+      const widgetJson = StringifyWidgetCode(headerCode, bodyCode, styleCode, scriptCode, variables);
+
+      const newElementData: ElementDataType = {
+        Name: widgetName,
+        DataType: DataType.WidgetElement as DataType,
+        Data: widgetJson,
+        DataWidth: widgetWidth,
+        DataHeight: widgetHeight,
+        CreatedBy: Identity.nickname,
+      };
+
+      if (!props.editElementDataId) {
+        insertElementData(newElementData);
+      } else {
+        updateElementData(props.editElementDataId, newElementData);
+      }
+
+      handleOnClose();
+    } catch (error) {
+      console.log("ERROR WHILE TRYING TO SAVE WIDGET", error);
+    }
+  };
+
+  const openExportModal = () => {
+    try {
+      DebugLogger("Opening widget export modal");
       const widgetJson = StringifyRawDataWidgetCode(
         widgetName,
         widgetWidth,
@@ -165,63 +234,37 @@ export const WidgetCreationModal = (props: IProps) => {
         variables
       );
 
-      (widgetStruct.value as WidgetElement).rawData = widgetJson;
-
-      updateElementStruct(props.editElementId, widgetStruct);
-
-      return handleOnClose();
+      setModals((oldModals: any) => [
+        ...oldModals,
+        <WidgetExportModal key="widgetExport_modal" widgetString={widgetJson} />,
+      ]);
+    } catch (error) {
+      console.log("ERROR WHILE OPENING WIDGET EXPORT MODAL", error);
     }
-
-    const widgetJson = StringifyWidgetCode(headerCode, bodyCode, styleCode, scriptCode, variables);
-
-    const newElementData: ElementDataType = {
-      Name: widgetName,
-      DataType: DataType.WidgetElement as DataType,
-      Data: widgetJson,
-      DataWidth: widgetWidth,
-      DataHeight: widgetHeight,
-      CreatedBy: Identity.nickname,
-    };
-
-    if (!props.editElementDataId) {
-      insertElementData(newElementData);
-    } else {
-      updateElementData(props.editElementDataId, newElementData);
-    }
-
-    handleOnClose();
-  };
-
-  const openExportModal = () => {
-    const widgetJson = StringifyRawDataWidgetCode(
-      widgetName,
-      widgetWidth,
-      widgetHeight,
-      headerCode,
-      bodyCode,
-      styleCode,
-      scriptCode,
-      variables
-    );
-
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <WidgetExportModal key="widgetExport_modal" widgetString={widgetJson} />,
-    ]);
   };
 
   const openImportModal = () => {
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <WidgetExportModal key="widgetImport_modal" importing={true} loadByWidgetString={loadByWidgetString} />,
-    ]);
+    try {
+      DebugLogger("Opening widget import modal");
+      setModals((oldModals: any) => [
+        ...oldModals,
+        <WidgetExportModal key="widgetImport_modal" importing={true} loadByWidgetString={loadByWidgetString} />,
+      ]);
+    } catch (error) {
+      console.log("ERROR WHILE OPENING WIDGET IMPORT MODAL", error);
+    }
   };
 
   useEffect(() => {
-    if (props.editElementDataId) return loadByElementDataID();
-    if (props.editElementId) return loadByElementID();
+    try {
+      if (props.editElementDataId) return loadByElementDataID();
+      if (props.editElementId) return loadByElementID();
+      DebugLogger("Initializing widget creation modal");
 
-    return setShowModal(true);
+      return setShowModal(true);
+    } catch (error) {
+      console.log("ERROR WHILE INITIALIZING WIDGET CREATION MODAL", error);
+    }
   }, [props, loadByElementDataID, loadByElementID]);
 
   if (isOverlay) return <></>;

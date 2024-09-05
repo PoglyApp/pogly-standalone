@@ -11,9 +11,10 @@ import WidgetElement from "../../module_bindings/widget_element";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useOverlayElementsEvents = (
-  layout: Layouts,
+  layout: Layouts | undefined,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function
 ) => {
@@ -22,15 +23,20 @@ export const useOverlayElementsEvents = (
   const activeLayout = useRef<Layouts>();
 
   useEffect(() => {
+    if (!layout) return;
+    DebugLogger("Updating overlay elements events refs");
     activeLayout.current = layout;
   }, [layout]);
 
   useEffect(() => {
     if (canvasInitialized.overlayElementEventsInitialized || !layout) return;
 
+    DebugLogger("Initializing overlay element events");
+
     Elements.onInsert((element, reducerEvent) => {
       if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element);
 
@@ -39,7 +45,8 @@ export const useOverlayElementsEvents = (
     });
 
     Elements.onUpdate((oldElement, newElement) => {
-      if (newElement.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (newElement.layoutId !== activeLayout.current.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -153,7 +160,8 @@ export const useOverlayElementsEvents = (
 
     Elements.onDelete((element, reducerEvent) => {
       if (!reducerEvent) return;
-      if (element.layoutId !== activeLayout.current!.id) return;
+      if (!activeLayout.current) return;
+      if (element.layoutId !== activeLayout.current.id) return;
 
       dispatch(removeCanvasElement(element));
       dispatch(removeElement(element));

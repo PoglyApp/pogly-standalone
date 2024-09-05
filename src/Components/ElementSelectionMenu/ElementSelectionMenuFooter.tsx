@@ -11,6 +11,7 @@ import { ChangelogModal } from "../Modals/ChangelogModal";
 import { ChangelogType } from "../../Types/General/ChangelogType";
 import { GetLatestChangelogVersion, useChangeLog } from "../../Hooks/useChangeLog";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const ElementSelectionMenuFooter = () => {
   const { setModals } = useContext(ModalContext);
@@ -25,10 +26,12 @@ export const ElementSelectionMenuFooter = () => {
 
   useEffect(() => {
     if (!changelog) return;
+    DebugLogger("Setting latest change log version");
     setLatestChangelogVersion(GetLatestChangelogVersion(changelog));
   }, [changelog]);
 
   const openChangelogModal = () => {
+    DebugLogger("Handling open change log modal");
     setModals((oldModals: any) => [
       ...oldModals,
       <ChangelogModal
@@ -41,6 +44,7 @@ export const ElementSelectionMenuFooter = () => {
   };
 
   const onLogOut = () => {
+    DebugLogger("Handling log out");
     localStorage.removeItem("stdbConnectDomain");
     localStorage.removeItem("stdbConnectModule");
     localStorage.removeItem("stdbConnectModuleAuthKey");

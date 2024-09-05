@@ -23,7 +23,7 @@
     &nbsp;
     <a href="https://github.com/clockworklabs/spacetimedb"><img src="https://img.shields.io/badge/powered_by-SpacetimeDB-000000.svg?style=flat-square" /></a>
     &nbsp;
-	<img src="https://img.shields.io/badge/version-v0.1.2_beta-9f9f9f.svg?style=flat-square" />
+	<img src="https://img.shields.io/badge/version-v0.1.3_beta-9f9f9f.svg?style=flat-square" />
     &nbsp;
     <a href="https://github.com/PoglyApp/pogly-standalone/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-50C878.svg?style=flat-square" /></a>
 </p>
@@ -42,7 +42,7 @@
 
 ## What is [Pogly](https://pogly.gg) Standalone?
 
-Pogly is a real-time collaborative stream overlay. Think Figma, but for your OBS overlay sources. 
+Pogly is a real-time collaborative stream overlay. Think Figma, but for your OBS overlay sources.
 
 With the power of Pogly, you can condense your cluttered OBS overlays into a single, powerful browser source. But wait, how is that like Figma? [SpacetimeDB](https://spacetimedb.com) enables Pogly to communicate in real-time with multiple users; we call them Editors.
 
@@ -57,6 +57,7 @@ There are both provider-hosted and self-hosted methods available.
 For assistance with we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
 
 ## Used by
+
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
 <a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
@@ -65,8 +66,14 @@ For assistance with we are available in our [Discord](https://discord.gg/uPQsBaV
 <a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank" title="Ashlynn"><img src="./images/streamers/ashlynn.svg" /></a>
 <a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank" title="Ssaab"><img src="./images/streamers/ssaab.svg" /></a>
 <a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank" title="JustAGameOverScreen"><img src="./images/streamers/justagameoverscreen.svg" /></a>
+<a href="https://www.twitch.tv/firthy00" rel="noreferrer" target="_blank" title="Firthy00"><img src="./images/streamers/firthy00.svg" /></a>
+<a href="https://www.twitch.tv/misasoupy" rel="noreferrer" target="_blank" title="Misasoupy"><img src="./images/streamers/misasoupy.svg" /></a>
+<a href="https://www.twitch.tv/gappyv" rel="noreferrer" target="_blank" title="GappyV"><img src="./images/streamers/gappyv.svg" /></a>
+<a href="https://www.twitch.tv/kr3ia" rel="noreferrer" target="_blank" title="kr3ia"><img src="./images/streamers/kr3ia.svg" /></a>
+<a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
 
 ## Contributing
+
 Check out our [contribution guidelines](https://github.com/PoglyApp/pogly-standalone/blob/main/CONTRIBUTING.md).
 
 ## License

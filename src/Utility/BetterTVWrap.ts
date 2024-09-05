@@ -1,33 +1,38 @@
 import BetterTVEmote from "../Types/BetterTVTypes/BetterTVEmoteType";
 import BetterTVUserType from "../Types/BetterTVTypes/BetterTVUserType";
+import { DebugLogger } from "./DebugLogger";
 
 interface BetterTVResponse {
-    data: any;
-    status: number;
+  data: any;
+  status: number;
 }
 
 export class BetterTVWrapper {
-    public async ApiGET(route: string): Promise<BetterTVResponse> {
-        const request = await fetch("https://api.betterttv.net/3/" + route, {
-            method: "GET",
-            referrerPolicy: "no-referrer",
-        });
-        const data = await request.json();
-        return {
-            data: data,
-            status: request.status
-        };
-    }
+  public async ApiGET(route: string): Promise<BetterTVResponse> {
+    DebugLogger("Getting BetterTV emotes");
 
-    public async GetUserByTwitchId(twitchId: string): Promise<BetterTVUserType> {
-        const { data, status } = await this.ApiGET("cached/users/twitch/" + twitchId);
+    const request = await fetch("https://api.betterttv.net/3/" + route, {
+      method: "GET",
+      referrerPolicy: "no-referrer",
+    });
+    const data = await request.json();
+    return {
+      data: data,
+      status: request.status,
+    };
+  }
 
-        return data as BetterTVUserType;
-    }
+  public async GetUserByTwitchId(twitchId: string): Promise<BetterTVUserType> {
+    DebugLogger("Getting BetterTV user by Twitch ID");
 
-    public GetURLFromEmote(emote: BetterTVEmote): string {
-        return "https://cdn.betterttv.net/emote/" + emote.id + "/3x.webp";
-      }
+    const { data, status } = await this.ApiGET("cached/users/twitch/" + twitchId);
+
+    return data as BetterTVUserType;
+  }
+
+  public GetURLFromEmote(emote: BetterTVEmote): string {
+    return "https://cdn.betterttv.net/emote/" + emote.id + "/3x.webp";
+  }
 }
 
 const BetterTVWrap = new BetterTVWrapper();

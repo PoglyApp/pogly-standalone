@@ -5,6 +5,7 @@ import Elements from "../../module_bindings/elements";
 import ImageElement from "../../module_bindings/image_element";
 import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   elements: Elements;
@@ -24,12 +25,13 @@ export const Image = (props: IProp) => {
 
   useEffect(() => {
     handleElementBorder(Identity.identity, props.elements.id.toString());
+    DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
       const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
 
-      if(!eData) return;
-      
+      if (!eData) return;
+
       setImageData(eData.data);
       setImageName(eData.name);
     } else {
@@ -52,6 +54,8 @@ export const Image = (props: IProp) => {
       style={{
         width: imageElement.width,
         height: imageElement.height,
+        minWidth: "16px",
+        minHeight: "16px",
         transform: props.elements.transform,
         opacity: props.elements.transparency / 100 <= 0.2 && !isOverlay ? 0.2 : props.elements.transparency / 100,
         clipPath: props.elements.clip,

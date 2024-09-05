@@ -1,6 +1,8 @@
 import AuditLog from "../module_bindings/audit_log";
+import { DebugLogger } from "./DebugLogger";
 
 export const ParseAuditLog = (auditLog: AuditLog) => {
+  DebugLogger("Parsing audit log");
   let ret = "";
 
   switch (auditLog.reducer) {
@@ -93,6 +95,8 @@ export const ParseAuditLog = (auditLog: AuditLog) => {
 };
 
 const parseChat = (auditLog: AuditLog) => {
+  DebugLogger("Parsing chat");
+
   var message = "";
   if (auditLog.newChange.tag == "ChatMessage") message = auditLog.newChange.value.message;
 
@@ -100,6 +104,8 @@ const parseChat = (auditLog: AuditLog) => {
 };
 
 const parseAdd = (auditLog: AuditLog) => {
+  DebugLogger("Parsing add");
+
   var ret = "";
   switch (auditLog.newChange.tag) {
     case "ElementChange":
@@ -126,6 +132,8 @@ const parseAdd = (auditLog: AuditLog) => {
 };
 
 const parseDelete = (auditLog: AuditLog) => {
+  DebugLogger("Parsing delete");
+
   var ret = "";
   switch (auditLog.oldChange.tag) {
     case "ElementChange":
@@ -152,6 +160,8 @@ const parseDelete = (auditLog: AuditLog) => {
 };
 
 const parse = (auditLog: AuditLog) => {
+  DebugLogger("Parsing");
+
   var ret = "";
   switch (auditLog.newChange.tag) {
     case "ElementChange":
@@ -177,6 +187,8 @@ const parse = (auditLog: AuditLog) => {
 };
 
 const parseUser = (auditLog: AuditLog) => {
+  DebugLogger("Parsing user");
+
   //return Guests.filterByIdentity(identity)?.nickname;
   //var username = auditLog.identity.toHexString() === "9e1bf1818e936b740a820a78cd5f63596a8b637253a6da402b75d6d0f9fdd7bd" ? "Server" : identity.toHexString();
 

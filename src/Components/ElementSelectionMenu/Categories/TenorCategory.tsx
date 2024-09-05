@@ -10,6 +10,7 @@ import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElementData from "../../../module_bindings/image_element_data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const TenorCategory = () => {
   const layoutContext = useContext(LayoutContext);
@@ -23,11 +24,14 @@ export const TenorCategory = () => {
   useTenor(apiKey, searchEmotes, searchIndex, setTenorEmotes);
 
   const handleSearch = (search: string) => {
+    DebugLogger("Searching Tenor");
     setSearchIndex("");
     setSearchEmotes(search);
   };
 
   const AddTenorToCanvas = (emote: TenorSearchResponseType) => {
+    DebugLogger("Adding Tenor element to canvas");
+
     var blob =
       emote.media_formats.webp?.url || emote.media_formats.webp_transparent?.url || emote.media_formats.gif.url;
 
@@ -40,7 +44,7 @@ export const TenorCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext!.activeLayout
+        layoutContext.activeLayout
       );
     };
   };

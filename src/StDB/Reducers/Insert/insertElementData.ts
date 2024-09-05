@@ -1,8 +1,11 @@
 import AddElementDataReducer from "../../../module_bindings/add_element_data_reducer";
 import DataType from "../../../module_bindings/data_type";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
+import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const insertElementData = (elementData: ElementDataType) => {
+  DebugLogger("Inserting new element data");
+
   switch (elementData.DataType) {
     case DataType.TextElement:
       AddElementDataReducer.call(

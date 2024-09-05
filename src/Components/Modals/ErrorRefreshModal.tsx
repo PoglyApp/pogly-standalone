@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogContentText, DialogTitle } from "@mui/mate
 import { useEffect, useState } from "react";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ClearConnectionSettings } from "../../Utility/ClearConnectionSettings";
+import KickSelfReducer from "../../module_bindings/kick_self_reducer";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProp {
   type: string; //should be "timer" or "button"
@@ -10,6 +12,7 @@ interface IProp {
   titleText: string;
   contentText: string;
   clearSettings: boolean;
+  kickSelf?: boolean;
 }
 
 export const ErrorRefreshModal = (props: IProp) => {
@@ -17,12 +20,14 @@ export const ErrorRefreshModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   //Clear out connection settings to prevent getting stuck
-  if(props.clearSettings) ClearConnectionSettings();
+  if (props.clearSettings) ClearConnectionSettings();
 
   useEffect(() => {
     if (isOverlay) return;
 
     if (props.type !== "timer") return;
+
+    DebugLogger("Initializing refresh");
 
     if (timer === 0) window.location.reload();
 
@@ -30,6 +35,13 @@ export const ErrorRefreshModal = (props: IProp) => {
       setTimer(timer - 1);
     }, 1000);
   }, [timer, isOverlay, props.type]);
+
+  const handleClick = () => {
+    DebugLogger("Handling refresh click");
+    if (props.kickSelf) KickSelfReducer.call();
+
+    window.location.reload();
+  };
 
   if (isOverlay) return <></>;
 
@@ -51,9 +63,7 @@ export const ErrorRefreshModal = (props: IProp) => {
                 textColor="black"
                 backgroundColor="#ffffffa6"
                 hoverColor="white"
-                onClick={() => {
-                  window.location.reload();
-                }}
+                onClick={handleClick}
               />
             </center>
           </>

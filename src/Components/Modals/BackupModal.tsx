@@ -18,6 +18,7 @@ import { UploadBackupFromFile } from "../../Utility/UploadElementData";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
 import { ConfigContext } from "../../Contexts/ConfigContext";
+import { DebugLogger } from "../../Utility/DebugLogger";
 
 interface IProps {
   download: boolean;
@@ -38,20 +39,24 @@ export const BackupModal = (props: IProps) => {
     if (!props.download) return;
 
     if (downElement) setDownData(true);
+    DebugLogger("Setting download data");
   }, [downData, downElement, downLayout, props.download]);
 
   const handleOnClose = () => {
+    DebugLogger("Handling backup modal close");
     setFile(null);
     setError("");
     closeModal("backup_modal", modals, setModals);
   };
 
   const handleFileChange = (file: any) => {
+    DebugLogger("Handling backup modal file change");
     setError("");
 
     const isJson = file.target.files[0].type === "application/json";
 
     if (!isJson) {
+      DebugLogger("File not JSON");
       setError("Incorrect file format. File must be a .json file.");
       setFile(null);
       return;
@@ -61,11 +66,13 @@ export const BackupModal = (props: IProps) => {
   };
 
   const handleUpload = () => {
+    DebugLogger("Uploading backup data");
     UploadBackupFromFile(file);
     closeModal("backup_modal", modals, setModals);
   };
 
   const handleDownload = () => {
+    DebugLogger("Handling download data");
     DownloadElementData(downData, downElement, downLayout, config, modals, setModals, closeModal);
   };
 
