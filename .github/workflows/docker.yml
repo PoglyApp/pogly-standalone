@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths-ignore:
-    - '**/README.md'
+      - "**/README.md"
+      - "**/images/streamers/*.svg"
 
 jobs:
   docker:
@@ -18,7 +19,7 @@ jobs:
         run: |
           echo "GITHUB_OWNER_LC=${GITHUB_OWNER,,}" >>${GITHUB_ENV}
         env:
-          GITHUB_OWNER: '${{ github.repository_owner }}'
+          GITHUB_OWNER: "${{ github.repository_owner }}"
       - uses: actions/checkout@v4
       - uses: docker/login-action@v2
         with:
@@ -39,7 +40,7 @@ jobs:
     steps:
       - uses: actions/delete-package-versions@v5
         with:
-          package-name: 'pogly'
-          package-type: 'container'
+          package-name: "pogly"
+          package-type: "container"
           min-versions-to-keep: 5
           delete-only-untagged-versions: true
