@@ -9,10 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-      - run: |
+      - name: "Create artifacts"
+        run: |
           mkdir assets
           cd web-files
           tar -czf ../assets/pogly-web.tar.gz *
+          zip -r ../assets/pogly-web.zip *
           cd ..
           mv spacetimedb-module/pogly.wasm assets/pogly-spacetimedb-module.wasm
       - uses: shogo82148/actions-upload-release-asset@v1

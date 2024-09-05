@@ -49,6 +49,9 @@ jobs:
         run: |
           npm install
           npm run build
+# Disables warnings failing production builds
+#        env:
+#          CI: ""
       - name: "Upload artifact"
         uses: actions/upload-artifact@v4
         with:
@@ -56,15 +59,15 @@ jobs:
           path: build/
           overwrite: true
 
-  deploy:
-    name: "Deploy"
-    needs: frontend
-    if: >
-      github.ref == 'refs/heads/main' ||
-      github.ref == 'refs/heads/dev' ||
-      startsWith(github.ref, 'refs/tags/v')
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
+#  deploy:
+#    name: "Deploy"
+#    needs: frontend
+#    if: >
+#      github.ref == 'refs/heads/main' ||
+#      github.ref == 'refs/heads/dev' ||
+#      startsWith(github.ref, 'refs/tags/v')
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
 
   release:
     name: "Release"
