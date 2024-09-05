@@ -42,7 +42,7 @@
 
 ## What is [Pogly](https://pogly.gg) Standalone?
 
-Pogly is a real-time collaborative stream overlay. Think Figma, but for your OBS overlay sources. 
+Pogly is a real-time collaborative stream overlay. Think Figma, but for your OBS overlay sources.
 
 With the power of Pogly, you can condense your cluttered OBS overlays into a single, powerful browser source. But wait, how is that like Figma? [SpacetimeDB](https://spacetimedb.com) enables Pogly to communicate in real-time with multiple users; we call them Editors.
 
@@ -51,13 +51,15 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 [example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
 ## Can I use Pogly without hosting the project myself?
+
 We host the editor at [standalone.pogly.gg](https://standalone.pogly.gg/) and you can get a **free** module by joining our [Discord](https://discord.gg/uPQsBaVdB7) and creating one with our Discord bot or following [this module publishing guide](https://github.com/PoglyApp/pogly-documentation/blob/main/install/moduleSetup.md) and publish one yourself.
- 
+
 ## Installing
 
-Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md). 
+Pogly Standalone user documentation and installation instructions are available in our [documentation wiki](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md).
 
 ## Used by
+
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
 <a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
@@ -66,8 +68,10 @@ Pogly Standalone user documentation and installation instructions are available 
 <a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank" title="Ashlynn"><img src="./images/streamers/ashlynn.svg" /></a>
 <a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank" title="Ssaab"><img src="./images/streamers/ssaab.svg" /></a>
 <a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank" title="JustAGameOverScreen"><img src="./images/streamers/justagameoverscreen.svg" /></a>
+<a href="https://www.twitch.tv/firthy00" rel="noreferrer" target="_blank" title="Firthy00"><img src="./images/streamers/firthy00.svg" /></a>
 
 ## Contributing
+
 Check out our [contribution guidelines](https://github.com/PoglyApp/pogly-standalone/blob/main/CONTRIBUTING.md).
 
 ## License
