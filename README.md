@@ -73,6 +73,7 @@ Pogly Standalone user documentation and installation instructions are available 
 <a href="https://www.twitch.tv/gappyv" rel="noreferrer" target="_blank" title="GappyV"><img src="./images/streamers/gappyv.svg" /></a>
 <a href="https://www.twitch.tv/kr3ia" rel="noreferrer" target="_blank" title="kr3ia"><img src="./images/streamers/kr3ia.svg" /></a>
 <a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
+<a href="https://www.twitch.tv/savix" rel="noreferrer" target="_blank" title="Savix"><img src="./images/streamers/savix.svg" /></a>
 
 ## Contributing
 
