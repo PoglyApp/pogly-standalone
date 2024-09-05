@@ -15,6 +15,7 @@ export const updateElementStruct = (elementId: number, element: ElementStruct) =
         size: ViewportToStdbFontSize(textElement.size).fontSize,
         color: textElement.color,
         font: textElement.font,
+        shadow: textElement.shadow,
       });
       break;
 

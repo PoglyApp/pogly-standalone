@@ -46,11 +46,15 @@ export const TextCreationModal = (props: IProps) => {
   const [useCustomFont, setUseCustomFont] = useState<boolean>(false);
   const [customFont, setCustomFont] = useState<string>("");
   const [fontSize, setFontSize] = useState<string>("12");
+  const [shadowColor, setShadowColor] = useState<string>("#000000");
+  const [shadowHeight, setShadowHeight] = useState<string>("2");
+  const [shadowWidth, setShadowWidth] = useState<string>("2");
 
-  const [color, setColor] = useState<string>("#FFFFFF");
+  const [textColor, setTextColor] = useState<string>("#FFFFFF");
   const [autoUpdate, setAutoUpdate] = useState<boolean>(true);
 
-  const [showPicker, setShowPicker] = useState<boolean>(false);
+  const [showTextColorPicker, setShowTextColorPicker] = useState<boolean>(false);
+  const [showShadowColorPicker, setShowShadowColorPicker] = useState<boolean>(false);
 
   const [error, setError] = useState<string>("");
 
@@ -69,7 +73,7 @@ export const TextCreationModal = (props: IProps) => {
 
     setText(textStruct.text);
     setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
-    setColor(textStruct.color);
+    setTextColor(textStruct.color);
 
     try {
       DebugLogger("Using custom font");
@@ -129,7 +133,7 @@ export const TextCreationModal = (props: IProps) => {
     }
 
     if (!regex.test(size)) {
-      DebugLogger("Fomt size not a number");
+      DebugLogger("Font size not a number");
       setFontSize("");
       return setError("Font size has to be a number.");
     }
@@ -138,8 +142,8 @@ export const TextCreationModal = (props: IProps) => {
     setError("");
   };
 
-  const handleColorChange = (color: any) => {
-    DebugLogger("Color updated");
+  const handleTextColorChange = (color: any) => {
+    DebugLogger("Text color updated");
     if (color.length < 3) {
       DebugLogger("Color hex not long enough");
       setError("Color hex has to be at least 3 characters long.");
@@ -147,7 +151,38 @@ export const TextCreationModal = (props: IProps) => {
       setError("");
     }
 
-    setColor(color);
+    setTextColor(color);
+  };
+
+  const handleShadowColorChange = (color: any) => {
+    DebugLogger("Shadow color updated");
+    if (color.length < 3) {
+      DebugLogger("Shadow hex not long enough");
+      setError("Shadow hex has to be at least 3 characters long.");
+    } else {
+      setError("");
+    }
+
+    setShadowColor(color);
+  };
+
+  const handleShadowSizeChange = (size: any, height: boolean) => {
+    const regex = new RegExp("^[0-9]+$");
+
+    if (size.length < 1) {
+      DebugLogger("Shadow field size empty");
+      setFontSize("");
+      return setError("Shadow size field cannot be blank.");
+    }
+
+    if (!regex.test(size)) {
+      DebugLogger("Shadow size not a number");
+      setFontSize("");
+      return;
+    }
+
+    if (height) setShadowHeight(size);
+    else setShadowWidth(size);
   };
 
   const handleOnClose = () => {
@@ -171,8 +206,9 @@ export const TextCreationModal = (props: IProps) => {
     const textElement: ElementStruct = ElementStruct.TextElement({
       text: text,
       size: ViewportToStdbFontSize(parseInt(fontSize)).fontSize,
-      color: color,
+      color: textColor,
       font: useFont,
+      shadow: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
     });
 
     if (!props.editElementId) {
@@ -273,9 +309,9 @@ export const TextCreationModal = (props: IProps) => {
 
               <div style={{ display: "flex" }}>
                 <ColorBox
-                  color={color}
-                  onClick={() => setShowPicker(!showPicker)}
-                  style={{ backgroundColor: color, marginRight: "10px" }}
+                  color={textColor}
+                  onClick={() => setShowTextColorPicker(!showTextColorPicker)}
+                  style={{ backgroundColor: textColor, marginRight: "10px" }}
                 />
                 <div>
                   <Typography variant="subtitle2" color="#ffffffa6">
@@ -284,14 +320,64 @@ export const TextCreationModal = (props: IProps) => {
                   <StyledColorInput
                     type="text"
                     name="variableValue"
-                    value={color}
-                    onChange={(event) => handleColorChange(event.target.value)}
+                    value={textColor}
+                    onChange={(event) => handleTextColorChange(event.target.value)}
                   />
                 </div>
-                {showPicker && (
+                {showTextColorPicker && (
                   <Popover>
-                    <Cover onClick={() => setShowPicker(!showPicker)} />
-                    <HexColorPicker color={color} onChange={(color) => handleColorChange(color)} />
+                    <Cover onClick={() => setShowTextColorPicker(!showTextColorPicker)} />
+                    <HexColorPicker color={textColor} onChange={(color) => handleTextColorChange(color)} />
+                  </Popover>
+                )}
+              </div>
+
+              <div style={{ display: "flex" }}>
+                <ColorBox
+                  color={shadowColor}
+                  onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
+                  style={{ backgroundColor: shadowColor, marginRight: "10px" }}
+                />
+                <div>
+                  <Typography variant="subtitle2" color="#ffffffa6">
+                    Color
+                  </Typography>
+                  <StyledColorInput
+                    type="text"
+                    name="variableValue"
+                    value={shadowColor}
+                    onChange={(event) => handleShadowColorChange(event.target.value)}
+                    style={{ maxWidth: "80px", marginRight: "8px" }}
+                  />
+                </div>
+                <div>
+                  <Typography variant="subtitle2" color="#ffffffa6">
+                    Height
+                  </Typography>
+                  <StyledColorInput
+                    type="text"
+                    name="variableValue"
+                    value={shadowHeight}
+                    onChange={(event) => handleShadowSizeChange(event.target.value, true)}
+                    style={{ maxWidth: "50px", marginRight: "8px" }}
+                  />
+                </div>
+                <div>
+                  <Typography variant="subtitle2" color="#ffffffa6">
+                    Width
+                  </Typography>
+                  <StyledColorInput
+                    type="text"
+                    name="variableValue"
+                    value={shadowWidth}
+                    onChange={(event) => handleShadowSizeChange(event.target.value, false)}
+                    style={{ maxWidth: "50px" }}
+                  />
+                </div>
+                {showShadowColorPicker && (
+                  <Popover>
+                    <Cover onClick={() => setShowShadowColorPicker(!showShadowColorPicker)} />
+                    <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
                   </Popover>
                 )}
               </div>
@@ -340,7 +426,17 @@ export const TextCreationModal = (props: IProps) => {
               Cancel
             </Button>
             <Button
-              disabled={text === "" || fontSize === "" || color === "" || error !== "" ? true : false}
+              disabled={
+                text === "" ||
+                fontSize === "" ||
+                textColor === "" ||
+                shadowColor === "" ||
+                shadowHeight === "" ||
+                shadowWidth === "" ||
+                error !== ""
+                  ? true
+                  : false
+              }
               variant="outlined"
               sx={{
                 color: "#ffffffa6",

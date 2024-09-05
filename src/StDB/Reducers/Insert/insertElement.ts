@@ -44,6 +44,7 @@ export const insertElement = (
         size: textElement.size,
         color: textElement.color,
         font: textElement.font,
+        shadow: textElement.shadow,
       });
       break;
 

@@ -26,6 +26,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
         size: element.element.value.size,
         color: element.element.value.color,
         font: element.element.value.font,
+        shadow: element.element.value.shadow,
       });
       break;
     case "ImageElement":
@@ -89,6 +90,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
         size: fontSize,
         color: textElement.color,
         font: textElement.font,
+        shadow: textElement.shadow,
       });
       break;
 
