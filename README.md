@@ -71,6 +71,8 @@ Pogly Standalone user documentation and installation instructions are available 
 <a href="https://www.twitch.tv/firthy00" rel="noreferrer" target="_blank" title="Firthy00"><img src="./images/streamers/firthy00.svg" /></a>
 <a href="https://www.twitch.tv/misasoupy" rel="noreferrer" target="_blank" title="Misasoupy"><img src="./images/streamers/misasoupy.svg" /></a>
 <a href="https://www.twitch.tv/gappyv" rel="noreferrer" target="_blank" title="GappyV"><img src="./images/streamers/gappyv.svg" /></a>
+<a href="https://www.twitch.tv/kr3ia" rel="noreferrer" target="_blank" title="kr3ia"><img src="./images/streamers/kr3ia.svg" /></a>
+<a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
 
 ## Contributing
 
