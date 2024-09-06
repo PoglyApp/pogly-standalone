@@ -253,7 +253,9 @@ export const ElementContextMenu = (props: IProps) => {
               <StyledMenuItem value={"Vertical"}>
                 <Slider
                   size="small"
-                  defaultValue={Elements.findById(selectedElement.id)?.transparency || selectedElement.transparency}
+                  defaultValue={
+                    Elements.findById(selectedElement.id)?.transparency.valueOf() || selectedElement.transparency
+                  }
                   aria-label="Small"
                   valueLabelDisplay="on"
                   onChange={(event, number) => handleTransparency(selectedElement, number)}
