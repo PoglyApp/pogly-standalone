@@ -146,6 +146,11 @@ export const useElementsEvents = (
             }
           }
 
+          // UPDATE SHADOW
+          if (oldTextElement.shadow !== newTextElement.shadow) {
+            component.style.textShadow = newTextElement.shadow;
+          }
+
           break;
 
         case "WidgetElement":
