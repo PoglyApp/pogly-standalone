@@ -110,6 +110,11 @@ export const useOverlayElementsEvents = (
               component.style.fontFamily = newTextElement.font;
             }
           }
+
+          // UPDATE SHADOW
+          if (oldTextElement.shadow !== newTextElement.shadow) {
+            component.style.textShadow = newTextElement.shadow;
+          }
           break;
 
         case "WidgetElement":

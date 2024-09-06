@@ -75,6 +75,12 @@ export const TextCreationModal = (props: IProps) => {
     setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
     setTextColor(textStruct.color);
 
+    const shadowVariables = textStruct.shadow.split(" ");
+
+    setShadowHeight(shadowVariables[0].replace("px", ""));
+    setShadowWidth(shadowVariables[1].replace("px", ""));
+    setShadowColor(shadowVariables[2]);
+
     try {
       DebugLogger("Using custom font");
       const fontJson = JSON.parse(textStruct.font);

@@ -300,6 +300,35 @@ public partial class Module
             Log($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void UpdateTextElementShadow(ReducerContext ctx, uint elementId, string shadow)
+    {
+        string func = "UpdateTextElementShadow";
+        try
+        {
+            if (!GetGuest(func, ctx.Sender, out var guest))
+                return;
+            if (!GuestAuthenticated(func, guest)) return;
+
+            var oldElement = Elements.FilterById(elementId).First();
+
+            if (oldElement.Element is not ElementStruct.TextElement textElement) return;
+            
+            var updatedElement = oldElement;
+            var updatedTextElement = textElement.TextElement_;
+            updatedTextElement.Shadow = shadow;
+            updatedElement.Element = new ElementStruct.TextElement(updatedTextElement);
+
+            Elements.UpdateById(elementId, updatedElement);
+            
+            LogAudit(ctx,func,GetChangeStructFromElement(oldElement),GetChangeStructFromElement(updatedElement), Config.FindByVersion(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {shadow}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateImageElementDataStruct(ReducerContext ctx, uint elementId,

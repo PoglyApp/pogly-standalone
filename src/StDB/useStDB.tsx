@@ -65,6 +65,7 @@ import { SetStdbConnected } from "../Utility/SetStdbConnected";
 import KickSelfReducer from "../module_bindings/kick_self_reducer";
 import ConnectReducer from "../module_bindings/connect_reducer";
 import { DebugLogger } from "../Utility/DebugLogger";
+import UpdateTextElementShadowReducer from "../module_bindings/update_text_element_shadow_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -107,6 +108,7 @@ const useStDB = (
       UpdateTextElementFontReducer,
       UpdateTextElementSizeReducer,
       UpdateTextElementTextReducer,
+      UpdateTextElementShadowReducer,
       UpdateWidgetElementSizeReducer,
       UpdateImageElementSizeReducer,
       UpdateImageElementDataStructReducer,
