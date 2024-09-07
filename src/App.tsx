@@ -38,6 +38,7 @@ export const App: React.FC = () => {
 
   const [versionNumber, setVersionNumber] = useState<string>("");
   const [activePage, setActivePage] = useState<Number>(0);
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   // CANVAS
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -227,7 +228,7 @@ export const App: React.FC = () => {
 
     const alreadyLogged = Guests.findByIdentity(spacetime.Identity);
 
-    if (alreadyLogged) {
+    if (!isOverlay && alreadyLogged) {
       DebugLogger("Guest already logged in");
       return (
         <ErrorRefreshModal

@@ -142,6 +142,7 @@ const useStDB = (
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
+    const isOverlay: Boolean = window.location.href.includes("/overlay");
 
     const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
 
@@ -197,7 +198,7 @@ const useStDB = (
 
     client?.onError((...args: any[]) => {
       if(args[0].type === "close") {
-        setDisconnected(true);
+        if(!isOverlay)setDisconnected(true);
         return;
       }
 

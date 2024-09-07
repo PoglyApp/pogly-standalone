@@ -14,9 +14,10 @@ export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType,
 
     DebugLogger("Initializing overlay guest events");
 
-    Guests.onDelete((guest) => {
-      if (isOverlay && guest.identity.toHexString() === Identity.identity.toHexString()) window.location.reload();
-    });
+    // Shouldn't need this anymore because of the debug option to refresh-- keeping just in case.
+    // Guests.onDelete((guest) => {
+    //   if (isOverlay && guest.identity.toHexString() === Identity.identity.toHexString()) window.location.reload();
+    // });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayGuestEventsInitialized: true }));
   }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, isOverlay, setCanvasInitialized]);
