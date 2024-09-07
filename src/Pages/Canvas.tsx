@@ -115,6 +115,7 @@ export const Canvas = (props: IProps) => {
   useEffect(() => {
     DebugLogger("Setting active page");
     props.setActivePage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.setActivePage]);
 
   // Limit how many times cursor event is updated
