@@ -20,7 +20,7 @@ interface IProp {
 }
 
 export const ChooseInstanceModal = (props: IProp) => {
-  const [type, setType] = useState<string>("Testnet");
+  const [type, setType] = useState<string>("Cloud");
   const [customDomain, setCustomDomain] = useState<string>("");
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
@@ -35,6 +35,9 @@ export const ChooseInstanceModal = (props: IProp) => {
     let domain: string = "";
 
     switch (type) {
+      case "Cloud":
+        domain = "wss://pogly.spacetimedb.com";
+        break;
       case "Testnet":
         domain = "wss://testnet.spacetimedb.com";
         break;
@@ -74,6 +77,13 @@ export const ChooseInstanceModal = (props: IProp) => {
       <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
         <FormGroup sx={{ gap: "20px" }}>
           <RadioGroup row sx={{ color: "#ffffffa6", display: "block", textAlign: "center" }}>
+          <FormControlLabel
+              control={
+                <Radio checked={type === "Cloud"} onChange={() => setType("Cloud")} sx={{ color: "#ffffffa6" }} />
+              }
+              label="Cloud"
+              labelPlacement="top"
+            />
             <FormControlLabel
               control={
                 <Radio checked={type === "Testnet"} onChange={() => setType("Testnet")} sx={{ color: "#ffffffa6" }} />
