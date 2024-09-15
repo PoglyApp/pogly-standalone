@@ -146,8 +146,12 @@ public partial class Module
 
         try
         {
-            var g = Guests.FindByAddress(guest.Address);
-            if (g is not null) Guests.DeleteByAddress(g.Value.Address);
+            foreach (var s in Guests.FilterByIdentity(ctx.Sender))
+            {
+                Guests.DeleteByAddress(s.Address);
+            }
+            // var g = Guests.FindByAddress(guest.Address);
+            // if (g is not null) Guests.DeleteByAddress(g.Value.Address);
         }
         catch (Exception e)
         {
