@@ -8,6 +8,7 @@ export class Guests extends DatabaseTable
 {
 	public static db: ClientDB = __SPACETIMEDB__.clientDB;
 	public static tableName = "Guests";
+	public address: Address;
 	public identity: Identity;
 	public nickname: string;
 	public color: string;
@@ -16,10 +17,11 @@ export class Guests extends DatabaseTable
 	public positionY: number;
 	public authenticated: boolean;
 
-	public static primaryKey: string | undefined = "identity";
+	public static primaryKey: string | undefined = "address";
 
-	constructor(identity: Identity, nickname: string, color: string, selectedElementId: number, positionX: number, positionY: number, authenticated: boolean) {
+	constructor(address: Address, identity: Identity, nickname: string, color: string, selectedElementId: number, positionX: number, positionY: number, authenticated: boolean) {
 	super();
+		this.address = address;
 		this.identity = identity;
 		this.nickname = nickname;
 		this.color = color;
@@ -31,13 +33,16 @@ export class Guests extends DatabaseTable
 
 	public static serialize(value: Guests): object {
 		return [
-		Array.from(value.identity.toUint8Array()), value.nickname, value.color, value.selectedElementId, value.positionX, value.positionY, value.authenticated
+		Array.from(value.address.toUint8Array()), Array.from(value.identity.toUint8Array()), value.nickname, value.color, value.selectedElementId, value.positionX, value.positionY, value.authenticated
 		];
 	}
 
 	public static getAlgebraicType(): AlgebraicType
 	{
 		return AlgebraicType.createProductType([
+			new ProductTypeElement("address", AlgebraicType.createProductType([
+			new ProductTypeElement("addressBytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+		])),
 			new ProductTypeElement("identity", AlgebraicType.createProductType([
 			new ProductTypeElement("__identity_bytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
 		])),
@@ -53,14 +58,30 @@ export class Guests extends DatabaseTable
 	public static fromValue(value: AlgebraicValue): Guests
 	{
 		let productValue = value.asProductValue();
-		let __Identity = new Identity(productValue.elements[0].asProductValue().elements[0].asBytes());
-		let __Nickname = productValue.elements[1].asString();
-		let __Color = productValue.elements[2].asString();
-		let __SelectedElementId = productValue.elements[3].asNumber();
-		let __PositionX = productValue.elements[4].asNumber();
-		let __PositionY = productValue.elements[5].asNumber();
-		let __Authenticated = productValue.elements[6].asBoolean();
-		return new this(__Identity, __Nickname, __Color, __SelectedElementId, __PositionX, __PositionY, __Authenticated);
+		let __Address = new Address(productValue.elements[0].asProductValue().elements[0].asBytes());
+		let __Identity = new Identity(productValue.elements[1].asProductValue().elements[0].asBytes());
+		let __Nickname = productValue.elements[2].asString();
+		let __Color = productValue.elements[3].asString();
+		let __SelectedElementId = productValue.elements[4].asNumber();
+		let __PositionX = productValue.elements[5].asNumber();
+		let __PositionY = productValue.elements[6].asNumber();
+		let __Authenticated = productValue.elements[7].asBoolean();
+		return new this(__Address, __Identity, __Nickname, __Color, __SelectedElementId, __PositionX, __PositionY, __Authenticated);
+	}
+
+	public static *filterByAddress(value: Address): IterableIterator<Guests>
+	{
+		for (let instance of this.db.getTable("Guests").getInstances())
+		{
+			if (instance.address.isEqual(value)) {
+				yield instance;
+			}
+		}
+	}
+
+	public static findByAddress(value: Address): Guests | undefined
+	{
+		return this.filterByAddress(value).next().value;
 	}
 
 	public static *filterByIdentity(value: Identity): IterableIterator<Guests>
