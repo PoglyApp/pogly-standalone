@@ -39,7 +39,6 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
-import { Identity, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 
 interface IProps {
   setActivePage: Function;

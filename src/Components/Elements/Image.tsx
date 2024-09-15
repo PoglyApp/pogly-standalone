@@ -24,7 +24,7 @@ export const Image = (props: IProp) => {
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(Identity.identity, props.elements.id.toString());
+    handleElementBorder(Identity.address, props.elements.id.toString());
     DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
@@ -44,6 +44,7 @@ export const Image = (props: IProp) => {
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
+    Identity.address
   ]);
 
   return (

@@ -90,6 +90,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!stdbInitialized) return;
     if (!spacetime.Identity) return;
+    if (!spacetime.Address) return;
     if (!spacetime.Client) return;
 
     DebugLogger("Setting nickname and Spacetime context");
@@ -103,7 +104,7 @@ export const App: React.FC = () => {
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = Guests.findByIdentity(spacetime.Identity);
+    const guest = Guests.findByAddress(spacetime.Address);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
@@ -113,7 +114,7 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client]);
 
   useEffect(() => {
     DebugLogger("Setting SpacetimeDB authenticated ref");
@@ -145,7 +146,7 @@ export const App: React.FC = () => {
             />
           }
         />
-        <Route path="overlay" element={<Overlay />} />
+        <Route path="overlay" element={<Overlay disconnected={spacetime.Disconnected} />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     )

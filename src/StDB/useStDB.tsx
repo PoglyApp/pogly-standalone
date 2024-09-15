@@ -149,14 +149,16 @@ const useStDB = (
     const isOverlay: Boolean = window.location.href.includes("/overlay");
 
     const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
+    let address: Address | undefined;
 
     client?.onConnect((token: string, Identity: Identity, Address: Address) => {
       try {
         setIdentity(Identity);
         setAddress(Address);
+        address = Address;
         setStdbClient(client);
         localStorage.setItem("stdbToken", token);
-        console.log("Connected to StDB! [" + Identity.toHexString() + "]");
+        console.log("Connected to StDB! [" + Identity.toHexString() + "] @ [" + Address.toHexString() + "]");
         client?.subscribe([
           "SELECT * FROM Heartbeat",
           "SELECT * FROM Guests",
@@ -194,7 +196,12 @@ const useStDB = (
 
           setConfig(fetchedConfig);
 
-          SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
+          if(!address) {
+            setError(true);
+            return;
+          }
+
+          SetStdbConnected(client, address, fetchedConfig, setStdbConnected, setStdbAuthenticated);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
@@ -203,7 +210,7 @@ const useStDB = (
 
     client?.onError((...args: any[]) => {
       if(args[0].type === "close") {
-        if(!isOverlay)setDisconnected(true);
+        setDisconnected(true);
         return;
       }
 

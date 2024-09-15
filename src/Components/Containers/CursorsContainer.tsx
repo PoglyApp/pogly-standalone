@@ -16,7 +16,7 @@ export const CursorsContainer = () => {
     <>
       {guests
         .filter(
-          (guest: Guests) => guest.identity.toHexString() !== Identity.identity.toHexString() && guest.nickname !== ""
+          (guest: Guests) => guest.address.toHexString() !== Identity.address.toHexString() && guest.nickname !== ""
         )
         .map((guest: Guests) => {
           if (config.authentication && !guest.authenticated) return <></>;
