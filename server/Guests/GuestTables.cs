@@ -7,6 +7,9 @@ public partial class Module
     public partial struct Guests
     {
         [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        public Address Address;
+        
+        [SpacetimeDB.Column(ColumnAttrs.Unique)]
         public Identity Identity;
 
         public string Nickname;

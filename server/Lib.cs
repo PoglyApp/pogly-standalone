@@ -32,11 +32,14 @@ static partial class Module
     {
         try
         {
+            if (ctx.Address is null) throw new Exception("Guest with Null Address tried to Connect!");
+            
             var random = new Random();
             var color = $"#{random.Next(0x1000000):X6}";
 
             var guest = new Guests
             {
+                Address = ctx.Address,
                 Identity = ctx.Sender,
                 Nickname = "",
                 Color = color,
