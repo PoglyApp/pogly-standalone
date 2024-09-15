@@ -69,7 +69,7 @@ public partial class Module
             throw new Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
         }
         
-        if (!GetGuest("SetConfig", ctx.Sender, out var guest))
+        if (!GetGuest("SetConfig", ctx.Address!, out var guest))
             throw new Exception($"Unable to SetConfig: {ctx.Sender} does not have Guest entry!");
         
         if (authentication && string.IsNullOrEmpty(authKey))
@@ -123,7 +123,8 @@ public partial class Module
     {
         string func = "UpdateAuthenticationKey";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx.Sender)) return;
 
@@ -141,12 +142,13 @@ public partial class Module
         }
     }
     
-    private static List<Tuple<Identity,int>> _identities = new();
+    private static List<Tuple<Address,int>> _identities = new();
 
     [SpacetimeDB.Reducer]
     public static void Authenticate(ReducerContext ctx, string key)
     {
-        if (!GetGuest("Authenticate", ctx.Sender, out var guest))
+        if (ctx.Address is null) throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have an address!");
+        if (!GetGuest("Authenticate", ctx.Address, out var guest))
             throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have Guest entry!");
         
         if (string.IsNullOrEmpty(key))
@@ -159,7 +161,7 @@ public partial class Module
             {
                 if (key == _key.Value.Key)
                 {
-                    _identities.Add(new Tuple<Identity, int>(ctx.Sender,0));
+                    _identities.Add(new Tuple<Address, int>(ctx.Address,0));
                 }
             }
         }
@@ -209,10 +211,10 @@ public partial class Module
                 if (i.Item2 > 15) _identities.Remove(i);
 
                 guest.Authenticated = true;
-                var a = Guests.UpdateByIdentity(i.Item1, guest);
+                var a = Guests.UpdateByAddress(i.Item1, guest);
                 if (!a)
                 {
-                    _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Identity, int>(i.Item1, i.Item2+1);
+                    _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Address, int>(i.Item1, i.Item2+1);
                 }
             }
             catch (Exception e)

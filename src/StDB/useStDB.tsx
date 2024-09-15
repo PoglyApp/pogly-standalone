@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SpacetimeDBClient, Identity } from "@clockworklabs/spacetimedb-sdk";
+import { SpacetimeDBClient, Identity, Address } from "@clockworklabs/spacetimedb-sdk";
 import Heartbeat from "../module_bindings/heartbeat";
 import Guests from "../module_bindings/guests";
 import Elements from "../module_bindings/elements";
@@ -75,6 +75,7 @@ const useStDB = (
   setInstanceConfigured: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
+  const [address, setAddress] = useState<Address>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
@@ -140,7 +141,8 @@ const useStDB = (
       ClearRefreshOverlayRequestsReducer,
       KickGuestReducer,
       KickSelfReducer,
-      ConnectReducer
+      ConnectReducer,
+      RefreshOverlayClearStorageReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
@@ -148,9 +150,10 @@ const useStDB = (
 
     const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
 
-    client?.onConnect((token: string, Identity: Identity) => {
+    client?.onConnect((token: string, Identity: Identity, Address: Address) => {
       try {
         setIdentity(Identity);
+        setAddress(Address);
         setStdbClient(client);
         localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + Identity.toHexString() + "]");
@@ -211,7 +214,7 @@ const useStDB = (
     client?.connect();
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
-  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error, Disconnected: disconnected };
+  return { Client: stdbClient, Identity: identity, Address: address, InstanceConfig: config, Error: error, Disconnected: disconnected };
 };
 
 export default useStDB;

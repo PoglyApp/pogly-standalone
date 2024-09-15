@@ -64,11 +64,12 @@ static partial class Module
     {
         try
         {
-            var guest = Guests.FindByIdentity(ctx.Sender);
+            if (ctx.Address is null) throw new Exception($"Address missing for disconnecting Guest");
+            var guest = Guests.FindByAddress(ctx.Address);
             if (guest is null)
                 throw new Exception("Identity did not have Guest entry");
             
-            Guests.DeleteByIdentity(guest.Value.Identity);
+            Guests.DeleteByAddress(guest.Value.Address);
             
             Log($"[OnDisconnect] Guest {ctx.Sender} at {ctx.Address} has disconnected.", LogLevel.Info);
             LogAudit(ctx,"OnDisconnect",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), Config.FindByVersion(0)!.Value.DebugMode);

@@ -9,21 +9,23 @@ public partial class Module
     {
         string func = "UpdateGuest";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try
         {
-            var oldGuest = Guests.FilterByIdentity(ctx.Sender).First();
-            var updatedGuest = oldGuest;
+            var oldGuest = Guests.FindByAddress(ctx.Address);
+            if (oldGuest is null) throw new Exception("Guest is null");
+            var updatedGuest = oldGuest.Value;
             updatedGuest.Nickname = nickname;
             updatedGuest.SelectedElementId = selectedElementId;
             updatedGuest.PositionX = positionX;
             updatedGuest.PositionY = positionY;
 
-            Guests.UpdateByIdentity(ctx.Sender, updatedGuest);
+            Guests.UpdateByAddress(ctx.Address, updatedGuest);
             
-            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
+            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
@@ -35,18 +37,20 @@ public partial class Module
     public static void UpdateGuestNickname(ReducerContext ctx, string nickname)
     {
         string func = "UpdateGuestNickname";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         
         try
         {
-            var oldGuest = Guests.FilterByIdentity(ctx.Sender).First();
-            var updatedGuest = oldGuest;
+            var oldGuest = Guests.FindByAddress(ctx.Address);
+            if (oldGuest is null) throw new Exception("Guest is null");
+            var updatedGuest = oldGuest.Value;
             updatedGuest.Nickname = nickname;
 
-            Guests.UpdateByIdentity(ctx.Sender, updatedGuest);
+            Guests.UpdateByAddress(ctx.Address, updatedGuest);
             
-            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
+            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
@@ -58,21 +62,23 @@ public partial class Module
     public static void UpdateGuestSelectedElement(ReducerContext ctx, uint selectedElementId)
     {
         string func = "UpdateGuestSelectedElement";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         UpdateElementZIndex(ctx, selectedElementId);
         
         try
         {
-            var oldGuest = Guests.FilterByIdentity(ctx.Sender).First();
-            var updatedGuest = oldGuest;
+            var oldGuest = Guests.FindByAddress(ctx.Address);
+            if (oldGuest is null) throw new Exception("Guest is null");
+            var updatedGuest = oldGuest.Value;
             updatedGuest.SelectedElementId = selectedElementId;
 
-            Guests.UpdateByIdentity(ctx.Sender, updatedGuest);
+            Guests.UpdateByAddress(ctx.Address, updatedGuest);
             
-            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
+            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
@@ -84,20 +90,22 @@ public partial class Module
     public static void UpdateGuestPosition(ReducerContext ctx, int positionX, int positionY)
     {
         string func = "UpdateGuestPosition";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
 
         try
         {
-            var oldGuest = Guests.FilterByIdentity(ctx.Sender).First();
-            var updatedGuest = oldGuest;
+            var oldGuest = Guests.FindByAddress(ctx.Address);
+            if (oldGuest is null) throw new Exception("Guest is null");
+            var updatedGuest = oldGuest.Value;
             updatedGuest.PositionX = positionX;
             updatedGuest.PositionY = positionY;
 
-            Guests.UpdateByIdentity(ctx.Sender, updatedGuest);
+            Guests.UpdateByAddress(ctx.Address, updatedGuest);
 
-            LogAudit(ctx, func, GetChangeStructFromGuest(oldGuest), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
+            LogAudit(ctx, func, GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
@@ -107,18 +115,19 @@ public partial class Module
     }
     
     [SpacetimeDB.Reducer]
-    public static void KickGuest(ReducerContext ctx, Identity identity)
+    public static void KickGuest(ReducerContext ctx, Address address)
     {
         string func = "KickGuest";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx.Sender)) return;
 
         try
         {
-            var g = Guests.FindByIdentity(identity);
-            if (g is not null) Guests.DeleteByIdentity(g.Value.Identity);
+            var g = Guests.FindByAddress(address);
+            if (g is not null) Guests.DeleteByAddress(g.Value.Address);
         }
         catch (Exception e)
         {
@@ -132,12 +141,13 @@ public partial class Module
     {
         string func = "KickSelf";
 
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
 
         try
         {
-            var g = Guests.FindByIdentity(guest.Identity);
-            if (g is not null) Guests.DeleteByIdentity(g.Value.Identity);
+            var g = Guests.FindByAddress(guest.Address);
+            if (g is not null) Guests.DeleteByAddress(g.Value.Address);
         }
         catch (Exception e)
         {
@@ -150,8 +160,9 @@ public partial class Module
     public static void SetIdentityPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel)
     {
         string func = "SetIdentityPermission";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx.Sender)) return;
 
@@ -210,8 +221,9 @@ public partial class Module
     public static void ClearIdentityPermission(ReducerContext ctx, Identity identity)
     {
         string func = "ClearIdentityPermission";
-        
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx.Sender)) return;
 

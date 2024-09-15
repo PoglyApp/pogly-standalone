@@ -193,6 +193,23 @@ export const App: React.FC = () => {
     return <Loading text="Retreiving Identity" />;
   }
 
+  if (!spacetime.Address) {
+    DebugLogger("Waiting for SpacetimeDB address");
+    if (spacetime.Error) {
+      DebugLogger("Failed to load SpacetimeDB address");
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving SpacetimeDB Address!"
+          contentText="Please try again. If this error persists, you may have to clear your LocalStorage AuthToken."
+          clearSettings={true}
+        />
+      );
+    }
+    return <Loading text="Retreiving Address" />;
+  }
+
   if (!spacetime.InstanceConfig) {
     DebugLogger("Waiting for instance config ");
     if (spacetime.Error) {
@@ -226,7 +243,7 @@ export const App: React.FC = () => {
       );
     }
 
-    const alreadyLogged = Guests.findByIdentity(spacetime.Identity);
+    const alreadyLogged = Guests.findByAddress(spacetime.Address);
 
     if (!isOverlay && alreadyLogged) {
       DebugLogger("Guest already logged in");
