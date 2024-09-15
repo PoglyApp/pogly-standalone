@@ -66,6 +66,7 @@ import KickSelfReducer from "../module_bindings/kick_self_reducer";
 import ConnectReducer from "../module_bindings/connect_reducer";
 import { DebugLogger } from "../Utility/DebugLogger";
 import UpdateTextElementShadowReducer from "../module_bindings/update_text_element_shadow_reducer";
+import AddElementDataArrayReducer from "../module_bindings/add_element_data_array_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -142,7 +143,8 @@ const useStDB = (
       KickGuestReducer,
       KickSelfReducer,
       ConnectReducer,
-      RefreshOverlayClearStorageReducer
+      RefreshOverlayClearStorageReducer,
+      AddElementDataArrayReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";

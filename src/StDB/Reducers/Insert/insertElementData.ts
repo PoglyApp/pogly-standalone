@@ -1,3 +1,4 @@
+import AddElementDataArrayReducer from "../../../module_bindings/add_element_data_array_reducer";
 import AddElementDataReducer from "../../../module_bindings/add_element_data_reducer";
 import DataType from "../../../module_bindings/data_type";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
@@ -23,10 +24,11 @@ export const insertElementData = (elementData: ElementDataType) => {
         image.src = elementData.Data;
 
         image.onload = async function () {
-          AddElementDataReducer.call(
+          AddElementDataArrayReducer.call(
             elementData.Name,
             elementData.DataType,
             elementData.Data,
+            convertDataURIToBinary(elementData.Data),
             image.width || 128,
             image.height || 128
           );
@@ -34,7 +36,11 @@ export const insertElementData = (elementData: ElementDataType) => {
         };
       } else {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
-          AddElementDataReducer.call(elementData.Name, elementData.DataType, result.r, result.w, result.h);
+          const arr = convertDataURIToBinary(result.r);
+          AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, result.r, arr, result.w, result.h);
+
+          console.log("base64 => " + new Blob([result.r]).size);
+          console.log("binary => " + arr.length)
         });
       }
       break;
@@ -80,4 +86,18 @@ const getImageWidthAndHeight = (src: string) => {
   image.src = src;
 
   image.onload = async function () {};
+};
+
+const convertDataURIToBinary = (dataURI: any) => {
+  var base64Index = dataURI.indexOf(';base64,') + ';base64,'.length;
+  var base64 = dataURI.substring(base64Index);
+  var raw = window.atob(base64);
+  var rawLength = raw.length;
+  var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+  for(var i = 0; i < rawLength; i++) {
+    array[i] = raw.charCodeAt(i);
+  }
+
+  return array;
 };

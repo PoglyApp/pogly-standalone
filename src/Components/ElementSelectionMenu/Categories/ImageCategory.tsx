@@ -47,6 +47,19 @@ export const ImageCategory = (props: IProps) => {
     );
   };
 
+  const convertBinaryToDataURI = (element: ElementData) => {
+    if(!element.byteArray) return element.data;
+
+    var raw = "";
+    for (var i = 0; i < element.byteArray.length; i++) {
+      raw += String.fromCharCode(element.byteArray[i]);
+    }
+
+    const base64 = "data:image;base64," + window.btoa(raw);
+
+    return base64;
+  }
+
   return (
     <Accordion>
       <AccordionSummary
@@ -117,7 +130,7 @@ export const ImageCategory = (props: IProps) => {
                       }}
                       onClick={() => AddElementToCanvas(elementData)}
                     >
-                      <ElementIcon src={elementData.data} />
+                      <ElementIcon src={convertBinaryToDataURI(elementData)} />
                       {elementData.name}
                     </Button>
                     <br />
