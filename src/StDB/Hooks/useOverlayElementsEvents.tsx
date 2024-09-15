@@ -12,6 +12,7 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -21,6 +22,7 @@ export const useOverlayElementsEvents = (
   const dispatch = useAppDispatch();
 
   const activeLayout = useRef<Layouts>();
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   useEffect(() => {
     if (!layout) return;
@@ -38,7 +40,14 @@ export const useOverlayElementsEvents = (
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 
-      const newElement: CanvasElementType | undefined = CreateElementComponent(element);
+      const newElement: CanvasElementType | undefined = CreateElementComponent(element, isOverlay);
+
+      if(InRenderBounds(newElement.Elements)) {
+        newElement.Component.style.setProperty("display","block");
+      }
+      else {
+        newElement.Component.style.setProperty("display","none");
+      }
 
       dispatch(addElement(newElement.Elements));
       dispatch(addCanvasElement(newElement));
@@ -54,7 +63,7 @@ export const useOverlayElementsEvents = (
       if (oldElement.layoutId !== newElement.layoutId) {
         if (component) return;
 
-        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement);
+        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement, isOverlay);
 
         dispatch(addElement(newCanvasElement.Elements));
         dispatch(addCanvasElement(newCanvasElement));
@@ -142,7 +151,14 @@ export const useOverlayElementsEvents = (
 
       // UPDATE TRANSFORM
       if (oldElement.transform !== newElement.transform) {
-        component.style.setProperty("transform", newElement.transform);
+        if(InRenderBounds(newElement)) {
+          component.style.setProperty("display","block");
+          component.style.setProperty("transform", newElement.transform);
+        }
+        else {
+          component.style.setProperty("display","none");
+        }
+
       }
 
       // UPDATE RESIZE
@@ -173,5 +189,5 @@ export const useOverlayElementsEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch, isOverlay]);
 };

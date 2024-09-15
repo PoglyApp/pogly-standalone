@@ -53,7 +53,7 @@ const useFetchElement = (
     const canvasElements: CanvasElementType[] = [];
 
     offsetElements.forEach((element: Elements) => {
-      canvasElements.push(CreateElementComponent(element));
+      canvasElements.push(CreateElementComponent(element, isOverlay));
     });
 
     dispatch(initCanvasElements(canvasElements));

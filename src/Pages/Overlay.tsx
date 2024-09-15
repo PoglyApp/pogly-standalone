@@ -12,6 +12,9 @@ import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { GetCoordsFromTransform, InRenderBounds } from "../Utility/ConvertCoordinates";
+import Elements from "../module_bindings/elements";
+import styled from "styled-components";
 
 interface IProps {
   disconnected: boolean;
@@ -63,7 +66,12 @@ export const Overlay = (props: IProps) => {
         <>
           <div className="elementContent">
             {canvasElements.map((element: CanvasElementType) => {
-              return <div key={element.Elements.id.toString()}>{element.Component}</div>;
+              
+              return (
+                <div key={element.Elements.id.toString()}>
+                  {element.Component}
+                </div>
+              );
             })}
           </div>
         </>

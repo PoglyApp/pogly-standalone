@@ -6,9 +6,11 @@ import ImageElement from "../../module_bindings/image_element";
 import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 
 interface IProp {
   elements: Elements;
+  isOverlay?: Boolean;
 }
 
 export const Image = (props: IProp) => {
@@ -47,6 +49,15 @@ export const Image = (props: IProp) => {
     Identity.address
   ]);
 
+  const renderDisplay = () => {
+    if(InRenderBounds(props.elements)) {
+      return "block";
+    }
+    else {
+      return "none";
+    }
+  }
+
   return (
     <div
       className="element"
@@ -63,6 +74,7 @@ export const Image = (props: IProp) => {
         position: "fixed",
         zIndex: props.elements.zIndex,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
+        display: isOverlay ? renderDisplay() : "block",
       }}
       data-locked={props.elements.locked}
     >

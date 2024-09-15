@@ -22,7 +22,7 @@ export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType,
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayGuestEventsInitialized: true }));
-  }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, isOverlay, setCanvasInitialized]);
+  }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, Identity.address, isOverlay, setCanvasInitialized]);
 
   return disconnected;
 };
