@@ -107,7 +107,7 @@ public partial class Module
                 Key = authKey
             }.Insert();
 
-            if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
+            //if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
             Config.UpdateByVersion(0, config);
             Log($"[SetConfig] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}");
         }
@@ -161,7 +161,12 @@ public partial class Module
             {
                 if (key == _key.Value.Key)
                 {
-                    _identities.Add(new Tuple<Address, int>(ctx.Address,0));
+                    //_identities.Add(new Tuple<Address, int>(ctx.Address,0));
+                    var g = Guests.FindByAddress(ctx.Address);
+                    if (g is null) throw new Exception("Guest is null!");
+                    var newGuest = g.Value;
+                    newGuest.Authenticated = true;
+                    Guests.UpdateByAddress(newGuest.Address, newGuest);
                 }
             }
         }
@@ -174,53 +179,53 @@ public partial class Module
     }
     
     
-    private static int _maxPatience = 25;
-    private static int _currentPatience = 0;
-    
-    [SpacetimeDB.Reducer]
-    public static void AuthenticateDoWork(ReducerContext ctx, AuthenticationWorker args)
-    {
-        if (Guests.Iter().Count() == 0 || _identities.Count == 0)
-        {
-            _currentPatience++;
-        }
-        else
-        {
-            _currentPatience = 0;
-        }
-        
-        if (_currentPatience > _maxPatience)
-        {
-            _currentPatience = 0;
-            Log("[AuthDoWork] Max patience reached... pausing.");
-            _identities.Clear();
-            StopAuthWorker();
-            return;
-        }
-
-        if (_identities.Count == 0) return;
-
-        foreach (var i in _identities)
-        {
-            try
-            {
-                var g = GetGuest("AuthDoWork", i.Item1, out var guest);
-                if (!g) continue;
-
-                if (guest.Authenticated) _identities.Remove(i);
-                if (i.Item2 > 15) _identities.Remove(i);
-
-                guest.Authenticated = true;
-                var a = Guests.UpdateByAddress(i.Item1, guest);
-                if (!a)
-                {
-                    _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Address, int>(i.Item1, i.Item2+1);
-                }
-            }
-            catch (Exception e)
-            {
-                Log("AuthDoWork Error: " + e.Message, LogLevel.Error);
-            }
-        }
-    }
+    // private static int _maxPatience = 25;
+    // private static int _currentPatience = 0;
+    //
+    // [SpacetimeDB.Reducer]
+    // public static void AuthenticateDoWork(ReducerContext ctx, AuthenticationWorker args)
+    // {
+    //     if (Guests.Iter().Count() == 0 || _identities.Count == 0)
+    //     {
+    //         _currentPatience++;
+    //     }
+    //     else
+    //     {
+    //         _currentPatience = 0;
+    //     }
+    //     
+    //     if (_currentPatience > _maxPatience)
+    //     {
+    //         _currentPatience = 0;
+    //         Log("[AuthDoWork] Max patience reached... pausing.");
+    //         _identities.Clear();
+    //         StopAuthWorker();
+    //         return;
+    //     }
+    //
+    //     if (_identities.Count == 0) return;
+    //
+    //     foreach (var i in _identities)
+    //     {
+    //         try
+    //         {
+    //             var g = GetGuest("AuthDoWork", i.Item1, out var guest);
+    //             if (!g) continue;
+    //
+    //             if (guest.Authenticated) _identities.Remove(i);
+    //             if (i.Item2 > 15) _identities.Remove(i);
+    //
+    //             guest.Authenticated = true;
+    //             var a = Guests.UpdateByAddress(i.Item1, guest);
+    //             if (!a)
+    //             {
+    //                 _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Address, int>(i.Item1, i.Item2+1);
+    //             }
+    //         }
+    //         catch (Exception e)
+    //         {
+    //             Log("AuthDoWork Error: " + e.Message, LogLevel.Error);
+    //         }
+    //     }
+    // }
 }

@@ -10,7 +10,7 @@ static partial class Module
         
         try
         {
-            if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
+            //if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
             
             Log($"[Init] Server successfully started!",LogLevel.Info);
         }
@@ -23,7 +23,7 @@ static partial class Module
     [SpacetimeDB.Reducer(ReducerKind.Connect)]
     public static void OnConnect(ReducerContext ctx)
     {
-        if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
+        //if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
         Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
     }
 
