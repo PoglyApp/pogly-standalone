@@ -78,7 +78,7 @@ export const GuestListContextMenu = (props: IProps) => {
               )}
               <StyledMenuItemRed
                 onClick={() => {
-                  KickGuestReducer.call(selectedGuest.identity);
+                  KickGuestReducer.call(selectedGuest.address);
                   handleClose();
                 }}
               >

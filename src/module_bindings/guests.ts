@@ -94,11 +94,6 @@ export class Guests extends DatabaseTable
 		}
 	}
 
-	public static findByIdentity(value: Identity): Guests | undefined
-	{
-		return this.filterByIdentity(value).next().value;
-	}
-
 	public static *filterByNickname(value: string): IterableIterator<Guests>
 	{
 		for (let instance of this.db.getTable("Guests").getInstances())
