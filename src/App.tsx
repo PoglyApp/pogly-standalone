@@ -110,11 +110,12 @@ export const App: React.FC = () => {
     setSpacetimeContext({
       Client: spacetime.Client,
       Identity: guestWithNickname,
+      Runtime: spacetime.Runtime,
       Elements: [],
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client, spacetime.Runtime]);
 
   useEffect(() => {
     DebugLogger("Setting SpacetimeDB authenticated ref");

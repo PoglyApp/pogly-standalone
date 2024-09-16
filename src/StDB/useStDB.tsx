@@ -225,7 +225,7 @@ const useStDB = (
     client?.connect();
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
-  return { Client: stdbClient, Identity: identity, Address: address, InstanceConfig: config, Error: error, Disconnected: disconnected };
+  return { Client: stdbClient, Identity: identity, Address: address, InstanceConfig: config, Error: error, Disconnected: disconnected, Runtime: connectionConfig };
 };
 
 export default useStDB;

@@ -22,6 +22,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import Fingerprint from "@mui/icons-material/Fingerprint";
+import ContentPaste from "@mui/icons-material/ContentPaste"
 import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
@@ -46,7 +47,7 @@ interface IProp {
 
 export const SettingsModal = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
-  const { Identity } = useSpacetimeContext();
+  const { Runtime, Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const { settings, setSettings } = useContext(SettingsContext);
@@ -65,6 +66,17 @@ export const SettingsModal = (props: IProp) => {
   const [compressPaste, setCompressPaste] = useState<boolean>(
     settings.compressPaste != null ? settings.compressPaste : true
   );
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
+  let overlayURL =
+      window.location.origin +
+      "/overlay?domain=" +
+      Runtime?.domain +
+      "&module=" +
+      Runtime?.module;
+
+    if (config.authentication && Runtime?.authKey) {
+      overlayURL = overlayURL + "&auth=" + Runtime.authKey;
+    }
 
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);
@@ -77,8 +89,6 @@ export const SettingsModal = (props: IProp) => {
   const [updateHz, setUpdateHz] = useState<number>(config.updateHz);
   const [auth, setAuth] = useState<boolean>(config.authentication);
   const [strictMode, setStrictMode] = useState<boolean>(config.strictMode);
-
-  useEffect(() => {}, []);
 
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
@@ -320,6 +330,28 @@ export const SettingsModal = (props: IProp) => {
             </div>
 
             <div style={{ display: "grid" }}>
+              <Button
+                variant="outlined"
+                startIcon={<ContentPaste/>}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  marginTop: "10px",
+                }}
+                onClick={() => {
+                  navigator.clipboard.writeText(overlayURL);
+
+                  setCopyOverlayButtonText("Copied!");
+
+                  setTimeout(() => {
+                    setCopyOverlayButtonText("Copy Overlay URL");
+                  }, 1000);
+                }}
+              >
+                {copyOverlayButtonText}
+              </Button>
+
               <Button
                 variant="outlined"
                 startIcon={<Fingerprint />}
