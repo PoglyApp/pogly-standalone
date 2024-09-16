@@ -1,6 +1,21 @@
 @import url("fonts.css");
 
-body,
+body {
+  font-family: "Roboto", sans-serif !important;
+
+  margin: 0;
+  padding: 0;
+  
+  background-color: #0a2a47;
+
+  overflow: hidden;
+
+  -khtml-user-select: none;
+  -o-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 html {
   font-family: "Roboto", sans-serif !important;
 
