@@ -42,13 +42,6 @@ export const useOverlayElementsEvents = (
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element, isOverlay);
 
-      if(InRenderBounds(newElement.Elements)) {
-        newElement.Component.style.setProperty("display","block");
-      }
-      else {
-        newElement.Component.style.setProperty("display","none");
-      }
-
       dispatch(addElement(newElement.Elements));
       dispatch(addCanvasElement(newElement));
     });
