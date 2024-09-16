@@ -92,6 +92,7 @@ export const App: React.FC = () => {
     if (!spacetime.Identity) return;
     if (!spacetime.Address) return;
     if (!spacetime.Client) return;
+    if (!spacetime.Runtime) return;
 
     DebugLogger("Setting nickname and Spacetime context");
 
