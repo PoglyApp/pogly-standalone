@@ -67,6 +67,7 @@ import ConnectReducer from "../module_bindings/connect_reducer";
 import { DebugLogger } from "../Utility/DebugLogger";
 import UpdateTextElementShadowReducer from "../module_bindings/update_text_element_shadow_reducer";
 import AddElementDataArrayReducer from "../module_bindings/add_element_data_array_reducer";
+import UpdateConfigReducer from "../module_bindings/update_config_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -93,6 +94,7 @@ const useStDB = (
       UpdateGuestSelectedElementReducer,
       UpdateGuestPositionReducer,
       AddElementDataReducer,
+      AddElementDataArrayReducer,
       UpdateElementDataReducer,
       UpdateElementDataNameReducer,
       UpdateElementDataDataReducer,
@@ -127,6 +129,7 @@ const useStDB = (
       AuthenticateReducer,
       AuthenticateDoWorkReducer,
       SetConfigReducer,
+      UpdateConfigReducer,
       SetIdentityPermissionReducer,
       SetIdentityPermissionEditorReducer,
       SetIdentityPermissionModeratorReducer,
@@ -144,7 +147,6 @@ const useStDB = (
       KickSelfReducer,
       ConnectReducer,
       RefreshOverlayClearStorageReducer,
-      AddElementDataArrayReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
