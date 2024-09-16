@@ -3,7 +3,6 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Config from "../../module_bindings/config";
-import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 
 export const useConfigEvents = (canvasInitialized: CanvasInitializedType) => {
   const { Identity } = useSpacetimeContext();
