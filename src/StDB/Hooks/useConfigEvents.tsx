@@ -17,7 +17,7 @@ export const useConfigEvents = (canvasInitialized: CanvasInitializedType) => {
     Config.onUpdate((oldConfig, newConfig, reducerEvent) => {
       if(oldConfig !== newConfig) setReload(!reload);
     });
-  }, [Identity, canvasInitialized.elementEventsInitialized]);
+  }, [Identity, reload, setReload, canvasInitialized.elementEventsInitialized]);
 
   return reload;
 };
