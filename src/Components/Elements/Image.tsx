@@ -7,6 +7,7 @@ import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProp {
   elements: Elements;
@@ -34,7 +35,7 @@ export const Image = (props: IProp) => {
 
       if (!eData) return;
 
-      setImageData(eData.data);
+      setImageData(convertBinaryToDataURI(eData));
       setImageName(eData.name);
     } else {
       setImageData(imageElement.imageElementData.value);

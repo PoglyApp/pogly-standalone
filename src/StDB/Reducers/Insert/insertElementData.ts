@@ -3,6 +3,7 @@ import AddElementDataReducer from "../../../module_bindings/add_element_data_red
 import DataType from "../../../module_bindings/data_type";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { convertDataURIToBinary } from "../../../Utility/ImageConversion";
 
 export const insertElementData = (elementData: ElementDataType) => {
   DebugLogger("Inserting new element data");
@@ -38,9 +39,6 @@ export const insertElementData = (elementData: ElementDataType) => {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
           const arr = convertDataURIToBinary(result.r);
           AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, result.r, arr, result.w, result.h);
-
-          console.log("base64 => " + new Blob([result.r]).size);
-          console.log("binary => " + arr.length)
         });
       }
       break;
@@ -86,18 +84,4 @@ const getImageWidthAndHeight = (src: string) => {
   image.src = src;
 
   image.onload = async function () {};
-};
-
-const convertDataURIToBinary = (dataURI: any) => {
-  var base64Index = dataURI.indexOf(';base64,') + ';base64,'.length;
-  var base64 = dataURI.substring(base64Index);
-  var raw = window.atob(base64);
-  var rawLength = raw.length;
-  var array = new Uint8Array(new ArrayBuffer(rawLength));
-
-  for(var i = 0; i < rawLength; i++) {
-    array[i] = raw.charCodeAt(i);
-  }
-
-  return array;
 };
