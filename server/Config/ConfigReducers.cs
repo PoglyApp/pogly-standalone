@@ -61,6 +61,7 @@ public partial class Module
     public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz, 
         uint editorBorder, bool authentication, bool strictMode, string authKey="")
     {
+        string func = "SetConfig";
         var config = Config.FilterByVersion(0).First();
 
         if (config.ConfigInit)
@@ -69,11 +70,11 @@ public partial class Module
             throw new Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
         }
         
-        if (!GetGuest("SetConfig", ctx.Address!, out var guest))
-            throw new Exception($"Unable to SetConfig: {ctx.Sender} does not have Guest entry!");
+        if (!GetGuest(func, ctx.Address!, out var guest))
+            throw new Exception($"Unable to {func}: {ctx.Sender} does not have Guest entry!");
         
         if (authentication && string.IsNullOrEmpty(authKey))
-            throw new Exception($"Unable to SetConfig: {ctx.Sender} has authentication enabled but did not provide a Key!");
+            throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
 
         try
         {
@@ -97,8 +98,8 @@ public partial class Module
             }
             catch (Exception e)
             {
-                Log("[SetConfig] - Unable to set guest as owner! " + e.Message,LogLevel.Panic);
-                throw new Exception("[SetConfig] - Unable to set guest as owner!");
+                Log($"[{func}] - Unable to set guest as owner! " + e.Message,LogLevel.Panic);
+                throw new Exception($"[{func}] - Unable to set guest as owner!");
             }
         
             new _AuthenticationKey
@@ -109,12 +110,42 @@ public partial class Module
 
             //if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
             Config.UpdateByVersion(0, config);
-            Log($"[SetConfig] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}");
+            Log($"[{func}] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}!");
         }
         catch (Exception e)
         {
-            Log("[SetConfig] - Unable to SetConfig! " + e.Message,LogLevel.Panic);
-            throw new Exception("[SetConfig] - Unable to SetConfig!");
+            Log($"[{func}] - Unable to SetConfig! " + e.Message,LogLevel.Panic);
+            throw new Exception($"[{func}] - Unable to SetConfig!");
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void UpdateConfig(ReducerContext ctx, string platform, string channel, uint updateHz,
+        bool authentication, bool strictMode)
+    {
+        string func = "UpdateConfig";
+        
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx.Sender)) return;
+
+        try
+        {
+            var oldConfig = Config.FindByVersion(0)!.Value;
+            var newConfig = oldConfig;
+            newConfig.StreamingPlatform = platform;
+            newConfig.StreamName = channel;
+            newConfig.UpdateHz = updateHz;
+            newConfig.Authentication = authentication;
+            newConfig.StrictMode = strictMode;
+            
+            Config.UpdateByVersion(0, newConfig);
+            Log($"[{func}] Success with Globals => StreamingPlatform:{newConfig.StreamingPlatform}, StreamName:{newConfig.StreamName}, UpdateHz:{newConfig.UpdateHz.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}!");
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] - Unable to UpdateConfig! " + e.Message,LogLevel.Error);
         }
     }
 
@@ -142,7 +173,7 @@ public partial class Module
         }
     }
     
-    private static List<Tuple<Address,int>> _identities = new();
+    //private static List<Tuple<Address,int>> _identities = new();
 
     [SpacetimeDB.Reducer]
     public static void Authenticate(ReducerContext ctx, string key)
