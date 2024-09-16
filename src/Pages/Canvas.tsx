@@ -39,6 +39,7 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 
 interface IProps {
   setActivePage: Function;
@@ -92,6 +93,7 @@ export const Canvas = (props: IProps) => {
   useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
 
   useHeartbeatEvents(props.canvasInitialized);
+  const configReload = useConfigEvents(props.canvasInitialized);
 
   useNotice(setNoticeMessage);
 
@@ -142,6 +144,19 @@ export const Canvas = (props: IProps) => {
         buttonText="Reload"
         titleText="Disconnected"
         contentText="You have been disconnected from the Pogly instance."
+        clearSettings={false}
+      />
+    );
+  }
+
+  if (configReload) {
+    DebugLogger("Config has been updated");
+    return (
+      <ErrorRefreshModal
+        type="timer"
+        refreshTimer={3}
+        titleText="Config changed by Owner"
+        contentText="This Pogly instance's config settings have been changed by the owner. The module is reloading automatically..."
         clearSettings={false}
       />
     );
