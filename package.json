@@ -19,6 +19,7 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-dropzone": "^14.2.3",
+    "react-markdown": "^9.0.1",
     "react-moveable": "^0.56.0",
     "react-redux": "^9.0.4",
     "react-router-dom": "6.4",
@@ -29,6 +30,7 @@
     "react-twitch-embed": "^3.0.2",
     "react-zoom-pan-pinch": "^3.4.4",
     "reakeys": "^2.0.3",
+    "remark-gfm": "^4.0.0",
     "styled-components": "^6.1.6",
     "typescript": "^4.9.5"
   },

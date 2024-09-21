@@ -30,6 +30,9 @@ import { HexColorPicker } from "react-colorful";
 import { GetFontFamily } from "../../Utility/GetFontFamily";
 import { DebugLogger } from "../../Utility/DebugLogger";
 
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 interface IProps {
   editElementId?: number;
 }
@@ -231,6 +234,117 @@ export const TextCreationModal = (props: IProps) => {
   if (isOverlay) return <></>;
 
   return (
+    <>
+      {showModal && (
+        <Dialog open={true} onClose={handleOnClose} sx={{ "* > .MuiPaper-root": { overflow: "visible" } }}>
+          <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
+            {props.editElementId ? "Edit text" : "Add text"}
+          </DialogTitle>
+          <DialogContent
+            sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}
+          ></DialogContent>
+
+          <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
+            {props.editElementId && (
+              <FormControlLabel
+                componentsProps={{
+                  typography: { color: "#ffffffa6", width: "84px" },
+                }}
+                control={
+                  <Checkbox
+                    sx={{ color: "#ffffffa6", height: "20px", width: "30px", paddingLeft: "10px", marginLeft: "20px" }}
+                    onChange={() => {
+                      setAutoUpdate((autoUpdate) => !autoUpdate);
+                    }}
+                    defaultChecked={autoUpdate}
+                    value={autoUpdate}
+                  />
+                }
+                label="Live update"
+              />
+            )}
+
+            <Button
+              variant="outlined"
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+              }}
+              onClick={handleOnClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={
+                text === "" ||
+                fontSize === "" ||
+                textColor === "" ||
+                shadowColor === "" ||
+                shadowHeight === "" ||
+                shadowWidth === "" ||
+                error !== ""
+                  ? true
+                  : false
+              }
+              variant="outlined"
+              sx={{
+                color: "#ffffffa6",
+                borderColor: "#ffffffa6",
+                "&:hover": { borderColor: "white" },
+                "&:disabled": {
+                  borderColor: "gray",
+                  color: "gray",
+                },
+              }}
+              onClick={() => {
+                handleSave(true);
+              }}
+            >
+              {props.editElementId ? "Edit" : "Add"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+    </>
+  );
+};
+
+const StyledColorInput = styled.input`
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  background-color: #0a2a47;
+  color: #b0bec5;
+  border: 1px solid #ffffffa6;
+  border-width: 2px;
+  border-radius: 5px;
+`;
+
+const ColorBox = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ffffffa6;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+`;
+
+const Popover = styled.div`
+  position: absolute;
+  z-index: 2;
+`;
+
+const Cover = styled.div`
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+`;
+
+/* 
+
     <>
       {showModal && (
         <Dialog open={true} onClose={handleOnClose} sx={{ "* > .MuiPaper-root": { overflow: "visible" } }}>
@@ -463,38 +577,4 @@ export const TextCreationModal = (props: IProps) => {
         </Dialog>
       )}
     </>
-  );
-};
-
-const StyledColorInput = styled.input`
-  width: 100%;
-  padding: 6px;
-  box-sizing: border-box;
-  background-color: #0a2a47;
-  color: #b0bec5;
-  border: 1px solid #ffffffa6;
-  border-width: 2px;
-  border-radius: 5px;
-`;
-
-const ColorBox = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 2px solid #ffffffa6;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-`;
-
-const Popover = styled.div`
-  position: absolute;
-  z-index: 2;
-`;
-
-const Cover = styled.div`
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-`;
+*/
