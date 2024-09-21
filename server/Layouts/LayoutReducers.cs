@@ -8,9 +8,11 @@ public partial class Module
     {
         string func = "AddLayout";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -41,9 +43,11 @@ public partial class Module
     {
         string func = "UpdateLayoutName";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -71,9 +75,11 @@ public partial class Module
     {
         string func = "SetLayoutActive";
 
+        if (ctx.Address is null) return;
+        
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -103,9 +109,11 @@ public partial class Module
     {
         string func = "DeleteLayout";
 
+        if (ctx.Address is null) return;
+        
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -153,9 +161,11 @@ public partial class Module
     {
         string func = "DeleteAllLayouts";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)

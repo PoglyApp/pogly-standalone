@@ -54,6 +54,7 @@ export const ImageUploadModal = (props: IProps) => {
     handleNameChange(props.dragnAndDropFile.name.substr(0, props.dragnAndDropFile.name.lastIndexOf(".")));
 
     setFieldsInitialized(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.dragnAndDropFile]);
 
   const handleNameChange = (name: any) => {

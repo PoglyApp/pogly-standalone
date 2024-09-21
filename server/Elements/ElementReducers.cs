@@ -12,8 +12,8 @@ public partial class Module
         
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -59,8 +59,8 @@ public partial class Module
         
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -105,8 +105,8 @@ public partial class Module
         string func = "UpdateElement";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -148,8 +148,8 @@ public partial class Module
         string func = "UpdateElementStruct";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (elementStruct is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -188,8 +188,8 @@ public partial class Module
         string func = "UpdateTextElementText";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
@@ -220,8 +220,8 @@ public partial class Module
         string func = "UpdateTextElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -249,8 +249,8 @@ public partial class Module
         string func = "UpdateTextElementColor";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -278,8 +278,8 @@ public partial class Module
         string func = "UpdateTextElementFont";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -337,8 +337,8 @@ public partial class Module
         string func = "UpdateImageElementDataStruct";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -366,8 +366,8 @@ public partial class Module
         string func = "UpdateImageElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -396,8 +396,8 @@ public partial class Module
         string func = "UpdateImageElementWidth";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -425,8 +425,8 @@ public partial class Module
         string func = "UpdateImageElementHeight";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -454,8 +454,8 @@ public partial class Module
         string func = "UpdateWidgetElementDataId";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -483,8 +483,8 @@ public partial class Module
         string func = "UpdateWidgetElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -513,8 +513,8 @@ public partial class Module
         string func = "UpdateWidgetElementWidth";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -542,8 +542,8 @@ public partial class Module
         string func = "UpdateWidgetElementHeight";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -571,8 +571,8 @@ public partial class Module
         string func = "UpdateWidgetElementRawData";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -602,8 +602,8 @@ public partial class Module
         string func = "UpdateElementTransparency";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -627,8 +627,8 @@ public partial class Module
         string func = "UpdateElementTransform";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -652,8 +652,8 @@ public partial class Module
         string func = "UpdateElementClip";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -677,8 +677,8 @@ public partial class Module
         string func = "UpdateElementLocked";
         try
         {
-            if(!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -703,8 +703,8 @@ public partial class Module
 
         try
         {
-            if(!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
             {
@@ -734,8 +734,8 @@ public partial class Module
         string func = "UpdateElementZIndex";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             List<int> zIndexes = new List<int>();
@@ -776,7 +776,8 @@ public partial class Module
     {
         string func = "DeleteElement";
         
-        if (!GetGuest(func, ctx.Sender, out var guest))return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try
@@ -798,7 +799,8 @@ public partial class Module
     {
         string func = "DeleteAllElements";
         
-        if (!GetGuest(func, ctx.Sender, out var guest))return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try

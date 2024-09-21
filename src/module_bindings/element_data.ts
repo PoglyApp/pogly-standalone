@@ -14,18 +14,20 @@ export class ElementData extends DatabaseTable
 	public name: string;
 	public dataType: DataType;
 	public data: string;
+	public byteArray: Uint8Array | null;
 	public dataWidth: number;
 	public dataHeight: number;
 	public createdBy: string;
 
 	public static primaryKey: string | undefined = "id";
 
-	constructor(id: number, name: string, dataType: DataType, data: string, dataWidth: number, dataHeight: number, createdBy: string) {
+	constructor(id: number, name: string, dataType: DataType, data: string, byteArray: Uint8Array | null, dataWidth: number, dataHeight: number, createdBy: string) {
 	super();
 		this.id = id;
 		this.name = name;
 		this.dataType = dataType;
 		this.data = data;
+		this.byteArray = byteArray;
 		this.dataWidth = dataWidth;
 		this.dataHeight = dataHeight;
 		this.createdBy = createdBy;
@@ -33,7 +35,7 @@ export class ElementData extends DatabaseTable
 
 	public static serialize(value: ElementData): object {
 		return [
-		value.id, value.name, DataType.serialize(value.dataType), value.data, value.dataWidth, value.dataHeight, value.createdBy
+		value.id, value.name, DataType.serialize(value.dataType), value.data, value.byteArray ? { "some": Array.from(value.byteArray) } : { "none": [] }, value.dataWidth, value.dataHeight, value.createdBy
 		];
 	}
 
@@ -44,6 +46,11 @@ export class ElementData extends DatabaseTable
 			new ProductTypeElement("name", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("dataType", DataType.getAlgebraicType()),
 			new ProductTypeElement("data", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
+			new ProductTypeElement("byteArray", AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		])),
 			new ProductTypeElement("dataWidth", AlgebraicType.createPrimitiveType(BuiltinType.Type.I32)),
 			new ProductTypeElement("dataHeight", AlgebraicType.createPrimitiveType(BuiltinType.Type.I32)),
 			new ProductTypeElement("createdBy", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
@@ -57,10 +64,11 @@ export class ElementData extends DatabaseTable
 		let __Name = productValue.elements[1].asString();
 		let __DataType = DataType.fromValue(productValue.elements[2]);
 		let __Data = productValue.elements[3].asString();
-		let __DataWidth = productValue.elements[4].asNumber();
-		let __DataHeight = productValue.elements[5].asNumber();
-		let __CreatedBy = productValue.elements[6].asString();
-		return new this(__Id, __Name, __DataType, __Data, __DataWidth, __DataHeight, __CreatedBy);
+		let __ByteArray = productValue.elements[4].asSumValue().tag == 1 ? null : productValue.elements[4].asSumValue().value.asBytes();
+		let __DataWidth = productValue.elements[5].asNumber();
+		let __DataHeight = productValue.elements[6].asNumber();
+		let __CreatedBy = productValue.elements[7].asString();
+		return new this(__Id, __Name, __DataType, __Data, __ByteArray, __DataWidth, __DataHeight, __CreatedBy);
 	}
 
 	public static *filterById(value: number): IterableIterator<ElementData>

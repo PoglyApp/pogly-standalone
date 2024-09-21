@@ -5,6 +5,7 @@
   Chippy: Nah but I'll write something about it. Just like in general how StDB should be 1080p and the client is downscaled 4x
 */
 
+import Elements from "../module_bindings/elements";
 import { DebugLogger } from "./DebugLogger";
 
 export const ViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
@@ -154,3 +155,32 @@ export const StdbToOverlayCoords = (x: number, y: number): { x: number; y: numbe
     y: newY,
   };
 };
+
+export const InRenderBounds = (element: Elements) => {
+  const coords = GetCoordsFromTransform(element.transform);
+  let width = 0;
+  let height = 0;
+  let isText = false;
+
+  switch(element.element.tag) {
+    case "TextElement":
+      isText = true;
+      break;
+    case "ImageElement":
+      width = element.element.value.width;
+      height = element.element.value.height;
+      break;
+    case "WidgetElement":
+      width = element.element.value.width;
+      height = element.element.value.height;
+      break;
+  }
+
+  const visible = isText ? true : 
+    coords.x + width >= 0 &&
+    coords.x <= 1920 &&
+    coords.y + height >= 0 &&
+    coords.y <= 1080;
+    
+  return visible;
+}

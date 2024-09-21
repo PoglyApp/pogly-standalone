@@ -14,7 +14,8 @@ public partial class Module
             }
             else
             {
-                var guest = Guests.FindByIdentity(ctx.Sender);
+                if (ctx.Address is null) return;
+                var guest = Guests.FindByAddress(ctx.Address);
                 if (guest is null)
                 {
                     //Log($"[AuditLog - {reducer}] Unable to audit log because Guest nickname is null!",LogLevel.Error);

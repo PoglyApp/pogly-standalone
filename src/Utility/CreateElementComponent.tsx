@@ -5,6 +5,7 @@ import { Image } from "../Components/Elements/Image";
 import { Widget } from "../Components/Elements/Widget";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { DebugLogger } from "./DebugLogger";
+import { InRenderBounds } from "./ConvertCoordinates";
 
 export const CreateOffsetElementComponent = (elements: Elements) => {
   DebugLogger("Creating offset element component");
@@ -34,7 +35,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
   return canvasElement;
 };
 
-export const CreateElementComponent = (elements: Elements) => {
+export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) => {
   DebugLogger("Creating element component");
   const newElement: Elements = {
     id: elements.id,
@@ -61,14 +62,14 @@ export const CreateElementComponent = (elements: Elements) => {
       break;
 
     case "ImageElement":
-      canvasElement.Component = <Image elements={newElement} />;
+      canvasElement.Component = <Image elements={newElement} isOverlay={isOverlay} />;
       break;
 
     case "WidgetElement":
-      canvasElement.Component = <Widget elements={newElement} />;
+      canvasElement.Component = <Widget elements={newElement} isOverlay={isOverlay} />;
 
       break;
   }
-
+  
   return canvasElement;
 };

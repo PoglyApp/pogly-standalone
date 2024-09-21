@@ -17,7 +17,7 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
 
     const guests = Guests.all();
 
-    const guest = guests.findIndex((g) => g.identity.toHexString() === Identity.identity.toHexString());
+    const guest = guests.findIndex((g) => g.address.toHexString() === Identity.address.toHexString());
 
     guests[guest].nickname = Identity.nickname;
 

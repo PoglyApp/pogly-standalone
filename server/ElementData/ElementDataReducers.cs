@@ -9,7 +9,8 @@ public partial class Module
     {
         string func = "AddElementData";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {
@@ -36,13 +37,49 @@ public partial class Module
             Log($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message, LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height)
+    {
+        string func = "AddElementData";
+        
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (Config.FindByVersion(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx.Sender)) return;
+        }
+        
+        try
+        {
+            var elementData = new ElementData
+            {
+                Name = name,
+                DataType = type,
+                Data = data,
+                ByteArray = array,
+                DataWidth = width,
+                DataHeight = height,
+                CreatedBy = guest.Nickname
+            };
+            elementData.Insert();
+            
+            LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromElementData(elementData), Config.FindByVersion(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message, LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateElementData(ReducerContext ctx, uint dataId, string name, string data, int width, int height)
     {
         string func = "UpdateElementData";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {
@@ -73,7 +110,8 @@ public partial class Module
     {
         string func = "UpdateElementDataSize";
 
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
 
         try
@@ -98,7 +136,8 @@ public partial class Module
     {
         string func = "UpdateElementDataName";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try
@@ -122,7 +161,8 @@ public partial class Module
     {
         string func = "UpdateElementDataData";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {
@@ -150,7 +190,8 @@ public partial class Module
     {
         string func = "DeleteElementDataById";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {
@@ -192,7 +233,8 @@ public partial class Module
     {
         string func = "DeleteElementDataByName";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {
@@ -234,7 +276,8 @@ public partial class Module
     {
         string func = "DeleteAllElementData";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (Config.FindByVersion(0)!.Value.StrictMode)
         {

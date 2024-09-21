@@ -179,7 +179,7 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerIdentity.toHexString() === Identity.identity.toHexString() || !component) return;
+      if (reducerEvent?.callerAddress?.toHexString() === Identity.address.toHexString() || !component) return;
 
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
@@ -218,6 +218,7 @@ export const useElementsEvents = (
   }, [
     canvasInitialized.elementEventsInitialized,
     Identity.identity,
+    Identity.address,
     selectoRef,
     setCanvasInitialized,
     setSelected,

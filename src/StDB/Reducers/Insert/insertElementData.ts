@@ -1,7 +1,9 @@
+import AddElementDataArrayReducer from "../../../module_bindings/add_element_data_array_reducer";
 import AddElementDataReducer from "../../../module_bindings/add_element_data_reducer";
 import DataType from "../../../module_bindings/data_type";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { convertDataURIToBinary } from "../../../Utility/ImageConversion";
 
 export const insertElementData = (elementData: ElementDataType) => {
   DebugLogger("Inserting new element data");
@@ -23,10 +25,11 @@ export const insertElementData = (elementData: ElementDataType) => {
         image.src = elementData.Data;
 
         image.onload = async function () {
-          AddElementDataReducer.call(
+          AddElementDataArrayReducer.call(
             elementData.Name,
             elementData.DataType,
             elementData.Data,
+            convertDataURIToBinary(elementData.Data),
             image.width || 128,
             image.height || 128
           );
@@ -34,7 +37,8 @@ export const insertElementData = (elementData: ElementDataType) => {
         };
       } else {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
-          AddElementDataReducer.call(elementData.Name, elementData.DataType, result.r, result.w, result.h);
+          const arr = convertDataURIToBinary(result.r);
+          AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, result.r, arr, result.w, result.h);
         });
       }
       break;

@@ -11,6 +11,7 @@ public partial class Module
         public string Name;
         public DataType DataType;
         public string Data;
+        public byte[]? ByteArray;
         public int DataWidth;
         public int DataHeight;
         public string CreatedBy;

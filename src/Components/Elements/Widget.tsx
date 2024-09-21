@@ -5,9 +5,11 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../Modals/WidgetCreationModal";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 
 interface IProp {
   elements: Elements;
+  isOverlay?: Boolean;
 }
 
 export const Widget = (props: IProp) => {
@@ -40,6 +42,15 @@ export const Widget = (props: IProp) => {
     ]);
   };
 
+  const renderDisplay = () => {
+    if(InRenderBounds(props.elements)) {
+      return "block";
+    }
+    else {
+      return "none";
+    }
+  }
+
   return (
     <div
       id={props.elements.id.toString()}
@@ -55,6 +66,7 @@ export const Widget = (props: IProp) => {
         zIndex: props.elements.zIndex,
         overflow: "hidden",
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
+        display: isOverlay ? renderDisplay() : "block",
       }}
       onDoubleClick={showWidgetCreationModal}
     >

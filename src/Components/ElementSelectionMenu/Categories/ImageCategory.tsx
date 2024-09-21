@@ -16,6 +16,7 @@ import { ModalContext } from "../../../Contexts/ModalContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { convertBinaryToDataURI } from "../../../Utility/ImageConversion";
 
 interface IProps {
   elementData: ElementData[];
@@ -117,7 +118,7 @@ export const ImageCategory = (props: IProps) => {
                       }}
                       onClick={() => AddElementToCanvas(elementData)}
                     >
-                      <ElementIcon src={elementData.data} />
+                      <ElementIcon src={convertBinaryToDataURI(elementData)} />
                       {elementData.name}
                     </Button>
                     <br />

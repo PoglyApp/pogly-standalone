@@ -61,6 +61,7 @@ public partial class Module
     public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz, 
         uint editorBorder, bool authentication, bool strictMode, string authKey="")
     {
+        string func = "SetConfig";
         var config = Config.FilterByVersion(0).First();
 
         if (config.ConfigInit)
@@ -69,11 +70,11 @@ public partial class Module
             throw new Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
         }
         
-        if (!GetGuest("SetConfig", ctx.Sender, out var guest))
-            throw new Exception($"Unable to SetConfig: {ctx.Sender} does not have Guest entry!");
+        if (!GetGuest(func, ctx.Address!, out var guest))
+            throw new Exception($"Unable to {func}: {ctx.Sender} does not have Guest entry!");
         
         if (authentication && string.IsNullOrEmpty(authKey))
-            throw new Exception($"Unable to SetConfig: {ctx.Sender} has authentication enabled but did not provide a Key!");
+            throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
 
         try
         {
@@ -97,8 +98,8 @@ public partial class Module
             }
             catch (Exception e)
             {
-                Log("[SetConfig] - Unable to set guest as owner! " + e.Message,LogLevel.Panic);
-                throw new Exception("[SetConfig] - Unable to set guest as owner!");
+                Log($"[{func}] - Unable to set guest as owner! " + e.Message,LogLevel.Panic);
+                throw new Exception($"[{func}] - Unable to set guest as owner!");
             }
         
             new _AuthenticationKey
@@ -107,14 +108,44 @@ public partial class Module
                 Key = authKey
             }.Insert();
 
-            if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
+            //if (config.Authentication && !IsAuthWorking()) StartAuthWorker();
             Config.UpdateByVersion(0, config);
-            Log($"[SetConfig] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}");
+            Log($"[{func}] Success with Globals => DebugMode:{config.DebugMode.ToString()}, StrictMode:{config.StrictMode.ToString()}, Authentication:{config.Authentication.ToString()}!");
         }
         catch (Exception e)
         {
-            Log("[SetConfig] - Unable to SetConfig! " + e.Message,LogLevel.Panic);
-            throw new Exception("[SetConfig] - Unable to SetConfig!");
+            Log($"[{func}] - Unable to SetConfig! " + e.Message,LogLevel.Panic);
+            throw new Exception($"[{func}] - Unable to SetConfig!");
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void UpdateConfig(ReducerContext ctx, string platform, string channel, uint updateHz,
+        bool authentication, bool strictMode)
+    {
+        string func = "UpdateConfig";
+        
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx.Sender)) return;
+
+        try
+        {
+            var oldConfig = Config.FindByVersion(0)!.Value;
+            var newConfig = oldConfig;
+            newConfig.StreamingPlatform = platform;
+            newConfig.StreamName = channel;
+            newConfig.UpdateHz = updateHz;
+            newConfig.Authentication = authentication;
+            newConfig.StrictMode = strictMode;
+            
+            Config.UpdateByVersion(0, newConfig);
+            Log($"[{func}] Success with Globals => StreamingPlatform:{newConfig.StreamingPlatform}, StreamName:{newConfig.StreamName}, UpdateHz:{newConfig.UpdateHz.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}!");
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] - Unable to UpdateConfig! " + e.Message,LogLevel.Error);
         }
     }
 
@@ -123,7 +154,8 @@ public partial class Module
     {
         string func = "UpdateAuthenticationKey";
         
-        if (!GetGuest(func, ctx.Sender, out var guest)) return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx.Sender)) return;
 
@@ -141,12 +173,13 @@ public partial class Module
         }
     }
     
-    private static List<Tuple<Identity,int>> _identities = new();
+    //private static List<Tuple<Address,int>> _identities = new();
 
     [SpacetimeDB.Reducer]
     public static void Authenticate(ReducerContext ctx, string key)
     {
-        if (!GetGuest("Authenticate", ctx.Sender, out var guest))
+        if (ctx.Address is null) throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have an address!");
+        if (!GetGuest("Authenticate", ctx.Address, out var guest))
             throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have Guest entry!");
         
         if (string.IsNullOrEmpty(key))
@@ -159,7 +192,12 @@ public partial class Module
             {
                 if (key == _key.Value.Key)
                 {
-                    _identities.Add(new Tuple<Identity, int>(ctx.Sender,0));
+                    //_identities.Add(new Tuple<Address, int>(ctx.Address,0));
+                    var g = Guests.FindByAddress(ctx.Address);
+                    if (g is null) throw new Exception("Guest is null!");
+                    var newGuest = g.Value;
+                    newGuest.Authenticated = true;
+                    Guests.UpdateByAddress(newGuest.Address, newGuest);
                 }
             }
         }
@@ -172,53 +210,53 @@ public partial class Module
     }
     
     
-    private static int _maxPatience = 25;
-    private static int _currentPatience = 0;
-    
-    [SpacetimeDB.Reducer]
-    public static void AuthenticateDoWork(ReducerContext ctx, AuthenticationWorker args)
-    {
-        if (Guests.Iter().Count() == 0 || _identities.Count == 0)
-        {
-            _currentPatience++;
-        }
-        else
-        {
-            _currentPatience = 0;
-        }
-        
-        if (_currentPatience > _maxPatience)
-        {
-            _currentPatience = 0;
-            Log("[AuthDoWork] Max patience reached... pausing.");
-            _identities.Clear();
-            StopAuthWorker();
-            return;
-        }
-
-        if (_identities.Count == 0) return;
-
-        foreach (var i in _identities)
-        {
-            try
-            {
-                var g = GetGuest("AuthDoWork", i.Item1, out var guest);
-                if (!g) continue;
-
-                if (guest.Authenticated) _identities.Remove(i);
-                if (i.Item2 > 15) _identities.Remove(i);
-
-                guest.Authenticated = true;
-                var a = Guests.UpdateByIdentity(i.Item1, guest);
-                if (!a)
-                {
-                    _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Identity, int>(i.Item1, i.Item2+1);
-                }
-            }
-            catch (Exception e)
-            {
-                Log("AuthDoWork Error: " + e.Message, LogLevel.Error);
-            }
-        }
-    }
+    // private static int _maxPatience = 25;
+    // private static int _currentPatience = 0;
+    //
+    // [SpacetimeDB.Reducer]
+    // public static void AuthenticateDoWork(ReducerContext ctx, AuthenticationWorker args)
+    // {
+    //     if (Guests.Iter().Count() == 0 || _identities.Count == 0)
+    //     {
+    //         _currentPatience++;
+    //     }
+    //     else
+    //     {
+    //         _currentPatience = 0;
+    //     }
+    //     
+    //     if (_currentPatience > _maxPatience)
+    //     {
+    //         _currentPatience = 0;
+    //         Log("[AuthDoWork] Max patience reached... pausing.");
+    //         _identities.Clear();
+    //         StopAuthWorker();
+    //         return;
+    //     }
+    //
+    //     if (_identities.Count == 0) return;
+    //
+    //     foreach (var i in _identities)
+    //     {
+    //         try
+    //         {
+    //             var g = GetGuest("AuthDoWork", i.Item1, out var guest);
+    //             if (!g) continue;
+    //
+    //             if (guest.Authenticated) _identities.Remove(i);
+    //             if (i.Item2 > 15) _identities.Remove(i);
+    //
+    //             guest.Authenticated = true;
+    //             var a = Guests.UpdateByAddress(i.Item1, guest);
+    //             if (!a)
+    //             {
+    //                 _identities[_identities.FindIndex(id => id.Item1 == i.Item1)] = new Tuple<Address, int>(i.Item1, i.Item2+1);
+    //             }
+    //         }
+    //         catch (Exception e)
+    //         {
+    //             Log("AuthDoWork Error: " + e.Message, LogLevel.Error);
+    //         }
+    //     }
+    // }
 }
