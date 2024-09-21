@@ -55,7 +55,7 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 For installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/).
 There are both provider-hosted and self-hosted methods available.
 
-For assistance with we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
+For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
 
 ## Used by
 
