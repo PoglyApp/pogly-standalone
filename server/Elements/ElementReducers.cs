@@ -307,7 +307,8 @@ public partial class Module
         string func = "UpdateTextElementShadow";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
 
