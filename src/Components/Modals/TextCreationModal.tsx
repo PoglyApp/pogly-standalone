@@ -32,6 +32,7 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { MarkdownEditor } from "../General/MarkdownEditor";
 
 interface IProps {
   editElementId?: number;
@@ -240,9 +241,10 @@ export const TextCreationModal = (props: IProps) => {
           <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
             {props.editElementId ? "Edit text" : "Add text"}
           </DialogTitle>
-          <DialogContent
-            sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}
-          ></DialogContent>
+          <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
+            <Markdown>{text}</Markdown>
+            <MarkdownEditor text={text} setText={handleTextChange} />
+          </DialogContent>
 
           <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
             {props.editElementId && (

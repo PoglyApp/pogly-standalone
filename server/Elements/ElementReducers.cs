@@ -23,11 +23,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
-            if (element is ElementStruct.TextElement text)
+            /*if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }
+            }*/
 
             var newElement = new Elements
             {
@@ -70,11 +70,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
-            if (element is ElementStruct.TextElement text)
+            /*if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }
+            }*/
 
             var newElement = new Elements
             {
@@ -116,11 +116,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             
-            if (element is ElementStruct.TextElement text)
+            /*if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }
+            }*/
 
             var oldElement = Elements.FilterById(elementId).First();
             var updatedElement = oldElement;
@@ -159,11 +159,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             
-            if (elementStruct is ElementStruct.TextElement text)
+            /*if (elementStruct is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }
+            }*/
 
             var oldElement = Elements.FilterById(elementId).First();
             var updatedElement = oldElement;
@@ -192,8 +192,8 @@ public partial class Module
             if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
-            if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
-                return;
+            /*if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
+                return;*/
 
             var oldElement = Elements.FilterById(elementId).First();
 
