@@ -25,11 +25,10 @@ export const insertElementData = (elementData: ElementDataType) => {
         image.src = elementData.Data;
 
         image.onload = async function () {
-          AddElementDataArrayReducer.call(
+          AddElementDataReducer.call(
             elementData.Name,
             elementData.DataType,
             elementData.Data,
-            convertDataURIToBinary(elementData.Data),
             image.width || 128,
             image.height || 128
           );
@@ -38,7 +37,7 @@ export const insertElementData = (elementData: ElementDataType) => {
       } else {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
           const arr = convertDataURIToBinary(result.r);
-          AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, result.r, arr, result.w, result.h);
+          AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, "", arr, result.w, result.h);
         });
       }
       break;
@@ -77,11 +76,4 @@ const getBase64 = (file: any, cb: any) => {
   reader.onerror = function (error) {
     console.log("Error uploading Image to Pogly: ", error);
   };
-};
-
-const getImageWidthAndHeight = (src: string) => {
-  const image = new Image();
-  image.src = src;
-
-  image.onload = async function () {};
 };
