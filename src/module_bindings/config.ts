@@ -17,11 +17,12 @@ export class Config extends DatabaseTable
 	public editorBorder: number;
 	public authentication: boolean;
 	public strictMode: boolean;
+	public editorGuidelines: string;
 	public configInit: boolean;
 
 	public static primaryKey: string | undefined = "version";
 
-	constructor(version: number, ownerIdentity: Identity, streamingPlatform: string, streamName: string, debugMode: boolean, updateHz: number, editorBorder: number, authentication: boolean, strictMode: boolean, configInit: boolean) {
+	constructor(version: number, ownerIdentity: Identity, streamingPlatform: string, streamName: string, debugMode: boolean, updateHz: number, editorBorder: number, authentication: boolean, strictMode: boolean, editorGuidelines: string, configInit: boolean) {
 	super();
 		this.version = version;
 		this.ownerIdentity = ownerIdentity;
@@ -32,12 +33,13 @@ export class Config extends DatabaseTable
 		this.editorBorder = editorBorder;
 		this.authentication = authentication;
 		this.strictMode = strictMode;
+		this.editorGuidelines = editorGuidelines;
 		this.configInit = configInit;
 	}
 
 	public static serialize(value: Config): object {
 		return [
-		value.version, Array.from(value.ownerIdentity.toUint8Array()), value.streamingPlatform, value.streamName, value.debugMode, value.updateHz, value.editorBorder, value.authentication, value.strictMode, value.configInit
+		value.version, Array.from(value.ownerIdentity.toUint8Array()), value.streamingPlatform, value.streamName, value.debugMode, value.updateHz, value.editorBorder, value.authentication, value.strictMode, value.editorGuidelines, value.configInit
 		];
 	}
 
@@ -55,6 +57,7 @@ export class Config extends DatabaseTable
 			new ProductTypeElement("editorBorder", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("authentication", AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool)),
 			new ProductTypeElement("strictMode", AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool)),
+			new ProductTypeElement("editorGuidelines", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("configInit", AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool)),
 		]);
 	}
@@ -71,8 +74,9 @@ export class Config extends DatabaseTable
 		let __EditorBorder = productValue.elements[6].asNumber();
 		let __Authentication = productValue.elements[7].asBoolean();
 		let __StrictMode = productValue.elements[8].asBoolean();
-		let __ConfigInit = productValue.elements[9].asBoolean();
-		return new this(__Version, __OwnerIdentity, __StreamingPlatform, __StreamName, __DebugMode, __UpdateHz, __EditorBorder, __Authentication, __StrictMode, __ConfigInit);
+		let __EditorGuidelines = productValue.elements[9].asString();
+		let __ConfigInit = productValue.elements[10].asBoolean();
+		return new this(__Version, __OwnerIdentity, __StreamingPlatform, __StreamName, __DebugMode, __UpdateHz, __EditorBorder, __Authentication, __StrictMode, __EditorGuidelines, __ConfigInit);
 	}
 
 	public static *filterByVersion(value: number): IterableIterator<Config>
@@ -165,6 +169,16 @@ export class Config extends DatabaseTable
 		for (let instance of this.db.getTable("Config").getInstances())
 		{
 			if (instance.strictMode === value) {
+				yield instance;
+			}
+		}
+	}
+
+	public static *filterByEditorGuidelines(value: string): IterableIterator<Config>
+	{
+		for (let instance of this.db.getTable("Config").getInstances())
+		{
+			if (instance.editorGuidelines === value) {
 				yield instance;
 			}
 		}

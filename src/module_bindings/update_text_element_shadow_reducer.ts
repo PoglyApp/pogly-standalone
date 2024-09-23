@@ -7,16 +7,16 @@ import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeEl
 export class UpdateTextElementShadowReducer extends Reducer
 {
 	public static reducerName: string = "UpdateTextElementShadow";
-	public static call(_elementId: number, _shadow: string) {
-		this.getReducer().call(_elementId, _shadow);
+	public static call(_elementId: number, _css: string) {
+		this.getReducer().call(_elementId, _css);
 	}
 
-	public call(_elementId: number, _shadow: string) {
+	public call(_elementId: number, _css: string) {
 		const serializer = this.client.getSerializer();
 		let _elementIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
 		serializer.write(_elementIdType, _elementId);
-		let _shadowType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		serializer.write(_shadowType, _shadow);
+		let _cssType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		serializer.write(_cssType, _css);
 		this.client.call("UpdateTextElementShadow", serializer);
 	}
 
@@ -24,16 +24,16 @@ export class UpdateTextElementShadowReducer extends Reducer
 		let elementIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
 		let elementIdValue = AlgebraicValue.deserialize(elementIdType, adapter.next())
 		let elementId = elementIdValue.asNumber();
-		let shadowType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
-		let shadowValue = AlgebraicValue.deserialize(shadowType, adapter.next())
-		let shadow = shadowValue.asString();
-		return [elementId, shadow];
+		let cssType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
+		let cssValue = AlgebraicValue.deserialize(cssType, adapter.next())
+		let css = cssValue.asString();
+		return [elementId, css];
 	}
 
-	public static on(callback: (reducerEvent: ReducerEvent, _elementId: number, _shadow: string) => void) {
+	public static on(callback: (reducerEvent: ReducerEvent, _elementId: number, _css: string) => void) {
 		this.getReducer().on(callback);
 	}
-	public on(callback: (reducerEvent: ReducerEvent, _elementId: number, _shadow: string) => void)
+	public on(callback: (reducerEvent: ReducerEvent, _elementId: number, _css: string) => void)
 	{
 		this.client.on("reducer:UpdateTextElementShadow", callback);
 	}

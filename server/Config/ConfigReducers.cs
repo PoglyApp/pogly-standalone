@@ -173,6 +173,31 @@ public partial class Module
                 LogLevel.Error);
         }
     }
+
+    [SpacetimeDB.Reducer]
+    public static void UpdateEditorGuidelines(ReducerContext ctx, string guidelines)
+    {
+        string func = "UpdateEditorGuidelines";
+
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx.Sender)) return;
+
+        try
+        {
+            var oldConfig = Config.FindByVersion(0)!.Value;
+            var newConfig = oldConfig;
+            newConfig.EditorGuidelines = guidelines;
+            
+            Config.UpdateByVersion(0, newConfig);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Encountered error updating EditorGuidelines, requested by {ctx.Sender}. " + e.Message,
+                LogLevel.Error);
+        }
+    }
     
     //private static List<Tuple<Address,int>> _identities = new();
 
