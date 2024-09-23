@@ -18,6 +18,7 @@ import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { marked } from "marked";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -61,7 +62,7 @@ export const useElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+    Elements.onUpdate(async (oldElement, newElement, reducerEvent) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -122,7 +123,8 @@ export const useElementsEvents = (
 
           // UPDATE TEXT
           if (oldTextElement.text !== newTextElement.text) {
-            component.innerHTML = newTextElement.text;
+            const markdownToHtml = await marked.parse(newTextElement.text);
+            component.innerHTML = markdownToHtml;
           }
 
           // UPDATE SIZE
