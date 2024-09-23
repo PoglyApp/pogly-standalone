@@ -34,9 +34,6 @@ import { LayoutContext } from "../Contexts/LayoutContext";
 import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 import { useHotkeys } from "reakeys";
 import { UserInputHandler } from "../Utility/UserInputHandler";
-import Dropzone from "react-dropzone";
-import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
-import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
@@ -55,7 +52,6 @@ export const Canvas = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
-  const { setModals } = useContext(ModalContext);
   const { settings } = useContext(SettingsContext);
   const { Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
@@ -76,9 +72,7 @@ export const Canvas = (props: IProps) => {
   });
 
   const [noticeMessage, setNoticeMessage] = useState<any>();
-  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
-
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
+  
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
@@ -186,21 +180,6 @@ export const Canvas = (props: IProps) => {
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <>
-          <Dropzone
-            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
-            noClick={true}
-            onDragEnter={() => setisDroppingSelectionMenu(true)}
-            onDragLeave={() => setisDroppingSelectionMenu(false)}
-            onDropAccepted={() => setisDroppingSelectionMenu(false)}
-            onDropRejected={() => setisDroppingSelectionMenu(false)}
-          >
-            {({ getRootProps }) => (
-              <div {...getRootProps()}>
-                <ElementSelectionMenu elementData={elementData} isDropping={isDroppingSelectionMenu} />
-              </div>
-            )}
-          </Dropzone>
-
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
           <TransformWrapper

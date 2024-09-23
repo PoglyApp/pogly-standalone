@@ -1,5 +1,5 @@
 import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
 import { Outlet, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
@@ -12,6 +12,11 @@ import Toolbar from "@mui/material/Toolbar";
 import { ModalContext } from "../Contexts/ModalContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
+import Dropzone from "react-dropzone";
+import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
+import { useAppSelector } from "../Store/Features/store";
+import ElementData from "../module_bindings/element_data";
+import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 
 interface IProps {
   activePage: Number;
@@ -22,6 +27,8 @@ interface IProps {
 export const Header = (props: IProps) => {
   const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
+  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   const { setModals } = useContext(ModalContext);
 
@@ -102,6 +109,20 @@ export const Header = (props: IProps) => {
         </AppBar>
       </StyledBox>
       <main>
+      <Dropzone
+            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
+            noClick={true}
+            onDragEnter={() => setisDroppingSelectionMenu(true)}
+            onDragLeave={() => setisDroppingSelectionMenu(false)}
+            onDropAccepted={() => setisDroppingSelectionMenu(false)}
+            onDropRejected={() => setisDroppingSelectionMenu(false)}
+          >
+            {({ getRootProps }) => (
+              <div {...getRootProps()}>
+                <ElementSelectionMenu elementData={elementData} isDropping={isDroppingSelectionMenu} />
+              </div>
+            )}
+        </Dropzone>
         <Outlet />
       </main>
     </>
