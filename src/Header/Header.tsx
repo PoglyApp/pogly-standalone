@@ -14,8 +14,6 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
-import { useAppSelector } from "../Store/Features/store";
-import ElementData from "../module_bindings/element_data";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 
 interface IProps {
@@ -28,7 +26,6 @@ export const Header = (props: IProps) => {
   const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   const { setModals } = useContext(ModalContext);
 
@@ -119,7 +116,7 @@ export const Header = (props: IProps) => {
           >
             {({ getRootProps }) => (
               <div {...getRootProps()}>
-                <ElementSelectionMenu elementData={elementData} isDropping={isDroppingSelectionMenu} />
+                <ElementSelectionMenu isDropping={isDroppingSelectionMenu} />
               </div>
             )}
         </Dropzone>
