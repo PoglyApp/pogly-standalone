@@ -31,6 +31,7 @@ public partial class Module
                 EditorBorder = 200,
                 Authentication = false,
                 StrictMode = false,
+                EditorGuidelines = "Placeholder: Follow Twitch ToS :^)",
                 ConfigInit = false
             }.Insert();
 

@@ -302,7 +302,7 @@ public partial class Module
     }
     
     [SpacetimeDB.Reducer]
-    public static void UpdateTextElementShadow(ReducerContext ctx, uint elementId, string shadow)
+    public static void UpdateTextElementShadow(ReducerContext ctx, uint elementId, string css)
     {
         string func = "UpdateTextElementShadow";
         try
@@ -318,7 +318,7 @@ public partial class Module
             
             var updatedElement = oldElement;
             var updatedTextElement = textElement.TextElement_;
-            updatedTextElement.Shadow = shadow;
+            updatedTextElement.Css = css;
             updatedElement.Element = new ElementStruct.TextElement(updatedTextElement);
 
             Elements.UpdateById(elementId, updatedElement);
@@ -327,7 +327,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {shadow}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
+            Log($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
         }
     }
 

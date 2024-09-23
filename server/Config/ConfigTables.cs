@@ -33,6 +33,7 @@ public partial class Module
         public uint EditorBorder;
         public bool Authentication;
         public bool StrictMode;
+        public string EditorGuidelines;
         public bool ConfigInit;
     }
 
@@ -45,8 +46,8 @@ public partial class Module
         public string Key;
     }
     
-    [SpacetimeDB.Table(Public = false, Scheduled = "AuthenticateDoWork")]
-    public partial struct AuthenticationWorker { }
+    // [SpacetimeDB.Table(Public = false, Scheduled = "AuthenticateDoWork")]
+    // public partial struct AuthenticationWorker { }
     
     [SpacetimeDB.Table(Public = false)]
     public partial struct ZIndex

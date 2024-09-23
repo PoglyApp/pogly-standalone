@@ -4,8 +4,8 @@ import styled from "styled-components";
 import { Outlet, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
 import { SettingsModal } from "../Components/Modals/SettingModals";
-
 import HomeIcon from "@mui/icons-material/Home";
+import SecurityIcon from '@mui/icons-material/Security';
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Toolbar from "@mui/material/Toolbar";
@@ -84,6 +84,7 @@ export const Header = (props: IProps) => {
                   onClick={() => changePage(1, "/canvas")}
                 />
                 <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
+                <StyledGuidelines icon={<SecurityIcon />} iconPosition="start" label="Editor Guidelines" />
               </Tabs>
             </Box>
 
@@ -106,6 +107,11 @@ const StyledBox = styled(Box)`
 const StyledTab = styled(Tab)`
   text-transform: none !important;
 `;
+
+const StyledGuidelines = styled(Tab)`
+  text-transform: none !important;
+  color: #ffa700 !important;
+  `;
 
 const StyledMenuItem = styled(MenuItem)`
   background-color: #001529;
