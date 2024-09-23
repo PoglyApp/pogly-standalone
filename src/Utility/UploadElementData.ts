@@ -95,7 +95,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
               size: e.element.value.size,
               color: e.element.value.color,
               font: e.element.value.font,
-              shadow: e.element.value.shadow,
+              css: e.element.value.css,
             });
             break;
           case "ImageElement":

@@ -202,7 +202,7 @@ export const UserInputHandler = (
                 size: ViewportToStdbFontSize(12).fontSize,
                 color: "#FFFFFF",
                 font: "Roboto",
-                shadow: "",
+                css: "",
               });
 
               insertElement(textElement, activeLayout);

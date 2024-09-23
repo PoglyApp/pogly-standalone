@@ -31,8 +31,8 @@ export const updateTextElement = (elementId: number, elementStruct: ElementStruc
       UpdateTextElementTextReducer.call(elementId, newTextStruct.text);
       break;
 
-    case oldTextStruct.shadow !== newTextStruct.shadow:
-      UpdateTextElementShadowReducer.call(elementId, newTextStruct.shadow);
+    case oldTextStruct.css !== newTextStruct.css:
+      UpdateTextElementShadowReducer.call(elementId, newTextStruct.css);
       break;
   }
 };

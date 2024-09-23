@@ -49,7 +49,7 @@ export const Text = (props: IProp) => {
         transform: props.elements.transform,
         fontFamily: textElement.font,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
-        textShadow: textElement.shadow ? textElement.shadow : "2px 2px #000000",
+        textShadow: textElement.css ? textElement.css : "2px 2px #000000",
       }}
       onDoubleClick={showTextCreationModal}
     >

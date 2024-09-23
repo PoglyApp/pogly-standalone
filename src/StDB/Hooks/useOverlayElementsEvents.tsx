@@ -114,8 +114,8 @@ export const useOverlayElementsEvents = (
           }
 
           // UPDATE SHADOW
-          if (oldTextElement.shadow !== newTextElement.shadow) {
-            component.style.textShadow = newTextElement.shadow;
+          if (oldTextElement.css !== newTextElement.css) {
+            component.style.textShadow = newTextElement.css;
           }
           break;
 

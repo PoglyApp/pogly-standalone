@@ -79,7 +79,7 @@ export const TextCreationModal = (props: IProps) => {
     setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
     setTextColor(textStruct.color);
 
-    const shadowVariables = textStruct.shadow.split(" ");
+    const shadowVariables = textStruct.css.split(" ");
 
     setShadowHeight(shadowVariables[0].replace("px", ""));
     setShadowWidth(shadowVariables[1].replace("px", ""));
@@ -218,7 +218,7 @@ export const TextCreationModal = (props: IProps) => {
       size: ViewportToStdbFontSize(parseInt(fontSize)).fontSize,
       color: textColor,
       font: useFont,
-      shadow: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
+      css: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
     });
 
     if (!props.editElementId) {
