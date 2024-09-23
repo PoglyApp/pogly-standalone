@@ -58,7 +58,6 @@ export const TextCreationModal = (props: IProps) => {
   const [shadowWidth, setShadowWidth] = useState<string>("2");
 
   const [textColor, setTextColor] = useState<string>("#FFFFFF");
-  const [autoUpdate, setAutoUpdate] = useState<boolean>(true);
 
   const [showTextColorPicker, setShowTextColorPicker] = useState<boolean>(false);
   const [showShadowColorPicker, setShowShadowColorPicker] = useState<boolean>(false);
@@ -501,25 +500,6 @@ export const TextCreationModal = (props: IProps) => {
           </DialogContent>
 
           <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-            {props.editElementId && (
-              <FormControlLabel
-                componentsProps={{
-                  typography: { color: "#ffffffa6", width: "84px" },
-                }}
-                control={
-                  <Checkbox
-                    sx={{ color: "#ffffffa6", height: "20px", width: "30px", paddingLeft: "10px", marginLeft: "20px" }}
-                    onChange={() => {
-                      setAutoUpdate((autoUpdate) => !autoUpdate);
-                    }}
-                    defaultChecked={autoUpdate}
-                    value={autoUpdate}
-                  />
-                }
-                label="Live update"
-              />
-            )}
-
             <Button
               variant="outlined"
               sx={{
