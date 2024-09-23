@@ -103,8 +103,6 @@ export const SettingsModal = (props: IProp) => {
         auth !== config.authentication ||
         strictMode !== config.strictMode;
 
-        console.log(doUpdate);
-
         if(doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
     }
 

@@ -37,6 +37,42 @@ public partial class Module
             Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void AddLayoutWithId(ReducerContext ctx, uint id, string name, bool active = false)
+    {
+        string func = "AddLayoutWithId";
+
+        if (ctx.Address is null) return;
+
+        try
+        {
+            if (!GetGuest(func, ctx.Address, out var guest))
+                return;
+            if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
+
+            var newLayout = new Layouts
+            {
+                Id = id,
+                Name = name,
+                CreatedBy = guest.Nickname,
+                Active = active
+            };
+            newLayout.Insert();
+            
+            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
+            if(Config.FindByVersion(0)!.Value.DebugMode) 
+                Log($"[Layouts - {func}] {guest.Nickname} added layout {name}!");
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateLayoutName(ReducerContext ctx, uint layoutId, string name)

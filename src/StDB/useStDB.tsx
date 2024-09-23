@@ -69,6 +69,9 @@ import UpdateTextElementShadowReducer from "../module_bindings/update_text_eleme
 import AddElementDataArrayReducer from "../module_bindings/add_element_data_array_reducer";
 import UpdateConfigReducer from "../module_bindings/update_config_reducer";
 import UpdateEditorGuidelinesReducer from "../module_bindings/update_editor_guidelines_reducer";
+import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
+import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
+import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_data_array_with_id_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -95,7 +98,9 @@ const useStDB = (
       UpdateGuestSelectedElementReducer,
       UpdateGuestPositionReducer,
       AddElementDataReducer,
+      AddElementDataWithIdReducer,
       AddElementDataArrayReducer,
+      AddElementDataArrayWithIdReducer,
       UpdateElementDataReducer,
       UpdateElementDataNameReducer,
       UpdateElementDataDataReducer,
@@ -137,6 +142,7 @@ const useStDB = (
       SetIdentityPermissionModeratorReducer,
       ClearIdentityPermissionReducer,
       AddLayoutReducer,
+      AddLayoutWithIdReducer,
       UpdateLayoutNameReducer,
       SetLayoutActiveReducer,
       DeleteLayoutReducer,
