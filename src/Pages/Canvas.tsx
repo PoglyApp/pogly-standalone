@@ -40,6 +40,9 @@ import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import Permissions from "../module_bindings/permissions";
+import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 
 interface IProps {
   setActivePage: Function;
@@ -49,10 +52,13 @@ interface IProps {
 }
 
 export const Canvas = (props: IProps) => {
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { setModals } = useContext(ModalContext);
   const { settings } = useContext(SettingsContext);
+  const { Identity } = useSpacetimeContext();
+  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -76,6 +82,15 @@ export const Canvas = (props: IProps) => {
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
+    const initGuidelineAccept = () => {
+      if(isOverlay) return true;
+      if(permission && permission.tag === "Owner") return true;
+      if(localStorage.getItem("Accept_EditorGuidelines")) return true;
+      return false;
+  };
+
+  const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
+  
   useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
@@ -160,6 +175,11 @@ export const Canvas = (props: IProps) => {
         clearSettings={false}
       />
     );
+  }
+
+  if (!acceptedGuidelines) { 
+    DebugLogger("Guest has not accepted guidelines");
+      return ( <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} /> );
   }
 
   return (

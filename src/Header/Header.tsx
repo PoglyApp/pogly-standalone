@@ -11,6 +11,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Toolbar from "@mui/material/Toolbar";
 import { ModalContext } from "../Contexts/ModalContext";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 
 interface IProps {
   activePage: Number;
@@ -40,6 +41,14 @@ export const Header = (props: IProps) => {
       <SettingsModal key="settings_modal" onlineVersion={props.onlineVersion} />,
     ]);
   };
+
+  const showEditorGuidelines = () => {
+    DebugLogger("Opening editor guidelines modal");
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <EditorGuidelineModal key="guideline_modal" />,
+    ]);
+  }
 
   if (isOverlay) {
     return (
@@ -84,7 +93,7 @@ export const Header = (props: IProps) => {
                   onClick={() => changePage(1, "/canvas")}
                 />
                 <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
-                <StyledGuidelines icon={<SecurityIcon />} iconPosition="start" label="Editor Guidelines" />
+                <StyledGuidelines icon={<SecurityIcon />} iconPosition="start" label="Editor Guidelines" onClick={showEditorGuidelines} />
               </Tabs>
             </Box>
 
@@ -110,7 +119,7 @@ const StyledTab = styled(Tab)`
 
 const StyledGuidelines = styled(Tab)`
   text-transform: none !important;
-  color: #ffa700 !important;
+  color: #e6b559 !important;
   `;
 
 const StyledMenuItem = styled(MenuItem)`

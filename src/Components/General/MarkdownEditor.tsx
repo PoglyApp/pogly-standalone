@@ -34,6 +34,7 @@ export const MarkdownEditor = (props: IProps) => {
         view={{ menu: true, md: true, html: false }}
         canView={{ menu: true, md: true, html: false, fullScreen: false, hideMenu: false, both: false }}
         onImageUpload={() => console.log("test")}
+        defaultValue={props.text}
       />
     </EditorContainer>
   );
