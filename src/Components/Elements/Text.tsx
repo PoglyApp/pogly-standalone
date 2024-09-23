@@ -5,6 +5,7 @@ import TextElement from "../../module_bindings/text_element";
 import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import Markdown from "react-markdown";
 
 interface IProp {
   elements: Elements;
@@ -53,7 +54,7 @@ export const Text = (props: IProp) => {
       }}
       onDoubleClick={showTextCreationModal}
     >
-      {textElement.text}
+      <Markdown>{textElement.text}</Markdown>
     </div>
   );
 };

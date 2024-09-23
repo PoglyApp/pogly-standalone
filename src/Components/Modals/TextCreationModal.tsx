@@ -14,6 +14,9 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
+  AccordionDetails,
+  AccordionSummary,
+  Accordion,
 } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import ElementStruct from "../../module_bindings/element_struct";
@@ -31,8 +34,8 @@ import { GetFontFamily } from "../../Utility/GetFontFamily";
 import { DebugLogger } from "../../Utility/DebugLogger";
 
 import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { MarkdownEditor } from "../General/MarkdownEditor";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface IProps {
   editElementId?: number;
@@ -132,23 +135,23 @@ export const TextCreationModal = (props: IProps) => {
     setCustomFont(newFont);
   };
 
-  const handleFontSizeChange = (size: any) => {
+  const handleFontSizeChange = (newFontSize: any) => {
     DebugLogger("Font size updated");
     const regex = new RegExp("^[0-9]+$");
 
-    if (size.length < 1) {
+    if (newFontSize.length < 1) {
       DebugLogger("Font field empty");
       setFontSize("");
       return setError("Font size cannot be blank.");
     }
 
-    if (!regex.test(size)) {
+    if (!regex.test(newFontSize)) {
       DebugLogger("Font size not a number");
       setFontSize("");
       return setError("Font size has to be a number.");
     }
 
-    setFontSize(size);
+    setFontSize(newFontSize);
     setError("");
   };
 
@@ -176,23 +179,26 @@ export const TextCreationModal = (props: IProps) => {
     setShadowColor(color);
   };
 
-  const handleShadowSizeChange = (size: any, height: boolean) => {
+  const handleShadowSizeChange = (newShadowSize: any, height: boolean) => {
     const regex = new RegExp("^[0-9]+$");
 
-    if (size.length < 1) {
+    if (newShadowSize.length < 1) {
       DebugLogger("Shadow field size empty");
-      setFontSize("");
+      if (height) setShadowHeight("");
+      else setShadowWidth("");
+
       return setError("Shadow size field cannot be blank.");
     }
 
-    if (!regex.test(size)) {
+    if (!regex.test(newShadowSize)) {
       DebugLogger("Shadow size not a number");
-      setFontSize("");
+      if (height) setShadowHeight("");
+      else setShadowWidth("");
       return;
     }
 
-    if (height) setShadowHeight(size);
-    else setShadowWidth(size);
+    if (height) setShadowHeight(newShadowSize);
+    else setShadowWidth(newShadowSize);
   };
 
   const handleOnClose = () => {
@@ -237,273 +243,251 @@ export const TextCreationModal = (props: IProps) => {
   return (
     <>
       {showModal && (
-        <Dialog open={true} onClose={handleOnClose} sx={{ "* > .MuiPaper-root": { overflow: "visible" } }}>
+        <Dialog
+          open={true}
+          onClose={handleOnClose}
+          sx={{ "* > .MuiPaper-root": { overflow: "visible", minWidth: "500px !important" } }}
+        >
           <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
             {props.editElementId ? "Edit text" : "Add text"}
           </DialogTitle>
           <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
-            <Markdown>{text}</Markdown>
-            <MarkdownEditor text={text} setText={handleTextChange} />
-          </DialogContent>
+            <Typography variant="h6" color="#ffffffa6">
+              Text preview
+            </Typography>
+            <PreviewContainer
+              style={{
+                color: textColor,
+                fontSize: fontSize ? ViewportToStdbFontSize(parseInt(fontSize)).fontSize : 1,
+                fontFamily: !useCustomFont ? selectedFont : "inherit",
+                textShadow: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
+              }}
+            >
+              <Markdown>{text}</Markdown>
+            </PreviewContainer>
 
-          <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-            {props.editElementId && (
-              <FormControlLabel
-                componentsProps={{
-                  typography: { color: "#ffffffa6", width: "84px" },
+            {useCustomFont && (
+              <Alert
+                variant="filled"
+                severity="warning"
+                sx={{
+                  backgroundColor: "#f57c00 !important",
+                  color: "#212121",
+                  marginTop: "15px",
+                  marginBottom: "15px",
                 }}
-                control={
-                  <Checkbox
-                    sx={{ color: "#ffffffa6", height: "20px", width: "30px", paddingLeft: "10px", marginLeft: "20px" }}
-                    onChange={() => {
-                      setAutoUpdate((autoUpdate) => !autoUpdate);
-                    }}
-                    defaultChecked={autoUpdate}
-                    value={autoUpdate}
-                  />
-                }
-                label="Live update"
-              />
+              >
+                Custom fonts cannot be previewed.
+              </Alert>
             )}
 
-            <Button
-              variant="outlined"
-              sx={{
-                color: "#ffffffa6",
-                borderColor: "#ffffffa6",
-                "&:hover": { borderColor: "white" },
-              }}
-              onClick={handleOnClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={
-                text === "" ||
-                fontSize === "" ||
-                textColor === "" ||
-                shadowColor === "" ||
-                shadowHeight === "" ||
-                shadowWidth === "" ||
-                error !== ""
-                  ? true
-                  : false
-              }
-              variant="outlined"
-              sx={{
-                color: "#ffffffa6",
-                borderColor: "#ffffffa6",
-                "&:hover": { borderColor: "white" },
-                "&:disabled": {
-                  borderColor: "gray",
-                  color: "gray",
-                },
-              }}
-              onClick={() => {
-                handleSave(true);
-              }}
-            >
-              {props.editElementId ? "Edit" : "Add"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
-    </>
-  );
-};
+            <MarkdownEditor text={text} setText={handleTextChange} style={{ marginBottom: "15px" }} />
 
-const StyledColorInput = styled.input`
-  width: 100%;
-  padding: 6px;
-  box-sizing: border-box;
-  background-color: #0a2a47;
-  color: #b0bec5;
-  border: 1px solid #ffffffa6;
-  border-width: 2px;
-  border-radius: 5px;
-`;
-
-const ColorBox = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 2px solid #ffffffa6;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-`;
-
-const Popover = styled.div`
-  position: absolute;
-  z-index: 2;
-`;
-
-const Cover = styled.div`
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-`;
-
-/* 
-
-    <>
-      {showModal && (
-        <Dialog open={true} onClose={handleOnClose} sx={{ "* > .MuiPaper-root": { overflow: "visible" } }}>
-          <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
-            {props.editElementId ? "Edit text" : "Add text"}
-          </DialogTitle>
-          <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
-            <FormGroup sx={{ gap: "20px" }}>
-              <StyledInput
-                focused={true}
-                label="Text"
-                color="#ffffffa6"
-                onChange={(text: any) => handleTextChange(text)}
-                defaultValue={text}
-              />
-
-              <FormControl fullWidth sx={{ "&:hover": { borderColor: "#ffffffa6 !important" } }}>
-                {!useCustomFont ? (
-                  <>
-                    <InputLabel id="fontSelectLabel" sx={{ color: "#ffffffa6" }}>
-                      Font
-                    </InputLabel>
-                    <Select
-                      labelId="fontSelectLabel"
-                      id="fontSelectLabel"
-                      value={selectedFont}
-                      label="Font"
-                      onChange={(event) => setSelectedFont(event.target.value)}
-                      variant="outlined"
-                      sx={{
-                        "label + &": { color: "#ffffffa6" },
-                        ".MuiOutlinedInput-notchedOutline ": { borderColor: "#ffffffa6", borderWidth: "2px" },
-                        ".MuiSvgIcon-root": { fill: "#ffffffa6" },
-                        "&:hover": {
-                          "&& fieldset": {
-                            borderColor: "#ffffffa6",
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+                sx={{
+                  color: "#ffffffa6",
+                  backgroundColor: "#001529 !important",
+                }}
+              >
+                <span style={{ lineHeight: 1.5, fontSize: "15px" }}>General settings</span>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  backgroundColor: "#000c17",
+                  paddingBottom: "0px",
+                  paddingTop: "15px",
+                  maxHeight: "800px",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  "::-webkit-scrollbar": { width: "0", background: "transparent" },
+                  "> *": {
+                    marginBottom: "20px",
+                  },
+                }}
+              >
+                <FormControl
+                  fullWidth
+                  sx={{ "&:hover": { borderColor: "#ffffffa6 !important" }, marginBottom: "15px" }}
+                >
+                  {!useCustomFont ? (
+                    <>
+                      <InputLabel id="fontSelectLabel" sx={{ color: "#ffffffa6" }}>
+                        Font
+                      </InputLabel>
+                      <Select
+                        labelId="fontSelectLabel"
+                        id="fontSelectLabel"
+                        value={selectedFont}
+                        label="Font"
+                        onChange={(event) => setSelectedFont(event.target.value)}
+                        variant="outlined"
+                        sx={{
+                          "label + &": { color: "#ffffffa6" },
+                          ".MuiOutlinedInput-notchedOutline ": { borderColor: "#ffffffa6", borderWidth: "2px" },
+                          ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+                          "&:hover": {
+                            "&& fieldset": {
+                              borderColor: "#ffffffa6",
+                            },
                           },
-                        },
-                      }}
-                    >
-                      {fonts.map((_font: string) => {
-                        return (
-                          <MenuItem key={_font} value={_font}>
-                            {_font}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </>
-                ) : (
-                  <StyledInput
-                    focused={false}
-                    label="Font URL"
-                    color="#ffffffa6"
-                    defaultValue={customFont}
-                    onChange={(text: any) => handleCustomFontChange(text)}
-                  />
-                )}
-
-                <FormControlLabel
-                  componentsProps={{
-                    typography: { color: "#ffffffa6" },
-                  }}
-                  control={
-                    <Checkbox
-                      onChange={() => setUseCustomFont(!useCustomFont)}
-                      checked={useCustomFont}
-                      sx={{ color: "#ffffffa6" }}
+                          width: "150px",
+                        }}
+                      >
+                        {fonts.map((_font: string) => {
+                          return (
+                            <MenuItem key={_font} value={_font}>
+                              {_font}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </>
+                  ) : (
+                    <StyledInput
+                      focused={false}
+                      label="Font URL"
+                      color="#ffffffa6"
+                      defaultValue={customFont}
+                      onChange={(text: any) => handleCustomFontChange(text)}
+                      style={{ width: "210px" }}
                     />
-                  }
-                  label="Use custom font"
-                />
-              </FormControl>
+                  )}
 
-              <StyledInput
-                focused={false}
-                label="Font size"
-                color="#ffffffa6"
-                onChange={(text: any) => handleFontSizeChange(text)}
-                defaultValue={fontSize}
-              />
+                  <FormControlLabel
+                    componentsProps={{
+                      typography: { color: "#ffffffa6" },
+                    }}
+                    control={
+                      <Checkbox
+                        onChange={() => setUseCustomFont(!useCustomFont)}
+                        checked={useCustomFont}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Use custom font"
+                  />
+                </FormControl>
 
-              <div style={{ display: "flex" }}>
-                <ColorBox
-                  color={textColor}
-                  onClick={() => setShowTextColorPicker(!showTextColorPicker)}
-                  style={{ backgroundColor: textColor, marginRight: "10px" }}
+                <StyledInput
+                  focused={false}
+                  label="Font size"
+                  color="#ffffffa6"
+                  onChange={(text: any) => handleFontSizeChange(text)}
+                  defaultValue={fontSize}
                 />
-                <div>
-                  <Typography variant="subtitle2" color="#ffffffa6">
-                    Color
-                  </Typography>
-                  <StyledColorInput
-                    type="text"
-                    name="variableValue"
-                    value={textColor}
-                    onChange={(event) => handleTextColorChange(event.target.value)}
-                  />
-                </div>
-                {showTextColorPicker && (
-                  <Popover>
-                    <Cover onClick={() => setShowTextColorPicker(!showTextColorPicker)} />
-                    <HexColorPicker color={textColor} onChange={(color) => handleTextColorChange(color)} />
-                  </Popover>
-                )}
-              </div>
 
-              <div style={{ display: "flex" }}>
-                <ColorBox
-                  color={shadowColor}
-                  onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
-                  style={{ backgroundColor: shadowColor, marginRight: "10px" }}
-                />
-                <div>
-                  <Typography variant="subtitle2" color="#ffffffa6">
-                    Color
-                  </Typography>
-                  <StyledColorInput
-                    type="text"
-                    name="variableValue"
-                    value={shadowColor}
-                    onChange={(event) => handleShadowColorChange(event.target.value)}
-                    style={{ maxWidth: "80px", marginRight: "8px" }}
+                <div style={{ display: "flex" }}>
+                  <ColorBox
+                    color={textColor}
+                    onClick={() => setShowTextColorPicker(!showTextColorPicker)}
+                    style={{ backgroundColor: textColor, marginRight: "10px" }}
                   />
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Color
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      value={textColor}
+                      onChange={(event) => handleTextColorChange(event.target.value)}
+                    />
+                  </div>
+                  {showTextColorPicker && (
+                    <Popover>
+                      <Cover onClick={() => setShowTextColorPicker(!showTextColorPicker)} />
+                      <HexColorPicker color={textColor} onChange={(color) => handleTextColorChange(color)} />
+                    </Popover>
+                  )}
                 </div>
-                <div>
-                  <Typography variant="subtitle2" color="#ffffffa6">
-                    Height
-                  </Typography>
-                  <StyledColorInput
-                    type="text"
-                    name="variableValue"
-                    value={shadowHeight}
-                    onChange={(event) => handleShadowSizeChange(event.target.value, true)}
-                    style={{ maxWidth: "50px", marginRight: "8px" }}
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+                sx={{
+                  color: "#ffffffa6",
+                  backgroundColor: "#001529 !important",
+                }}
+              >
+                <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Styling</span>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  backgroundColor: "#000c17",
+                  paddingBottom: "0px",
+                  paddingTop: "15px",
+                  maxHeight: "800px",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  "::-webkit-scrollbar": { width: "0", background: "transparent" },
+                  "> *": {
+                    marginBottom: "20px",
+                  },
+                }}
+              >
+                <Typography variant="subtitle1" color="#ffffffa6" marginBottom={1}>
+                  Text Shadow
+                </Typography>
+
+                <div style={{ display: "flex" }}>
+                  <ColorBox
+                    color={shadowColor}
+                    onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
+                    style={{ backgroundColor: shadowColor, marginRight: "10px" }}
                   />
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Color
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      value={shadowColor}
+                      onChange={(event) => handleShadowColorChange(event.target.value)}
+                      style={{ maxWidth: "80px", marginRight: "8px" }}
+                    />
+                  </div>
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Height
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      defaultValue={shadowHeight}
+                      onChange={(event) => handleShadowSizeChange(event.target.value, true)}
+                      style={{ maxWidth: "50px", marginRight: "8px" }}
+                    />
+                  </div>
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Width
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      defaultValue={shadowWidth}
+                      onChange={(event) => handleShadowSizeChange(event.target.value, false)}
+                      style={{ maxWidth: "50px" }}
+                    />
+                  </div>
+                  {showShadowColorPicker && (
+                    <Popover>
+                      <Cover onClick={() => setShowShadowColorPicker(!showShadowColorPicker)} />
+                      <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
+                    </Popover>
+                  )}
                 </div>
-                <div>
-                  <Typography variant="subtitle2" color="#ffffffa6">
-                    Width
-                  </Typography>
-                  <StyledColorInput
-                    type="text"
-                    name="variableValue"
-                    value={shadowWidth}
-                    onChange={(event) => handleShadowSizeChange(event.target.value, false)}
-                    style={{ maxWidth: "50px" }}
-                  />
-                </div>
-                {showShadowColorPicker && (
-                  <Popover>
-                    <Cover onClick={() => setShowShadowColorPicker(!showShadowColorPicker)} />
-                    <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
-                  </Popover>
-                )}
-              </div>
-            </FormGroup>
+              </AccordionDetails>
+            </Accordion>
 
             {error !== "" && (
               <Alert
@@ -579,4 +563,55 @@ const Cover = styled.div`
         </Dialog>
       )}
     </>
-*/
+  );
+};
+
+const StyledColorInput = styled.input`
+  width: 145px;
+  padding: 6px;
+  box-sizing: border-box;
+  background-color: #000c17;
+  color: #b0bec5;
+  border: 1px solid #ffffffa6;
+  border-width: 2px;
+  border-radius: 5px;
+`;
+
+const ColorBox = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ffffffa6;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+`;
+
+const Popover = styled.div`
+  position: absolute;
+  z-index: 2;
+`;
+
+const Cover = styled.div`
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+`;
+
+const PreviewContainer = styled.div`
+  background-color: #063053;
+  color: #ffffffa6;
+
+  padding: 5px;
+  margin-bottom: 15px;
+
+  max-height: 300px;
+  overflow: auto;
+
+  border: 3px solid #001529;
+
+  > * {
+    margin: 0 !important;
+  }
+`;
