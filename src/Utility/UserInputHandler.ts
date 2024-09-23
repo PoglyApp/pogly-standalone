@@ -16,11 +16,13 @@ import {
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
+import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 
 export const UserInputHandler = (
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
-  compressPaste: boolean | undefined
+  compressPaste: boolean | undefined,
+  transformRef: ReactZoomPanPinchRef | null
 ): any => {
   const userInputs = [];
 
@@ -492,6 +494,80 @@ export const UserInputHandler = (
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - UP / W
+  userInputs.push({
+    name: "canvasUp",
+    keys: "w",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed w");
+      event.preventDefault();
+
+      try {
+        if(!transformRef) return;
+        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX,transformRef.instance.transformState.positionY+15);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - DOWN / S
+  userInputs.push({
+    name: "canvasDown",
+    keys: "s",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed s");
+      event.preventDefault();
+
+      try {
+        if(!transformRef) return;
+        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX,transformRef.instance.transformState.positionY-15);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas down!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - LEFT / A
+  userInputs.push({
+    name: "canvasLeft",
+    keys: "a",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed a");
+      event.preventDefault();
+
+      try {
+        if(!transformRef) return;
+        console.log(transformRef);
+        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX+15,transformRef.instance.transformState.positionY);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - RIGHT / D
+  userInputs.push({
+    name: "canvasRight",
+    keys: "d",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed d");
+      event.preventDefault();
+
+      try {
+        if(!transformRef) return;
+        console.log(transformRef);
+        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX-15,transformRef.instance.transformState.positionY);
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
       }
     },
   });
