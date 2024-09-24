@@ -12,7 +12,7 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
-import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
+import { ConvertCSSToCanvas, StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
@@ -150,7 +150,7 @@ export const useElementsEvents = (
 
           // UPDATE SHADOW
           if (oldTextElement.css !== newTextElement.css) {
-            component.style.textShadow = newTextElement.css;
+            component.style.textShadow = ConvertCSSToCanvas(newTextElement.css);
           }
 
           break;

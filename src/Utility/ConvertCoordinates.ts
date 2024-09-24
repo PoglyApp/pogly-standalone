@@ -184,3 +184,9 @@ export const InRenderBounds = (element: Elements) => {
     
   return visible;
 }
+
+export const ConvertCSSToCanvas = (input: string) => {
+  return input.replace(/\b\d+(\.\d+)?px\b/g, (match) => {
+    return (parseFloat(match) / 4).toString() + "px";
+  }); 
+}

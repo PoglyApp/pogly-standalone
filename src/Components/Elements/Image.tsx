@@ -7,11 +7,10 @@ import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
-import { convertBinaryToDataURI, convertBinaryToRaw } from "../../Utility/ImageConversion";
+import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProp {
   elements: Elements;
-  isOverlay?: Boolean;
 }
 
 export const Image = (props: IProp) => {

@@ -1,4 +1,3 @@
-import AddElementReducer from "../../../module_bindings/add_element_reducer";
 import AddElementToLayoutReducer from "../../../module_bindings/add_element_to_layout_reducer";
 import DataType from "../../../module_bindings/data_type";
 import ElementStruct from "../../../module_bindings/element_struct";

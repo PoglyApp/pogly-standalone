@@ -9,7 +9,6 @@ import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 
 interface IProp {
   elements: Elements;
-  isOverlay?: Boolean;
 }
 
 export const Widget = (props: IProp) => {

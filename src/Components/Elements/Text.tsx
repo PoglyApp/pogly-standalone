@@ -6,6 +6,7 @@ import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
+import { ConvertCSSToCanvas } from "../../Utility/ConvertCoordinates";
 
 interface IProp {
   elements: Elements;
@@ -35,6 +36,9 @@ export const Text = (props: IProp) => {
     ]);
   };
 
+  const converted = ConvertCSSToCanvas(textElement.css);
+  console.log(textElement.css, converted);
+
   return (
     <div
       id={props.elements.id.toString()}
@@ -50,7 +54,7 @@ export const Text = (props: IProp) => {
         transform: props.elements.transform,
         fontFamily: textElement.font,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
-        textShadow: textElement.css ? textElement.css : "2px 2px #000000",
+        textShadow: textElement.css ? (!isOverlay ? converted : textElement.css) : "",
       }}
       onDoubleClick={showTextCreationModal}
     >
