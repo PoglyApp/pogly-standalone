@@ -20,6 +20,8 @@ export const Text = (props: IProp) => {
   const textElement: TextElement = props.elements.element.value as TextElement;
   const targetRef = useRef<HTMLDivElement>(null);
 
+  const converted = ConvertCSSToCanvas(textElement.css);
+
   useEffect(() => {
     DebugLogger("Creating text");
     try {
@@ -35,9 +37,6 @@ export const Text = (props: IProp) => {
       <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />,
     ]);
   };
-
-  const converted = ConvertCSSToCanvas(textElement.css);
-  console.log(textElement.css, converted);
 
   return (
     <div
