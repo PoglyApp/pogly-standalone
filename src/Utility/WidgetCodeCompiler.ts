@@ -18,7 +18,7 @@ export const WidgetCodeCompiler = (elementDataId?: number, rawData?: string) => 
   const headerTag: string = `<head>${widgetData.headerTag} <style>${widgetData.styleTag}</style> </head>`;
   const bodyTag: string = `<body>${widgetData.bodyTag} <script>${widgetData.scriptTag}</script> </body>`;
 
-  let htmlTag: string = `<!DOCTYPE html> <html>${headerTag} ${bodyTag}</html>`;
+  let htmlTag: string = `${headerTag} ${bodyTag}`;
 
   if (widgetData.variables && widgetData.variables.length !== 0) {
     widgetData.variables.forEach((variable: any) => {

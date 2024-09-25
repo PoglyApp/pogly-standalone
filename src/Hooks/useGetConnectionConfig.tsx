@@ -3,8 +3,10 @@ import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useGetConnectionConfig = (setConnectionConfig: Function) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const isWidget: Boolean = window.location.href.includes("/widget");
 
   useEffect(() => {
+    if(isWidget) return;
     DebugLogger("Getting connection config");
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -27,5 +29,5 @@ export const useGetConnectionConfig = (setConnectionConfig: Function) => {
           remember: true,
         });
     }
-  }, [isOverlay, setConnectionConfig]);
+  }, [isOverlay, setConnectionConfig, isWidget]);
 };

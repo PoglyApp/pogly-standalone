@@ -32,6 +32,7 @@ import { LayoutContext } from "./Contexts/LayoutContext";
 import ConnectReducer from "./module_bindings/connect_reducer";
 import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 import { DebugLogger } from "./Utility/DebugLogger";
+import { WidgetPage } from "./Pages/Widget";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -39,6 +40,7 @@ export const App: React.FC = () => {
   const [versionNumber, setVersionNumber] = useState<string>("");
   const [activePage, setActivePage] = useState<Number>(0);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const isWidget: Boolean = window.location.href.includes("/widget");
 
   // CANVAS
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -88,6 +90,7 @@ export const App: React.FC = () => {
   );
 
   useEffect(() => {
+    if (isWidget) return;
     if (!stdbInitialized) return;
     if (!spacetime.Identity) return;
     if (!spacetime.Address) return;
@@ -116,18 +119,20 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client, spacetime.Runtime]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client, spacetime.Runtime, isWidget]);
 
   useEffect(() => {
+    if (isWidget) return;
     DebugLogger("Setting SpacetimeDB authenticated ref");
     stdbAuthenticatedRef.current = stdbAuthenticated;
-  }, [stdbAuthenticated]);
+  }, [stdbAuthenticated, isWidget]);
 
   useEffect(() => {
+    if (isWidget) return;
     if (!stdbInitialized) return;
     DebugLogger("Setting active layout");
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
-  }, [activeLayout, stdbInitialized]);
+  }, [activeLayout, stdbInitialized, isWidget]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -149,10 +154,15 @@ export const App: React.FC = () => {
           }
         />
         <Route path="overlay" element={<Overlay disconnected={spacetime.Disconnected} />} />
+        <Route path="widget" element={<WidgetPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     )
   );
+
+  if (isWidget) {
+    return (<RouterProvider router={router} />);
+  }
 
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {

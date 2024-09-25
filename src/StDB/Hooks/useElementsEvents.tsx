@@ -173,7 +173,7 @@ export const useElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
+            component.children[0].setAttribute("src", window.location + "widget?b64=" + btoa(encodeURIComponent(htmlTag)));
           }
           break;
       }

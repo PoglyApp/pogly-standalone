@@ -25,6 +25,7 @@ interface IProps {
 export const Header = (props: IProps) => {
   const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const isWidget: Boolean = window.location.href.includes("/widget");
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 
   const { setModals } = useContext(ModalContext);
@@ -55,6 +56,14 @@ export const Header = (props: IProps) => {
   }
 
   if (isOverlay) {
+    return (
+      <main>
+        <Outlet />
+      </main>
+    );
+  }
+
+  if (isWidget) {
     return (
       <main>
         <Outlet />

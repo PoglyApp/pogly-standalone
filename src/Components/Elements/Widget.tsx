@@ -28,7 +28,8 @@ export const Widget = (props: IProp) => {
 
       DebugLogger("Creating widget");
 
-      setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
+      //setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
+      setIframeSrc(window.location.origin + "/widget?b64=" + btoa(encodeURIComponent(htmlCode)));
     } catch (error) {
       console.log("ERROR WHILE SPAWNING WIDGET", error);
     }
