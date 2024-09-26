@@ -59,6 +59,7 @@ For assistance with setting up Pogly, we are available in our [Discord](https://
 
 ## Used by
 
+<a href="https://www.twitch.tv/EMIRU" rel="noreferrer" target="_blank" title="Emiru"><img src="./images/streamers/emiru.svg" /></a>
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
 <a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
