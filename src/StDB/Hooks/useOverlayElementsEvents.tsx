@@ -12,7 +12,8 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { ConvertCSSToCanvas, InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -113,9 +114,16 @@ export const useOverlayElementsEvents = (
             }
           }
 
-          // UPDATE SHADOW
+          // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
-            component.style.textShadow = newTextElement.css;
+            const css = JSON.parse(newTextElement.css);
+            const customCss = parseCustomCss(css.custom);
+
+            component.style.textShadow = ConvertCSSToCanvas(css.shadow);
+
+            Object.keys(customCss).forEach((styleKey: any) => {
+              component.style[styleKey] = customCss[styleKey];
+            });
           }
           break;
 
@@ -144,14 +152,12 @@ export const useOverlayElementsEvents = (
 
       // UPDATE TRANSFORM
       if (oldElement.transform !== newElement.transform) {
-        if(InRenderBounds(newElement)) {
-          component.style.setProperty("display","block");
+        if (InRenderBounds(newElement)) {
+          component.style.setProperty("display", "block");
           component.style.setProperty("transform", newElement.transform);
+        } else {
+          component.style.setProperty("display", "none");
         }
-        else {
-          component.style.setProperty("display","none");
-        }
-
       }
 
       // UPDATE RESIZE

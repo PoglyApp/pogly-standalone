@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import Elements from "../../module_bindings/elements";
 import TextElement from "../../module_bindings/text_element";
@@ -7,6 +7,7 @@ import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
 import { ConvertCSSToCanvas } from "../../Utility/ConvertCoordinates";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 interface IProp {
   elements: Elements;
@@ -20,7 +21,17 @@ export const Text = (props: IProp) => {
   const textElement: TextElement = props.elements.element.value as TextElement;
   const targetRef = useRef<HTMLDivElement>(null);
 
-  const converted = ConvertCSSToCanvas(textElement.css);
+  const [textShadow, setTextShadow] = useState<string>("");
+  const [customCss, setCustomCss] = useState<object>();
+
+  useEffect(() => {
+    if (!textElement.css && !isOverlay) return;
+
+    const css = JSON.parse(textElement.css);
+
+    setTextShadow(ConvertCSSToCanvas(css.shadow));
+    setCustomCss(parseCustomCss(css.custom));
+  }, [textElement]);
 
   useEffect(() => {
     DebugLogger("Creating text");
@@ -53,7 +64,8 @@ export const Text = (props: IProp) => {
         transform: props.elements.transform,
         fontFamily: textElement.font,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
-        textShadow: textElement.css ? (!isOverlay ? converted : textElement.css) : "",
+        textShadow: textShadow,
+        ...customCss,
       }}
       onDoubleClick={showTextCreationModal}
     >

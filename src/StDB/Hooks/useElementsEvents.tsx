@@ -19,6 +19,7 @@ import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -148,9 +149,16 @@ export const useElementsEvents = (
             }
           }
 
-          // UPDATE SHADOW
+          // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
-            component.style.textShadow = ConvertCSSToCanvas(newTextElement.css);
+            const css = JSON.parse(newTextElement.css);
+            const customCss = parseCustomCss(css.custom);
+
+            component.style.textShadow = ConvertCSSToCanvas(css.shadow);
+
+            Object.keys(customCss).forEach((styleKey: any) => {
+              component.style[styleKey] = customCss[styleKey];
+            });
           }
 
           break;
@@ -173,7 +181,10 @@ export const useElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("src", window.location + "widget?b64=" + btoa(encodeURIComponent(htmlTag)));
+            component.children[0].setAttribute(
+              "src",
+              window.location + "widget?b64=" + btoa(encodeURIComponent(htmlTag))
+            );
           }
           break;
       }

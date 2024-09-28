@@ -36,12 +36,21 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 interface IProps {
   editElementId?: number;
 }
 
 const fonts = ["Roboto", "Tiny5", "Lato", "Ubuntu", "Merriweather", "Bebas Neue", "Anton"];
+
+const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
+  highlight(input, language, languageString)
+    .split("\n")
+    .map((line, i) => `<span class='editorLineNumber'>${i + 1}</span>${line}`)
+    .join("\n");
 
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -53,14 +62,18 @@ export const TextCreationModal = (props: IProps) => {
   const [useCustomFont, setUseCustomFont] = useState<boolean>(false);
   const [customFont, setCustomFont] = useState<string>("");
   const [fontSize, setFontSize] = useState<string>("12");
+
   const [shadowColor, setShadowColor] = useState<string>("#000000");
   const [shadowHeight, setShadowHeight] = useState<string>("2");
   const [shadowWidth, setShadowWidth] = useState<string>("2");
+  const [shadowBlur, setShadowBlur] = useState<string>("0");
 
   const [textColor, setTextColor] = useState<string>("#FFFFFF");
 
   const [showTextColorPicker, setShowTextColorPicker] = useState<boolean>(false);
   const [showShadowColorPicker, setShowShadowColorPicker] = useState<boolean>(false);
+
+  const [customCss, setCustomCss] = useState<string>("");
 
   const [error, setError] = useState<string>("");
 
@@ -81,11 +94,16 @@ export const TextCreationModal = (props: IProps) => {
     setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
     setTextColor(textStruct.color);
 
-    const shadowVariables = textStruct.css.split(" ");
+    const css = JSON.parse(textStruct.css);
+
+    const shadowVariables = css.shadow.split(" ");
 
     setShadowHeight(shadowVariables[0].replace("px", ""));
     setShadowWidth(shadowVariables[1].replace("px", ""));
-    setShadowColor(shadowVariables[2]);
+    setShadowWidth(shadowVariables[2].replace("px", ""));
+    setShadowColor(shadowVariables[3]);
+
+    setCustomCss(css.custom);
 
     try {
       DebugLogger("Using custom font");
@@ -193,11 +211,30 @@ export const TextCreationModal = (props: IProps) => {
       DebugLogger("Shadow size not a number");
       if (height) setShadowHeight("");
       else setShadowWidth("");
-      return;
+      return setError("Shadow size has to be a number.");
     }
 
     if (height) setShadowHeight(newShadowSize);
     else setShadowWidth(newShadowSize);
+
+    setError("");
+  };
+
+  const handleShadowBlurChange = (newBlur: any) => {
+    const regex = new RegExp("^[0-9]+$");
+
+    if (newBlur.length < 1) {
+      DebugLogger("Blur field size empty");
+      return setError("Blur size cannot be blank.");
+    }
+
+    if (!regex.test(newBlur)) {
+      DebugLogger("Blur size not a number");
+      return setError("Shadow blur has to be a number.");
+    }
+
+    setError("");
+    setShadowBlur(newBlur);
   };
 
   const handleOnClose = () => {
@@ -223,7 +260,10 @@ export const TextCreationModal = (props: IProps) => {
       size: ViewportToStdbFontSize(parseInt(fontSize)).fontSize,
       color: textColor,
       font: useFont,
-      css: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
+      css: JSON.stringify({
+        shadow: `${shadowHeight}px ${shadowWidth}px ${shadowBlur}px ${shadowColor}`,
+        custom: customCss,
+      }),
     });
 
     if (!props.editElementId) {
@@ -257,9 +297,10 @@ export const TextCreationModal = (props: IProps) => {
             <PreviewContainer
               style={{
                 color: textColor,
-                fontSize: fontSize ? ViewportToStdbFontSize(parseInt(fontSize)).fontSize : 1,
+                fontSize: fontSize ? ViewportToStdbFontSize(parseInt(fontSize)).fontSize / 1.5 : 1,
                 fontFamily: !useCustomFont ? selectedFont : "inherit",
-                textShadow: `${shadowHeight}px ${shadowWidth}px ${shadowColor}`,
+                textShadow: `${shadowHeight}px ${shadowWidth}px ${shadowBlur}px ${shadowColor}`,
+                ...parseCustomCss(customCss),
               }}
             >
               <Markdown>{text}</Markdown>
@@ -475,6 +516,18 @@ export const TextCreationModal = (props: IProps) => {
                       name="variableValue"
                       defaultValue={shadowWidth}
                       onChange={(event) => handleShadowSizeChange(event.target.value, false)}
+                      style={{ maxWidth: "50px", marginRight: "8px" }}
+                    />
+                  </div>
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Blur
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      defaultValue={shadowBlur}
+                      onChange={(event) => handleShadowBlurChange(event.target.value)}
                       style={{ maxWidth: "50px" }}
                     />
                   </div>
@@ -485,6 +538,43 @@ export const TextCreationModal = (props: IProps) => {
                     </Popover>
                   )}
                 </div>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+                sx={{
+                  color: "#ffffffa6",
+                  backgroundColor: "#001529 !important",
+                }}
+              >
+                <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Custom css</span>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  backgroundColor: "#000c17",
+                  paddingBottom: "0px",
+                  paddingTop: "15px",
+                  maxHeight: "800px",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  "::-webkit-scrollbar": { width: "0", background: "transparent" },
+                  "> *": {
+                    marginBottom: "20px",
+                  },
+                }}
+              >
+                <StyledEditor
+                  value={customCss}
+                  onValueChange={(code) => setCustomCss(code)}
+                  highlight={(code) => hightlightWithLineNumbers(code, languages.css, "css")}
+                  padding={10}
+                  textareaId="codeArea"
+                  className="editor"
+                />
               </AccordionDetails>
             </Accordion>
 
@@ -594,4 +684,13 @@ const PreviewContainer = styled.div`
   > * {
     margin: 0 !important;
   }
+`;
+
+const StyledEditor = styled(Editor)`
+  font-family: "Fira code", "Fira Mono", monospace;
+  font-size: 12px;
+  outline: 0px;
+  background-color: #1f1f1f;
+  color: #9cdcfe;
+  margin-top: 10px;
 `;
