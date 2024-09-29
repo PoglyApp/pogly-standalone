@@ -57,7 +57,7 @@ export const SettingsModal = (props: IProp) => {
   const stream = document.getElementById("stream")!;
   const [nicknameInput, setNicknameInput] = useState<string>(localStorage.getItem("nickname")!);
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
-  const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(settings.cursorName || true);
+  const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(true);
   const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(stream.style.pointerEvents === "none" ? false : true);
 
   // ADVANCED
@@ -216,21 +216,6 @@ export const SettingsModal = (props: IProp) => {
               />
 
               <div style={{ display: "grid", marginTop: "10px" }}>
-                <FormControlLabel
-                  componentsProps={{
-                    typography: { color: "#ffffffa6", paddingTop: "1px" },
-                  }}
-                  sx={{ alignItems: "start" }}
-                  control={
-                    <Checkbox
-                      onChange={() => setCursorNameCheckbox(!cursorNameCheckbox)}
-                      defaultChecked={cursorNameCheckbox}
-                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
-                    />
-                  }
-                  label="Show cursor usernames"
-                />
-
                 <FormControlLabel
                   componentsProps={{
                     typography: { color: "#ffffffa6", paddingTop: "1px" },
