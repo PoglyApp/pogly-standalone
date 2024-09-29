@@ -22,8 +22,6 @@ export const convertBinaryToDataURI = (element: ElementData) => {
         raw += String.fromCharCode(element.byteArray[i]);
     }
 
-    console.log("a");
-
     const base64 = "data:image/webp;base64," + window.btoa(raw);
 
     return base64;

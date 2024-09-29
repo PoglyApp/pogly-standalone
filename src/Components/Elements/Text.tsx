@@ -22,15 +22,17 @@ export const Text = (props: IProp) => {
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [textShadow, setTextShadow] = useState<string>("");
+  const [textOutline, setTextOutline] = useState<string>("");
   const [customCss, setCustomCss] = useState<object>();
 
   useEffect(() => {
-    if (!textElement.css && !isOverlay) return;
+    if (!textElement.css) return;
 
     const css = JSON.parse(textElement.css);
 
-    setTextShadow(ConvertCSSToCanvas(css.shadow));
-    setCustomCss(parseCustomCss(css.custom));
+    setTextShadow(isOverlay ? css.shadow : ConvertCSSToCanvas(css.shadow));
+    setTextOutline(isOverlay ? css.outline : ConvertCSSToCanvas(css.outline));
+    setCustomCss(isOverlay ? parseCustomCss(css.custom) : parseCustomCss(ConvertCSSToCanvas(css.custom)));
   }, [textElement]);
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export const Text = (props: IProp) => {
     DebugLogger("Opening text creation modal");
     setModals((oldModals: any) => [
       ...oldModals,
-      <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />,
+      <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />, 
     ]);
   };
 
@@ -65,6 +67,7 @@ export const Text = (props: IProp) => {
         fontFamily: textElement.font,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
         textShadow: textShadow,
+        WebkitTextStroke: textOutline,
         ...customCss,
       }}
       onDoubleClick={showTextCreationModal}

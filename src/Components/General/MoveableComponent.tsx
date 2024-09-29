@@ -1,13 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import Moveable, { OnDragGroup, OnRotateGroup } from "react-moveable";
 import Selecto from "react-selecto";
-import ElementStruct from "../../module_bindings/element_struct";
-import ImageElement from "../../module_bindings/image_element";
-import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
 import Config from "../../module_bindings/config";
-import WidgetElement from "../../module_bindings/widget_element";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GetCoordsFromTransform, ViewportToStdbSize } from "../../Utility/ConvertCoordinates";
@@ -203,7 +199,7 @@ export const MoveableComponent = (props: IProp) => {
       // snappable={isShiftPressed && !isResize}
       // snapGridWidth={10}
       // snapGridHeight={10}
-      resizable={true && props.transformSelect.size}
+      resizable={true && props.transformSelect.size && props.selected?.Elements.element.tag !== "TextElement"}
       // warpable={true && props.transformSelect.warp}
       // clippable={true && props.transformSelect.clip}
       warpable={false}

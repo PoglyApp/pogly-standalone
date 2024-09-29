@@ -12,8 +12,9 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { ConvertCSSToCanvas, InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { marked } from "marked";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -47,7 +48,7 @@ export const useOverlayElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate((oldElement, newElement) => {
+    Elements.onUpdate(async (oldElement, newElement) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -91,7 +92,8 @@ export const useOverlayElementsEvents = (
 
           // UPDATE TEXT
           if (oldTextElement.text !== newTextElement.text) {
-            component.innerHTML = newTextElement.text;
+            const markdownToHtml = await marked.parse(newTextElement.text);
+            component.innerHTML = markdownToHtml;
           }
 
           // UPDATE SIZE
@@ -119,7 +121,8 @@ export const useOverlayElementsEvents = (
             const css = JSON.parse(newTextElement.css);
             const customCss = parseCustomCss(css.custom);
 
-            component.style.textShadow = ConvertCSSToCanvas(css.shadow);
+            component.style.textShadow = css.shadow;
+            component.style.webkitTextStroke = css.outline;
 
             Object.keys(customCss).forEach((styleKey: any) => {
               component.style[styleKey] = customCss[styleKey];

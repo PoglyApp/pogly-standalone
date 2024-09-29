@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import ElementData from "../../module_bindings/element_data";
 import Elements from "../../module_bindings/elements";

@@ -43,6 +43,7 @@ html {
 }
 
 .moveable-control-box {
+  display: "inline" !important;
   z-index: 1999998 !important;
 }
 

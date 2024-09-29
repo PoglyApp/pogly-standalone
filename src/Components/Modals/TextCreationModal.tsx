@@ -63,15 +63,21 @@ export const TextCreationModal = (props: IProps) => {
   const [customFont, setCustomFont] = useState<string>("");
   const [fontSize, setFontSize] = useState<string>("12");
 
+  const [shadow, setShadow] = useState<boolean>(false);
   const [shadowColor, setShadowColor] = useState<string>("#000000");
-  const [shadowHeight, setShadowHeight] = useState<string>("2");
-  const [shadowWidth, setShadowWidth] = useState<string>("2");
-  const [shadowBlur, setShadowBlur] = useState<string>("0");
+  const [shadowHeight, setShadowHeight] = useState<string>("0");
+  const [shadowWidth, setShadowWidth] = useState<string>("0");
+  const [shadowBlur, setShadowBlur] = useState<string>("0");  
+
+  const [outline, setOutline] = useState<boolean>(false);
+  const [outlineColor, setOutlineColor] = useState<string>("#000000");
+  const [outlineSize, setOutlineSize] = useState<string>("0");
 
   const [textColor, setTextColor] = useState<string>("#FFFFFF");
 
   const [showTextColorPicker, setShowTextColorPicker] = useState<boolean>(false);
   const [showShadowColorPicker, setShowShadowColorPicker] = useState<boolean>(false);
+  const [showOutlineColorPicker, setShowOutlineColorPicker] = useState<boolean>(false);
 
   const [customCss, setCustomCss] = useState<string>("");
 
@@ -97,11 +103,26 @@ export const TextCreationModal = (props: IProps) => {
     const css = JSON.parse(textStruct.css);
 
     const shadowVariables = css.shadow.split(" ");
+    const sHeight = shadowVariables[0].replace("px", "");
+    const sWidth = shadowVariables[1].replace("px", "");
+    const sBlur = shadowVariables[2].replace("px", "");
 
-    setShadowHeight(shadowVariables[0].replace("px", ""));
-    setShadowWidth(shadowVariables[1].replace("px", ""));
-    setShadowWidth(shadowVariables[2].replace("px", ""));
+    setShadowHeight(sHeight);
+    setShadowWidth(sWidth);
+    setShadowBlur(sBlur);
     setShadowColor(shadowVariables[3]);
+
+    if(sHeight!=="0" || sWidth !== "0") {
+      setShadow(true);
+    }
+
+    const outlineVariables = css.outline.split(" ");
+    const oSize = outlineVariables[0].replace("px", "");
+
+    setOutlineSize(oSize);
+    setOutlineColor(outlineVariables[1]);
+
+    if(oSize !== "0") setOutline(true);
 
     setCustomCss(css.custom);
 
@@ -196,6 +217,18 @@ export const TextCreationModal = (props: IProps) => {
     setShadowColor(color);
   };
 
+  const handleOutlineColorChange = (color: any) => {
+    DebugLogger("Outline color updated");
+    if (color.length < 3) {
+      DebugLogger("Outline hex not long enough");
+      setError("Outline hex has to be at least 3 characters long.");
+    } else {
+      setError("");
+    }
+
+    setOutlineColor(color);
+  };
+
   const handleShadowSizeChange = (newShadowSize: any, height: boolean) => {
     const regex = new RegExp("^[0-9]+$");
 
@@ -219,6 +252,28 @@ export const TextCreationModal = (props: IProps) => {
 
     setError("");
   };
+
+  const handleOutlineSizeChange = (newOutlineSize: any) => {
+    const regex = new RegExp("^[0-9]+$");
+
+    if (newOutlineSize.length < 1) {
+      DebugLogger("Outline field size empty");
+      setOutlineSize("");
+
+      return setError("Outline size field cannot be blank.");
+    }
+
+    if (!regex.test(newOutlineSize)) {
+      DebugLogger("Outline size not a number");
+      setOutlineSize("");
+
+      return setError("Outline size has to be a number.");
+    }
+
+    setOutlineSize(newOutlineSize);
+
+    setError("");
+  }
 
   const handleShadowBlurChange = (newBlur: any) => {
     const regex = new RegExp("^[0-9]+$");
@@ -262,6 +317,7 @@ export const TextCreationModal = (props: IProps) => {
       font: useFont,
       css: JSON.stringify({
         shadow: `${shadowHeight}px ${shadowWidth}px ${shadowBlur}px ${shadowColor}`,
+        outline: `${outlineSize}px ${outlineColor}`,
         custom: customCss,
       }),
     });
@@ -300,6 +356,7 @@ export const TextCreationModal = (props: IProps) => {
                 fontSize: fontSize ? ViewportToStdbFontSize(parseInt(fontSize)).fontSize / 1.5 : 1,
                 fontFamily: !useCustomFont ? selectedFont : "inherit",
                 textShadow: `${shadowHeight}px ${shadowWidth}px ${shadowBlur}px ${shadowColor}`,
+                WebkitTextStroke: `${outlineSize}px ${outlineColor}`,
                 ...parseCustomCss(customCss),
               }}
             >
@@ -473,11 +530,32 @@ export const TextCreationModal = (props: IProps) => {
                   },
                 }}
               >
-                <Typography variant="subtitle1" color="#ffffffa6" marginBottom={1}>
-                  Text Shadow
-                </Typography>
 
-                <div style={{ display: "flex" }}>
+                <FormControlLabel
+                    componentsProps={{
+                      typography: { color: "#ffffffa6" },
+                    }}
+                    control={
+                      <Checkbox
+                        onChange={() => {
+                          if(shadow) {
+                            setShadow(false);
+                            setShadowWidth("0");
+                            setShadowHeight("0");
+                          } else {
+                            setShadow(true);
+                            setShadowWidth("2");
+                            setShadowHeight("2");
+                          }
+                        }}
+                        checked={shadow}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Text Shadow"
+                  />
+
+                {shadow&&<div style={{ display: "flex" }}>
                   <ColorBox
                     color={shadowColor}
                     onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
@@ -537,7 +615,67 @@ export const TextCreationModal = (props: IProps) => {
                       <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
                     </Popover>
                   )}
-                </div>
+                </div>}
+
+                <br /><FormControlLabel
+                    componentsProps={{
+                      typography: { color: "#ffffffa6" },
+                    }}
+                    control={
+                      <Checkbox
+                        onChange={() => {
+                          if(outline) {
+                            setOutline(false);
+                            setOutlineSize("0");
+                          } else {
+                            setOutline(true);
+                            setOutlineSize("1");
+                          }
+                        }}
+                        checked={outline}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Text Outline"
+                  />
+
+                {outline&&<div style={{ display: "flex" }}>
+                  <ColorBox
+                    color={outlineColor}
+                    onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)}
+                    style={{ backgroundColor: outlineColor, marginRight: "10px" }}
+                  />
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Color
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      value={outlineColor}
+                      onChange={(event) => handleOutlineColorChange(event.target.value)}
+                      style={{ maxWidth: "80px", marginRight: "8px" }}
+                    />
+                  </div>
+                  <div>
+                    <Typography variant="subtitle2" color="#ffffffa6">
+                      Size
+                    </Typography>
+                    <StyledColorInput
+                      type="text"
+                      name="variableValue"
+                      defaultValue={outlineSize}
+                      onChange={(event) => handleOutlineSizeChange(event.target.value)}
+                      style={{ maxWidth: "50px", marginRight: "8px" }}
+                    />
+                  </div>
+                  {showOutlineColorPicker && (
+                    <Popover>
+                      <Cover onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)} />
+                      <HexColorPicker color={outlineColor} onChange={(color) => handleOutlineColorChange(color)} />
+                    </Popover>
+                  )}
+                </div>}
               </AccordionDetails>
             </Accordion>
 

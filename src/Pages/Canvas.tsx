@@ -14,7 +14,6 @@ import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
 import Config from "../module_bindings/config";
-import ElementData from "../module_bindings/element_data";
 import { Loading } from "../Components/General/Loading";
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { SelectoComponent } from "../Components/General/SelectoComponent";
@@ -223,7 +222,7 @@ export const Canvas = (props: IProps) => {
                     top: "50%",
                   }}
                 >
-                  <div className="elementContent" style={{ position: "absolute" }}>
+                  <div className="elementContent">
                     {canvasElements.map((element: CanvasElementType) => {
                       return (
                         <div
@@ -236,7 +235,6 @@ export const Canvas = (props: IProps) => {
                               Component: element.Component,
                             });
                           }}
-                          style={{ cursor: "context-menu" }}
                         >
                           {element.Component}
                         </div>

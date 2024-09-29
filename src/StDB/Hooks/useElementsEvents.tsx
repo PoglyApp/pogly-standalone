@@ -152,9 +152,10 @@ export const useElementsEvents = (
           // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
             const css = JSON.parse(newTextElement.css);
-            const customCss = parseCustomCss(css.custom);
+            const customCss = parseCustomCss(ConvertCSSToCanvas(css.custom));
 
             component.style.textShadow = ConvertCSSToCanvas(css.shadow);
+            component.style.webkitTextStroke = ConvertCSSToCanvas(css.outline);
 
             Object.keys(customCss).forEach((styleKey: any) => {
               component.style[styleKey] = customCss[styleKey];
