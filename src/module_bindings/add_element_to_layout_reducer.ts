@@ -9,11 +9,11 @@ import { ElementStruct } from "./element_struct";
 export class AddElementToLayoutReducer extends Reducer
 {
 	public static reducerName: string = "AddElementToLayout";
-	public static call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number) {
-		this.getReducer().call(_element, _transparency, _transform, _clip, _layoutId);
+	public static call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number, _folderId: number | null) {
+		this.getReducer().call(_element, _transparency, _transform, _clip, _layoutId, _folderId);
 	}
 
-	public call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number) {
+	public call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number, _folderId: number | null) {
 		const serializer = this.client.getSerializer();
 		let _elementType = ElementStruct.getAlgebraicType();
 		serializer.write(_elementType, _element);
@@ -25,6 +25,12 @@ export class AddElementToLayoutReducer extends Reducer
 		serializer.write(_clipType, _clip);
 		let _layoutIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
 		serializer.write(_layoutIdType, _layoutId);
+		let _folderIdType = AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		]);
+		serializer.write(_folderIdType, _folderId);
 		this.client.call("AddElementToLayout", serializer);
 	}
 
@@ -44,13 +50,20 @@ export class AddElementToLayoutReducer extends Reducer
 		let layoutIdType = AlgebraicType.createPrimitiveType(BuiltinType.Type.U32);
 		let layoutIdValue = AlgebraicValue.deserialize(layoutIdType, adapter.next())
 		let layoutId = layoutIdValue.asNumber();
-		return [element, transparency, transform, clip, layoutId];
+		let folderIdType = AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		]);
+		let folderIdValue = AlgebraicValue.deserialize(folderIdType, adapter.next())
+		let folderId = folderIdValue.asSumValue().tag == 1 ? null : folderIdValue.asSumValue().value.asNumber();
+		return [element, transparency, transform, clip, layoutId, folderId];
 	}
 
-	public static on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number) => void) {
+	public static on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number, _folderId: number | null) => void) {
 		this.getReducer().on(callback);
 	}
-	public on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number) => void)
+	public on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _layoutId: number, _folderId: number | null) => void)
 	{
 		this.client.on("reducer:AddElementToLayout", callback);
 	}
