@@ -6,7 +6,7 @@ public partial class Module
 {
     [SpacetimeDB.Reducer]
     public static void AddElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip)
+        string clip, uint? folderId = null)
     {
         string func = "AddElement";
         
@@ -23,11 +23,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
-            /*if (element is ElementStruct.TextElement text)
+            if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }*/
+            }
 
             var newElement = new Elements
             {
@@ -37,6 +37,7 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = GetActiveLayout(),
+                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ZIndex.FindByVersion(0)!.Value.Max + 1
@@ -53,7 +54,7 @@ public partial class Module
     
     [SpacetimeDB.Reducer]
     public static void AddElementToLayout(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip, uint layoutId)
+        string clip, uint layoutId, uint? folderId = null)
     {
         string func = "AddElementToLayout";
         
@@ -70,11 +71,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
-            /*if (element is ElementStruct.TextElement text)
+            if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }*/
+            }
 
             var newElement = new Elements
             {
@@ -84,6 +85,7 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = layoutId,
+                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ZIndex.FindByVersion(0)!.Value.Max + 1
@@ -116,11 +118,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             
-            /*if (element is ElementStruct.TextElement text)
+            if (element is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }*/
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
             var updatedElement = oldElement;
@@ -159,11 +161,11 @@ public partial class Module
                         if (!IsGuestModerator(func, ctx.Sender)) return;
             }
             
-            /*if (elementStruct is ElementStruct.TextElement text)
+            if (elementStruct is ElementStruct.TextElement text)
             {
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
-            }*/
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
             var updatedElement = oldElement;
@@ -192,8 +194,8 @@ public partial class Module
             if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
-            /*if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
-                return;*/
+            if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
+                return;
 
             var oldElement = Elements.FilterById(elementId).First();
 
@@ -308,8 +310,7 @@ public partial class Module
         try
         {
             if (ctx.Address is null) return;
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -341,6 +342,10 @@ public partial class Module
             if (ctx.Address is null) return;
             if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
 
@@ -575,6 +580,10 @@ public partial class Module
             if (ctx.Address is null) return;
             if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
 
@@ -729,6 +738,38 @@ public partial class Module
         }
     }
     
+    [SpacetimeDB.Reducer]
+    public static void UpdateElementFolder(ReducerContext ctx, uint elementId, uint? folderId)
+    {
+        string func = "UpdateElementFolder";
+
+        try
+        {
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
+            if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
+
+            var oldElement = Elements.FilterById(elementId).First();
+            var updatedElement = oldElement;
+            updatedElement.FolderId = folderId;
+            updatedElement.LastEditedBy = guest.Nickname;
+
+            Elements.UpdateById(elementId, updatedElement);
+            
+            //TODO: Update AuditLog Elements ChangeStruct to include Layout Column
+            if(Config.FindByVersion(0)!.Value.DebugMode) 
+                Log($"[Elements - {func}] {guest.Nickname} updated elementId {elementId} to folder {folderId}!");
+        }
+        catch(Exception e)
+        {
+            Log($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
+    
     private static void UpdateElementZIndex(ReducerContext ctx, uint elementId)
     {
         if (elementId == 0) return;
@@ -780,6 +821,10 @@ public partial class Module
         if (ctx.Address is null) return;
         if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        if (Config.FindByVersion(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx.Sender)) return;
+        }
         
         try
         {
@@ -803,6 +848,10 @@ public partial class Module
         if (ctx.Address is null) return;
         if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        if (Config.FindByVersion(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx.Sender)) return;
+        }
         
         try
         {
