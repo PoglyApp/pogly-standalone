@@ -100,10 +100,12 @@ const SelectionMenuContainer = styled.div`
   width: 218px;
   height: 95vh;
 
-  position: fixed;
+  position: absolute;
   overflow-y: auto;
 
   padding-top: 10px;
+
+  z-index: 2;
 
   &::-webkit-scrollbar {
     width: 0;

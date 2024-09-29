@@ -12,7 +12,6 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
-import { ConvertCSSToCanvas, StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
@@ -130,8 +129,7 @@ export const useElementsEvents = (
 
           // UPDATE SIZE
           if (oldTextElement.size !== newTextElement.size) {
-            const newFontSize = StdbToViewportFontSize(newTextElement.size).fontSize;
-            component.style.fontSize = `${newFontSize}px`;
+            component.style.fontSize = `${newTextElement.size}px`;
           }
 
           // UPDATE COLOR
@@ -152,10 +150,10 @@ export const useElementsEvents = (
           // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
             const css = JSON.parse(newTextElement.css);
-            const customCss = parseCustomCss(ConvertCSSToCanvas(css.custom));
+            const customCss = parseCustomCss(css.custom);
 
-            component.style.textShadow = ConvertCSSToCanvas(css.shadow);
-            component.style.webkitTextStroke = ConvertCSSToCanvas(css.outline);
+            component.style.textShadow = css.shadow;
+            component.style.webkitTextStroke = css.outline;
 
             Object.keys(customCss).forEach((styleKey: any) => {
               component.style[styleKey] = customCss[styleKey];
@@ -204,9 +202,8 @@ export const useElementsEvents = (
         const newImageElement: any = newElement.element.value;
 
         if (oldImageElement.height !== newImageElement.height || oldImageElement.width !== newImageElement.width) {
-          const newSize = StdbToViewportSize(newImageElement.width, newImageElement.height);
-          component.style.width = newSize.width + "px";
-          component.style.height = newSize.height + "px";
+          component.style.width = newImageElement.width + "px";
+          component.style.height = newImageElement.height + "px";
         }
       }
 

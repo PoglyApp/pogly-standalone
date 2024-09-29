@@ -9,7 +9,6 @@ import WidgetElement from "../../../module_bindings/widget_element";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
-  ViewportToStdbCoords,
 } from "../../../Utility/ConvertCoordinates";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 
@@ -22,11 +21,10 @@ export const insertElement = (
 ) => {
   DebugLogger("Inserting new element");
 
-  const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 285px)");
-  const coords = ViewportToStdbCoords(transformCoords.x, transformCoords.y);
+  const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 1100px)");
   const newTransform = GetTransformFromCoords(
-    coords.x,
-    coords.y,
+    transformCoords.x,
+    transformCoords.y,
     transformCoords.rotation,
     transformCoords.scaleX,
     transformCoords.scaleY

@@ -54,10 +54,11 @@ export const SettingsModal = (props: IProp) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   // GENERAL
+  const stream = document.getElementById("stream")!;
   const [nicknameInput, setNicknameInput] = useState<string>(localStorage.getItem("nickname")!);
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
   const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(settings.cursorName || true);
-  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(false);
+  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(stream.style.pointerEvents === "none" ? false : true);
 
   // ADVANCED
   const [compressUpload, setCompressUpload] = useState<boolean>(

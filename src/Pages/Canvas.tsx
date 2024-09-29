@@ -178,84 +178,81 @@ export const Canvas = (props: IProps) => {
   return (
     <>
       {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
-        <>
+        <TransformWrapper
+          ref={transformRef}
+          limitToBounds={false}
+          centerOnInit={true}
+          initialScale={.5}
+          centerZoomedOut={false}
+          minScale={.125}
+          maxScale={4}
+          pinch={{ disabled: true }}
+          panning={{
+            wheelPanning: true,
+            allowLeftClickPan: false,
+            allowRightClickPan: false,
+          }}
+          doubleClick={{ disabled: true }}
+          smooth={false}
+          wheel={{
+            step: 0.1,
+          }}
+        >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
-          <TransformWrapper
-            ref={transformRef}
-            limitToBounds={true}
-            centerOnInit={true}
-            initialScale={2.25}
-            centerZoomedOut={true}
-            minScale={1}
-            maxScale={4}
-            pinch={{ disabled: true }}
-            panning={{
-              wheelPanning: true,
-              allowLeftClickPan: false,
-              allowRightClickPan: false,
-            }}
-            doubleClick={{ disabled: true }}
-            smooth={false}
-            wheel={{
-              step: 0.1,
-            }}
-          >
-            <TransformComponent
+          <TransformComponent
               contentProps={{ id: "transformContainer" }}
-              wrapperStyle={{ display: "flex", flex: 1, marginLeft: "218px" }}
-              contentStyle={{ display: "flex", flex: 1 }}
+              wrapperStyle={{ width:"100vw", height:"100vh"}}
               contentClass="grid-bg"
             >
-              <Container className="mouseContainer" onMouseMove={onMouseMove}>
-                <div
-                  id="streamContent"
-                  className="streamContent"
-                  style={{
-                    height: 270,
-                    marginTop: -175,
-                    width: 480,
-                    marginLeft: -280,
-                    zIndex: 0,
-                    position: "fixed",
-                    left: "50%",
-                    top: "50%",
-                  }}
-                >
-                  <div className="elementContent">
-                    {canvasElements.map((element: CanvasElementType) => {
-                      return (
-                        <div
-                          key={element.Elements.id.toString() + "_" + element.Elements.element.tag}
-                          onContextMenu={(event: any) => {
-                            HandleElementContextMenu(event, setContextMenu, contextMenu, element.Elements);
+            <Container className="mouseContainer" onMouseMove={onMouseMove}>
+              <div
+                id="streamContent"
+                className="streamContent"
+                style={{
+                  height: 1080,
+                  marginTop: -607,
+                  width: 1920,
+                  marginLeft: -742,
+                  zIndex: 0,
+                  position: "fixed",
+                  left: "50%",
+                  top: "50%",
+                }}
+              >
+                <div className="elementContent">
+                  {canvasElements.map((element: CanvasElementType) => {
+                    return (
+                      <div
+                        key={element.Elements.id.toString() + "_" + element.Elements.element.tag}
+                        onContextMenu={(event: any) => {
+                          HandleElementContextMenu(event, setContextMenu, contextMenu, element.Elements);
 
-                            setSelected({
-                              Elements: element.Elements,
-                              Component: element.Component,
-                            });
-                          }}
-                        >
-                          {element.Component}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <CursorsContainer />
-                  <StreamContainer />
+                          setSelected({
+                            Elements: element.Elements,
+                            Component: element.Component,
+                          });
+                        }}
+                      >
+                        {element.Component}
+                      </div>
+                    );
+                  })}
                 </div>
-              </Container>
+                <CursorsContainer />
+                <StreamContainer />
+              </div>
+            </Container>
 
-              <MoveableComponent
-                transformSelect={transformSelect}
-                selected={selected}
-                moveableRef={moveableRef}
-                selectoRef={selectoRef}
-                selectoTargets={selectoTargets}
-              />
-            </TransformComponent>
-          </TransformWrapper>
-
+            <MoveableComponent
+              transformSelect={transformSelect}
+              selected={selected}
+              moveableRef={moveableRef}
+              selectoRef={selectoRef}
+              selectoTargets={selectoTargets}
+            />
+          </TransformComponent>
+          
           <ElementContextMenu
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
@@ -273,7 +270,7 @@ export const Canvas = (props: IProps) => {
             setSelected={setSelected}
             elements={elements}
           />
-        </>
+        </TransformWrapper>
       ) : (
         <Loading text="Initializing Canvas" />
       )}
@@ -281,7 +278,7 @@ export const Canvas = (props: IProps) => {
   );
 };
 
-const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
-`;
+const Container = styled.div``
+//   width: 100%;
+//   height: 100%;
+// `;

@@ -6,7 +6,6 @@ import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
-import { ConvertCSSToCanvas } from "../../Utility/ConvertCoordinates";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 interface IProp {
@@ -30,9 +29,9 @@ export const Text = (props: IProp) => {
 
     const css = JSON.parse(textElement.css);
 
-    setTextShadow(isOverlay ? css.shadow : ConvertCSSToCanvas(css.shadow));
-    setTextOutline(isOverlay ? css.outline : ConvertCSSToCanvas(css.outline));
-    setCustomCss(isOverlay ? parseCustomCss(css.custom) : parseCustomCss(ConvertCSSToCanvas(css.custom)));
+    setTextShadow(isOverlay ? css.shadow : css.shadow);
+    setTextOutline(isOverlay ? css.outline : css.outline);
+    setCustomCss(isOverlay ? parseCustomCss(css.custom) : parseCustomCss(css.custom));
   }, [textElement, isOverlay]);
 
   useEffect(() => {

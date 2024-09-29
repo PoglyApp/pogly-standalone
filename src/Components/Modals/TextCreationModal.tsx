@@ -24,7 +24,6 @@ import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
 import { ModalContext } from "../../Contexts/ModalContext";
 import TextElement from "../../module_bindings/text_element";
 import Elements from "../../module_bindings/elements";
-import { StdbToViewportFontSize, ViewportToStdbFontSize } from "../../Utility/ConvertCoordinates";
 import UpdateTextElementTextReducer from "../../module_bindings/update_text_element_text_reducer";
 import { updateTextElement } from "../../StDB/Reducers/Update/updateTextElement";
 import { LayoutContext } from "../../Contexts/LayoutContext";
@@ -97,7 +96,7 @@ export const TextCreationModal = (props: IProps) => {
     const textStruct: TextElement = textElement.element.value as TextElement;
 
     setText(textStruct.text);
-    setFontSize(StdbToViewportFontSize(textStruct.size).fontSize.toString());
+    setFontSize(textStruct.size.toString());
     setTextColor(textStruct.color);
 
     const css = JSON.parse(textStruct.css);
@@ -312,7 +311,7 @@ export const TextCreationModal = (props: IProps) => {
 
     const textElement: ElementStruct = ElementStruct.TextElement({
       text: text,
-      size: ViewportToStdbFontSize(parseInt(fontSize)).fontSize,
+      size: parseInt(fontSize),
       color: textColor,
       font: useFont,
       css: JSON.stringify({
@@ -353,7 +352,7 @@ export const TextCreationModal = (props: IProps) => {
             <PreviewContainer
               style={{
                 color: textColor,
-                fontSize: fontSize ? ViewportToStdbFontSize(parseInt(fontSize)).fontSize / 1.5 : 1,
+                fontSize: fontSize ? parseInt(fontSize) / 1.5 : 1,
                 fontFamily: !useCustomFont ? selectedFont : "inherit",
                 textShadow: `${shadowHeight}px ${shadowWidth}px ${shadowBlur}px ${shadowColor}`,
                 WebkitTextStroke: `${outlineSize}px ${outlineColor}`,

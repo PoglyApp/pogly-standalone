@@ -113,9 +113,7 @@ export const Header = (props: IProps) => {
             <GuestListContainer />
           </Toolbar>
         </AppBar>
-      </StyledBox>
-      <main>
-      <Dropzone
+        <Dropzone
             onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
             noClick={true}
             onDragEnter={() => setisDroppingSelectionMenu(true)}
@@ -129,6 +127,8 @@ export const Header = (props: IProps) => {
               </div>
             )}
         </Dropzone>
+      </StyledBox>
+      <main>
         <Outlet />
       </main>
     </>
@@ -148,7 +148,3 @@ const StyledGuidelines = styled(Tab)`
   text-transform: none !important;
   color: #e6b559 !important;
   `;
-
-const StyledMenuItem = styled(MenuItem)`
-  background-color: #001529;
-`;

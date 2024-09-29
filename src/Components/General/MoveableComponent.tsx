@@ -6,7 +6,7 @@ import { SelectedType } from "../../Types/General/SelectedType";
 import Config from "../../module_bindings/config";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
-import { GetCoordsFromTransform, ViewportToStdbSize } from "../../Utility/ConvertCoordinates";
+import { GetCoordsFromTransform } from "../../Utility/ConvertCoordinates";
 import UpdateWidgetElementSizeReducer from "../../module_bindings/update_widget_element_size_reducer";
 import UpdateImageElementSizeReducer from "../../module_bindings/update_image_element_size_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
@@ -130,15 +130,13 @@ export const MoveableComponent = (props: IProp) => {
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-        const imageSize = ViewportToStdbSize(event.lastEvent.width, event.lastEvent.height);
 
-        UpdateImageElementSizeReducer.call(event.target.id, imageSize.width, imageSize.height);
+        UpdateImageElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
 
       case "WidgetElement":
-        const widgetSize = ViewportToStdbSize(event.lastEvent.width, event.lastEvent.height);
 
-        UpdateWidgetElementSizeReducer.call(event.target.id, widgetSize.width, widgetSize.height);
+        UpdateWidgetElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
     }
 
@@ -157,15 +155,13 @@ export const MoveableComponent = (props: IProp) => {
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-        const imageSize = ViewportToStdbSize(event.width, event.height);
 
-        UpdateImageElementSizeReducer.call(event.target.id, imageSize.width, imageSize.height);
+        UpdateImageElementSizeReducer.call(event.target.id, event.width, event.height);
         break;
 
       case "WidgetElement":
-        const widgetSize = ViewportToStdbSize(event.width, event.height);
 
-        UpdateWidgetElementSizeReducer.call(event.target.id, widgetSize.width, widgetSize.height);
+        UpdateWidgetElementSizeReducer.call(event.target.id, event.width, event.height);
         break;
     }
 
