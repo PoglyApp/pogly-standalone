@@ -33,7 +33,7 @@ export const Text = (props: IProp) => {
     setTextShadow(isOverlay ? css.shadow : ConvertCSSToCanvas(css.shadow));
     setTextOutline(isOverlay ? css.outline : ConvertCSSToCanvas(css.outline));
     setCustomCss(isOverlay ? parseCustomCss(css.custom) : parseCustomCss(ConvertCSSToCanvas(css.custom)));
-  }, [textElement]);
+  }, [textElement, isOverlay]);
 
   useEffect(() => {
     DebugLogger("Creating text");
