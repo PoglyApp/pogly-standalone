@@ -184,13 +184,13 @@ export const Canvas = (props: IProps) => {
           centerOnInit={true}
           initialScale={.5}
           centerZoomedOut={false}
-          minScale={.125}
+          minScale={.1}
           maxScale={4}
-          pinch={{ disabled: true }}
           panning={{
             wheelPanning: true,
             allowLeftClickPan: false,
             allowRightClickPan: false,
+            allowMiddleClickPan: true,
           }}
           doubleClick={{ disabled: true }}
           smooth={false}
