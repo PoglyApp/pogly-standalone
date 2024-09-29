@@ -176,7 +176,7 @@ export const Canvas = (props: IProps) => {
   }
 
   return (
-    <>
+    <div className="mouseContainer" onMouseMove={onMouseMove}>
       {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <TransformWrapper
           ref={transformRef}
@@ -205,7 +205,7 @@ export const Canvas = (props: IProps) => {
               wrapperStyle={{ width:"100vw", height:"100vh"}}
               contentClass="grid-bg"
             >
-            <Container className="mouseContainer" onMouseMove={onMouseMove}>
+            <Container>
               <div
                 id="streamContent"
                 className="streamContent"
@@ -274,11 +274,11 @@ export const Canvas = (props: IProps) => {
       ) : (
         <Loading text="Initializing Canvas" />
       )}
-    </>
+    </div>
   );
 };
 
-const Container = styled.div``
-//   width: 100%;
-//   height: 100%;
-// `;
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`;
