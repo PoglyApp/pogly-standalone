@@ -78,6 +78,10 @@ export const useGuestsEvents = (
         cursor.style.transform = transform;
         cursor.style.position = "fixed";
       }
+
+      if (oldGuest.selectedLayoutId !== newGuest.selectedLayoutId) {
+        console.log(Identity.selectedLayoutId);
+      }
     });
 
     Guests.onDelete((guest, reducerEvent) => {

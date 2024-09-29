@@ -8,9 +8,11 @@ import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { LayoutContext } from "../../Contexts/LayoutContext";
 
 export const GuestListContainer = () => {
   const config: Config = useContext(ConfigContext);
+  const layoutContext = useContext(LayoutContext);
 
   const guestStore = useAppSelector((state: any) => state.guests.guests);
 
@@ -67,7 +69,13 @@ export const GuestListContainer = () => {
                   }}
                 >
                   <Avatar
-                    sx={{ bgcolor: guest.color, verticalAlign: "middle", position: "relative", marginLeft: "6px" }}
+                    sx={{
+                      bgcolor: guest.color,
+                      verticalAlign: "middle",
+                      position: "relative",
+                      marginLeft: "6px",
+                      filter: layoutContext.activeLayout.id === guest.selectedLayoutId ? "unset" : "grayscale(1);",
+                    }}
                     onClick={easterEgg}
                   >
                     {(showPedro && (

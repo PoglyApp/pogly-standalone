@@ -44,6 +44,7 @@ static partial class Module
                 Nickname = "",
                 Color = color,
                 SelectedElementId = 0,
+                SelectedLayoutId = GetActiveLayout(),
                 PositionX = -1,
                 PositionY = -1,
                 Authenticated = !Config.FindByVersion(0)!.Value.Authentication

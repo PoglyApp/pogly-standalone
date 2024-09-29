@@ -14,6 +14,7 @@ public partial class Module
         public string Nickname;
         public string Color;
         public uint SelectedElementId;
+        public uint SelectedLayoutId;
 
         public int PositionX;
         public int PositionY;

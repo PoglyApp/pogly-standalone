@@ -5,10 +5,12 @@ import { CursorComponent } from "../General/CursorComponent";
 import Config from "../../module_bindings/config";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
+import { LayoutContext } from "../../Contexts/LayoutContext";
 
 export const CursorsContainer = () => {
   const { Identity } = useSpacetimeContext();
   const config: Config = useContext(ConfigContext);
+  const layoutContext = useContext(LayoutContext);
 
   const guests = useAppSelector((state: any) => state.guests.guests);
 
@@ -16,7 +18,10 @@ export const CursorsContainer = () => {
     <>
       {guests
         .filter(
-          (guest: Guests) => guest.address.toHexString() !== Identity.address.toHexString() && guest.nickname !== ""
+          (guest: Guests) =>
+            guest.address.toHexString() !== Identity.address.toHexString() &&
+            guest.nickname !== "" &&
+            layoutContext.activeLayout.id === Identity.selectedLayoutId
         )
         .map((guest: Guests) => {
           if (config.authentication && !guest.authenticated) return <></>;

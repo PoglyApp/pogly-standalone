@@ -180,6 +180,13 @@ public partial class Module
                 }
             }
 
+            foreach (Guests g in Guests.Query(x => x.SelectedLayoutId == layoutId))
+            {
+                var newGuest = g;
+                newGuest.SelectedLayoutId = GetActiveLayout();
+                Guests.UpdateByAddress(g.Address, newGuest);
+            }
+
             Layouts.DeleteById(layoutId);
             
             //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
@@ -231,6 +238,13 @@ public partial class Module
             {
                 if(layout is not {Name: "Default", CreatedBy: "Server"}) //Just a cheeky double-check
                     Layouts.DeleteById(layout.Id);
+            }
+            
+            foreach (Guests g in Guests.Iter())
+            {
+                var newGuest = g;
+                newGuest.SelectedLayoutId = 1;
+                Guests.UpdateByAddress(g.Address, newGuest);
             }
             
             //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
