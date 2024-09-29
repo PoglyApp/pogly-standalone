@@ -131,7 +131,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
             break;
         }
 
-        AddElementToLayoutReducer.call(newElementStruct, e.transparency, e.transform, e.clip, layoutId);
+        AddElementToLayoutReducer.call(newElementStruct, e.transparency, e.transform, e.clip, layoutId, null);
       });
     }
   };

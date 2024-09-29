@@ -72,6 +72,13 @@ import UpdateEditorGuidelinesReducer from "../module_bindings/update_editor_guid
 import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
 import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
 import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_data_array_with_id_reducer";
+import AddFolderReducer from "../module_bindings/add_folder_reducer";
+import UpdateFolderNameReducer from "../module_bindings/update_folder_name_reducer";
+import UpdateFolderIconReducer from "../module_bindings/update_folder_icon_reducer";
+import DeleteFolderReducer from "../module_bindings/delete_folder_reducer";
+import DeleteAllFoldersReducer from "../module_bindings/delete_all_folders_reducer";
+import UpdateElementLayoutReducer from "../module_bindings/update_element_layout_reducer";
+import UpdateElementFolderReducer from "../module_bindings/update_element_folder_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -114,6 +121,8 @@ const useStDB = (
       UpdateElementTransformReducer,
       UpdateElementClipReducer,
       UpdateElementLockedReducer,
+      UpdateElementLayoutReducer,
+      UpdateElementFolderReducer,
       UpdateTextElementColorReducer,
       UpdateTextElementFontReducer,
       UpdateTextElementSizeReducer,
@@ -155,7 +164,12 @@ const useStDB = (
       KickSelfReducer,
       ConnectReducer,
       RefreshOverlayClearStorageReducer,
-      UpdateEditorGuidelinesReducer
+      UpdateEditorGuidelinesReducer,
+      AddFolderReducer,
+      UpdateFolderNameReducer,
+      UpdateFolderIconReducer,
+      DeleteFolderReducer,
+      DeleteAllFoldersReducer,
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";

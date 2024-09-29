@@ -74,6 +74,7 @@ export const insertElement = (
     transparency || 100,
     newTransform,
     clip || "rect(0px, 0px, 0px, 0px)",
-    activeLayout.id
+    activeLayout.id,
+    null
   );
 };

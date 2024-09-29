@@ -63,6 +63,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
     clip: element.clip,
     locked: element.locked,
     layoutId: element.layoutId,
+    folderId: element.folderId,
     placedBy: element.placedBy,
     lastEditedBy: element.lastEditedBy,
     zIndex: element.zIndex,

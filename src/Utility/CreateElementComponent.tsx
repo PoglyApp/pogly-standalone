@@ -44,6 +44,7 @@ export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) =
     clip: elements.clip,
     locked: elements.locked,
     layoutId: elements.layoutId,
+    folderId: elements.folderId,
     placedBy: elements.placedBy,
     lastEditedBy: elements.lastEditedBy,
     zIndex: elements.zIndex,
