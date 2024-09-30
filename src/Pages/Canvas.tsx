@@ -184,7 +184,7 @@ export const Canvas = (props: IProps) => {
           centerOnInit={true}
           initialScale={.5}
           centerZoomedOut={false}
-          minScale={.1}
+          minScale={0.05}
           maxScale={4}
           panning={{
             wheelPanning: true,
@@ -193,9 +193,9 @@ export const Canvas = (props: IProps) => {
             allowMiddleClickPan: true,
           }}
           doubleClick={{ disabled: true }}
-          smooth={false}
+          smooth={true}
           wheel={{
-            step: 0.1,
+            step: 0.1
           }}
         >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}

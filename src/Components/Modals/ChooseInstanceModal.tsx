@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { QuickSwap } from "./QuickSwapModal";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -61,6 +62,23 @@ export const ChooseInstanceModal = (props: IProp) => {
       localStorage.setItem("stdbConnectDomain", domain);
       localStorage.setItem("stdbConnectModule", moduleName);
       localStorage.setItem("stdbConnectModuleAuthKey", authKey);
+
+      const qSwap = localStorage.getItem("poglyQuickSwap");
+      let existingSwap: QuickSwap[] = [];
+      try {
+        if(qSwap) existingSwap = JSON.parse(qSwap);
+      } catch (error) {
+        //do nothing
+      }
+      const newConnection: QuickSwap = {domain: domain, module: moduleName, auth: authKey};
+      if (existingSwap) {
+        if(existingSwap.some((x) => x.module === moduleName)) return;
+        existingSwap.push(newConnection);
+        localStorage.setItem("poglyQuickSwap", JSON.stringify(existingSwap));
+      } else {
+        let swapArray: QuickSwap[] = [newConnection];
+        localStorage.setItem("poglyQuickSwap", JSON.stringify(swapArray));
+      }
     }
 
     setIsModalOpen(false);
