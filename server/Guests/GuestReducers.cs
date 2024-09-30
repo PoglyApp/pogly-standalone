@@ -111,32 +111,6 @@ public partial class Module
             Log($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.Sender}. " + e.Message, LogLevel.Error);
         }
     }
-    
-    [SpacetimeDB.Reducer]
-    public static void UpdateGuestSelectedLayoutByGuestId(ReducerContext ctx, uint guestId, uint selectedLayoutId)
-    {
-        string func = "UpdateGuestSelectedLayout";
-
-        if (ctx.Address is null) return;
-        if (!GetGuest(func, ctx.Address, out var guest)) return;
-        if (!GuestAuthenticated(func, guest)) return;
-        
-        try
-        {
-            var oldGuest = Guests.FindByAddress(ctx.Address);
-            if (oldGuest is null) throw new Exception("Guest is null");
-            var updatedGuest = oldGuest.Value;
-            updatedGuest.SelectedLayoutId = selectedLayoutId;
-
-            Guests.UpdateByAddress(ctx.Address, updatedGuest);
-            
-            LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), Config.FindByVersion(0)!.Value.DebugMode);
-        }
-        catch (Exception e)
-        {
-            Log($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.Sender}. " + e.Message, LogLevel.Error);
-        }
-    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateGuestPosition(ReducerContext ctx, int positionX, int positionY)

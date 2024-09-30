@@ -114,6 +114,7 @@ export const useGuestsEvents = (
     transformRef,
     setCanvasInitialized,
     dispatch,
+    Identity.selectedLayoutId
   ]);
 
   return disconnected;
