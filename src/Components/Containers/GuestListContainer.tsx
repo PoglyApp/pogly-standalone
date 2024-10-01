@@ -3,16 +3,14 @@ import { useAppSelector } from "../../Store/Features/store";
 import Guests from "../../module_bindings/guests";
 import styled from "styled-components";
 import Config from "../../module_bindings/config";
-import { Avatar, Menu, MenuItem } from "@mui/material";
+import { Avatar, Menu } from "@mui/material";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { LayoutContext } from "../../Contexts/LayoutContext";
 
 export const GuestListContainer = () => {
   const config: Config = useContext(ConfigContext);
-  const layoutContext = useContext(LayoutContext);
 
   const guestStore = useAppSelector((state: any) => state.guests.guests);
 
@@ -74,7 +72,6 @@ export const GuestListContainer = () => {
                       verticalAlign: "middle",
                       position: "relative",
                       marginLeft: "6px",
-                      filter: layoutContext.activeLayout.id === guest.selectedLayoutId ? "unset" : "grayscale(1);",
                     }}
                     onClick={easterEgg}
                   >

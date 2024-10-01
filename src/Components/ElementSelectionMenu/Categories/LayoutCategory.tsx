@@ -29,8 +29,8 @@ export const LayoutCategory = () => {
   useLayoutEvents(setLayouts);
 
   const changeLayout = (layout: Layouts) => {
-    layoutContext.setActiveLayout(layout);
     UpdateGuestSelectedLayoutReducer.call(layout.id);
+    layoutContext.setActiveLayout(layout);
   };
 
   const showLayoutCreationModal = () => {
