@@ -28,8 +28,8 @@ RUN apt-get update \
 COPY --from=web /app/build /usr/share/caddy
 COPY --from=module /root/.spacetime/conf /etc/spacetime
 COPY --from=module /stdb /stdb
-COPY docker/Caddyfile /etc/caddy/
-COPY docker/start.sh /app/start.sh
+COPY .github/workflows/docker/Caddyfile /etc/caddy/
+COPY .github/workflows/docker/start.sh /app/start.sh
 
 ENTRYPOINT ["/bin/sh", "/app/start.sh"]
 EXPOSE 80/tcp

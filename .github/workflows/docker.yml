@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
     tags: ['v*']
     paths-ignore:
       - "**/README.md"
