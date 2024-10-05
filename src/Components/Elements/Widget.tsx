@@ -28,8 +28,7 @@ export const Widget = (props: IProp) => {
 
       DebugLogger("Creating widget");
 
-      //setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
-      setIframeSrc(window.location.origin + "/widget?b64=" + btoa(encodeURIComponent(htmlCode)));
+      setIframeSrc(htmlCode);
     } catch (error) {
       console.log("ERROR WHILE SPAWNING WIDGET", error);
     }
@@ -71,7 +70,7 @@ export const Widget = (props: IProp) => {
       onDoubleClick={showWidgetCreationModal}
     >
       <iframe
-        src={iframeSrc}
+        srcDoc={iframeSrc}
         style={{ pointerEvents: "none", border: "none", overflow: "hidden" }}
         scrolling="no"
         width="100%"

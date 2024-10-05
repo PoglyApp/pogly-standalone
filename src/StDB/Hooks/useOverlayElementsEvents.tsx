@@ -148,7 +148,7 @@ export const useOverlayElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
+            component.children[0].setAttribute("srcDoc", htmlTag);
           }
           break;
       }
