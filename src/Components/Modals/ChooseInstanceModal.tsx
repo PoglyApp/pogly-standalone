@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { QuickSwap } from "./QuickSwapModal";
+import { QuickSwapType } from "../../Types/General/QuickSwapType";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -64,19 +64,19 @@ export const ChooseInstanceModal = (props: IProp) => {
       localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
       const qSwap = localStorage.getItem("poglyQuickSwap");
-      let existingSwap: QuickSwap[] = [];
+      let existingSwap: QuickSwapType[] = [];
       try {
-        if(qSwap) existingSwap = JSON.parse(qSwap);
+        if (qSwap) existingSwap = JSON.parse(qSwap);
       } catch (error) {
         //do nothing
       }
-      const newConnection: QuickSwap = {domain: domain, module: moduleName, auth: authKey};
+      const newConnection: QuickSwapType = { domain: domain, module: moduleName, auth: authKey };
       if (existingSwap) {
-        if(existingSwap.some((x) => x.module === moduleName)) return;
+        if (existingSwap.some((x) => x.module === moduleName)) return;
         existingSwap.push(newConnection);
         localStorage.setItem("poglyQuickSwap", JSON.stringify(existingSwap));
       } else {
-        let swapArray: QuickSwap[] = [newConnection];
+        let swapArray: QuickSwapType[] = [newConnection];
         localStorage.setItem("poglyQuickSwap", JSON.stringify(swapArray));
       }
     }
@@ -95,7 +95,7 @@ export const ChooseInstanceModal = (props: IProp) => {
       <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
         <FormGroup sx={{ gap: "20px" }}>
           <RadioGroup row sx={{ color: "#ffffffa6", display: "block", textAlign: "center" }}>
-          <FormControlLabel
+            <FormControlLabel
               control={
                 <Radio checked={type === "Cloud"} onChange={() => setType("Cloud")} sx={{ color: "#ffffffa6" }} />
               }

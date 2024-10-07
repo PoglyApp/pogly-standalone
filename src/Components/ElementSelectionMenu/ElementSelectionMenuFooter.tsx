@@ -5,7 +5,6 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import UpdateIcon from "@mui/icons-material/Update";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import LogoutIcon from "@mui/icons-material/Logout";
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { ChangelogModal } from "../Modals/ChangelogModal";
@@ -13,7 +12,6 @@ import { ChangelogType } from "../../Types/General/ChangelogType";
 import { GetLatestChangelogVersion, useChangeLog } from "../../Hooks/useChangeLog";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { QuickSwapModal } from "../Modals/QuickSwapModal";
 
 export const ElementSelectionMenuFooter = () => {
   const { setModals } = useContext(ModalContext);
@@ -44,11 +42,6 @@ export const ElementSelectionMenuFooter = () => {
       />,
     ]);
   };
-
-  const showQuickSwapModal = () => {
-    DebugLogger("Opening quick swap modal");
-    setModals((oldModals: any) => [...oldModals, <QuickSwapModal key="quickSwap_modal" client={Client}/>])
-  }
 
   const onLogOut = () => {
     DebugLogger("Handling log out");
@@ -141,18 +134,6 @@ export const ElementSelectionMenuFooter = () => {
         >
           Discord
         </Link>
-      </FooterLinkContainer>
-
-      <FooterLinkContainer>
-        <SwitchAccountIcon sx={{ color: "#ffffffa6" }} />
-
-        <Button
-          variant="text"
-          sx={{ color: "#ffffffa6", textTransform: "initial", font: "inherit", padding: "0", paddingLeft: "2px" }}
-          onClick={showQuickSwapModal}
-        >
-          Quick-Swap
-        </Button>
       </FooterLinkContainer>
 
       <FooterLinkContainer>
