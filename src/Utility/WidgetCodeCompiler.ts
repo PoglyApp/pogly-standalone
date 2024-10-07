@@ -15,7 +15,7 @@ export const WidgetCodeCompiler = (elementDataId?: number, rawData?: string) => 
     widgetData = JSON.parse(data);
   }
 
-  const headerTag: string = `<head>${widgetData.headerTag} <style>${widgetData.styleTag}</style> </head>`;
+  const headerTag: string = `<head>${widgetData.headerTag} <style> html { pointer-events: none; } ${widgetData.styleTag}</style> </head>`;
   const bodyTag: string = `<body>${widgetData.bodyTag} <script>${widgetData.scriptTag}</script> </body>`;
 
   let htmlTag: string = `${headerTag} ${bodyTag}`;

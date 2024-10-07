@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
 import Guests from "../../module_bindings/guests";
 import { CursorComponent } from "../General/CursorComponent";
@@ -21,7 +21,7 @@ export const CursorsContainer = () => {
           (guest: Guests) =>
             guest.address.toHexString() !== Identity.address.toHexString() &&
             guest.nickname !== "" &&
-            layoutContext.activeLayout.id === Identity.selectedLayoutId
+            layoutContext.activeLayout.id === guest.selectedLayoutId
         )
         .map((guest: Guests) => {
           if (config.authentication && !guest.authenticated) return <></>;

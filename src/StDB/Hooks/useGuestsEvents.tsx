@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
-import { addGuest, removeGuest, updateGuest } from "../../Store/Features/GuestSlice";
+import { addGuest, removeGuest, updateGuest, updateGuestLayout } from "../../Store/Features/GuestSlice";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
@@ -77,6 +77,11 @@ export const useGuestsEvents = (
         cursor.setAttribute("data-raw-positionY", newGuest.positionY.toString());
         cursor.style.transform = transform;
         cursor.style.position = "fixed";
+      }
+
+      // UPDATE GUEST SELECTED LAYOUT
+      if (oldGuest.selectedLayoutId !== newGuest.selectedLayoutId) {
+        dispatch(updateGuestLayout(newGuest));
       }
     });
 

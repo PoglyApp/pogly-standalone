@@ -46,7 +46,7 @@ export const Text = (props: IProp) => {
     DebugLogger("Opening text creation modal");
     setModals((oldModals: any) => [
       ...oldModals,
-      <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />, 
+      <TextCreationModal key="textCreation_modal" editElementId={props.elements.id} />,
     ]);
   };
 
@@ -54,7 +54,7 @@ export const Text = (props: IProp) => {
     <div
       id={props.elements.id.toString()}
       ref={targetRef}
-      className="element"
+      className="element textElement"
       data-locked={props.elements.locked}
       style={{
         position: "fixed",
