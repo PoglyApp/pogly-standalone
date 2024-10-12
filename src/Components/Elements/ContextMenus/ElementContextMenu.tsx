@@ -321,6 +321,16 @@ export const ElementContextMenu = (props: IProps) => {
 
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
+      {showExamine && element && element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" &&(
+        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+          Image: {ElementData.findById(element.element.value.imageElementData.value)?.name || ""}
+        </Paper>
+      )}
+      {showExamine && element && element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "RawData" &&(
+        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+          Image: {/7tv|betterttv|tenor/.test(element.element.value.imageElementData.value) ? "7TV/BTTV/Tenor" : "RawData"}
+        </Paper>
+      )}
       {showExamine && element && (
         <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
           Edited by: {element.lastEditedBy}
