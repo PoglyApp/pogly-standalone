@@ -7,10 +7,7 @@ import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import {
-  GetCoordsFromTransform,
-  GetTransformFromCoords,
-} from "./ConvertCoordinates";
+import { GetCoordsFromTransform, GetTransformFromCoords } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
@@ -24,8 +21,8 @@ export const UserInputHandler = (
 ): any => {
   const userInputs = [];
 
-   // GO HOME
-   userInputs.push({
+  // GO HOME
+  userInputs.push({
     name: "goHome",
     keys: "home",
     action: "keydown",
@@ -515,8 +512,12 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        if(!transformRef) return;
-        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX,transformRef.instance.transformState.positionY+15);
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX,
+          transformRef.instance.transformState.positionY + 15
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to move canvas up!");
       }
@@ -533,8 +534,12 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        if(!transformRef) return;
-        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX,transformRef.instance.transformState.positionY-15);
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX,
+          transformRef.instance.transformState.positionY - 15
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to move canvas down!");
       }
@@ -551,9 +556,12 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        if(!transformRef) return;
-        console.log(transformRef);
-        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX+15,transformRef.instance.transformState.positionY);
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX + 15,
+          transformRef.instance.transformState.positionY
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to move canvas up!");
       }
@@ -570,9 +578,12 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        if(!transformRef) return;
-        console.log(transformRef);
-        transformRef.instance.setTransformState(transformRef.instance.transformState.scale,transformRef.instance.transformState.positionX-15,transformRef.instance.transformState.positionY);
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX - 15,
+          transformRef.instance.transformState.positionY
+        );
       } catch {
         console.log("Pogly encountered an issue when attempting to move canvas up!");
       }
