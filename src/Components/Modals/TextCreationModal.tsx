@@ -66,7 +66,7 @@ export const TextCreationModal = (props: IProps) => {
   const [shadowColor, setShadowColor] = useState<string>("#000000");
   const [shadowHeight, setShadowHeight] = useState<string>("0");
   const [shadowWidth, setShadowWidth] = useState<string>("0");
-  const [shadowBlur, setShadowBlur] = useState<string>("0");  
+  const [shadowBlur, setShadowBlur] = useState<string>("0");
 
   const [outline, setOutline] = useState<boolean>(false);
   const [outlineColor, setOutlineColor] = useState<string>("#000000");
@@ -99,6 +99,9 @@ export const TextCreationModal = (props: IProps) => {
     setFontSize(textStruct.size.toString());
     setTextColor(textStruct.color);
 
+    // This is here to not brick text made before 0.2.0 version
+    if (!textStruct.css) return setShowModal(true);
+
     const css = JSON.parse(textStruct.css);
 
     const shadowVariables = css.shadow.split(" ");
@@ -111,7 +114,7 @@ export const TextCreationModal = (props: IProps) => {
     setShadowBlur(sBlur);
     setShadowColor(shadowVariables[3]);
 
-    if(sHeight!=="0" || sWidth !== "0") {
+    if (sHeight !== "0" || sWidth !== "0") {
       setShadow(true);
     }
 
@@ -121,7 +124,7 @@ export const TextCreationModal = (props: IProps) => {
     setOutlineSize(oSize);
     setOutlineColor(outlineVariables[1]);
 
-    if(oSize !== "0") setOutline(true);
+    if (oSize !== "0") setOutline(true);
 
     setCustomCss(css.custom);
 
@@ -272,7 +275,7 @@ export const TextCreationModal = (props: IProps) => {
     setOutlineSize(newOutlineSize);
 
     setError("");
-  }
+  };
 
   const handleShadowBlurChange = (newBlur: any) => {
     const regex = new RegExp("^[0-9]+$");
@@ -529,152 +532,156 @@ export const TextCreationModal = (props: IProps) => {
                   },
                 }}
               >
-
                 <FormControlLabel
-                    componentsProps={{
-                      typography: { color: "#ffffffa6" },
-                    }}
-                    control={
-                      <Checkbox
-                        onChange={() => {
-                          if(shadow) {
-                            setShadow(false);
-                            setShadowWidth("0");
-                            setShadowHeight("0");
-                          } else {
-                            setShadow(true);
-                            setShadowWidth("2");
-                            setShadowHeight("2");
-                          }
-                        }}
-                        checked={shadow}
-                        sx={{ color: "#ffffffa6" }}
+                  componentsProps={{
+                    typography: { color: "#ffffffa6" },
+                  }}
+                  control={
+                    <Checkbox
+                      onChange={() => {
+                        if (shadow) {
+                          setShadow(false);
+                          setShadowWidth("0");
+                          setShadowHeight("0");
+                        } else {
+                          setShadow(true);
+                          setShadowWidth("2");
+                          setShadowHeight("2");
+                        }
+                      }}
+                      checked={shadow}
+                      sx={{ color: "#ffffffa6" }}
+                    />
+                  }
+                  label="Text Shadow"
+                />
+
+                {shadow && (
+                  <div style={{ display: "flex" }}>
+                    <ColorBox
+                      color={shadowColor}
+                      onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
+                      style={{ backgroundColor: shadowColor, marginRight: "10px" }}
+                    />
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Color
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        value={shadowColor}
+                        onChange={(event) => handleShadowColorChange(event.target.value)}
+                        style={{ maxWidth: "80px", marginRight: "8px" }}
                       />
-                    }
-                    label="Text Shadow"
-                  />
-
-                {shadow&&<div style={{ display: "flex" }}>
-                  <ColorBox
-                    color={shadowColor}
-                    onClick={() => setShowShadowColorPicker(!showShadowColorPicker)}
-                    style={{ backgroundColor: shadowColor, marginRight: "10px" }}
-                  />
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Color
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      value={shadowColor}
-                      onChange={(event) => handleShadowColorChange(event.target.value)}
-                      style={{ maxWidth: "80px", marginRight: "8px" }}
-                    />
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Height
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      defaultValue={shadowHeight}
-                      onChange={(event) => handleShadowSizeChange(event.target.value, true)}
-                      style={{ maxWidth: "50px", marginRight: "8px" }}
-                    />
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Width
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      defaultValue={shadowWidth}
-                      onChange={(event) => handleShadowSizeChange(event.target.value, false)}
-                      style={{ maxWidth: "50px", marginRight: "8px" }}
-                    />
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Blur
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      defaultValue={shadowBlur}
-                      onChange={(event) => handleShadowBlurChange(event.target.value)}
-                      style={{ maxWidth: "50px" }}
-                    />
-                  </div>
-                  {showShadowColorPicker && (
-                    <Popover>
-                      <Cover onClick={() => setShowShadowColorPicker(!showShadowColorPicker)} />
-                      <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
-                    </Popover>
-                  )}
-                </div>}
-
-                <br /><FormControlLabel
-                    componentsProps={{
-                      typography: { color: "#ffffffa6" },
-                    }}
-                    control={
-                      <Checkbox
-                        onChange={() => {
-                          if(outline) {
-                            setOutline(false);
-                            setOutlineSize("0");
-                          } else {
-                            setOutline(true);
-                            setOutlineSize("1");
-                          }
-                        }}
-                        checked={outline}
-                        sx={{ color: "#ffffffa6" }}
+                    </div>
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Height
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        defaultValue={shadowHeight}
+                        onChange={(event) => handleShadowSizeChange(event.target.value, true)}
+                        style={{ maxWidth: "50px", marginRight: "8px" }}
                       />
-                    }
-                    label="Text Outline"
-                  />
+                    </div>
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Width
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        defaultValue={shadowWidth}
+                        onChange={(event) => handleShadowSizeChange(event.target.value, false)}
+                        style={{ maxWidth: "50px", marginRight: "8px" }}
+                      />
+                    </div>
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Blur
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        defaultValue={shadowBlur}
+                        onChange={(event) => handleShadowBlurChange(event.target.value)}
+                        style={{ maxWidth: "50px" }}
+                      />
+                    </div>
+                    {showShadowColorPicker && (
+                      <Popover>
+                        <Cover onClick={() => setShowShadowColorPicker(!showShadowColorPicker)} />
+                        <HexColorPicker color={shadowColor} onChange={(color) => handleShadowColorChange(color)} />
+                      </Popover>
+                    )}
+                  </div>
+                )}
 
-                {outline&&<div style={{ display: "flex" }}>
-                  <ColorBox
-                    color={outlineColor}
-                    onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)}
-                    style={{ backgroundColor: outlineColor, marginRight: "10px" }}
-                  />
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Color
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      value={outlineColor}
-                      onChange={(event) => handleOutlineColorChange(event.target.value)}
-                      style={{ maxWidth: "80px", marginRight: "8px" }}
+                <br />
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6" },
+                  }}
+                  control={
+                    <Checkbox
+                      onChange={() => {
+                        if (outline) {
+                          setOutline(false);
+                          setOutlineSize("0");
+                        } else {
+                          setOutline(true);
+                          setOutlineSize("1");
+                        }
+                      }}
+                      checked={outline}
+                      sx={{ color: "#ffffffa6" }}
                     />
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2" color="#ffffffa6">
-                      Size
-                    </Typography>
-                    <StyledColorInput
-                      type="text"
-                      name="variableValue"
-                      defaultValue={outlineSize}
-                      onChange={(event) => handleOutlineSizeChange(event.target.value)}
-                      style={{ maxWidth: "50px", marginRight: "8px" }}
+                  }
+                  label="Text Outline"
+                />
+
+                {outline && (
+                  <div style={{ display: "flex" }}>
+                    <ColorBox
+                      color={outlineColor}
+                      onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)}
+                      style={{ backgroundColor: outlineColor, marginRight: "10px" }}
                     />
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Color
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        value={outlineColor}
+                        onChange={(event) => handleOutlineColorChange(event.target.value)}
+                        style={{ maxWidth: "80px", marginRight: "8px" }}
+                      />
+                    </div>
+                    <div>
+                      <Typography variant="subtitle2" color="#ffffffa6">
+                        Size
+                      </Typography>
+                      <StyledColorInput
+                        type="text"
+                        name="variableValue"
+                        defaultValue={outlineSize}
+                        onChange={(event) => handleOutlineSizeChange(event.target.value)}
+                        style={{ maxWidth: "50px", marginRight: "8px" }}
+                      />
+                    </div>
+                    {showOutlineColorPicker && (
+                      <Popover>
+                        <Cover onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)} />
+                        <HexColorPicker color={outlineColor} onChange={(color) => handleOutlineColorChange(color)} />
+                      </Popover>
+                    )}
                   </div>
-                  {showOutlineColorPicker && (
-                    <Popover>
-                      <Cover onClick={() => setShowOutlineColorPicker(!showOutlineColorPicker)} />
-                      <HexColorPicker color={outlineColor} onChange={(color) => handleOutlineColorChange(color)} />
-                    </Popover>
-                  )}
-                </div>}
+                )}
               </AccordionDetails>
             </Accordion>
 
