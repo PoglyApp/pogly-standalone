@@ -2,7 +2,6 @@ import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_dat
 import AddElementDataReducer from "../module_bindings/add_element_data_reducer";
 import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
 import AddElementToLayoutReducer from "../module_bindings/add_element_to_layout_reducer";
-import AddLayoutReducer from "../module_bindings/add_layout_reducer";
 import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
 import ElementData from "../module_bindings/element_data";
 import ElementStruct from "../module_bindings/element_struct";

@@ -19,6 +19,10 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
+import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
+import DeleteAllLayoutsReducer from "../../module_bindings/delete_all_layouts_reducer";
+import DeleteAllFoldersReducer from "../../module_bindings/delete_all_folders_reducer";
 
 interface IProps {
   download: boolean;
@@ -34,6 +38,7 @@ export const BackupModal = (props: IProps) => {
   const [downData, setDownData] = useState<boolean>(true);
   const [downElement, setDownElement] = useState<boolean>(false);
   const [downLayout, setDownLayout] = useState<boolean>(false);
+  const [deleteOnUpload,setDeleteOnUpload] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.download) return;
@@ -66,9 +71,19 @@ export const BackupModal = (props: IProps) => {
   };
 
   const handleUpload = () => {
-    DebugLogger("Uploading backup data");
-    UploadBackupFromFile(file);
-    closeModal("backup_modal", modals, setModals);
+    if(!deleteOnUpload) {
+      DebugLogger("Uploading backup data");
+      UploadBackupFromFile(file);
+      closeModal("backup_modal", modals, setModals);
+    } else {
+      DebugLogger("Uploading backup data - clearing existing data");
+      DeleteAllElementsReducer.call();
+      DeleteAllElementDataReducer.call();
+      DeleteAllLayoutsReducer.call(false);
+      DeleteAllFoldersReducer.call(false);
+      UploadBackupFromFile(file);
+      closeModal("backup_modal", modals, setModals);
+    }
   };
 
   const handleDownload = () => {
@@ -93,6 +108,23 @@ export const BackupModal = (props: IProps) => {
               </Tooltip>
             </Typography>
             <Input type="file" onChange={(event: any) => handleFileChange(event)} />
+            <div style={{ display: "grid", marginTop: "10px" }}>
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6", paddingTop: "1px" },
+                  }}
+                  sx={{ alignItems: "start" }}
+                  control={
+                    <Checkbox
+                      onChange={() => setDeleteOnUpload(!deleteOnUpload)}
+                      defaultChecked={deleteOnUpload}
+                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
+                    />
+                  }
+                  label="Clear existing data"
+                  title="Recommended for large modules with multiple layouts!"
+                />
+              </div>
             {error !== "" && (
               <Alert
                 variant="filled"

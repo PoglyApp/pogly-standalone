@@ -34,6 +34,7 @@ export const useSevenTV = (
 
     streamerIdPromise?.then((p) => {
       if (!p.data) return;
+      if (!p.data.users[0]) return
       setStreamerId(p.data.users[0].id);
       setTwitchIdPromise(SevenTVWrap.GetUserById(p.data.users[0].id));
     });
