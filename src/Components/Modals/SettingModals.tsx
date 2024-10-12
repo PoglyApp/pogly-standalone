@@ -401,6 +401,20 @@ export const SettingsModal = (props: IProp) => {
             </div>
 
             <div style={{ display: "grid", marginTop: "10px" }}>
+            <Button
+                variant="outlined"
+                startIcon={<DeleteIcon />}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "#ffffff" },
+                  marginTop: "10px",
+                }}
+                onClick={() => {localStorage.removeItem("poglyQuickSwap");}}
+              >
+                Clear Quick-Swap Modules
+              </Button>
+
               <Button
                 variant="outlined"
                 startIcon={<DeleteIcon />}
