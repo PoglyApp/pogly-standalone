@@ -22,7 +22,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import Fingerprint from "@mui/icons-material/Fingerprint";
-import ContentPaste from "@mui/icons-material/ContentPaste"
+import ContentPaste from "@mui/icons-material/ContentPaste";
 import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
@@ -58,7 +58,9 @@ export const SettingsModal = (props: IProp) => {
   const [nicknameInput, setNicknameInput] = useState<string>(localStorage.getItem("nickname")!);
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
   const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(true);
-  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(stream.style.pointerEvents === "none" ? false : true);
+  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
+    stream.style.pointerEvents === "none" ? false : true
+  );
 
   // ADVANCED
   const [compressUpload, setCompressUpload] = useState<boolean>(
@@ -68,16 +70,11 @@ export const SettingsModal = (props: IProp) => {
     settings.compressPaste != null ? settings.compressPaste : true
   );
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  let overlayURL =
-      window.location.origin +
-      "/overlay?domain=" +
-      Runtime?.domain +
-      "&module=" +
-      Runtime?.module;
+  let overlayURL = window.location.origin + "/overlay?domain=" + Runtime?.domain + "&module=" + Runtime?.module;
 
-    if (config.authentication && Runtime?.authKey) {
-      overlayURL = overlayURL + "&auth=" + Runtime.authKey;
-    }
+  if (config.authentication && Runtime?.authKey) {
+    overlayURL = overlayURL + "&auth=" + Runtime.authKey;
+  }
 
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);
@@ -96,15 +93,15 @@ export const SettingsModal = (props: IProp) => {
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
     UpdateGuestNicknameReducer.call(nicknameInput);
 
-    if(permission && permission.tag === "Owner") {
-      const doUpdate = 
-        platform !== config.streamingPlatform || 
+    if (permission && permission.tag === "Owner") {
+      const doUpdate =
+        platform !== config.streamingPlatform ||
         streamName !== config.streamName ||
         updateHz !== config.updateHz ||
         auth !== config.authentication ||
         strictMode !== config.strictMode;
 
-        if(doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
+      if (doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
     }
 
     let newSettings = settings;
@@ -193,7 +190,9 @@ export const SettingsModal = (props: IProp) => {
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="General" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Advanced" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Debug" />
-            {permission && permission.tag === "Owner" && <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" /> }
+            {permission && permission.tag === "Owner" && (
+              <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />
+            )}
           </Tabs>
           <SettingsTabPanel value={tabValue} index={0}>
             <StyledInput
@@ -290,7 +289,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
                   marginRight: "10px",
-                  width: "48.5%"
+                  width: "48.5%",
                 }}
                 onClick={showUploadModal}
               >
@@ -305,7 +304,7 @@ export const SettingsModal = (props: IProp) => {
                   borderColor: "#ffffffa6",
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
-                  width: "48.5%"
+                  width: "48.5%",
                 }}
                 onClick={showDownloadModal}
               >
@@ -316,7 +315,7 @@ export const SettingsModal = (props: IProp) => {
             <div style={{ display: "grid" }}>
               <Button
                 variant="outlined"
-                startIcon={<ContentPaste/>}
+                startIcon={<ContentPaste />}
                 sx={{
                   color: "#ffffffa6",
                   borderColor: "#ffffffa6",
@@ -401,7 +400,7 @@ export const SettingsModal = (props: IProp) => {
             </div>
 
             <div style={{ display: "grid", marginTop: "10px" }}>
-            <Button
+              <Button
                 variant="outlined"
                 startIcon={<DeleteIcon />}
                 sx={{
@@ -410,7 +409,9 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#ffffff" },
                   marginTop: "10px",
                 }}
-                onClick={() => {localStorage.removeItem("poglyQuickSwap");}}
+                onClick={() => {
+                  localStorage.removeItem("poglyQuickSwap");
+                }}
               >
                 Clear Quick-Swap Modules
               </Button>
@@ -475,9 +476,80 @@ export const SettingsModal = (props: IProp) => {
               </Button>
             </div>
           </SettingsTabPanel>
-          {permission && permission.tag === "Owner" && 
+          {permission && permission.tag === "Owner" && (
             <SettingsTabPanel value={tabValue} index={3}>
-              <div style={{ display: "grid", marginTop: "10px" }}>
+              <div style={{ display: "grid" }}>
+                <RadioGroup
+                  row
+                  sx={{ color: "#ffffffa6", display: "block", textAlign: "center", marginBottom: "10px" }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "twitch"}
+                        onChange={() => setPlatform("twitch")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Twitch"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "youtube"}
+                        onChange={() => setPlatform("youtube")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Youtube"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "kick"}
+                        onChange={() => setPlatform("kick")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Kick"
+                    labelPlacement="top"
+                  />
+                </RadioGroup>
+                {platform === "youtube" && (
+                  <Alert
+                    variant="filled"
+                    severity="warning"
+                    sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginBottom: "20px" }}
+                  >
+                    Youtubers! Enter your CHANNEL_ID found{" "}
+                    <a href="https://www.youtube.com/account_advanced" target="_blank" rel="noreferrer">
+                      here
+                    </a>{" "}
+                    below.
+                  </Alert>
+                )}
+                <StyledInput
+                  focused={false}
+                  label={platform !== "youtube" ? "Channel Name" : "CHANNEL_ID"}
+                  color="#ffffffa6"
+                  onChange={setStreamName}
+                  defaultValue={streamName}
+                  style={{ width: "100%" }}
+                />
+                <div style={{ display: "grid", marginTop: "20px", marginBottom: "20px" }}>
+                  <StyledInput
+                    focused={false}
+                    label="Update Hz (Refresh Rate)"
+                    color="#ffffffa6"
+                    onChange={(event: any) => {
+                      setUpdateHz(Number(event));
+                    }}
+                    defaultValue={updateHz.toString()}
+                    style={{ width: "100%" }}
+                  />
+                </div>
                 <FormControlLabel
                   componentsProps={{
                     typography: { color: "#ffffffa6", paddingTop: "1px" },
@@ -525,69 +597,9 @@ export const SettingsModal = (props: IProp) => {
                 >
                   Update Instance Password
                 </Button>
-                <div style={{ display: "grid", marginTop: "10px" }}>
-                  <RadioGroup row sx={{ color: "#ffffffa6", display: "block", textAlign: "center" }}>
-                    <FormControlLabel
-                      control={
-                        <Radio
-                          checked={platform === "twitch"}
-                          onChange={() => setPlatform("twitch")}
-                          sx={{ color: "#ffffffa6" }}
-                        />
-                      }
-                      label="Twitch"
-                      labelPlacement="top"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Radio
-                          checked={platform === "youtube"}
-                          onChange={() => setPlatform("youtube")}
-                          sx={{ color: "#ffffffa6" }}
-                        />
-                      }
-                      label="Youtube"
-                      labelPlacement="top"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Radio checked={platform === "kick"} onChange={() => setPlatform("kick")} sx={{ color: "#ffffffa6" }} />
-                      }
-                      label="Kick"
-                      labelPlacement="top"
-                    />
-                  </RadioGroup>
-                  {platform === "youtube" && (
-                    <Alert variant="filled" severity="warning" sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginBottom:"20px" }}>
-                      Youtubers! Enter your CHANNEL_ID found{" "}
-                      <a href="https://www.youtube.com/account_advanced" target="_blank" rel="noreferrer">
-                        here
-                      </a>{" "}
-                      below.
-                    </Alert>
-                  )}
-                  <StyledInput
-                    focused={false}
-                    label={platform !== "youtube" ? "Channel Name" : "CHANNEL_ID"}
-                    color="#ffffffa6"
-                    onChange={setStreamName}
-                    defaultValue={streamName}
-                    style={{ width: "100%" }}
-                  />
-                </div>
-                <div style={{ display: "grid", marginTop: "20px" }}>
-                  <StyledInput
-                    focused={false}
-                    label="Update Hz (Refresh Rate)"
-                    color="#ffffffa6"
-                    onChange={(event: any) => {setUpdateHz(Number(event))}}
-                    defaultValue={updateHz.toString()}
-                    style={{ width: "100%" }}
-                  />
-                </div>
               </div>
-          </SettingsTabPanel>
-          }
+            </SettingsTabPanel>
+          )}
         </Box>
       </DialogContent>
 
