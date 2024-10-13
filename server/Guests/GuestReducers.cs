@@ -222,26 +222,44 @@ public partial class Module
     }
 
     [SpacetimeDB.Reducer]
-    public static void ImportPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel)
+    public static void ImportPermission(ReducerContext ctx, byte[] identity, string permissionLevel)
     {
         string func = "ImportPermission";
         if (Config.FindByVersion(0)!.Value.ConfigInit) return;
 
         try
         {
-            var perm = Permissions.FindByIdentity(identity);
+            var perm = Permissions.FindByIdentity(new Identity(identity));
+            
+            PermissionLevel perms = PermissionLevel.None;
+            switch (permissionLevel)
+            {
+                case "None":
+                    perms = PermissionLevel.None;
+                    break;
+                case "Editor":
+                    perms = PermissionLevel.Editor;
+                    break;
+                case "Moderator":
+                    perms = PermissionLevel.Moderator;
+                    break;
+                case "Owner":
+                    perms = PermissionLevel.Owner;
+                    break;
+            }
+            
             if (perm is null)
             {
                 new Permissions
                 {
-                    Identity = identity,
-                    PermissionLevel = permissionLevel
+                    Identity = new Identity(identity),
+                    PermissionLevel = perms
                 }.Insert();
             } 
             else
             {
                 var newPerm = perm.Value;
-                newPerm.PermissionLevel = permissionLevel;
+                newPerm.PermissionLevel = perms;
                 Permissions.UpdateByIdentity(newPerm.Identity, newPerm);
             }
         }
