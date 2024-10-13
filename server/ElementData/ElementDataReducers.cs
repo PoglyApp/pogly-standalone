@@ -76,7 +76,7 @@ public partial class Module
     [SpacetimeDB.Reducer]
     public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height)
     {
-        string func = "AddElementData";
+        string func = "AddElementDataArray";
         
         if (ctx.Address is null) return;
         if (!GetGuest(func, ctx.Address, out var guest)) return;
@@ -111,7 +111,7 @@ public partial class Module
     [SpacetimeDB.Reducer]
     public static void AddElementDataArrayWithId(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] array, int width, int height)
     {
-        string func = "AddElementData";
+        string func = "AddElementDataArrayWithId";
         
         if (ctx.Address is null) return;
         if (!GetGuest(func, ctx.Address, out var guest)) return;
@@ -137,6 +137,34 @@ public partial class Module
             elementData.Insert();
             
             LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromElementData(elementData), Config.FindByVersion(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message, LogLevel.Error);
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height, string createdBy)
+    {
+        string func = "ImportElementDataArrayWithId";
+        
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+        
+        try
+        {
+            var elementData = new ElementData
+            {
+                Id = id,
+                Name = name,
+                DataType = type,
+                Data = data,
+                ByteArray = null,
+                DataWidth = width,
+                DataHeight = height,
+                CreatedBy = createdBy
+            };
+            elementData.Insert();
         }
         catch (Exception e)
         {

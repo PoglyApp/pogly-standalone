@@ -149,6 +149,41 @@ public partial class Module
             Log($"[{func}] - Unable to UpdateConfig! " + e.Message,LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz, 
+        uint editorBorder, bool authentication, bool strictMode, string authKey="")
+    {
+        string func = "ImportConfig";
+        var config = Config.FilterByVersion(0).First();
+        if (config.ConfigInit) return;
+
+        try
+        {
+            config.StreamingPlatform = platform;
+            config.StreamName = channel;
+            config.OwnerIdentity = ownerIdentity;
+            config.DebugMode = debug;
+            config.UpdateHz = updateHz;
+            config.EditorBorder = editorBorder;
+            config.Authentication = authentication;
+            config.StrictMode = strictMode;
+            config.ConfigInit = true;
+        
+            new _AuthenticationKey
+            {
+                Version = 0,
+                Key = authKey
+            }.Insert();
+
+            Config.UpdateByVersion(0, config); 
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] - Unable to ImportConfig! " + e.Message,LogLevel.Panic);
+            throw new Exception($"[{func}] - Unable to ImportConfig!");
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateAuthenticationKey(ReducerContext ctx, string authenticationKey)

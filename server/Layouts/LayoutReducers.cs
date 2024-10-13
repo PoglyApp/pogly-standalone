@@ -73,6 +73,30 @@ public partial class Module
             Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportLayout(ReducerContext ctx, uint id, string name, string createdBy, bool active = false)
+    {
+        string func = "ImportLayout";
+
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+
+        try
+        {
+            var newLayout = new Layouts
+            {
+                Id = id,
+                Name = name,
+                CreatedBy = createdBy,
+                Active = active
+            };
+            newLayout.Insert();
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateLayoutName(ReducerContext ctx, uint layoutId, string name)

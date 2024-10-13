@@ -99,6 +99,37 @@ public partial class Module
             Log($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
+        string clip, uint layoutId, string placedBy, string lastEditedBy, int zindex, uint? folderId = null)
+    {
+        string func = "ImportElement";
+        
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+        
+        try
+        {
+            var newElement = new Elements
+            {
+                Element = element,
+                Transparency = transparency,
+                Transform = transform,
+                Clip = clip,
+                Locked = false,
+                LayoutId = layoutId,
+                FolderId = folderId,
+                PlacedBy = placedBy,
+                LastEditedBy = lastEditedBy,
+                ZIndex = zindex
+            };
+            newElement.Insert();
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateElement(ReducerContext ctx, uint elementId, ElementStruct element, int transparency, string transform,

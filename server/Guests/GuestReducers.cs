@@ -222,6 +222,37 @@ public partial class Module
     }
 
     [SpacetimeDB.Reducer]
+    public static void ImportPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel)
+    {
+        string func = "ImportPermission";
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+
+        try
+        {
+            var perm = Permissions.FindByIdentity(identity);
+            if (perm is null)
+            {
+                new Permissions
+                {
+                    Identity = identity,
+                    PermissionLevel = permissionLevel
+                }.Insert();
+            } 
+            else
+            {
+                var newPerm = perm.Value;
+                newPerm.PermissionLevel = permissionLevel;
+                Permissions.UpdateByIdentity(newPerm.Identity, newPerm);
+            }
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Encountered error importing permission, requested by {ctx.Sender}. " + e.Message,
+                LogLevel.Error);
+        }
+    }
+
+    [SpacetimeDB.Reducer]
     public static void SetIdentityPermissionModerator(ReducerContext ctx, Identity identity)
     {
         SetIdentityPermission(ctx, identity, PermissionLevel.Moderator);
