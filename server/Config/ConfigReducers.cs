@@ -152,7 +152,7 @@ public partial class Module
     
     [SpacetimeDB.Reducer]
     public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz, 
-        uint editorBorder, bool authentication, bool strictMode, string authKey="")
+        uint editorBorder, bool authentication, bool strictMode, int zmin, int zmax, string authKey="")
     {
         string func = "ImportConfig";
         var config = Config.FilterByVersion(0).First();
@@ -175,6 +175,11 @@ public partial class Module
                 Version = 0,
                 Key = authKey
             }.Insert();
+
+            var zindex = ZIndex.FilterByVersion(0).First();
+            zindex.Min = zmin;
+            zindex.Max = zmax;
+            ZIndex.UpdateByVersion(0, zindex);
 
             Config.UpdateByVersion(0, config); 
         }
