@@ -48,7 +48,7 @@ export const InitialSetupModal = (props: IProp) => {
   const [error, setError] = useState<string>("");
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const badCharacters = / `!@#$%^&*()_+-=\[\]{};':"\\|,.<>\/?~]/;
+  const regex = /^[0-9a-zA-Z]+$/;
   const badCharError = "Special characters are not supported in Authentication Key at this time.";
 
   useGetDefaultElements(setDefaultElements);
@@ -69,18 +69,17 @@ export const InitialSetupModal = (props: IProp) => {
 
   const handleAuthKeyChange = (text: any) => {
     DebugLogger("Handling auth key change");
-    if (badCharacters.test(text)) {
+    if (!regex.test(text)) {
       setError(badCharError);
-
       return;
     }
+      if (error === badCharError) setError("");
 
-    if (error === badCharError) setError("");
-
-    setAuthKey(text);
+      setAuthKey(text);
   };
 
   const handleSave = () => {
+    console.log(authKey);
     DebugLogger("Saving instance settings");
     const regex = new RegExp("^[0-9]+$");
 
