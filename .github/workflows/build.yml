@@ -22,7 +22,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y binaryen
           dotnet workload install wasi-experimental
-          curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/latest/download/spacetime.linux-amd64.tar.gz | sudo tar -xzC /usr/bin/
+          curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/download/v0.11.1-beta/spacetime.linux-amd64.tar.gz | sudo tar -xzC /usr/bin/
           sudo chmod +x /usr/bin/spacetime
       - name: "Build module"
         run: |
