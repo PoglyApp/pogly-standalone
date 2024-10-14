@@ -3,7 +3,7 @@ WORKDIR /app
 
 # binaryen is wasm optimization, spacetime build complains if this isn't installed
 RUN apt-get update && apt-get install -y binaryen \
-    && curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/latest/download/spacetime.linux-amd64.tar.gz | tar -xzC /usr/bin/ \
+    && curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/download/v0.11.1-beta/spacetime.linux-amd64.tar.gz | tar -xzC /usr/bin/ \
     && chmod +x /usr/bin/spacetime \
     && dotnet workload install wasi-experimental
 
