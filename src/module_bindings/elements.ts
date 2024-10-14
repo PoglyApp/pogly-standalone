@@ -16,6 +16,7 @@ export class Elements extends DatabaseTable
 	public transform: string;
 	public clip: string;
 	public locked: boolean;
+	public folderId: number | null;
 	public layoutId: number;
 	public placedBy: string;
 	public lastEditedBy: string;
@@ -23,7 +24,7 @@ export class Elements extends DatabaseTable
 
 	public static primaryKey: string | undefined = "id";
 
-	constructor(id: number, element: ElementStruct, transparency: number, transform: string, clip: string, locked: boolean, layoutId: number, placedBy: string, lastEditedBy: string, zIndex: number) {
+	constructor(id: number, element: ElementStruct, transparency: number, transform: string, clip: string, locked: boolean, folderId: number | null, layoutId: number, placedBy: string, lastEditedBy: string, zIndex: number) {
 	super();
 		this.id = id;
 		this.element = element;
@@ -31,6 +32,7 @@ export class Elements extends DatabaseTable
 		this.transform = transform;
 		this.clip = clip;
 		this.locked = locked;
+		this.folderId = folderId;
 		this.layoutId = layoutId;
 		this.placedBy = placedBy;
 		this.lastEditedBy = lastEditedBy;
@@ -39,7 +41,7 @@ export class Elements extends DatabaseTable
 
 	public static serialize(value: Elements): object {
 		return [
-		value.id, ElementStruct.serialize(value.element), value.transparency, value.transform, value.clip, value.locked, value.layoutId, value.placedBy, value.lastEditedBy, value.zIndex
+		value.id, ElementStruct.serialize(value.element), value.transparency, value.transform, value.clip, value.locked, value.folderId ? { "some": value.folderId } : { "none": [] }, value.layoutId, value.placedBy, value.lastEditedBy, value.zIndex
 		];
 	}
 
@@ -52,6 +54,11 @@ export class Elements extends DatabaseTable
 			new ProductTypeElement("transform", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("clip", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("locked", AlgebraicType.createPrimitiveType(BuiltinType.Type.Bool)),
+			new ProductTypeElement("folderId", AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		])),
 			new ProductTypeElement("layoutId", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
 			new ProductTypeElement("placedBy", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("lastEditedBy", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
@@ -68,11 +75,12 @@ export class Elements extends DatabaseTable
 		let __Transform = productValue.elements[3].asString();
 		let __Clip = productValue.elements[4].asString();
 		let __Locked = productValue.elements[5].asBoolean();
-		let __LayoutId = productValue.elements[6].asNumber();
-		let __PlacedBy = productValue.elements[7].asString();
-		let __LastEditedBy = productValue.elements[8].asString();
-		let __ZIndex = productValue.elements[9].asNumber();
-		return new this(__Id, __Element, __Transparency, __Transform, __Clip, __Locked, __LayoutId, __PlacedBy, __LastEditedBy, __ZIndex);
+		let __FolderId = productValue.elements[6].asSumValue().tag == 1 ? null : productValue.elements[6].asSumValue().value.asNumber();
+		let __LayoutId = productValue.elements[7].asNumber();
+		let __PlacedBy = productValue.elements[8].asString();
+		let __LastEditedBy = productValue.elements[9].asString();
+		let __ZIndex = productValue.elements[10].asNumber();
+		return new this(__Id, __Element, __Transparency, __Transform, __Clip, __Locked, __FolderId, __LayoutId, __PlacedBy, __LastEditedBy, __ZIndex);
 	}
 
 	public static *filterById(value: number): IterableIterator<Elements>

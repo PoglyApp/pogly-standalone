@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  Radio,
+  RadioGroup,
   Tab,
   Tabs,
 } from "@mui/material";
@@ -20,6 +22,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import Fingerprint from "@mui/icons-material/Fingerprint";
+import ContentPaste from "@mui/icons-material/ContentPaste";
 import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
@@ -36,6 +39,7 @@ import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_
 import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
 import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
 import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
+import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
 
 interface IProp {
   onlineVersion: string;
@@ -43,17 +47,20 @@ interface IProp {
 
 export const SettingsModal = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
-  const { Identity } = useSpacetimeContext();
+  const { Runtime, Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   // GENERAL
+  const stream = document.getElementById("stream")!;
   const [nicknameInput, setNicknameInput] = useState<string>(localStorage.getItem("nickname")!);
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
-  const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(settings.cursorName || true);
-  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(false);
+  const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(true);
+  const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
+    stream.style.pointerEvents === "none" ? false : true
+  );
 
   // ADVANCED
   const [compressUpload, setCompressUpload] = useState<boolean>(
@@ -62,20 +69,40 @@ export const SettingsModal = (props: IProp) => {
   const [compressPaste, setCompressPaste] = useState<boolean>(
     settings.compressPaste != null ? settings.compressPaste : true
   );
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
+  let overlayURL = window.location.origin + "/overlay?domain=" + Runtime?.domain + "&module=" + Runtime?.module;
+
+  if (config.authentication && Runtime?.authKey) {
+    overlayURL = overlayURL + "&auth=" + Runtime.authKey;
+  }
 
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);
-
   const [tabValue, setTabValue] = useState<number>(0);
-
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  useEffect(() => {}, []);
+  // OWNER
+  const [platform, setPlatform] = useState<string>(config.streamingPlatform);
+  const [streamName, setStreamName] = useState<string>(config.streamName);
+  const [updateHz, setUpdateHz] = useState<number>(config.updateHz);
+  const [auth, setAuth] = useState<boolean>(config.authentication);
+  const [strictMode, setStrictMode] = useState<boolean>(config.strictMode);
 
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
     UpdateGuestNicknameReducer.call(nicknameInput);
+
+    if (permission && permission.tag === "Owner") {
+      const doUpdate =
+        platform !== config.streamingPlatform ||
+        streamName !== config.streamName ||
+        updateHz !== config.updateHz ||
+        auth !== config.authentication ||
+        strictMode !== config.strictMode;
+
+      if (doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
+    }
 
     let newSettings = settings;
 
@@ -133,6 +160,8 @@ export const SettingsModal = (props: IProp) => {
     }
   };
 
+  const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
+
   if (isOverlay) return <></>;
 
   return (
@@ -143,7 +172,7 @@ export const SettingsModal = (props: IProp) => {
       sx={{
         ".MuiDialog-paper": {
           height: "580px !important",
-          width: "360px !important",
+          width: "420px !important",
         },
       }}
     >
@@ -158,9 +187,12 @@ export const SettingsModal = (props: IProp) => {
       >
         <Box sx={{ width: "100%" }}>
           <Tabs value={tabValue} onChange={(event, value) => setTabValue(value)} aria-label="settings tabs">
-            <Tab sx={{ backgroundColor: "#001529", width: "33%" }} label="General" />
-            <Tab sx={{ backgroundColor: "#001529", width: "33%" }} label="Advanced" />
-            <Tab sx={{ backgroundColor: "#001529", width: "33%" }} label="Debug" />
+            <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="General" />
+            <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Advanced" />
+            <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Debug" />
+            {permission && permission.tag === "Owner" && (
+              <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />
+            )}
           </Tabs>
           <SettingsTabPanel value={tabValue} index={0}>
             <StyledInput
@@ -190,21 +222,6 @@ export const SettingsModal = (props: IProp) => {
                   sx={{ alignItems: "start" }}
                   control={
                     <Checkbox
-                      onChange={() => setCursorNameCheckbox(!cursorNameCheckbox)}
-                      defaultChecked={cursorNameCheckbox}
-                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
-                    />
-                  }
-                  label="Show cursor usernames"
-                />
-
-                <FormControlLabel
-                  componentsProps={{
-                    typography: { color: "#ffffffa6", paddingTop: "1px" },
-                  }}
-                  sx={{ alignItems: "start" }}
-                  control={
-                    <Checkbox
                       onChange={() => handleStreamPlayerInteractable()}
                       defaultChecked={streamPlayerInteractable}
                       sx={{ color: "#ffffffa6", paddingTop: "0px" }}
@@ -218,7 +235,7 @@ export const SettingsModal = (props: IProp) => {
                 <Alert
                   variant="filled"
                   severity="warning"
-                  sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "280px" }}
+                  sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "100%" }}
                 >
                   You have an outdated Pogly version!{" "}
                   <a href="https://github.com/PoglyApp/pogly-standalone/releases">Grab the new version here</a>.
@@ -226,7 +243,6 @@ export const SettingsModal = (props: IProp) => {
               )}
             </div>
           </SettingsTabPanel>
-
           <SettingsTabPanel value={tabValue} index={1}>
             <div style={{ display: "grid" }}>
               <FormControlLabel
@@ -273,6 +289,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
                   marginRight: "10px",
+                  width: "48.5%",
                 }}
                 onClick={showUploadModal}
               >
@@ -287,6 +304,7 @@ export const SettingsModal = (props: IProp) => {
                   borderColor: "#ffffffa6",
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
+                  width: "48.5%",
                 }}
                 onClick={showDownloadModal}
               >
@@ -295,6 +313,28 @@ export const SettingsModal = (props: IProp) => {
             </div>
 
             <div style={{ display: "grid" }}>
+              <Button
+                variant="outlined"
+                startIcon={<ContentPaste />}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  marginTop: "10px",
+                }}
+                onClick={() => {
+                  navigator.clipboard.writeText(overlayURL);
+
+                  setCopyOverlayButtonText("Copied!");
+
+                  setTimeout(() => {
+                    setCopyOverlayButtonText("Copy Overlay URL");
+                  }, 1000);
+                }}
+              >
+                {copyOverlayButtonText}
+              </Button>
+
               <Button
                 variant="outlined"
                 startIcon={<Fingerprint />}
@@ -308,22 +348,6 @@ export const SettingsModal = (props: IProp) => {
               >
                 Update Auth Token
               </Button>
-
-              {permission && permission.tag === "Owner" && config.authentication && (
-                <Button
-                  variant="outlined"
-                  startIcon={<PasswordIcon />}
-                  sx={{
-                    color: "#ffa700",
-                    borderColor: "#ffa700",
-                    "&:hover": { borderColor: "#db8f00" },
-                    marginTop: "10px",
-                  }}
-                  onClick={showInstancePassword}
-                >
-                  Update Instance Password
-                </Button>
-              )}
 
               <Button
                 variant="outlined"
@@ -376,6 +400,22 @@ export const SettingsModal = (props: IProp) => {
             </div>
 
             <div style={{ display: "grid", marginTop: "10px" }}>
+              <Button
+                variant="outlined"
+                startIcon={<DeleteIcon />}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "#ffffff" },
+                  marginTop: "10px",
+                }}
+                onClick={() => {
+                  localStorage.removeItem("poglyQuickSwap");
+                }}
+              >
+                Clear Quick-Swap Modules
+              </Button>
+
               <Button
                 variant="outlined"
                 startIcon={<DeleteIcon />}
@@ -436,6 +476,130 @@ export const SettingsModal = (props: IProp) => {
               </Button>
             </div>
           </SettingsTabPanel>
+          {permission && permission.tag === "Owner" && (
+            <SettingsTabPanel value={tabValue} index={3}>
+              <div style={{ display: "grid" }}>
+                <RadioGroup
+                  row
+                  sx={{ color: "#ffffffa6", display: "block", textAlign: "center", marginBottom: "10px" }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "twitch"}
+                        onChange={() => setPlatform("twitch")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Twitch"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "youtube"}
+                        onChange={() => setPlatform("youtube")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Youtube"
+                    labelPlacement="top"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={platform === "kick"}
+                        onChange={() => setPlatform("kick")}
+                        sx={{ color: "#ffffffa6" }}
+                      />
+                    }
+                    label="Kick"
+                    labelPlacement="top"
+                  />
+                </RadioGroup>
+                {platform === "youtube" && (
+                  <Alert
+                    variant="filled"
+                    severity="warning"
+                    sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginBottom: "20px" }}
+                  >
+                    Youtubers! Enter your CHANNEL_ID found{" "}
+                    <a href="https://www.youtube.com/account_advanced" target="_blank" rel="noreferrer">
+                      here
+                    </a>{" "}
+                    below.
+                  </Alert>
+                )}
+                <StyledInput
+                  focused={false}
+                  label={platform !== "youtube" ? "Channel Name" : "CHANNEL_ID"}
+                  color="#ffffffa6"
+                  onChange={setStreamName}
+                  defaultValue={streamName}
+                  style={{ width: "100%" }}
+                />
+                <div style={{ display: "grid", marginTop: "20px", marginBottom: "20px" }}>
+                  <StyledInput
+                    focused={false}
+                    label="Update Hz (Refresh Rate)"
+                    color="#ffffffa6"
+                    onChange={(event: any) => {
+                      setUpdateHz(Number(event));
+                    }}
+                    defaultValue={updateHz.toString()}
+                    style={{ width: "100%" }}
+                  />
+                </div>
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6", paddingTop: "1px" },
+                  }}
+                  sx={{ alignItems: "start" }}
+                  control={
+                    <Checkbox
+                      onChange={() => setStrictMode(!strictMode)}
+                      checked={strictMode}
+                      sx={{
+                        color: "#ffffffa6",
+                        paddingTop: "0px",
+                      }}
+                    />
+                  }
+                  label="Strict Mode"
+                />
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6", paddingTop: "1px" },
+                  }}
+                  sx={{ alignItems: "start" }}
+                  control={
+                    <Checkbox
+                      onChange={() => setAuth(!auth)}
+                      checked={auth}
+                      sx={{
+                        color: "#ffffffa6",
+                        paddingTop: "0px",
+                      }}
+                    />
+                  }
+                  label="Authentication Required"
+                />
+                <Button
+                  variant="outlined"
+                  startIcon={<PasswordIcon />}
+                  sx={{
+                    color: "#ffa700",
+                    borderColor: "#ffa700",
+                    "&:hover": { borderColor: "#db8f00" },
+                    marginTop: "10px",
+                  }}
+                  onClick={showInstancePassword}
+                >
+                  Update Instance Password
+                </Button>
+              </div>
+            </SettingsTabPanel>
+          )}
         </Box>
       </DialogContent>
 

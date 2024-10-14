@@ -1,6 +1,8 @@
+import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_data_array_with_id_reducer";
 import AddElementDataReducer from "../module_bindings/add_element_data_reducer";
+import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
 import AddElementToLayoutReducer from "../module_bindings/add_element_to_layout_reducer";
-import AddLayoutReducer from "../module_bindings/add_layout_reducer";
+import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
 import ElementData from "../module_bindings/element_data";
 import ElementStruct from "../module_bindings/element_struct";
 import Elements from "../module_bindings/elements";
@@ -70,14 +72,18 @@ export const UploadBackupFromFile = (backupFile: any) => {
     if (backup.data) {
       const upData: ElementData[] = JSON.parse(backup.data) as ElementData[];
       upData.forEach((e) => {
-        AddElementDataReducer.call(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+        if(e.byteArray) {
+          AddElementDataArrayWithIdReducer.call(e.id, e.name, e.dataType, e.data, e.byteArray, e.dataWidth || 128, e.dataHeight || 128);
+        } else {
+          AddElementDataWithIdReducer.call(e.id, e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+        }
       });
     }
 
     if (backup.layouts) {
       const upLayouts: Layouts[] = JSON.parse(backup.layouts) as Layouts[];
       upLayouts.reverse().forEach((e) => {
-        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") AddLayoutReducer.call(e.name, false);
+        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") AddLayoutWithIdReducer.call(e.id, e.name, false);
       });
     }
 
@@ -95,6 +101,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
               size: e.element.value.size,
               color: e.element.value.color,
               font: e.element.value.font,
+              css: e.element.value.css,
             });
             break;
           case "ImageElement":
@@ -123,7 +130,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
             break;
         }
 
-        AddElementToLayoutReducer.call(newElementStruct, e.transparency, e.transform, e.clip, layoutId);
+        AddElementToLayoutReducer.call(newElementStruct, e.transparency, e.transform, e.clip, layoutId, null);
       });
     }
   };

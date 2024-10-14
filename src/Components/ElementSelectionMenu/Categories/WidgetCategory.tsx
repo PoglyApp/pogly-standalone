@@ -6,7 +6,7 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import ElementData from "../../../module_bindings/element_data";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
 import ElementStruct from "../../../module_bindings/element_struct";
-import { useContext } from "react";
+import React, { useContext, useMemo, useCallback } from "react";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
@@ -21,27 +21,37 @@ interface IProps {
   setContextMenu: Function;
 }
 
-export const WidgetCategory = (props: IProps) => {
+export const WidgetCategory = React.memo((props: IProps) => {
   const { setModals } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
 
-  const showWidgetCreationModal = () => {
+  // Memoize the filtered elements (prevents recalculation on every render)
+  const filteredElementData = useMemo(() => {
+    return props.elementData.filter((elementData: ElementData) => elementData.dataType.tag === "WidgetElement");
+  }, [props.elementData]);
+
+  // Memoized function for showing the widget creation modal
+  const showWidgetCreationModal = useCallback(() => {
     DebugLogger("Opening widget creation modal");
     setModals((oldModals: any) => [...oldModals, <WidgetCreationModal key="widgetCreation_modal" />]);
-  };
+  }, [setModals]);
 
-  const AddElementToCanvas = (elementData: ElementData) => {
-    DebugLogger("Adding widget to canvas");
-    insertElement(
-      ElementStruct.WidgetElement({
-        elementDataId: elementData.id,
-        width: elementData.dataWidth,
-        height: elementData.dataHeight,
-        rawData: "",
-      }),
-      layoutContext.activeLayout
-    );
-  };
+  // Memoized function for adding element to canvas
+  const AddElementToCanvas = useCallback(
+    (elementData: ElementData) => {
+      DebugLogger("Adding widget to canvas");
+      insertElement(
+        ElementStruct.WidgetElement({
+          elementDataId: elementData.id,
+          width: elementData.dataWidth,
+          height: elementData.dataHeight,
+          rawData: "",
+        }),
+        layoutContext.activeLayout
+      );
+    },
+    [layoutContext.activeLayout]
+  );
 
   return (
     <Accordion>
@@ -91,35 +101,30 @@ export const WidgetCategory = (props: IProps) => {
           <></>
         )}
 
-        {props.elementData.map((elementData: ElementData) => {
-          if (elementData.dataType.tag === "WidgetElement")
-            return (
-              <div
-                key={elementData.id}
-                onContextMenu={(event: any) => {
-                  HandleElementSelectionContextMenu(event, props.setContextMenu, props.contextMenu, elementData);
-                }}
-              >
-                <Button
-                  variant="text"
-                  sx={{
-                    color: "#ffffffa6",
-                    textTransform: "initial",
-                    justifyContent: "left",
-                    width: "100%",
-                  }}
-                  onClick={() => AddElementToCanvas(elementData)}
-                  data-widget-selection-button={elementData.id}
-                >
-                  {elementData.name}
-                </Button>
-                <br />
-              </div>
-            );
-
-          return null;
-        })}
+        {filteredElementData.map((elementData: ElementData) => (
+          <div
+            key={elementData.id}
+            onContextMenu={(event: any) => {
+              HandleElementSelectionContextMenu(event, props.setContextMenu, props.contextMenu, elementData);
+            }}
+          >
+            <Button
+              variant="text"
+              sx={{
+                color: "#ffffffa6",
+                textTransform: "initial",
+                justifyContent: "left",
+                width: "100%",
+              }}
+              onClick={() => AddElementToCanvas(elementData)}
+              data-widget-selection-button={elementData.id}
+            >
+              {elementData.name}
+            </Button>
+            <br />
+          </div>
+        ))}
       </AccordionDetails>
     </Accordion>
   );
-};
+});

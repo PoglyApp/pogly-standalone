@@ -1,4 +1,3 @@
-import AddElementReducer from "../../../module_bindings/add_element_reducer";
 import AddElementToLayoutReducer from "../../../module_bindings/add_element_to_layout_reducer";
 import DataType from "../../../module_bindings/data_type";
 import ElementStruct from "../../../module_bindings/element_struct";
@@ -10,7 +9,6 @@ import WidgetElement from "../../../module_bindings/widget_element";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
-  ViewportToStdbCoords,
 } from "../../../Utility/ConvertCoordinates";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 
@@ -23,11 +21,10 @@ export const insertElement = (
 ) => {
   DebugLogger("Inserting new element");
 
-  const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 285px)");
-  const coords = ViewportToStdbCoords(transformCoords.x, transformCoords.y);
+  const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 1100px)");
   const newTransform = GetTransformFromCoords(
-    coords.x,
-    coords.y,
+    transformCoords.x,
+    transformCoords.y,
     transformCoords.rotation,
     transformCoords.scaleX,
     transformCoords.scaleY
@@ -44,6 +41,7 @@ export const insertElement = (
         size: textElement.size,
         color: textElement.color,
         font: textElement.font,
+        css: textElement.css,
       });
       break;
 
@@ -74,6 +72,7 @@ export const insertElement = (
     transparency || 100,
     newTransform,
     clip || "rect(0px, 0px, 0px, 0px)",
-    activeLayout.id
+    activeLayout.id,
+    null
   );
 };

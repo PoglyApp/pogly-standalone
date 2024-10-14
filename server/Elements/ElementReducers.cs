@@ -6,14 +6,14 @@ public partial class Module
 {
     [SpacetimeDB.Reducer]
     public static void AddElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip)
+        string clip, uint? folderId = null)
     {
         string func = "AddElement";
         
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -37,6 +37,7 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = GetActiveLayout(),
+                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ZIndex.FindByVersion(0)!.Value.Max + 1
@@ -53,14 +54,14 @@ public partial class Module
     
     [SpacetimeDB.Reducer]
     public static void AddElementToLayout(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip, uint layoutId)
+        string clip, uint layoutId, uint? folderId = null)
     {
         string func = "AddElementToLayout";
         
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -84,6 +85,7 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = layoutId,
+                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ZIndex.FindByVersion(0)!.Value.Max + 1
@@ -91,6 +93,37 @@ public partial class Module
             newElement.Insert();
             
             LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromElement(newElement), Config.FindByVersion(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
+        string clip, uint layoutId, string placedBy, string lastEditedBy, int zindex, uint? folderId = null)
+    {
+        string func = "ImportElement";
+        
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+        
+        try
+        {
+            var newElement = new Elements
+            {
+                Element = element,
+                Transparency = transparency,
+                Transform = transform,
+                Clip = clip,
+                Locked = false,
+                LayoutId = layoutId,
+                FolderId = folderId,
+                PlacedBy = placedBy,
+                LastEditedBy = lastEditedBy,
+                ZIndex = zindex
+            };
+            newElement.Insert();
         }
         catch (Exception e)
         {
@@ -105,8 +138,8 @@ public partial class Module
         string func = "UpdateElement";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -148,8 +181,8 @@ public partial class Module
         string func = "UpdateElementStruct";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (elementStruct is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
@@ -188,8 +221,8 @@ public partial class Module
         string func = "UpdateTextElementText";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             
             if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
@@ -220,8 +253,8 @@ public partial class Module
         string func = "UpdateTextElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -249,8 +282,8 @@ public partial class Module
         string func = "UpdateTextElementColor";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -278,8 +311,8 @@ public partial class Module
         string func = "UpdateTextElementFont";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -300,6 +333,35 @@ public partial class Module
             Log($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void UpdateTextElementShadow(ReducerContext ctx, uint elementId, string css)
+    {
+        string func = "UpdateTextElementShadow";
+        try
+        {
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
+            if (!GuestAuthenticated(func, guest)) return;
+
+            var oldElement = Elements.FilterById(elementId).First();
+
+            if (oldElement.Element is not ElementStruct.TextElement textElement) return;
+            
+            var updatedElement = oldElement;
+            var updatedTextElement = textElement.TextElement_;
+            updatedTextElement.Css = css;
+            updatedElement.Element = new ElementStruct.TextElement(updatedTextElement);
+
+            Elements.UpdateById(elementId, updatedElement);
+            
+            LogAudit(ctx,func,GetChangeStructFromElement(oldElement),GetChangeStructFromElement(updatedElement), Config.FindByVersion(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.Sender}! " + e.Message,LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateImageElementDataStruct(ReducerContext ctx, uint elementId,
@@ -308,9 +370,13 @@ public partial class Module
         string func = "UpdateImageElementDataStruct";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
 
@@ -337,8 +403,8 @@ public partial class Module
         string func = "UpdateImageElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -367,8 +433,8 @@ public partial class Module
         string func = "UpdateImageElementWidth";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -396,8 +462,8 @@ public partial class Module
         string func = "UpdateImageElementHeight";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -425,8 +491,8 @@ public partial class Module
         string func = "UpdateWidgetElementDataId";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -454,8 +520,8 @@ public partial class Module
         string func = "UpdateWidgetElementSize";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -484,8 +550,8 @@ public partial class Module
         string func = "UpdateWidgetElementWidth";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -513,8 +579,8 @@ public partial class Module
         string func = "UpdateWidgetElementHeight";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -542,9 +608,13 @@ public partial class Module
         string func = "UpdateWidgetElementRawData";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
 
             var oldElement = Elements.FilterById(elementId).First();
 
@@ -573,8 +643,8 @@ public partial class Module
         string func = "UpdateElementTransparency";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -598,8 +668,8 @@ public partial class Module
         string func = "UpdateElementTransform";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -623,8 +693,8 @@ public partial class Module
         string func = "UpdateElementClip";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -648,8 +718,8 @@ public partial class Module
         string func = "UpdateElementLocked";
         try
         {
-            if(!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             var oldElement = Elements.FilterById(elementId).First();
@@ -674,8 +744,8 @@ public partial class Module
 
         try
         {
-            if(!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
             {
@@ -699,14 +769,46 @@ public partial class Module
         }
     }
     
+    [SpacetimeDB.Reducer]
+    public static void UpdateElementFolder(ReducerContext ctx, uint elementId, uint? folderId)
+    {
+        string func = "UpdateElementFolder";
+
+        try
+        {
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
+            if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
+
+            var oldElement = Elements.FilterById(elementId).First();
+            var updatedElement = oldElement;
+            updatedElement.FolderId = folderId;
+            updatedElement.LastEditedBy = guest.Nickname;
+
+            Elements.UpdateById(elementId, updatedElement);
+            
+            //TODO: Update AuditLog Elements ChangeStruct to include Layout Column
+            if(Config.FindByVersion(0)!.Value.DebugMode) 
+                Log($"[Elements - {func}] {guest.Nickname} updated elementId {elementId} to folder {folderId}!");
+        }
+        catch(Exception e)
+        {
+            Log($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
+    
     private static void UpdateElementZIndex(ReducerContext ctx, uint elementId)
     {
         if (elementId == 0) return;
         string func = "UpdateElementZIndex";
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
-                return;
+            if (ctx.Address is null) return;
+            if (!GetGuest(func, ctx.Address, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
             List<int> zIndexes = new List<int>();
@@ -747,8 +849,13 @@ public partial class Module
     {
         string func = "DeleteElement";
         
-        if (!GetGuest(func, ctx.Sender, out var guest))return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        if (Config.FindByVersion(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx.Sender)) return;
+        }
         
         try
         {
@@ -769,8 +876,13 @@ public partial class Module
     {
         string func = "DeleteAllElements";
         
-        if (!GetGuest(func, ctx.Sender, out var guest))return;
+        if (ctx.Address is null) return;
+        if (!GetGuest(func, ctx.Address, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        if (Config.FindByVersion(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx.Sender)) return;
+        }
         
         try
         {

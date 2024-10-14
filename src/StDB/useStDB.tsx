@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SpacetimeDBClient, Identity } from "@clockworklabs/spacetimedb-sdk";
+import { SpacetimeDBClient, Identity, Address } from "@clockworklabs/spacetimedb-sdk";
 import Heartbeat from "../module_bindings/heartbeat";
 import Guests from "../module_bindings/guests";
 import Elements from "../module_bindings/elements";
@@ -65,6 +65,21 @@ import { SetStdbConnected } from "../Utility/SetStdbConnected";
 import KickSelfReducer from "../module_bindings/kick_self_reducer";
 import ConnectReducer from "../module_bindings/connect_reducer";
 import { DebugLogger } from "../Utility/DebugLogger";
+import UpdateTextElementShadowReducer from "../module_bindings/update_text_element_shadow_reducer";
+import AddElementDataArrayReducer from "../module_bindings/add_element_data_array_reducer";
+import UpdateConfigReducer from "../module_bindings/update_config_reducer";
+import UpdateEditorGuidelinesReducer from "../module_bindings/update_editor_guidelines_reducer";
+import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
+import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
+import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_data_array_with_id_reducer";
+import AddFolderReducer from "../module_bindings/add_folder_reducer";
+import UpdateFolderNameReducer from "../module_bindings/update_folder_name_reducer";
+import UpdateFolderIconReducer from "../module_bindings/update_folder_icon_reducer";
+import DeleteFolderReducer from "../module_bindings/delete_folder_reducer";
+import DeleteAllFoldersReducer from "../module_bindings/delete_all_folders_reducer";
+import UpdateElementLayoutReducer from "../module_bindings/update_element_layout_reducer";
+import UpdateElementFolderReducer from "../module_bindings/update_element_folder_reducer";
+import UpdateGuestSelectedLayoutReducer from "../module_bindings/update_guest_selected_layout_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -74,6 +89,7 @@ const useStDB = (
   setInstanceConfigured: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
+  const [address, setAddress] = useState<Address>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
@@ -90,6 +106,9 @@ const useStDB = (
       UpdateGuestSelectedElementReducer,
       UpdateGuestPositionReducer,
       AddElementDataReducer,
+      AddElementDataWithIdReducer,
+      AddElementDataArrayReducer,
+      AddElementDataArrayWithIdReducer,
       UpdateElementDataReducer,
       UpdateElementDataNameReducer,
       UpdateElementDataDataReducer,
@@ -103,10 +122,14 @@ const useStDB = (
       UpdateElementTransformReducer,
       UpdateElementClipReducer,
       UpdateElementLockedReducer,
+      UpdateElementLayoutReducer,
+      UpdateElementFolderReducer,
       UpdateTextElementColorReducer,
       UpdateTextElementFontReducer,
       UpdateTextElementSizeReducer,
       UpdateTextElementTextReducer,
+      UpdateTextElementShadowReducer,
+      UpdateTextElementShadowReducer,
       UpdateWidgetElementSizeReducer,
       UpdateImageElementSizeReducer,
       UpdateImageElementDataStructReducer,
@@ -123,11 +146,13 @@ const useStDB = (
       AuthenticateReducer,
       AuthenticateDoWorkReducer,
       SetConfigReducer,
+      UpdateConfigReducer,
       SetIdentityPermissionReducer,
       SetIdentityPermissionEditorReducer,
       SetIdentityPermissionModeratorReducer,
       ClearIdentityPermissionReducer,
       AddLayoutReducer,
+      AddLayoutWithIdReducer,
       UpdateLayoutNameReducer,
       SetLayoutActiveReducer,
       DeleteLayoutReducer,
@@ -138,20 +163,31 @@ const useStDB = (
       ClearRefreshOverlayRequestsReducer,
       KickGuestReducer,
       KickSelfReducer,
-      ConnectReducer
+      ConnectReducer,
+      RefreshOverlayClearStorageReducer,
+      UpdateEditorGuidelinesReducer,
+      AddFolderReducer,
+      UpdateFolderNameReducer,
+      UpdateFolderIconReducer,
+      DeleteFolderReducer,
+      DeleteAllFoldersReducer,
+      UpdateGuestSelectedLayoutReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
     const isOverlay: Boolean = window.location.href.includes("/overlay");
 
     const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
+    let address: Address | undefined;
 
-    client?.onConnect((token: string, Identity: Identity) => {
+    client?.onConnect((token: string, Identity: Identity, Address: Address) => {
       try {
         setIdentity(Identity);
+        setAddress(Address);
+        address = Address;
         setStdbClient(client);
         localStorage.setItem("stdbToken", token);
-        console.log("Connected to StDB! [" + Identity.toHexString() + "]");
+        console.log("Connected to StDB! [" + Identity.toHexString() + "] @ [" + Address.toHexString() + "]");
         client?.subscribe([
           "SELECT * FROM Heartbeat",
           "SELECT * FROM Guests",
@@ -189,7 +225,12 @@ const useStDB = (
 
           setConfig(fetchedConfig);
 
-          SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
+          if (!address) {
+            setError(true);
+            return;
+          }
+
+          SetStdbConnected(client, address, fetchedConfig, setStdbConnected, setStdbAuthenticated);
         }
       } catch (error) {
         console.log("initialStateSync failed:", error);
@@ -197,8 +238,8 @@ const useStDB = (
     });
 
     client?.onError((...args: any[]) => {
-      if(args[0].type === "close") {
-        if(!isOverlay)setDisconnected(true);
+      if (args[0].type === "close") {
+        setDisconnected(true);
         return;
       }
 
@@ -209,7 +250,15 @@ const useStDB = (
     client?.connect();
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbInitialized, setStdbAuthenticated]);
 
-  return { Client: stdbClient, Identity: identity, InstanceConfig: config, Error: error, Disconnected: disconnected };
+  return {
+    Client: stdbClient,
+    Identity: identity,
+    Address: address,
+    InstanceConfig: config,
+    Error: error,
+    Disconnected: disconnected,
+    Runtime: connectionConfig,
+  };
 };
 
 export default useStDB;

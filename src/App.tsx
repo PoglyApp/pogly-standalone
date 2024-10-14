@@ -39,6 +39,7 @@ export const App: React.FC = () => {
   const [versionNumber, setVersionNumber] = useState<string>("");
   const [activePage, setActivePage] = useState<Number>(0);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const isWidget: Boolean = window.location.href.includes("/widget");
 
   // CANVAS
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -88,9 +89,12 @@ export const App: React.FC = () => {
   );
 
   useEffect(() => {
+    if (isWidget) return;
     if (!stdbInitialized) return;
     if (!spacetime.Identity) return;
+    if (!spacetime.Address) return;
     if (!spacetime.Client) return;
+    if (!spacetime.Runtime) return;
 
     DebugLogger("Setting nickname and Spacetime context");
 
@@ -103,28 +107,31 @@ export const App: React.FC = () => {
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = Guests.findByIdentity(spacetime.Identity);
+    const guest = Guests.findByAddress(spacetime.Address);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
       Client: spacetime.Client,
       Identity: guestWithNickname,
+      Runtime: spacetime.Runtime,
       Elements: [],
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Client]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client, spacetime.Runtime, isWidget]);
 
   useEffect(() => {
+    if (isWidget) return;
     DebugLogger("Setting SpacetimeDB authenticated ref");
     stdbAuthenticatedRef.current = stdbAuthenticated;
-  }, [stdbAuthenticated]);
+  }, [stdbAuthenticated, isWidget]);
 
   useEffect(() => {
+    if (isWidget) return;
     if (!stdbInitialized) return;
     DebugLogger("Setting active layout");
     if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
-  }, [activeLayout, stdbInitialized]);
+  }, [activeLayout, stdbInitialized, isWidget]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -145,11 +152,15 @@ export const App: React.FC = () => {
             />
           }
         />
-        <Route path="overlay" element={<Overlay />} />
+        <Route path="overlay" element={<Overlay disconnected={spacetime.Disconnected} />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     )
   );
+
+  if (isWidget) {
+    return (<RouterProvider router={router} />);
+  }
 
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
@@ -193,6 +204,23 @@ export const App: React.FC = () => {
     return <Loading text="Retreiving Identity" />;
   }
 
+  if (!spacetime.Address) {
+    DebugLogger("Waiting for SpacetimeDB address");
+    if (spacetime.Error) {
+      DebugLogger("Failed to load SpacetimeDB address");
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Reload"
+          titleText="Error receiving SpacetimeDB Address!"
+          contentText="Please try again. If this error persists, you may have to clear your LocalStorage AuthToken."
+          clearSettings={true}
+        />
+      );
+    }
+    return <Loading text="Retreiving Address" />;
+  }
+
   if (!spacetime.InstanceConfig) {
     DebugLogger("Waiting for instance config ");
     if (spacetime.Error) {
@@ -226,7 +254,7 @@ export const App: React.FC = () => {
       );
     }
 
-    const alreadyLogged = Guests.findByIdentity(spacetime.Identity);
+    const alreadyLogged = Guests.findByAddress(spacetime.Address);
 
     if (!isOverlay && alreadyLogged) {
       DebugLogger("Guest already logged in");

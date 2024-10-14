@@ -7,32 +7,32 @@ import { __SPACETIMEDB__, AlgebraicType, ProductType, BuiltinType, ProductTypeEl
 export class KickGuestReducer extends Reducer
 {
 	public static reducerName: string = "KickGuest";
-	public static call(_identity: Identity) {
-		this.getReducer().call(_identity);
+	public static call(_address: Address) {
+		this.getReducer().call(_address);
 	}
 
-	public call(_identity: Identity) {
+	public call(_address: Address) {
 		const serializer = this.client.getSerializer();
-		let _identityType = AlgebraicType.createProductType([
-			new ProductTypeElement("__identity_bytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+		let _addressType = AlgebraicType.createProductType([
+			new ProductTypeElement("addressBytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
 		]);
-		serializer.write(_identityType, _identity);
+		serializer.write(_addressType, _address);
 		this.client.call("KickGuest", serializer);
 	}
 
 	public static deserializeArgs(adapter: ReducerArgsAdapter): any[] {
-		let identityType = AlgebraicType.createProductType([
-			new ProductTypeElement("__identity_bytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
+		let addressType = AlgebraicType.createProductType([
+			new ProductTypeElement("addressBytes", AlgebraicType.createArrayType(AlgebraicType.createPrimitiveType(BuiltinType.Type.U8))),
 		]);
-		let identityValue = AlgebraicValue.deserialize(identityType, adapter.next())
-		let identity = new Identity(identityValue.asProductValue().elements[0].asBytes());
-		return [identity];
+		let addressValue = AlgebraicValue.deserialize(addressType, adapter.next())
+		let address = new Address(addressValue.asProductValue().elements[0].asBytes());
+		return [address];
 	}
 
-	public static on(callback: (reducerEvent: ReducerEvent, _identity: Identity) => void) {
+	public static on(callback: (reducerEvent: ReducerEvent, _address: Address) => void) {
 		this.getReducer().on(callback);
 	}
-	public on(callback: (reducerEvent: ReducerEvent, _identity: Identity) => void)
+	public on(callback: (reducerEvent: ReducerEvent, _address: Address) => void)
 	{
 		this.client.on("reducer:KickGuest", callback);
 	}

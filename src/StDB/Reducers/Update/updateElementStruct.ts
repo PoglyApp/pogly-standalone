@@ -1,4 +1,3 @@
-import { ViewportToStdbFontSize, ViewportToStdbSize } from "../../../Utility/ConvertCoordinates";
 import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElement from "../../../module_bindings/image_element";
 import TextElement from "../../../module_bindings/text_element";
@@ -12,20 +11,20 @@ export const updateElementStruct = (elementId: number, element: ElementStruct) =
 
       element = ElementStruct.TextElement({
         text: textElement.text,
-        size: ViewportToStdbFontSize(textElement.size).fontSize,
+        size: textElement.size,
         color: textElement.color,
         font: textElement.font,
+        css: textElement.css,
       });
       break;
 
     case "ImageElement":
       const imageElement: ImageElement = element.value as ImageElement;
-      const imgSize = ViewportToStdbSize(imageElement.width, imageElement.height);
 
       element = ElementStruct.ImageElement({
         imageElementData: imageElement.imageElementData,
-        width: imgSize.width,
-        height: imgSize.height,
+        width: imageElement.width,
+        height: imageElement.height,
       });
       break;
 

@@ -14,7 +14,6 @@ import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
 import Config from "../module_bindings/config";
-import ElementData from "../module_bindings/element_data";
 import { Loading } from "../Components/General/Loading";
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { SelectoComponent } from "../Components/General/SelectoComponent";
@@ -34,12 +33,12 @@ import { LayoutContext } from "../Contexts/LayoutContext";
 import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 import { useHotkeys } from "reakeys";
 import { UserInputHandler } from "../Utility/UserInputHandler";
-import Dropzone from "react-dropzone";
-import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
-import { ModalContext } from "../Contexts/ModalContext";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
-import { Identity, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
+import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import Permissions from "../module_bindings/permissions";
+import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 
 interface IProps {
   setActivePage: Function;
@@ -49,10 +48,12 @@ interface IProps {
 }
 
 export const Canvas = (props: IProps) => {
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
-  const { setModals } = useContext(ModalContext);
   const { settings } = useContext(SettingsContext);
+  const { Identity } = useSpacetimeContext();
+  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -70,12 +71,19 @@ export const Canvas = (props: IProps) => {
   });
 
   const [noticeMessage, setNoticeMessage] = useState<any>();
-  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
-
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
+  
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
+    const initGuidelineAccept = () => {
+      if(isOverlay) return true;
+      if(permission && permission.tag === "Owner") return true;
+      if(localStorage.getItem("Accept_EditorGuidelines")) return true;
+      return false;
+  };
+
+  const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
+  
   useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
@@ -93,10 +101,11 @@ export const Canvas = (props: IProps) => {
   useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
 
   useHeartbeatEvents(props.canvasInitialized);
+  const configReload = useConfigEvents(props.canvasInitialized);
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste));
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {
@@ -148,103 +157,102 @@ export const Canvas = (props: IProps) => {
     );
   }
 
-  return (
-    <>
-      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
-        <>
-          <Dropzone
-            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
-            noClick={true}
-            onDragEnter={() => setisDroppingSelectionMenu(true)}
-            onDragLeave={() => setisDroppingSelectionMenu(false)}
-            onDropAccepted={() => setisDroppingSelectionMenu(false)}
-            onDropRejected={() => setisDroppingSelectionMenu(false)}
-          >
-            {({ getRootProps }) => (
-              <div {...getRootProps()}>
-                <ElementSelectionMenu elementData={elementData} isDropping={isDroppingSelectionMenu} />
-              </div>
-            )}
-          </Dropzone>
+  if (configReload) {
+    DebugLogger("Config has been updated");
+    return (
+      <ErrorRefreshModal
+        type="timer"
+        refreshTimer={3}
+        titleText="Config changed by Owner"
+        contentText="This Pogly instance's config settings have been changed by the owner. The module is reloading automatically..."
+        clearSettings={false}
+      />
+    );
+  }
 
+  if (!acceptedGuidelines) { 
+    DebugLogger("Guest has not accepted guidelines");
+      return ( <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} /> );
+  }
+
+  return (
+    <div className="mouseContainer" onMouseMove={onMouseMove}>
+      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
+        <TransformWrapper
+          ref={transformRef}
+          limitToBounds={false}
+          centerOnInit={true}
+          initialScale={.5}
+          centerZoomedOut={false}
+          minScale={0.05}
+          maxScale={4}
+          panning={{
+            wheelPanning: true,
+            allowLeftClickPan: false,
+            allowRightClickPan: false,
+            allowMiddleClickPan: true,
+          }}
+          doubleClick={{ disabled: true }}
+          smooth={true}
+          wheel={{
+            step: 0.1
+          }}
+        >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
-          <TransformWrapper
-            ref={transformRef}
-            limitToBounds={true}
-            centerOnInit={true}
-            initialScale={2.25}
-            centerZoomedOut={true}
-            minScale={1}
-            maxScale={4}
-            pinch={{ disabled: true }}
-            panning={{
-              wheelPanning: true,
-              allowLeftClickPan: false,
-              allowRightClickPan: false,
-            }}
-            doubleClick={{ disabled: true }}
-            smooth={false}
-            wheel={{
-              step: 0.1,
-            }}
-          >
-            <TransformComponent
+          <TransformComponent
               contentProps={{ id: "transformContainer" }}
-              wrapperStyle={{ display: "flex", flex: 1, marginLeft: "218px" }}
-              contentStyle={{ display: "flex", flex: 1 }}
+              wrapperStyle={{ width:"100vw", height:"100vh"}}
               contentClass="grid-bg"
             >
-              <Container className="mouseContainer" onMouseMove={onMouseMove}>
-                <div
-                  id="streamContent"
-                  className="streamContent"
-                  style={{
-                    height: 270,
-                    marginTop: -175,
-                    width: 480,
-                    marginLeft: -280,
-                    zIndex: 0,
-                    position: "fixed",
-                    left: "50%",
-                    top: "50%",
-                  }}
-                >
-                  <div className="elementContent" style={{ position: "absolute" }}>
-                    {canvasElements.map((element: CanvasElementType) => {
-                      return (
-                        <div
-                          key={element.Elements.id.toString() + "_" + element.Elements.element.tag}
-                          onContextMenu={(event: any) => {
-                            HandleElementContextMenu(event, setContextMenu, contextMenu, element.Elements);
+            <Container>
+              <div
+                id="streamContent"
+                className="streamContent"
+                style={{
+                  height: 1080,
+                  marginTop: -607,
+                  width: 1920,
+                  marginLeft: -742,
+                  zIndex: 0,
+                  position: "fixed",
+                  left: "50%",
+                  top: "50%",
+                }}
+              >
+                <div className="elementContent">
+                  {canvasElements.map((element: CanvasElementType) => {
+                    return (
+                      <div
+                        key={element.Elements.id.toString() + "_" + element.Elements.element.tag}
+                        onContextMenu={(event: any) => {
+                          HandleElementContextMenu(event, setContextMenu, contextMenu, element.Elements);
 
-                            setSelected({
-                              Elements: element.Elements,
-                              Component: element.Component,
-                            });
-                          }}
-                          style={{ cursor: "context-menu" }}
-                        >
-                          {element.Component}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <CursorsContainer />
-                  <StreamContainer />
+                          setSelected({
+                            Elements: element.Elements,
+                            Component: element.Component,
+                          });
+                        }}
+                      >
+                        {element.Component}
+                      </div>
+                    );
+                  })}
                 </div>
-              </Container>
+                <CursorsContainer />
+                <StreamContainer />
+              </div>
+            </Container>
 
-              <MoveableComponent
-                transformSelect={transformSelect}
-                selected={selected}
-                moveableRef={moveableRef}
-                selectoRef={selectoRef}
-                selectoTargets={selectoTargets}
-              />
-            </TransformComponent>
-          </TransformWrapper>
-
+            <MoveableComponent
+              transformSelect={transformSelect}
+              selected={selected}
+              moveableRef={moveableRef}
+              selectoRef={selectoRef}
+              selectoTargets={selectoTargets}
+            />
+          </TransformComponent>
+          
           <ElementContextMenu
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
@@ -262,15 +270,15 @@ export const Canvas = (props: IProps) => {
             setSelected={setSelected}
             elements={elements}
           />
-        </>
+        </TransformWrapper>
       ) : (
         <Loading text="Initializing Canvas" />
       )}
-    </>
+    </div>
   );
 };
 
 const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 `;

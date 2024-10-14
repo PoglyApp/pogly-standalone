@@ -110,8 +110,8 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
               const imgElementData: ElementData | undefined = ElementData.findById(dataId.value);
 
               if (imgElementData !== undefined) {
-                const newWidth = imgElementData.dataWidth / 4;
-                const newHeight = imgElementData.dataHeight / 4;
+                const newWidth = imgElementData.dataWidth;
+                const newHeight = imgElementData.dataHeight;
                 element.style.width = `${newWidth}px`;
                 element.style.height = `${newHeight}px`;
 
@@ -131,8 +131,8 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
               var image = new Image();
               image.src = rawData.value;
               image.onload = function () {
-                const newWidth = image.width / 4;
-                const newHeight = image.height / 4;
+                const newWidth = image.width;
+                const newHeight = image.height;
                 element.style.width = `${newWidth}px`;
                 element.style.height = `${newHeight}px`;
 
@@ -154,8 +154,8 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
           const wgtElementData: ElementData | undefined = ElementData.findById(widgetElement.value.elementDataId);
 
           if (wgtElementData !== undefined) {
-            const newWidth = wgtElementData.dataWidth / 4;
-            const newHeight = wgtElementData.dataHeight / 4;
+            const newWidth = wgtElementData.dataWidth;
+            const newHeight = wgtElementData.dataHeight;
             element.style.width = `${newWidth}px`;
             element.style.height = `${newHeight}px`;
 

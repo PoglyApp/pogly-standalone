@@ -5,7 +5,7 @@ import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import Layouts from "../../../module_bindings/layouts";
 import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";
@@ -14,6 +14,7 @@ import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import UpdateGuestSelectedLayoutReducer from "../../../module_bindings/update_guest_selected_layout_reducer";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
@@ -25,6 +26,11 @@ export const LayoutCategory = () => {
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
+
+  const changeLayout = (layout: Layouts) => {
+    UpdateGuestSelectedLayoutReducer.call(layout.id);
+    layoutContext.setActiveLayout(layout);
+  };
 
   const showLayoutCreationModal = () => {
     DebugLogger("Opening layout creation modal");
@@ -84,7 +90,7 @@ export const LayoutCategory = () => {
                     border: layoutContext.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17",
                   }}
                   onClick={() => {
-                    layoutContext.setActiveLayout(layout);
+                    changeLayout(layout);
                   }}
                 >
                   {layout.name}

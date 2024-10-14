@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Guests from "../../module_bindings/guests";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
@@ -6,6 +6,7 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const { Identity } = useSpacetimeContext();
+  const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -14,11 +15,14 @@ export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType,
 
     DebugLogger("Initializing overlay guest events");
 
-    // Shouldn't need this anymore because of the debug option to refresh-- keeping just in case.
-    // Guests.onDelete((guest) => {
-    //   if (isOverlay && guest.identity.toHexString() === Identity.identity.toHexString()) window.location.reload();
-    // });
+    Guests.onDelete((guest) => {
+      if (isOverlay && guest.address.toHexString() === Identity.address.toHexString()) {
+        setDisconnected(true);
+      }
+    });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayGuestEventsInitialized: true }));
-  }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, isOverlay, setCanvasInitialized]);
+  }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, Identity.address, isOverlay, setCanvasInitialized]);
+
+  return disconnected;
 };

@@ -12,12 +12,13 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import TextElement from "../../module_bindings/text_element";
 import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
-import { StdbToViewportFontSize, StdbToViewportSize } from "../../Utility/ConvertCoordinates";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { marked } from "marked";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -61,7 +62,7 @@ export const useElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate((oldElement, newElement, reducerEvent) => {
+    Elements.onUpdate(async (oldElement, newElement, reducerEvent) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -122,13 +123,13 @@ export const useElementsEvents = (
 
           // UPDATE TEXT
           if (oldTextElement.text !== newTextElement.text) {
-            component.innerHTML = newTextElement.text;
+            const markdownToHtml = await marked.parse(newTextElement.text);
+            component.innerHTML = markdownToHtml;
           }
 
           // UPDATE SIZE
           if (oldTextElement.size !== newTextElement.size) {
-            const newFontSize = StdbToViewportFontSize(newTextElement.size).fontSize;
-            component.style.fontSize = `${newFontSize}px`;
+            component.style.fontSize = `${newTextElement.size}px`;
           }
 
           // UPDATE COLOR
@@ -144,6 +145,19 @@ export const useElementsEvents = (
             } catch (error) {
               component.style.fontFamily = newTextElement.font;
             }
+          }
+
+          // UPDATE CSS
+          if (oldTextElement.css !== newTextElement.css) {
+            const css = JSON.parse(newTextElement.css);
+            const customCss = parseCustomCss(css.custom);
+
+            component.style.textShadow = css.shadow;
+            component.style.webkitTextStroke = css.outline;
+
+            Object.keys(customCss).forEach((styleKey: any) => {
+              component.style[styleKey] = customCss[styleKey];
+            });
           }
 
           break;
@@ -166,7 +180,7 @@ export const useElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
+            component.children[0].setAttribute("srcDoc", htmlTag);
           }
           break;
       }
@@ -174,7 +188,7 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerIdentity.toHexString() === Identity.identity.toHexString() || !component) return;
+      if (reducerEvent?.callerAddress?.toHexString() === Identity.address.toHexString() || !component) return;
 
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
@@ -185,9 +199,8 @@ export const useElementsEvents = (
         const newImageElement: any = newElement.element.value;
 
         if (oldImageElement.height !== newImageElement.height || oldImageElement.width !== newImageElement.width) {
-          const newSize = StdbToViewportSize(newImageElement.width, newImageElement.height);
-          component.style.width = newSize.width + "px";
-          component.style.height = newSize.height + "px";
+          component.style.width = newImageElement.width + "px";
+          component.style.height = newImageElement.height + "px";
         }
       }
 
@@ -213,6 +226,7 @@ export const useElementsEvents = (
   }, [
     canvasInitialized.elementEventsInitialized,
     Identity.identity,
+    Identity.address,
     selectoRef,
     setCanvasInitialized,
     setSelected,

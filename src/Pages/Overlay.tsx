@@ -13,7 +13,11 @@ import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
 
-export const Overlay = () => {
+interface IProps {
+  disconnected: boolean;
+}
+
+export const Overlay = (props: IProps) => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
     overlayElementDataEventsInitialized: false,
     overlayElementEventsInitialized: false,
@@ -29,7 +33,7 @@ export const Overlay = () => {
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
   useOverlayElementsEvents(activeLayout, canvasInitialized, setCanvasInitialized);
   useOverlayLayoutEvents(activeLayout, setActiveLayout);
-  useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
+  const disconnected = useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
 
   useHeartbeatEvents(canvasInitialized);
 
@@ -48,13 +52,23 @@ export const Overlay = () => {
     }
   }, []);
 
+  if (disconnected || props.disconnected) {
+    DebugLogger("Overlay is disconnected");
+    window.location.reload();
+  }
+
   return (
     <>
       {canvasInitialized.elementsFetchInitialized ? (
         <>
           <div className="elementContent">
             {canvasElements.map((element: CanvasElementType) => {
-              return <div key={element.Elements.id.toString()}>{element.Component}</div>;
+              
+              return (
+                <div key={element.Elements.id.toString()}>
+                  {element.Component}
+                </div>
+              );
             })}
           </div>
         </>

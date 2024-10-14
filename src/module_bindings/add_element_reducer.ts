@@ -9,11 +9,11 @@ import { ElementStruct } from "./element_struct";
 export class AddElementReducer extends Reducer
 {
 	public static reducerName: string = "AddElement";
-	public static call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string) {
-		this.getReducer().call(_element, _transparency, _transform, _clip);
+	public static call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _folderId: number | null) {
+		this.getReducer().call(_element, _transparency, _transform, _clip, _folderId);
 	}
 
-	public call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string) {
+	public call(_element: ElementStruct, _transparency: number, _transform: string, _clip: string, _folderId: number | null) {
 		const serializer = this.client.getSerializer();
 		let _elementType = ElementStruct.getAlgebraicType();
 		serializer.write(_elementType, _element);
@@ -23,6 +23,12 @@ export class AddElementReducer extends Reducer
 		serializer.write(_transformType, _transform);
 		let _clipType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
 		serializer.write(_clipType, _clip);
+		let _folderIdType = AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		]);
+		serializer.write(_folderIdType, _folderId);
 		this.client.call("AddElement", serializer);
 	}
 
@@ -39,13 +45,20 @@ export class AddElementReducer extends Reducer
 		let clipType = AlgebraicType.createPrimitiveType(BuiltinType.Type.String);
 		let clipValue = AlgebraicValue.deserialize(clipType, adapter.next())
 		let clip = clipValue.asString();
-		return [element, transparency, transform, clip];
+		let folderIdType = AlgebraicType.createSumType([
+			new SumTypeVariant("some", AlgebraicType.createPrimitiveType(BuiltinType.Type.U32)),
+			new SumTypeVariant("none", AlgebraicType.createProductType([
+		])),
+		]);
+		let folderIdValue = AlgebraicValue.deserialize(folderIdType, adapter.next())
+		let folderId = folderIdValue.asSumValue().tag == 1 ? null : folderIdValue.asSumValue().value.asNumber();
+		return [element, transparency, transform, clip, folderId];
 	}
 
-	public static on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string) => void) {
+	public static on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _folderId: number | null) => void) {
 		this.getReducer().on(callback);
 	}
-	public on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string) => void)
+	public on(callback: (reducerEvent: ReducerEvent, _element: ElementStruct, _transparency: number, _transform: string, _clip: string, _folderId: number | null) => void)
 	{
 		this.client.on("reducer:AddElement", callback);
 	}

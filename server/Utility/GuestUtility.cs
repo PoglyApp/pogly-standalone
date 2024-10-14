@@ -4,9 +4,9 @@ using static SpacetimeDB.Runtime;
 public partial class Module
 {
     
-    private static bool GetGuest(string reducerContext, Identity ctx, out Guests guest)
+    private static bool GetGuest(string reducerContext, Address ctx, out Guests guest)
     {
-        var g = Guests.FindByIdentity(ctx);
+        var g = Guests.FindByAddress(ctx);
         if (g is null)
         {
             Log($"[{reducerContext}] Unable to GetGuest: {ctx} does not have Guest entry.",LogLevel.Warn);
@@ -23,7 +23,7 @@ public partial class Module
         return guest.Authenticated;
     }
 
-    private static bool GuestAuthenticated(string reducerContext, Identity ctx)
+    private static bool GuestAuthenticated(string reducerContext, Address ctx)
     {
         var g = GetGuest(reducerContext, ctx, out var guest);
         

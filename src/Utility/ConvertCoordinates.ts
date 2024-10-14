@@ -1,85 +1,5 @@
-/*
-  <Insert link to documentation for what in God's green Earth all of this means when @Chippy writes it>
-
-  Dynny: You probably didn't write any documentation for it yet
-  Chippy: Nah but I'll write something about it. Just like in general how StDB should be 1080p and the client is downscaled 4x
-*/
-
+import Elements from "../module_bindings/elements";
 import { DebugLogger } from "./DebugLogger";
-
-export const ViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
-  DebugLogger("Converting viewport coordinates to SpacetimeDB coordinates");
-  return {
-    x: (x + 0.75) * 4,
-    y: (y + 0.75) * 4,
-  };
-};
-
-export const MouseViewportToStdbCoords = (x: number, y: number): { x: number; y: number } => {
-  DebugLogger("Converting mouse viewport coordinates to SpacetimeDB coordinates");
-  let vh = window.innerHeight;
-  let vw = window.innerWidth;
-
-  y = y * (1080 / vh);
-  x = x * (1920 / vw);
-
-  return {
-    x: x,
-    y: y,
-  };
-};
-
-export const ViewportToStdbSize = (width: number, height: number): { width: number; height: number } => {
-  DebugLogger("Converting viewport to SpacetimeDB");
-  return {
-    width: width * 4,
-    height: height * 4,
-  };
-};
-
-export const ViewportToStdbFontSize = (fontSize: number): { fontSize: number } => {
-  DebugLogger("Converting viewport font size to SpacetimeDB font size");
-  return {
-    fontSize: fontSize * 4,
-  };
-};
-
-export const StdbToViewportCoords = (x: number, y: number): { x: number; y: number } => {
-  DebugLogger("Converting SpacetimeDB coordinates to viewport coordinates");
-  return {
-    x: x / 4 - 0.75,
-    y: y / 4 - 0.75,
-  };
-};
-
-export const MouseStdbToViewportCoords = (x: number, y: number): { x: number; y: number } => {
-  DebugLogger("Converting SpacetimeDB mouse coordinates to viewport coordinates");
-  let vh = window.innerHeight;
-  let vw = window.innerWidth;
-
-  y = y * (vh / 1080);
-  x = x * (vw / 1920);
-
-  return {
-    x: x,
-    y: y,
-  };
-};
-
-export const StdbToViewportSize = (width: number, height: number): { width: number; height: number } => {
-  DebugLogger("Converting SpacetimeDB size to viewport size");
-  return {
-    width: width / 4,
-    height: height / 4,
-  };
-};
-
-export const StdbToViewportFontSize = (fontSize: number): { fontSize: number } => {
-  DebugLogger("Converting SpacetimeDB font size to viewport font size");
-  return {
-    fontSize: fontSize / 4,
-  };
-};
 
 export const GetCoordsFromTransform = (
   transform: string
@@ -139,18 +59,31 @@ export const GetTransformFromCoords = (
   return `translate(${x}px, ${y}px)` + rotate + scaleXString + scaleYString;
 };
 
-export const StdbToOverlayCoords = (x: number, y: number): { x: number; y: number } => {
-  DebugLogger("Getting SpacetimeDB coordinates to Overlay coordinates");
-  let vh = window.innerHeight;
+export const InRenderBounds = (element: Elements) => {
+  const coords = GetCoordsFromTransform(element.transform);
+  let width = 0;
+  let height = 0;
+  let isText = false;
 
-  let newX,
-    newY = 0;
+  switch(element.element.tag) {
+    case "TextElement":
+      isText = true;
+      break;
+    case "ImageElement":
+      width = element.element.value.width;
+      height = element.element.value.height;
+      break;
+    case "WidgetElement":
+      width = element.element.value.width;
+      height = element.element.value.height;
+      break;
+  }
 
-  newY = y * (vh / 1080);
-  newX = x * (vh / 1080);
-
-  return {
-    x: newX,
-    y: newY,
-  };
-};
+  const visible = isText ? true : 
+    coords.x + width >= 0 &&
+    coords.x <= 1920 &&
+    coords.y + height >= 0 &&
+    coords.y <= 1080;
+    
+  return visible;
+}

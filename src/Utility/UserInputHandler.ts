@@ -7,22 +7,36 @@ import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import {
-  GetCoordsFromTransform,
-  GetTransformFromCoords,
-  StdbToViewportCoords,
-  ViewportToStdbFontSize,
-} from "./ConvertCoordinates";
+import { GetCoordsFromTransform, GetTransformFromCoords } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
+import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 
 export const UserInputHandler = (
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
-  compressPaste: boolean | undefined
+  compressPaste: boolean | undefined,
+  transformRef: ReactZoomPanPinchRef | null
 ): any => {
   const userInputs = [];
+
+  // GO HOME
+  userInputs.push({
+    name: "goHome",
+    keys: "home",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed HOME");
+      event.preventDefault();
+
+      try {
+        transformRef?.centerView();
+      } catch (error) {
+        console.log("Pogly encountered an issue when attempting to Delete an element!");
+      }
+    },
+  });
 
   // DELETE SELECTED ELEMENT WITH DELETE
   userInputs.push({
@@ -47,7 +61,7 @@ export const UserInputHandler = (
 
   // CUT SELECTED ELEMENT WITH CTRL + X
   userInputs.push({
-    name: "deleteElement",
+    name: "cutElement",
     keys: "ctrl+x",
     action: "keydown",
     callback: (event: any) => {
@@ -199,9 +213,10 @@ export const UserInputHandler = (
             } else {
               const textElement: ElementStruct = ElementStruct.TextElement({
                 text: text,
-                size: ViewportToStdbFontSize(12).fontSize,
+                size: 12,
                 color: "#FFFFFF",
                 font: "Roboto",
+                css: "",
               });
 
               insertElement(textElement, activeLayout);
@@ -238,10 +253,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -273,10 +287,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -308,10 +321,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -343,10 +355,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -378,10 +389,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -414,10 +424,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -449,10 +458,9 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -484,13 +492,100 @@ export const UserInputHandler = (
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
-        const newCoords = StdbToViewportCoords(coords.x, coords.y);
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(newCoords.x, newCoords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - UP / W
+  userInputs.push({
+    name: "canvasUp",
+    keys: "w",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed w");
+      event.preventDefault();
+
+      try {
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX,
+          transformRef.instance.transformState.positionY + 15
+        );
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - DOWN / S
+  userInputs.push({
+    name: "canvasDown",
+    keys: "s",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed s");
+      event.preventDefault();
+
+      try {
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX,
+          transformRef.instance.transformState.positionY - 15
+        );
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas down!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - LEFT / A
+  userInputs.push({
+    name: "canvasLeft",
+    keys: "a",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed a");
+      event.preventDefault();
+
+      try {
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX + 15,
+          transformRef.instance.transformState.positionY
+        );
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // MOVE CANVAS - RIGHT / D
+  userInputs.push({
+    name: "canvasRight",
+    keys: "d",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed d");
+      event.preventDefault();
+
+      try {
+        if (!transformRef) return;
+        transformRef.instance.setTransformState(
+          transformRef.instance.transformState.scale,
+          transformRef.instance.transformState.positionX - 15,
+          transformRef.instance.transformState.positionY
+        );
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
       }
     },
   });

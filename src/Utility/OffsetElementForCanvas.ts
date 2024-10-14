@@ -7,9 +7,6 @@ import WidgetElement from "../module_bindings/widget_element";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
-  StdbToViewportCoords,
-  StdbToViewportFontSize,
-  StdbToViewportSize,
 } from "./ConvertCoordinates";
 import { DebugLogger } from "./DebugLogger";
 
@@ -26,6 +23,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
         size: element.element.value.size,
         color: element.element.value.color,
         font: element.element.value.font,
+        css: element.element.value.css,
       });
       break;
     case "ImageElement":
@@ -62,6 +60,7 @@ export const OffsetElementForCanvas = (element: Elements) => {
     clip: element.clip,
     locked: element.locked,
     layoutId: element.layoutId,
+    folderId: element.folderId,
     placedBy: element.placedBy,
     lastEditedBy: element.lastEditedBy,
     zIndex: element.zIndex,
@@ -69,11 +68,9 @@ export const OffsetElementForCanvas = (element: Elements) => {
 
   const transformCoords = GetCoordsFromTransform(newElement.transform);
 
-  const coords = StdbToViewportCoords(transformCoords.x, transformCoords.y);
-
   newElement.transform = GetTransformFromCoords(
-    coords.x,
-    coords.y,
+    transformCoords.x,
+    transformCoords.y,
     transformCoords.rotation,
     transformCoords.scaleX,
     transformCoords.scaleY
@@ -82,35 +79,33 @@ export const OffsetElementForCanvas = (element: Elements) => {
   switch (newElement.element.tag) {
     case "TextElement":
       const textElement: TextElement = newElement.element.value as TextElement;
-      const fontSize = StdbToViewportFontSize(textElement.size).fontSize;
 
       newElement.element = ElementStruct.TextElement({
         text: textElement.text,
-        size: fontSize,
+        size: textElement.size,
         color: textElement.color,
         font: textElement.font,
+        css: textElement.css,
       });
       break;
 
     case "ImageElement":
       const imageElement: ImageElement = newElement.element.value as ImageElement;
-      const imageSize = StdbToViewportSize(imageElement.width, imageElement.height);
 
       newElement.element = ElementStruct.ImageElement({
         imageElementData: imageElement.imageElementData,
-        width: imageSize.width,
-        height: imageSize.height,
+        width: imageElement.width,
+        height: imageElement.height,
       });
       break;
 
     case "WidgetElement":
       const widgetElement: WidgetElement = newElement.element.value as WidgetElement;
-      const widgetSize = StdbToViewportSize(widgetElement.width, widgetElement.height);
 
       newElement.element = ElementStruct.WidgetElement({
         elementDataId: widgetElement.elementDataId,
-        width: widgetSize.width,
-        height: widgetSize.height,
+        width: widgetElement.width,
+        height: widgetElement.height,
         rawData: widgetElement.rawData,
       });
       break;

@@ -8,9 +8,11 @@ public partial class Module
     {
         string func = "AddLayout";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -35,15 +37,77 @@ public partial class Module
             Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
         }
     }
+    
+    [SpacetimeDB.Reducer]
+    public static void AddLayoutWithId(ReducerContext ctx, uint id, string name, bool active = false)
+    {
+        string func = "AddLayoutWithId";
+
+        if (ctx.Address is null) return;
+
+        try
+        {
+            if (!GetGuest(func, ctx.Address, out var guest))
+                return;
+            if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
+
+            var newLayout = new Layouts
+            {
+                Id = id,
+                Name = name,
+                CreatedBy = guest.Nickname,
+                Active = active
+            };
+            newLayout.Insert();
+            
+            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
+            if(Config.FindByVersion(0)!.Value.DebugMode) 
+                Log($"[Layouts - {func}] {guest.Nickname} added layout {name}!");
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void ImportLayout(ReducerContext ctx, uint id, string name, string createdBy, bool active = false)
+    {
+        string func = "ImportLayout";
+
+        if (Config.FindByVersion(0)!.Value.ConfigInit) return;
+
+        try
+        {
+            var newLayout = new Layouts
+            {
+                Id = id,
+                Name = name,
+                CreatedBy = createdBy,
+                Active = active
+            };
+            newLayout.Insert();
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
 
     [SpacetimeDB.Reducer]
     public static void UpdateLayoutName(ReducerContext ctx, uint layoutId, string name)
     {
         string func = "UpdateLayoutName";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -71,9 +135,11 @@ public partial class Module
     {
         string func = "SetLayoutActive";
 
+        if (ctx.Address is null) return;
+        
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -103,9 +169,11 @@ public partial class Module
     {
         string func = "DeleteLayout";
 
+        if (ctx.Address is null) return;
+        
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -136,6 +204,13 @@ public partial class Module
                 }
             }
 
+            foreach (Guests g in Guests.Query(x => x.SelectedLayoutId == layoutId))
+            {
+                var newGuest = g;
+                newGuest.SelectedLayoutId = GetActiveLayout();
+                Guests.UpdateByAddress(g.Address, newGuest);
+            }
+
             Layouts.DeleteById(layoutId);
             
             //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
@@ -153,9 +228,11 @@ public partial class Module
     {
         string func = "DeleteAllLayouts";
 
+        if (ctx.Address is null) return;
+
         try
         {
-            if (!GetGuest(func, ctx.Sender, out var guest))
+            if (!GetGuest(func, ctx.Address, out var guest))
                 return;
             if (!GuestAuthenticated(func, guest)) return;
             if (Config.FindByVersion(0)!.Value.StrictMode)
@@ -185,6 +262,13 @@ public partial class Module
             {
                 if(layout is not {Name: "Default", CreatedBy: "Server"}) //Just a cheeky double-check
                     Layouts.DeleteById(layout.Id);
+            }
+            
+            foreach (Guests g in Guests.Iter())
+            {
+                var newGuest = g;
+                newGuest.SelectedLayoutId = 1;
+                Guests.UpdateByAddress(g.Address, newGuest);
             }
             
             //TODO: Add AutitLog() ChangeStruct types and methods for Layouts

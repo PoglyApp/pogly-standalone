@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { DebugLogger } from "../Utility/DebugLogger";
 
 export const useGetVersionNumber = async (setVersionNumber: Function) => {
+  const isWidget: Boolean = window.location.href.includes("/widget");
   useEffect(() => {
+    if(isWidget) return;
     (async () => {
       DebugLogger("Fetching version number");
 
@@ -11,5 +13,5 @@ export const useGetVersionNumber = async (setVersionNumber: Function) => {
 
       setVersionNumber(versionText);
     })();
-  }, [setVersionNumber]);
+  }, [setVersionNumber, isWidget]);
 };

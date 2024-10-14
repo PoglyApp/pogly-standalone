@@ -10,7 +10,7 @@ static partial class Module
         
         try
         {
-            if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
+            //if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
             
             Log($"[Init] Server successfully started!",LogLevel.Info);
         }
@@ -23,7 +23,7 @@ static partial class Module
     [SpacetimeDB.Reducer(ReducerKind.Connect)]
     public static void OnConnect(ReducerContext ctx)
     {
-        if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
+        //if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
         Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
     }
 
@@ -32,15 +32,19 @@ static partial class Module
     {
         try
         {
+            if (ctx.Address is null) throw new Exception("Guest with Null Address tried to Connect!");
+            
             var random = new Random();
             var color = $"#{random.Next(0x1000000):X6}";
 
             var guest = new Guests
             {
+                Address = ctx.Address,
                 Identity = ctx.Sender,
                 Nickname = "",
                 Color = color,
                 SelectedElementId = 0,
+                SelectedLayoutId = GetActiveLayout(),
                 PositionX = -1,
                 PositionY = -1,
                 Authenticated = !Config.FindByVersion(0)!.Value.Authentication
@@ -61,11 +65,12 @@ static partial class Module
     {
         try
         {
-            var guest = Guests.FindByIdentity(ctx.Sender);
+            if (ctx.Address is null) throw new Exception($"Address missing for disconnecting Guest");
+            var guest = Guests.FindByAddress(ctx.Address);
             if (guest is null)
                 throw new Exception("Identity did not have Guest entry");
             
-            Guests.DeleteByIdentity(guest.Value.Identity);
+            Guests.DeleteByAddress(guest.Value.Address);
             
             Log($"[OnDisconnect] Guest {ctx.Sender} at {ctx.Address} has disconnected.", LogLevel.Info);
             LogAudit(ctx,"OnDisconnect",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), Config.FindByVersion(0)!.Value.DebugMode);

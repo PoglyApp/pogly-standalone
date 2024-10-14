@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
-import { addGuest, removeGuest, updateGuest } from "../../Store/Features/GuestSlice";
+import { addGuest, removeGuest, updateGuest, updateGuestLayout } from "../../Store/Features/GuestSlice";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
@@ -32,7 +32,7 @@ export const useGuestsEvents = (
     });
 
     Guests.onUpdate((oldGuest, newGuest) => {
-      if (newGuest.identity.toHexString() === Identity.identity.toHexString()) return;
+      if (newGuest.address.toHexString() === Identity.address.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
       if (oldGuest.nickname === "" && newGuest.nickname !== "") {
@@ -53,10 +53,10 @@ export const useGuestsEvents = (
       // IF SELECTED ELEMENT IS UPDATED
       if (oldGuest.selectedElementId !== newGuest.selectedElementId) {
         // Handle old element
-        handleElementBorder(Identity.identity, oldGuest.selectedElementId.toString());
+        handleElementBorder(Identity.address, oldGuest.selectedElementId.toString());
 
         // Handle new element
-        handleElementBorder(Identity.identity, newGuest.selectedElementId.toString());
+        handleElementBorder(Identity.address, newGuest.selectedElementId.toString());
       }
 
       // IF CURSOR POSITION IS UPDATED
@@ -78,6 +78,11 @@ export const useGuestsEvents = (
         cursor.style.transform = transform;
         cursor.style.position = "fixed";
       }
+
+      // UPDATE GUEST SELECTED LAYOUT
+      if (oldGuest.selectedLayoutId !== newGuest.selectedLayoutId) {
+        dispatch(updateGuestLayout(newGuest));
+      }
     });
 
     Guests.onDelete((guest, reducerEvent) => {
@@ -92,11 +97,11 @@ export const useGuestsEvents = (
         theme: "dark",
       });
 
-      handleElementBorder(Identity.identity, guest.selectedElementId.toString());
+      handleElementBorder(Identity.address, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
 
-      if (guest.identity.toHexString() === Identity.identity.toHexString() && !isOverlay) {
+      if (guest.address.toHexString() === Identity.address.toHexString()) {
         setDisconnected(true);
       }
     });
@@ -105,10 +110,12 @@ export const useGuestsEvents = (
   }, [
     canvasInitialized.guestEventsInitialized,
     Identity.identity,
+    Identity.address,
     isOverlay,
     transformRef,
     setCanvasInitialized,
     dispatch,
+    Identity.selectedLayoutId,
   ]);
 
   return disconnected;

@@ -5,9 +5,8 @@ import { ImageCategory } from "./Categories/ImageCategory";
 import { ChannelEmoteCategory } from "./Categories/ChannelEmoteCategory";
 import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
-import PermissionLevel from "../../module_bindings/permission_level";
 import Config from "../../module_bindings/config";
 import Permissions from "../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
@@ -15,9 +14,10 @@ import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
+import { useAppSelector } from "../../Store/Features/store";
+import { shallowEqual } from "react-redux";
 
 interface IProps {
-  elementData: ElementData[];
   isDropping: boolean;
 }
 
@@ -25,12 +25,24 @@ export const ElementSelectionMenu = (props: IProps) => {
   const { Identity } = useSpacetimeContext();
   const config: Config = useContext(ConfigContext);
 
+  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
+  const memoizedData = useMemo(() => elementData, [elementData]);
+
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
-    StrictMode: Config.findByVersion(0)!.strictMode,
-    Permission: Permissions.findByIdentity(Identity.identity)?.permissionLevel,
-  };
+  const strictMode = useMemo(() => Config.findByVersion(0)!.strictMode, []);
+  const permissionLevel = useMemo(
+    () => Permissions.findByIdentity(Identity.identity)?.permissionLevel,
+    [Identity.identity]
+  );
+
+  const memoizedStrictSettings = useMemo(
+    () => ({
+      StrictMode: strictMode,
+      Permission: permissionLevel,
+    }),
+    [strictMode, permissionLevel]
+  );
 
   return (
     <>
@@ -55,16 +67,16 @@ export const ElementSelectionMenu = (props: IProps) => {
 
           <div style={{ borderStyle: `${props.isDropping ? "dashed" : "none"}`, borderColor: "green" }}>
             <ImageCategory
-              elementData={props.elementData}
-              strictSettings={strictSettings}
+              elementData={memoizedData}
+              strictSettings={memoizedStrictSettings}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
             />
           </div>
 
           <WidgetCategory
-            elementData={props.elementData}
-            strictSettings={strictSettings}
+            elementData={memoizedData}
+            strictSettings={memoizedStrictSettings}
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
           />
@@ -88,10 +100,12 @@ const SelectionMenuContainer = styled.div`
   width: 218px;
   height: 95vh;
 
-  position: fixed;
+  position: absolute;
   overflow-y: auto;
 
   padding-top: 10px;
+
+  z-index: 2;
 
   &::-webkit-scrollbar {
     width: 0;

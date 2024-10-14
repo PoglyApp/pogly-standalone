@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { QuickSwapType } from "../../Types/General/QuickSwapType";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -38,9 +39,6 @@ export const ChooseInstanceModal = (props: IProp) => {
       case "Cloud":
         domain = "wss://pogly.spacetimedb.com";
         break;
-      case "Testnet":
-        domain = "wss://testnet.spacetimedb.com";
-        break;
       case "Local":
         domain = "ws://127.0.0.1:3000";
         break;
@@ -61,6 +59,23 @@ export const ChooseInstanceModal = (props: IProp) => {
       localStorage.setItem("stdbConnectDomain", domain);
       localStorage.setItem("stdbConnectModule", moduleName);
       localStorage.setItem("stdbConnectModuleAuthKey", authKey);
+
+      const qSwap = localStorage.getItem("poglyQuickSwap");
+      let existingSwap: QuickSwapType[] = [];
+      try {
+        if (qSwap) existingSwap = JSON.parse(qSwap);
+      } catch (error) {
+        //do nothing
+      }
+      const newConnection: QuickSwapType = { domain: domain, module: moduleName, auth: authKey };
+      if (existingSwap) {
+        if (existingSwap.some((x) => x.module === moduleName)) return;
+        existingSwap.push(newConnection);
+        localStorage.setItem("poglyQuickSwap", JSON.stringify(existingSwap));
+      } else {
+        let swapArray: QuickSwapType[] = [newConnection];
+        localStorage.setItem("poglyQuickSwap", JSON.stringify(swapArray));
+      }
     }
 
     setIsModalOpen(false);
@@ -77,18 +92,11 @@ export const ChooseInstanceModal = (props: IProp) => {
       <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
         <FormGroup sx={{ gap: "20px" }}>
           <RadioGroup row sx={{ color: "#ffffffa6", display: "block", textAlign: "center" }}>
-          <FormControlLabel
+            <FormControlLabel
               control={
                 <Radio checked={type === "Cloud"} onChange={() => setType("Cloud")} sx={{ color: "#ffffffa6" }} />
               }
               label="Cloud"
-              labelPlacement="top"
-            />
-            <FormControlLabel
-              control={
-                <Radio checked={type === "Testnet"} onChange={() => setType("Testnet")} sx={{ color: "#ffffffa6" }} />
-              }
-              label="Testnet"
               labelPlacement="top"
             />
             <FormControlLabel
@@ -159,23 +167,30 @@ export const ChooseInstanceModal = (props: IProp) => {
         </FormGroup>
       </DialogContent>
 
-      <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-        <Button
-          disabled={moduleName === "" ? true : false}
-          variant="outlined"
-          sx={{
-            color: "#ffffffa6",
-            borderColor: "#ffffffa6",
-            "&:hover": { borderColor: "white" },
-            "&:disabled": {
-              borderColor: "gray",
-              color: "gray",
-            },
-          }}
-          onClick={handleSave}
-        >
-          Connect
-        </Button>
+      <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}>
+        <div style={{ position: "fixed" }}>
+        <p style={{ margin: "0", paddingLeft: "10px", fontSize: "12px", color: "#ffffffa6" }}>
+          Version: {process.env.REACT_APP_VERSION}
+        </p>
+        </div>
+        <div>
+          <Button
+            disabled={moduleName === "" ? true : false}
+            variant="outlined"
+            sx={{
+              color: "#ffffffa6",
+              borderColor: "#ffffffa6",
+              "&:hover": { borderColor: "white" },
+              "&:disabled": {
+                borderColor: "gray",
+                color: "gray",
+              },
+            }}
+            onClick={handleSave}
+          >
+            Connect
+          </Button>
+        </div>
       </DialogActions>
     </Dialog>
   );

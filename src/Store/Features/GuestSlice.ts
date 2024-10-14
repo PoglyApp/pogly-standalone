@@ -23,19 +23,27 @@ export const GuestSlice = createSlice({
 
     removeGuest: (state, action: PayloadAction<Guests>) => {
       state.guests = state.guests.filter((guest) => {
-        return guest.identity.toHexString() !== action.payload.identity.toHexString();
+        return guest.address.toHexString() !== action.payload.address.toHexString();
       });
     },
 
     updateGuest: (state, action: PayloadAction<Guests>) => {
       const guests = state.guests;
-      const guest = guests.findIndex((g) => g.identity.toHexString() === action.payload.identity.toHexString());
+      const guest = guests.findIndex((g) => g.address.toHexString() === action.payload.address.toHexString());
 
       guests[guest] = action.payload;
+      state.guests = [...guests];
+    },
+
+    updateGuestLayout: (state, action: PayloadAction<Guests>) => {
+      const guests = state.guests;
+      const guest = guests.findIndex((g) => g.address.toHexString() === action.payload.address.toHexString());
+
+      guests[guest].selectedLayoutId = action.payload.selectedLayoutId;
       state.guests = [...guests];
     },
   },
 });
 
 export default GuestSlice.reducer;
-export const { initGuests, addGuest, removeGuest, updateGuest } = GuestSlice.actions;
+export const { initGuests, addGuest, removeGuest, updateGuest, updateGuestLayout } = GuestSlice.actions;

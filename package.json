@@ -1,9 +1,9 @@
 {
   "name": "pogly-standalone",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
-    "@clockworklabs/spacetimedb-sdk": "^0.11.0",
+    "@clockworklabs/spacetimedb-sdk": "^0.11.1",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@reduxjs/toolkit": "^2.0.1",
@@ -13,12 +13,16 @@
     "@types/react-dom": "^18.2.18",
     "browser-image-compression": "^2.0.2",
     "css-filter-converter": "^1.0.109",
+    "markdown-it": "^14.1.0",
+    "marked": "^14.1.2",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-colorful": "^5.6.1",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-dropzone": "^14.2.3",
+    "react-markdown": "^9.0.1",
+    "react-markdown-editor-lite": "^1.3.4",
     "react-moveable": "^0.56.0",
     "react-redux": "^9.0.4",
     "react-router-dom": "6.4",
@@ -29,6 +33,7 @@
     "react-twitch-embed": "^3.0.2",
     "react-zoom-pan-pinch": "^3.4.4",
     "reakeys": "^2.0.3",
+    "remark-gfm": "^4.0.0",
     "styled-components": "^6.1.6",
     "typescript": "^4.9.5"
   },
@@ -63,6 +68,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/markdown-it": "^14.1.2",
     "@types/prismjs": "^1.26.4"
   }
 }

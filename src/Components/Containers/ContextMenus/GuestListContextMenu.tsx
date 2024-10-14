@@ -8,6 +8,7 @@ import SetIdentityPermissionModeratorReducer from "../../../module_bindings/set_
 import ClearIdentityPermissionReducer from "../../../module_bindings/clear_identity_permission_reducer";
 import KickGuestReducer from "../../../module_bindings/kick_guest_reducer";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import KickSelfReducer from "../../../module_bindings/kick_self_reducer";
 
 interface IProps {
   contextMenu: any;
@@ -77,7 +78,7 @@ export const GuestListContextMenu = (props: IProps) => {
               )}
               <StyledMenuItemRed
                 onClick={() => {
-                  KickGuestReducer.call(selectedGuest.identity);
+                  KickGuestReducer.call(selectedGuest.address);
                   handleClose();
                 }}
               >
@@ -87,6 +88,17 @@ export const GuestListContextMenu = (props: IProps) => {
           ) : (
             <></>
           )}
+
+          {selectedGuest.identity.isEqual(Identity.identity) ? (<>
+            <StyledMenuItemRed
+                onClick={() => {
+                  KickSelfReducer.call();
+                  handleClose();
+                }}
+              >
+                Kick Self
+              </StyledMenuItemRed>
+          </>) : (<></>)}
         </div>
       ) : (
         ""

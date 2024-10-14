@@ -5,6 +5,7 @@ import UpdateTextElementColorReducer from "../../../module_bindings/update_text_
 import UpdateTextElementFontReducer from "../../../module_bindings/update_text_element_font_reducer";
 import UpdateTextElementSizeReducer from "../../../module_bindings/update_text_element_size_reducer";
 import UpdateTextElementTextReducer from "../../../module_bindings/update_text_element_text_reducer";
+import UpdateTextElementShadowReducer from "../../../module_bindings/update_text_element_shadow_reducer";
 
 export const updateTextElement = (elementId: number, elementStruct: ElementStruct) => {
   const textElement = Elements.findById(elementId);
@@ -28,6 +29,10 @@ export const updateTextElement = (elementId: number, elementStruct: ElementStruc
 
     case oldTextStruct.text !== newTextStruct.text:
       UpdateTextElementTextReducer.call(elementId, newTextStruct.text);
+      break;
+
+    case oldTextStruct.css !== newTextStruct.css:
+      UpdateTextElementShadowReducer.call(elementId, newTextStruct.css);
       break;
   }
 };

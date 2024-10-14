@@ -3,7 +3,6 @@ import UpdateElementReducer from "../../../module_bindings/update_element_reduce
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
-  ViewportToStdbCoords,
 } from "../../../Utility/ConvertCoordinates";
 
 export const updateElement = (
@@ -15,10 +14,9 @@ export const updateElement = (
   locked?: boolean
 ) => {
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 0px)");
-  const coords = ViewportToStdbCoords(transformCoords.x, transformCoords.y);
   const newTransform = GetTransformFromCoords(
-    coords.x,
-    coords.y,
+    transformCoords.x,
+    transformCoords.y,
     transformCoords.rotation,
     transformCoords.scaleX,
     transformCoords.scaleY

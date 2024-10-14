@@ -34,7 +34,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
   return canvasElement;
 };
 
-export const CreateElementComponent = (elements: Elements) => {
+export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) => {
   DebugLogger("Creating element component");
   const newElement: Elements = {
     id: elements.id,
@@ -44,6 +44,7 @@ export const CreateElementComponent = (elements: Elements) => {
     clip: elements.clip,
     locked: elements.locked,
     layoutId: elements.layoutId,
+    folderId: elements.folderId,
     placedBy: elements.placedBy,
     lastEditedBy: elements.lastEditedBy,
     zIndex: elements.zIndex,
@@ -69,6 +70,6 @@ export const CreateElementComponent = (elements: Elements) => {
 
       break;
   }
-
+  
   return canvasElement;
 };

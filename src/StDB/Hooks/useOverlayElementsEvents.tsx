@@ -12,6 +12,9 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { marked } from "marked";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -21,6 +24,7 @@ export const useOverlayElementsEvents = (
   const dispatch = useAppDispatch();
 
   const activeLayout = useRef<Layouts>();
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   useEffect(() => {
     if (!layout) return;
@@ -38,13 +42,13 @@ export const useOverlayElementsEvents = (
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 
-      const newElement: CanvasElementType | undefined = CreateElementComponent(element);
+      const newElement: CanvasElementType | undefined = CreateElementComponent(element, isOverlay);
 
       dispatch(addElement(newElement.Elements));
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate((oldElement, newElement) => {
+    Elements.onUpdate(async (oldElement, newElement) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -54,7 +58,7 @@ export const useOverlayElementsEvents = (
       if (oldElement.layoutId !== newElement.layoutId) {
         if (component) return;
 
-        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement);
+        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement, isOverlay);
 
         dispatch(addElement(newCanvasElement.Elements));
         dispatch(addCanvasElement(newCanvasElement));
@@ -88,7 +92,8 @@ export const useOverlayElementsEvents = (
 
           // UPDATE TEXT
           if (oldTextElement.text !== newTextElement.text) {
-            component.innerHTML = newTextElement.text;
+            const markdownToHtml = await marked.parse(newTextElement.text);
+            component.innerHTML = markdownToHtml;
           }
 
           // UPDATE SIZE
@@ -110,6 +115,19 @@ export const useOverlayElementsEvents = (
               component.style.fontFamily = newTextElement.font;
             }
           }
+
+          // UPDATE CSS
+          if (oldTextElement.css !== newTextElement.css) {
+            const css = JSON.parse(newTextElement.css);
+            const customCss = parseCustomCss(css.custom);
+
+            component.style.textShadow = css.shadow;
+            component.style.webkitTextStroke = css.outline;
+
+            Object.keys(customCss).forEach((styleKey: any) => {
+              component.style[styleKey] = customCss[styleKey];
+            });
+          }
           break;
 
         case "WidgetElement":
@@ -130,14 +148,19 @@ export const useOverlayElementsEvents = (
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
 
-            component.children[0].setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag));
+            component.children[0].setAttribute("srcDoc", htmlTag);
           }
           break;
       }
 
       // UPDATE TRANSFORM
       if (oldElement.transform !== newElement.transform) {
-        component.style.setProperty("transform", newElement.transform);
+        if (InRenderBounds(newElement)) {
+          component.style.setProperty("display", "block");
+          component.style.setProperty("transform", newElement.transform);
+        } else {
+          component.style.setProperty("display", "none");
+        }
       }
 
       // UPDATE RESIZE
@@ -168,5 +191,5 @@ export const useOverlayElementsEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch, isOverlay]);
 };

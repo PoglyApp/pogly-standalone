@@ -1,16 +1,21 @@
-import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
-import { useContext } from "react";
+import { AppBar, Box, Button, Menu, MenuItem, Tab, Tabs, Typography } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Outlet, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
 import { SettingsModal } from "../Components/Modals/SettingModals";
-
-import HomeIcon from "@mui/icons-material/Home";
-import FormatPaintIcon from "@mui/icons-material/FormatPaint";
+import SecurityIcon from "@mui/icons-material/Security";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Toolbar from "@mui/material/Toolbar";
 import { ModalContext } from "../Contexts/ModalContext";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
+import Dropzone from "react-dropzone";
+import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
+import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import { QuickSwapType } from "../Types/General/QuickSwapType";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 interface IProps {
   activePage: Number;
@@ -19,19 +24,24 @@ interface IProps {
 }
 
 export const Header = (props: IProps) => {
-  const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const currentModule = localStorage.getItem("stdbConnectModule") || "";
+
+  const { Client } = useSpacetimeContext();
+
+  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
+
+  const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
+  const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
+  const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
 
   const { setModals } = useContext(ModalContext);
 
-  const changePage = (pageIndex: number, path: string) => {
-    if (props.activePage === pageIndex) return;
+  useEffect(() => {
+    const modules = localStorage.getItem("poglyQuickSwap");
 
-    DebugLogger("Changing page");
-
-    props.setActivePage(pageIndex);
-    navigate(path);
-  };
+    if (modules) setQuickSwapModules(JSON.parse(modules));
+  }, []);
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
@@ -39,6 +49,20 @@ export const Header = (props: IProps) => {
       ...oldModals,
       <SettingsModal key="settings_modal" onlineVersion={props.onlineVersion} />,
     ]);
+  };
+
+  const showEditorGuidelines = () => {
+    DebugLogger("Opening editor guidelines modal");
+    setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
+  };
+
+  const swapModule = (module: QuickSwapType) => {
+    DebugLogger("Swapping module via quick swap menu");
+    localStorage.setItem("stdbConnectDomain", module.domain);
+    localStorage.setItem("stdbConnectModule", module.module);
+    localStorage.setItem("stdbConnectModuleAuthKey", module.auth);
+    Client.disconnect();
+    window.location.reload();
   };
 
   if (isOverlay) {
@@ -67,29 +91,74 @@ export const Header = (props: IProps) => {
               <span style={{ color: "#ffffffd9" }}>Pogly</span> Standalone
             </Typography>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={props.activePage}>
-                {/* TODO: Home page*/}
+              <Tabs
+                value={0}
+                sx={{
+                  ".Mui-selected": { backgroundColor: "#001529 !important" },
+                  ".MuiTabs-indicator": { backgroundColor: "#001529 !important" },
+                }}
+              >
                 <StyledTab
-                  disabled
-                  icon={<HomeIcon />}
+                  id="quickswap-button"
+                  aria-controls={quickSwapMenuOpen ? "quickswap-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={quickSwapMenuOpen ? "true" : undefined}
+                  icon={<SwapHorizIcon />}
                   iconPosition="start"
-                  label="Home"
-                  onClick={() => changePage(0, "/")}
-                  sx={{ backgroundColor: "#000e1b" }}
-                />
-                <StyledTab
-                  icon={<FormatPaintIcon />}
-                  iconPosition="start"
-                  label="Canvas"
-                  onClick={() => changePage(1, "/canvas")}
+                  label="Swap module"
+                  onClick={(event: any) => setQuickSwapMenuAnchor(event.currentTarget)}
                 />
                 <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
+                <StyledGuidelines
+                  icon={<SecurityIcon />}
+                  iconPosition="start"
+                  label="Editor Guidelines"
+                  onClick={showEditorGuidelines}
+                />
               </Tabs>
             </Box>
 
             <GuestListContainer />
           </Toolbar>
         </AppBar>
+        <Dropzone
+          onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
+          noClick={true}
+          onDragEnter={() => setisDroppingSelectionMenu(true)}
+          onDragLeave={() => setisDroppingSelectionMenu(false)}
+          onDropAccepted={() => setisDroppingSelectionMenu(false)}
+          onDropRejected={() => setisDroppingSelectionMenu(false)}
+        >
+          {({ getRootProps }) => (
+            <div {...getRootProps()}>
+              <ElementSelectionMenu isDropping={isDroppingSelectionMenu} />
+            </div>
+          )}
+        </Dropzone>
+
+        <Menu
+          id="quickswap-menu"
+          anchorEl={quickSwapMenuAnchor}
+          open={quickSwapMenuOpen}
+          onClose={() => setQuickSwapMenuAnchor(null)}
+          MenuListProps={{
+            "aria-labelledby": "quickswap-button",
+          }}
+        >
+          {quickSwapModules.length > 0 ? (
+            quickSwapModules.map((module) => (
+              <StyledMenuItem
+                key={module.module}
+                onClick={() => swapModule(module)}
+                disabled={currentModule === module.module ? true : false}
+              >
+                {module.module}
+              </StyledMenuItem>
+            ))
+          ) : (
+            <span style={{ padding: "10px" }}>No saved modules</span>
+          )}
+        </Menu>
       </StyledBox>
       <main>
         <Outlet />
@@ -105,8 +174,23 @@ const StyledBox = styled(Box)`
 
 const StyledTab = styled(Tab)`
   text-transform: none !important;
+
+  &:hover {
+    background-color: #020e1a !important;
+  }
+`;
+
+const StyledGuidelines = styled(Tab)`
+  text-transform: none !important;
+  color: #e6b559 !important;
+
+  &:hover {
+    background-color: #020e1a !important;
+  }
 `;
 
 const StyledMenuItem = styled(MenuItem)`
-  background-color: #001529;
+  &:hover {
+    background-color: #020e1a !important;
+  }
 `;

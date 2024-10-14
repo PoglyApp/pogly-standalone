@@ -9,6 +9,7 @@ public partial class Module
         public int Size;
         public string Color;
         public string Font;
+        public string Css;
     }
 
     [SpacetimeDB.Type]

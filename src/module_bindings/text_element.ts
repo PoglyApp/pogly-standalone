@@ -12,20 +12,22 @@ export class TextElement extends DatabaseTable
 	public size: number;
 	public color: string;
 	public font: string;
+	public css: string;
 
 	public static primaryKey: string | undefined = undefined;
 
-	constructor(text: string, size: number, color: string, font: string) {
+	constructor(text: string, size: number, color: string, font: string, css: string) {
 	super();
 		this.text = text;
 		this.size = size;
 		this.color = color;
 		this.font = font;
+		this.css = css;
 	}
 
 	public static serialize(value: TextElement): object {
 		return [
-		value.text, value.size, value.color, value.font
+		value.text, value.size, value.color, value.font, value.css
 		];
 	}
 
@@ -36,6 +38,7 @@ export class TextElement extends DatabaseTable
 			new ProductTypeElement("size", AlgebraicType.createPrimitiveType(BuiltinType.Type.I32)),
 			new ProductTypeElement("color", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 			new ProductTypeElement("font", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
+			new ProductTypeElement("css", AlgebraicType.createPrimitiveType(BuiltinType.Type.String)),
 		]);
 	}
 
@@ -46,7 +49,8 @@ export class TextElement extends DatabaseTable
 		let __Size = productValue.elements[1].asNumber();
 		let __Color = productValue.elements[2].asString();
 		let __Font = productValue.elements[3].asString();
-		return new this(__Text, __Size, __Color, __Font);
+		let __Css = productValue.elements[4].asString();
+		return new this(__Text, __Size, __Color, __Font, __Css);
 	}
 
 }

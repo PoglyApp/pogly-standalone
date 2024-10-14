@@ -5,6 +5,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../Modals/WidgetCreationModal";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 
 interface IProp {
   elements: Elements;
@@ -27,7 +28,7 @@ export const Widget = (props: IProp) => {
 
       DebugLogger("Creating widget");
 
-      setIframeSrc("data:text/html;charset=utf-8," + encodeURIComponent(htmlCode));
+      setIframeSrc(htmlCode);
     } catch (error) {
       console.log("ERROR WHILE SPAWNING WIDGET", error);
     }
@@ -39,6 +40,15 @@ export const Widget = (props: IProp) => {
       <WidgetCreationModal key="widgetCreation_modal" editElementId={props.elements.id} />,
     ]);
   };
+
+  const renderDisplay = () => {
+    if(InRenderBounds(props.elements)) {
+      return "block";
+    }
+    else {
+      return "none";
+    }
+  }
 
   return (
     <div
@@ -55,11 +65,12 @@ export const Widget = (props: IProp) => {
         zIndex: props.elements.zIndex,
         overflow: "hidden",
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
+        display: isOverlay ? renderDisplay() : "block",
       }}
       onDoubleClick={showWidgetCreationModal}
     >
       <iframe
-        src={iframeSrc}
+        srcDoc={iframeSrc}
         style={{ pointerEvents: "none", border: "none", overflow: "hidden" }}
         scrolling="no"
         width="100%"

@@ -3,7 +3,7 @@ import { useAppSelector } from "../../Store/Features/store";
 import Guests from "../../module_bindings/guests";
 import styled from "styled-components";
 import Config from "../../module_bindings/config";
-import { Avatar, Menu, MenuItem } from "@mui/material";
+import { Avatar, Menu } from "@mui/material";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
@@ -67,7 +67,12 @@ export const GuestListContainer = () => {
                   }}
                 >
                   <Avatar
-                    sx={{ bgcolor: guest.color, verticalAlign: "middle", position: "relative", marginLeft: "6px" }}
+                    sx={{
+                      bgcolor: guest.color,
+                      verticalAlign: "middle",
+                      position: "relative",
+                      marginLeft: "6px",
+                    }}
                     onClick={easterEgg}
                   >
                     {(showPedro && (
