@@ -33,6 +33,7 @@ import { GetFontFamily } from "../../Utility/GetFontFamily";
 import { DebugLogger } from "../../Utility/DebugLogger";
 
 import Markdown from "react-markdown";
+import remark from "remark-gfm";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Editor from "react-simple-code-editor";
@@ -362,7 +363,7 @@ export const TextCreationModal = (props: IProps) => {
                 ...parseCustomCss(customCss),
               }}
             >
-              <Markdown>{text}</Markdown>
+              <Markdown remarkPlugins={[remark]}>{text}</Markdown>
             </PreviewContainer>
 
             {useCustomFont && (
