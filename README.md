@@ -51,13 +51,17 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 [example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
 ## Usage
-For installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/). 
+
+For installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/).
 There are both provider-hosted and self-hosted methods available.
 
-For assistance with we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
+For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
 
 ## Used by
 
+<a href="https://www.twitch.tv/shroud" rel="noreferrer" target="_blank" title="Shroud"><img src="./images/streamers/shroud.svg" /></a>
+<a href="https://www.twitch.tv/mizkif" rel="noreferrer" target="_blank" title="Mizkif"><img src="./images/streamers/mizkif.svg" /></a>
+<a href="https://www.twitch.tv/EMIRU" rel="noreferrer" target="_blank" title="Emiru"><img src="./images/streamers/emiru.svg" /></a>
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
 <a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
@@ -72,6 +76,7 @@ For assistance with we are available in our [Discord](https://discord.gg/uPQsBaV
 <a href="https://www.twitch.tv/kr3ia" rel="noreferrer" target="_blank" title="kr3ia"><img src="./images/streamers/kr3ia.svg" /></a>
 <a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
 <a href="https://www.twitch.tv/savix" rel="noreferrer" target="_blank" title="Savix"><img src="./images/streamers/savix.svg" /></a>
+<a href="https://www.twitch.tv/derkajohnstv" rel="noreferrer" target="_blank" title="DerkaJohnsTV"><img src="./images/streamers/derkajohnstv.svg" /></a>
 
 ## Contributing
 
