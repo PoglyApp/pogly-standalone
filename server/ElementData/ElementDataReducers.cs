@@ -19,8 +19,15 @@ public partial class Module
         
         try
         {
+            uint maxId = 0;
+            foreach (var i in ElementData.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
+            
             var elementData = new ElementData
             {
+                Id = maxId + 1,
                 Name = name,
                 DataType = type,
                 Data = data,
@@ -88,8 +95,15 @@ public partial class Module
         
         try
         {
+            uint maxId = 0;
+            foreach (var i in ElementData.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
+            
             var elementData = new ElementData
             {
+                Id = maxId + 1,
                 Name = name,
                 DataType = type,
                 Data = data,

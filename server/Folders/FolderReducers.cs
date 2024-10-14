@@ -20,8 +20,15 @@ public partial class Module
                 if (!IsGuestModerator(func, ctx.Sender)) return;
             }
 
+            uint maxId = 0;
+            foreach (var i in Folders.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
+            
             var newFolder = new Folders
             {
+                Id = maxId + 1,
                 Icon = icon,
                 Name = name,
                 CreatedBy = guest.Nickname

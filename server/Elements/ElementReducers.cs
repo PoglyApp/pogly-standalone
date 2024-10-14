@@ -28,9 +28,16 @@ public partial class Module
                 if (Regex.Match(text.TextElement_.Text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
                     return;
             }
+            
+            uint maxId = 0;
+            foreach (var i in Elements.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
 
             var newElement = new Elements
             {
+                Id = maxId + 1,
                 Element = element,
                 Transparency = transparency,
                 Transform = transform,
@@ -77,8 +84,15 @@ public partial class Module
                     return;
             }
 
+            uint maxId = 0;
+            foreach (var i in Elements.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
+            
             var newElement = new Elements
             {
+                Id = maxId + 1,
                 Element = element,
                 Transparency = transparency,
                 Transform = transform,

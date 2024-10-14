@@ -19,9 +19,16 @@ public partial class Module
             {
                 if (!IsGuestModerator(func, ctx.Sender)) return;
             }
+            
+            uint maxId = 0;
+            foreach (var i in Layouts.Iter())
+            {
+                if (i.Id > maxId) maxId = i.Id;
+            }
 
             var newLayout = new Layouts
             {
+                Id = maxId + 1,
                 Name = name,
                 CreatedBy = guest.Nickname,
                 Active = active
