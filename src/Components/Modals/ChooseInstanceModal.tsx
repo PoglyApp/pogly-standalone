@@ -39,9 +39,6 @@ export const ChooseInstanceModal = (props: IProp) => {
       case "Cloud":
         domain = "wss://pogly.spacetimedb.com";
         break;
-      case "Testnet":
-        domain = "wss://testnet.spacetimedb.com";
-        break;
       case "Local":
         domain = "ws://127.0.0.1:3000";
         break;
@@ -100,13 +97,6 @@ export const ChooseInstanceModal = (props: IProp) => {
                 <Radio checked={type === "Cloud"} onChange={() => setType("Cloud")} sx={{ color: "#ffffffa6" }} />
               }
               label="Cloud"
-              labelPlacement="top"
-            />
-            <FormControlLabel
-              control={
-                <Radio checked={type === "Testnet"} onChange={() => setType("Testnet")} sx={{ color: "#ffffffa6" }} />
-              }
-              label="Testnet"
               labelPlacement="top"
             />
             <FormControlLabel
@@ -177,23 +167,30 @@ export const ChooseInstanceModal = (props: IProp) => {
         </FormGroup>
       </DialogContent>
 
-      <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-        <Button
-          disabled={moduleName === "" ? true : false}
-          variant="outlined"
-          sx={{
-            color: "#ffffffa6",
-            borderColor: "#ffffffa6",
-            "&:hover": { borderColor: "white" },
-            "&:disabled": {
-              borderColor: "gray",
-              color: "gray",
-            },
-          }}
-          onClick={handleSave}
-        >
-          Connect
-        </Button>
+      <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}>
+        <div style={{ position: "fixed" }}>
+        <p style={{ margin: "0", paddingLeft: "10px", fontSize: "12px", color: "#ffffffa6" }}>
+          Version: {process.env.REACT_APP_VERSION}
+        </p>
+        </div>
+        <div>
+          <Button
+            disabled={moduleName === "" ? true : false}
+            variant="outlined"
+            sx={{
+              color: "#ffffffa6",
+              borderColor: "#ffffffa6",
+              "&:hover": { borderColor: "white" },
+              "&:disabled": {
+                borderColor: "gray",
+                color: "gray",
+              },
+            }}
+            onClick={handleSave}
+          >
+            Connect
+          </Button>
+        </div>
       </DialogActions>
     </Dialog>
   );
