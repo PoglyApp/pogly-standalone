@@ -61,7 +61,7 @@ export const TextCreationModal = (props: IProps) => {
   const [selectedFont, setSelectedFont] = useState<string>("Roboto");
   const [useCustomFont, setUseCustomFont] = useState<boolean>(false);
   const [customFont, setCustomFont] = useState<string>("");
-  const [fontSize, setFontSize] = useState<string>("12");
+  const [fontSize, setFontSize] = useState<string>("82");
 
   const [shadow, setShadow] = useState<boolean>(false);
   const [shadowColor, setShadowColor] = useState<string>("#000000");

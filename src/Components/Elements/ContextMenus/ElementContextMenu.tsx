@@ -1,5 +1,5 @@
-import { Divider, FormControl, Menu, MenuItem, Paper, Select, Slider } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { Divider, FormControl, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
+import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import Elements from "../../../module_bindings/elements";
 import { CanvasElementType } from "../../../Types/General/CanvasElementType";
@@ -20,6 +20,11 @@ import { WidgetVariableType } from "../../../Types/General/WidgetVariableType";
 import WidgetElement from "../../../module_bindings/widget_element";
 import ElementData from "../../../module_bindings/element_data";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import Config from "../../../module_bindings/config";
+import Permissions from "../../../module_bindings/permissions";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import PermissionLevel from "../../../module_bindings/permission_level";
+import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 
 interface IProps {
   contextMenu: any;
@@ -31,9 +36,13 @@ interface IProps {
 }
 
 export const ElementContextMenu = (props: IProps) => {
+  const { Identity } = useSpacetimeContext();
   const { setModals } = useContext(ModalContext);
 
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;
+
+  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const [transformEdit, setTransformEdit] = useState("Scale");
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
@@ -97,6 +106,8 @@ export const ElementContextMenu = (props: IProps) => {
     }
   };
 
+  if (!selectedElement) return <></>;
+
   return (
     <Menu
       open={props.contextMenu !== null}
@@ -143,38 +154,37 @@ export const ElementContextMenu = (props: IProps) => {
         </FormControl>
       </StyledMenuItem> */}
 
-      {selectedElement && (
-        <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
-          <FormControl fullWidth>
-            <StyledSelect
-              value={"Reset transform"}
-              variant={"standard"}
-              sx={{
-                ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
-                ".MuiSvgIcon-root": { fill: "#ffffffa6" },
-                marginRight: "5px !important",
-                marginTop: "0px !important",
-              }}
-              onOpen={(prev) => setShowResetTransformMenuItem(false)}
-              onClose={(prev) => setShowResetTransformMenuItem(true)}
+      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
+        <FormControl fullWidth>
+          <StyledSelect
+            value={"Reset transform"}
+            variant={"standard"}
+            sx={{
+              ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
+              ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+              marginRight: "5px !important",
+              marginTop: "0px !important",
+            }}
+            onOpen={(prev) => setShowResetTransformMenuItem(false)}
+            onClose={(prev) => setShowResetTransformMenuItem(true)}
+          >
+            <MenuItem value={"Reset transform"} style={{ display: showResetTransformMenuItem ? "block" : "none" }}>
+              Reset
+            </MenuItem>
+            <StyledMenuItem
+              value={"Scale"}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Scale, handleClose)}
             >
-              <MenuItem value={"Reset transform"} style={{ display: showResetTransformMenuItem ? "block" : "none" }}>
-                Reset
-              </MenuItem>
-              <StyledMenuItem
-                value={"Scale"}
-                onClick={() => handleResetTransform(selectedElement, TransformType.Scale, handleClose)}
-              >
-                Scale
-              </StyledMenuItem>
-              <StyledMenuItem
-                value={"Rotation"}
-                onClick={() => handleResetTransform(selectedElement, TransformType.Rotation, handleClose)}
-              >
-                Rotation
-              </StyledMenuItem>
-              {/* <StyledMenuItem
+              Scale
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"Rotation"}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Rotation, handleClose)}
+            >
+              Rotation
+            </StyledMenuItem>
+            {/* <StyledMenuItem
               value={"Warp"}
               onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
             >
@@ -186,87 +196,82 @@ export const ElementContextMenu = (props: IProps) => {
             >
               Clip
             </StyledMenuItem> */}
-            </StyledSelect>
-          </FormControl>
-        </StyledMenuItem>
-      )}
+          </StyledSelect>
+        </FormControl>
+      </StyledMenuItem>
 
-      {selectedElement && (
-        <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
-          <FormControl fullWidth>
-            <StyledSelect
-              value={"Flip"}
-              variant={"standard"}
-              sx={{
-                ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
-                ".MuiSvgIcon-root": { fill: "#ffffffa6" },
-                marginRight: "5px !important",
-                marginTop: "0px !important",
+      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
+        <FormControl fullWidth>
+          <StyledSelect
+            value={"Flip"}
+            variant={"standard"}
+            sx={{
+              ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
+              ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+              marginRight: "5px !important",
+              marginTop: "0px !important",
+            }}
+            onOpen={(prev) => setFlipShowMenuItem(false)}
+            onClose={(prev) => setFlipShowMenuItem(true)}
+          >
+            <MenuItem value={"Flip"} style={{ display: showFlipMenuItem ? "block" : "none" }}>
+              Flip
+            </MenuItem>
+            <StyledMenuItem
+              value={"Vertical"}
+              onClick={() => {
+                handleFlipElement(true, selectedElement, handleClose);
               }}
-              onOpen={(prev) => setFlipShowMenuItem(false)}
-              onClose={(prev) => setFlipShowMenuItem(true)}
             >
-              <MenuItem value={"Flip"} style={{ display: showFlipMenuItem ? "block" : "none" }}>
-                Flip
-              </MenuItem>
-              <StyledMenuItem
-                value={"Vertical"}
-                onClick={() => {
-                  handleFlipElement(true, selectedElement, handleClose);
-                }}
-              >
-                Vertical
-              </StyledMenuItem>
-              <StyledMenuItem
-                value={"Horizontal"}
-                onClick={() => {
-                  handleFlipElement(false, selectedElement, handleClose);
-                }}
-              >
-                Horizontal
-              </StyledMenuItem>
-            </StyledSelect>
-          </FormControl>
-        </StyledMenuItem>
-      )}
-
-      {selectedElement && (
-        <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
-          <FormControl fullWidth>
-            <StyledSelect
-              value={"Transparency"}
-              variant={"standard"}
-              sx={{
-                ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
-                ".MuiSvgIcon-root": { fill: "#ffffffa6" },
-                marginRight: "5px !important",
-                marginTop: "0px !important",
-                overflow: "visible !important",
+              Vertical
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"Horizontal"}
+              onClick={() => {
+                handleFlipElement(false, selectedElement, handleClose);
               }}
-              onOpen={(prev) => setShowTransparencyMenuItem(false)}
             >
-              <MenuItem value={"Transparency"} style={{ display: showTransparencyMenuItem ? "block" : "none" }}>
-                Transparency
-              </MenuItem>
-              <StyledMenuItem value={"Vertical"}>
-                <Slider
-                  size="small"
-                  defaultValue={
-                    Elements.findById(selectedElement.id)?.transparency.valueOf() || selectedElement.transparency
-                  }
-                  aria-label="Small"
-                  valueLabelDisplay="on"
-                  onChange={(event, number) => handleTransparency(selectedElement, number)}
-                />
-              </StyledMenuItem>
-            </StyledSelect>
-          </FormControl>
-        </StyledMenuItem>
-      )}
+              Horizontal
+            </StyledMenuItem>
+          </StyledSelect>
+        </FormControl>
+      </StyledMenuItem>
 
-      {(selectedElement?.element.tag === "TextElement" || selectedElement?.element.tag === "WidgetElement") && (
+      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
+        <FormControl fullWidth>
+          <StyledSelect
+            value={"Transparency"}
+            variant={"standard"}
+            sx={{
+              ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
+              ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+              marginRight: "5px !important",
+              marginTop: "0px !important",
+              overflow: "visible !important",
+            }}
+            onOpen={(prev) => setShowTransparencyMenuItem(false)}
+          >
+            <MenuItem value={"Transparency"} style={{ display: showTransparencyMenuItem ? "block" : "none" }}>
+              Transparency
+            </MenuItem>
+            <StyledMenuItem value={"Vertical"}>
+              <Slider
+                size="small"
+                defaultValue={
+                  Elements.findById(selectedElement.id)?.transparency.valueOf() || selectedElement.transparency
+                }
+                aria-label="Small"
+                valueLabelDisplay="on"
+                onChange={(event, number) => handleTransparency(selectedElement, number)}
+              />
+            </StyledMenuItem>
+          </StyledSelect>
+        </FormControl>
+      </StyledMenuItem>
+
+      {(selectedElement.element.tag === "TextElement" || selectedElement.element.tag === "WidgetElement") && (
         <StyledMenuItem onClick={openEditModal}>Edit</StyledMenuItem>
       )}
 
@@ -308,43 +313,52 @@ export const ElementContextMenu = (props: IProps) => {
         </StyledMenuItem>
       )}
 
-      {selectedElement && (
-        <StyledMenuItem
-          onClick={() => {
-            handleLocked(selectedElement, handleClose);
-          }}
-        >
-          {locked === "true" ? "Locked" : "Lock"}
-          {locked === "true" && <LockIcon sx={{ fontSize: "20px", paddingLeft: "5px" }} />}
-        </StyledMenuItem>
-      )}
+      <StyledMenuItem
+        onClick={() => {
+          handleLocked(selectedElement, handleClose);
+        }}
+      >
+        {locked === "true" ? "Locked" : "Lock"}
+        {locked === "true" && <LockIcon sx={{ fontSize: "20px", paddingLeft: "5px" }} />}
+      </StyledMenuItem>
 
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
-      {showExamine && element && element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" &&(
-        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-          Image: {ElementData.findById(element.element.value.imageElementData.value)?.name || ""}
-        </Paper>
-      )}
-      {showExamine && element && element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "RawData" &&(
-        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-          Image: {/7tv|betterttv|tenor/.test(element.element.value.imageElementData.value) ? "7TV/BTTV/Tenor" : "RawData"}
-        </Paper>
-      )}
       {showExamine && element && (
-        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-          Edited by: {element.lastEditedBy}
-        </Paper>
-      )}
-      {showExamine && element && (
-        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-          Added by: {element.placedBy}
-        </Paper>
+        <>
+          {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" && (
+            <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+              Image: {ElementData.findById(element.element.value.imageElementData.value)?.name || ""}
+            </Paper>
+          )}
+
+          {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "RawData" && (
+            <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+              Image:{" "}
+              {/7tv|betterttv|tenor/.test(element.element.value.imageElementData.value) ? "7TV/BTTV/Tenor" : "RawData"}
+            </Paper>
+          )}
+
+          <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            Edited by: {element.lastEditedBy}
+          </Paper>
+
+          <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            Added by: {element.placedBy}
+          </Paper>
+        </>
       )}
 
       <Divider component="li" variant="fullWidth" sx={{ border: "solid 1px #001529e6" }} />
 
-      {selectedElement && (
+      {strictMode && !permissions ? (
+        <Tooltip title="Strict mode is enabled and preventing you from deleting elements. Ask the instance owner!">
+          <StyledDisabledDeleteMenuItem>
+            <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingRight: "5px" }} />
+            Delete
+          </StyledDisabledDeleteMenuItem>
+        </Tooltip>
+      ) : (
         <StyledDeleteMenuItem
           onClick={() => {
             handleDelete(selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
@@ -379,6 +393,17 @@ const StyledDeleteMenuItem = styled(MenuItem)`
   &:hover {
     color: #960000;
   }
+`;
+
+const StyledDisabledDeleteMenuItem = styled(MenuItem)`
+  color: #681c1c;
+
+  margin-left: 5px;
+  margin-right: 5px;
+
+  padding-left: 5px;
+
+  cursor: not-allowed;
 `;
 
 const StyledSelect = styled(Select)`

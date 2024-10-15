@@ -1,4 +1,4 @@
-import { Menu, MenuItem, Paper } from "@mui/material";
+import { Menu, MenuItem, Paper, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
@@ -6,6 +6,11 @@ import SetLayoutActiveReducer from "../../../module_bindings/set_layout_active_r
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import Config from "../../../module_bindings/config";
+import PermissionLevel from "../../../module_bindings/permission_level";
+import Permissions from "../../../module_bindings/permissions";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 
 interface IProps {
   contextMenu: any;
@@ -14,8 +19,12 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
+  const { Identity } = useSpacetimeContext();
 
   const [showExamine, setShowExamine] = useState(false);
+
+  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const handleSetActive = () => {
     DebugLogger("Changing active layout");
@@ -74,7 +83,16 @@ export const LayoutContextMenu = (props: IProps) => {
         </Paper>
       )}
 
-      <StyledDeleteMenuItem onClick={showConfirmationModal}>Delete</StyledDeleteMenuItem>
+      {strictMode && !permissions ? (
+        <Tooltip title="Strict mode is enabled and preventing you from deleting layouts. Ask the instance owner!">
+          <StyledDisabledDeleteMenuItem>
+            <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingRight: "5px" }} />
+            Delete
+          </StyledDisabledDeleteMenuItem>
+        </Tooltip>
+      ) : (
+        <StyledDeleteMenuItem onClick={showConfirmationModal}>Delete</StyledDeleteMenuItem>
+      )}
     </Menu>
   );
 };
@@ -101,4 +119,15 @@ const StyledDeleteMenuItem = styled(MenuItem)`
   &:hover {
     color: #960000;
   }
+`;
+
+const StyledDisabledDeleteMenuItem = styled(MenuItem)`
+  color: #681c1c;
+
+  margin-left: 5px;
+  margin-right: 5px;
+
+  padding-left: 5px;
+
+  cursor: not-allowed;
 `;
