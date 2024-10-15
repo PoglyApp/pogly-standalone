@@ -68,7 +68,7 @@ export const ElementSelectionContextMenu = (props: IProps) => {
       )}
 
       {strictMode && !permissions ? (
-        <Tooltip title="Strict mode is enabled and preventing you from deleting elements data. Ask the instance owner!">
+        <Tooltip title="Strict mode is enabled and preventing you from deleting element data. Ask the instance owner!">
           <StyledDisabledDeleteMenuItem>
             <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingRight: "5px" }} />
             Delete
