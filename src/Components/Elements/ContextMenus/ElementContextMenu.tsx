@@ -48,6 +48,7 @@ export const ElementContextMenu = (props: IProps) => {
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
   const [showResetTransformMenuItem, setShowResetTransformMenuItem] = useState(true);
   const [showTransparencyMenuItem, setShowTransparencyMenuItem] = useState(true);
+  const [transparency, setTransparency] = useState<number>(0);
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -58,6 +59,7 @@ export const ElementContextMenu = (props: IProps) => {
   if (selectedElement) element = Elements.findById(selectedElement.id);
 
   useEffect(() => {
+    if (selectedElement) setTransparency(Elements.findById(selectedElement.id)!.transparency.valueOf());
     if (selectedElement?.element.tag !== "WidgetElement") return;
 
     DebugLogger("Setting widget data");
@@ -259,12 +261,10 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem value={"Vertical"}>
               <Slider
                 size="small"
-                defaultValue={
-                  Elements.findById(selectedElement.id)?.transparency.valueOf() || selectedElement.transparency
-                }
+                value={transparency}
                 aria-label="Small"
                 valueLabelDisplay="on"
-                onChange={(event, number) => handleTransparency(selectedElement, number)}
+                onChange={(event, number) => handleTransparency(selectedElement, setTransparency, number)}
               />
             </StyledMenuItem>
           </StyledSelect>
