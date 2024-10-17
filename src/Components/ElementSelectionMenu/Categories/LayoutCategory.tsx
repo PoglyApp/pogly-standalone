@@ -15,14 +15,22 @@ import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import UpdateGuestSelectedLayoutReducer from "../../../module_bindings/update_guest_selected_layout_reducer";
+import PermissionLevel from "../../../module_bindings/permission_level";
+import Config from "../../../module_bindings/config";
+import Permissions from "../../../module_bindings/permissions";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
+  const { Identity } = useSpacetimeContext();
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
+
+  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
@@ -57,19 +65,21 @@ export const LayoutCategory = () => {
             paddingBottom: "5px",
           }}
         >
-          <Button
-            variant="text"
-            startIcon={<AddCircleOutlineIcon />}
-            sx={{
-              color: "#ffffffa6",
-              textTransform: "initial",
-              justifyContent: "left",
-              width: "100%",
-            }}
-            onClick={showLayoutCreationModal}
-          >
-            Add Layout
-          </Button>
+          {strictMode && permissions && (
+            <Button
+              variant="text"
+              startIcon={<AddCircleOutlineIcon />}
+              sx={{
+                color: "#ffffffa6",
+                textTransform: "initial",
+                justifyContent: "left",
+                width: "100%",
+              }}
+              onClick={showLayoutCreationModal}
+            >
+              Add Layout
+            </Button>
+          )}
 
           {layouts.map((layout: Layouts) => {
             return (

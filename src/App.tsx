@@ -159,7 +159,7 @@ export const App: React.FC = () => {
   );
 
   if (isWidget) {
-    return (<RouterProvider router={router} />);
+    return <RouterProvider router={router} />;
   }
 
   // Step 1) Are connection settings configured?
@@ -277,7 +277,7 @@ export const App: React.FC = () => {
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
-  if (spacetime.InstanceConfig.authentication) {
+  if (!isOverlay && spacetime.InstanceConfig.authentication) {
     DebugLogger("Is guest authenticated");
     if (stdbAuthTimeout) {
       DebugLogger("Authentication required but authentication failed");
