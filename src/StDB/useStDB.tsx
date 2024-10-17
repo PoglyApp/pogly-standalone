@@ -175,9 +175,15 @@ const useStDB = (
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
+    let stdbDomain = connectionConfig?.domain || "";
+
     const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-    const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
+    if (isOverlay && stdbDomain === "") {
+      stdbDomain = "wss://pogly.spacetimedb.com";
+    }
+
+    const client = new SpacetimeDBClient(stdbDomain, connectionConfig?.module || "", stdbToken);
     let address: Address | undefined;
 
     client?.onConnect((token: string, Identity: Identity, Address: Address) => {

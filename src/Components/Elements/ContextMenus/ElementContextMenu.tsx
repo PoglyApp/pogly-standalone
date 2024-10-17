@@ -85,7 +85,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       setWidgetVariables(() => (toggleVariables.length > 0 ? toggleVariables : null));
     }
-  }, [props.contextMenu, selectedElement?.element.tag, selectedElement?.id]);
+  }, [props.contextMenu, selectedElement?.element.tag, selectedElement?.id, selectedElement]);
 
   const handleClose = () => {
     DebugLogger("Handling close context");
