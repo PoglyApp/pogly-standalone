@@ -17,7 +17,8 @@ export const UserInputHandler = (
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
   compressPaste: boolean | undefined,
-  transformRef: ReactZoomPanPinchRef | null
+  transformRef: ReactZoomPanPinchRef | null,
+  showSpotlight: Function,
 ): any => {
   const userInputs = [];
 
@@ -584,6 +585,24 @@ export const UserInputHandler = (
           transformRef.instance.transformState.positionX - 15,
           transformRef.instance.transformState.positionY
         );
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // SPOTLIGHT FEATURE 
+  userInputs.push({
+    name: "spotlight1",
+    keys: "ctrl+space",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("user opened spotlight");
+      event.preventDefault();
+
+      try {
+        DebugLogger("Opening settings modal");
+        showSpotlight();
       } catch {
         console.log("Pogly encountered an issue when attempting to move canvas up!");
       }

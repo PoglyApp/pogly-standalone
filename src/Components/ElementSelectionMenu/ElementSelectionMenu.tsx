@@ -71,6 +71,7 @@ export const ElementSelectionMenu = (props: IProps) => {
               strictSettings={memoizedStrictSettings}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
+              isSearch={false}
             />
           </div>
 
@@ -81,7 +82,7 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {config.streamingPlatform === "twitch" && <ChannelEmoteCategory />}
+          {config.streamingPlatform === "twitch" && <ChannelEmoteCategory isSearch={false} />}
 
           <TenorCategory />
         </CategoryContainer>

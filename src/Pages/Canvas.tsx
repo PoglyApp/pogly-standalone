@@ -39,6 +39,8 @@ import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import Permissions from "../module_bindings/permissions";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
+import { ModalContext } from "../Contexts/ModalContext";
+import { SpotlightModal } from "../Components/Modals/SpotlightModal";
 
 interface IProps {
   setActivePage: Function;
@@ -52,6 +54,7 @@ export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
+  const { setModals } = useContext(ModalContext);
   const { Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
@@ -105,7 +108,15 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current));
+  const showSpotlight = () => {
+    DebugLogger("Opening settings modal");
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <SpotlightModal key="spotlight_modal" />,
+    ]);
+  }
+
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current, showSpotlight));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {

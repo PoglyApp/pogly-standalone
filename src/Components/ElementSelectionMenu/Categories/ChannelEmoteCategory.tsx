@@ -17,8 +17,15 @@ import BetterTVWrap from "../../../Utility/BetterTVWrap";
 import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ModalContext } from "../../../Contexts/ModalContext";
 
-export const ChannelEmoteCategory = () => {
+interface IProps {
+  isSearch: boolean;
+  searchTerm?: string;
+}
+
+export const ChannelEmoteCategory = (props: IProps) => {
+  const { modals, setModals, closeModal } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
 
   const [sevenTVInitialized, setSevenTVInitialized] = useState<boolean>(false);
@@ -28,12 +35,23 @@ export const ChannelEmoteCategory = () => {
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
   const [searchEmote, setSearchEmote] = useState<string>("");
+  const [visible, setVisible] = useState<boolean>(!props.isSearch);
 
   const [shownEmotes, setShownEmotes] = useState<ChannelEmote[]>([]);
   const [maxDisplayed, setMaxDisplayed] = useState<number>(10);
 
   useSevenTV(setSevenTVEmotes, setTwitchId, sevenTVInitialized, setSevenTVInitialized);
   useBetterTV(twitchId, setBetterTVEmotes, betterTVInitialized, setBetterTVInitialized);
+
+  useEffect(() => {
+    if(props.searchTerm === undefined) return;
+    setSearchEmote(props.searchTerm);
+    if(props.searchTerm === "" || props.searchTerm === undefined) {
+      setVisible(false)
+    } else {
+      setVisible(shownEmotes.length > 0);
+    }
+  },[props.searchTerm, shownEmotes.length])
 
   useEffect(() => {
     if (sevenTVEmotes.length < 1) return;
@@ -80,6 +98,10 @@ export const ChannelEmoteCategory = () => {
         layoutContext.activeLayout
       );
     };
+
+    if(props.isSearch) {
+      closeModal("spotlight_modal", modals, setModals);
+    }
   };
 
   const AddBetterTVElementToCanvas = (emote: BetterTVEmote) => {
@@ -98,16 +120,23 @@ export const ChannelEmoteCategory = () => {
         layoutContext.activeLayout
       );
     };
+
+    if(props.isSearch) {
+      closeModal("spotlight_modal", modals, setModals);
+    }
   };
 
+  if(!visible) return(<></>);
+
   return (
-    <Accordion>
+    <Accordion defaultExpanded={props.isSearch ? true : false}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
         aria-controls="panel1-content"
         id="panel1-header"
         sx={{
           color: "#ffffffa6",
+          backgroundColor: "#001529",
         }}
       >
         <SvgIcon sx={{ marginRight: "5px" }}>{SevenTVIcon(true)}</SvgIcon>
@@ -123,7 +152,7 @@ export const ChannelEmoteCategory = () => {
           "::-webkit-scrollbar": { width: "0", background: "transparent" },
         }}
       >
-        <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchEmote} defaultValue={""} />
+        {props.isSearch ? (<></>) : (<StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchEmote} defaultValue={""} />)}
         <>
           {searchEmote !== "" && sevenTVEmotes ? (
             <>
@@ -182,7 +211,7 @@ export const ChannelEmoteCategory = () => {
             </>
           ) : (
             <>
-              {shownEmotes.map((e) => {
+              {!props.isSearch && shownEmotes.map((e) => {
                 switch (e.type) {
                   case "7tv":
                     return (
@@ -240,7 +269,7 @@ export const ChannelEmoteCategory = () => {
                     return <></>;
                 }
               })}
-              {maxDisplayed - 1 < sevenTVEmotes.length + betterTVEmotes.length && (
+              {maxDisplayed - 1 < sevenTVEmotes.length + betterTVEmotes.length && !props.isSearch && (
                 <>
                   <br />
                   <Button
