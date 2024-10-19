@@ -609,6 +609,24 @@ export const UserInputHandler = (
     },
   });
 
+  // SPOTLIGHT FEATURE (alt hotkey)
+  userInputs.push({
+    name: "spotlight2",
+    keys: "ctrl+k",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("user opened spotlight");
+      event.preventDefault();
+
+      try {
+        DebugLogger("Opening settings modal");
+        showSpotlight();
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
   return userInputs;
 };
 
