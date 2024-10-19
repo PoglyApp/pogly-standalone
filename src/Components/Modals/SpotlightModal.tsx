@@ -64,7 +64,7 @@ import { ChannelEmoteCategory } from "../ElementSelectionMenu/Categories/Channel
         <DialogContent sx={{ backgroundColor: "#0a2a47", paddingTop: "10px !important", paddingBottom: "10px !important" }}>
           <FormGroup>
             <StyledInput
-                focused={false}
+                focused={true}
                 label="Element"
                 color="#ffffffa6"
                 onChange={setSearchTerm}
