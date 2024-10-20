@@ -29,6 +29,8 @@ export const GuestListContextMenu = (props: IProps) => {
     props.setContextMenu(null);
   };
 
+  if (!selectedGuest) return <></>;
+
   return (
     <Menu
       open={props.contextMenu !== null}
@@ -43,66 +45,68 @@ export const GuestListContextMenu = (props: IProps) => {
       MenuListProps={{ onMouseLeave: handleClose }}
       sx={{ zIndex: 2000000 }}
     >
-      {selectedGuest !== null && identityPermission ? (
-        <div>
-          <Paper variant="outlined" sx={{ fontWeight: "bold", color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-            {selectedGuest.nickname}
-          </Paper>
+      <div>
+        <Paper variant="outlined" sx={{ fontWeight: "bold", color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+          {selectedGuest.nickname}
+        </Paper>
 
-          <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-            {"Permission: "}
-            {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
-          </Paper>
+        <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+          {"Permission: "}
+          {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
+        </Paper>
 
-          {!selectedGuest.identity.isEqual(Identity.identity) && identityPermission.tag === "Owner" ? (
-            <>
-              {selectedGuestPermission?.tag === "Moderator" ? (
-                <StyledMenuItemOrange
-                  onClick={() => {
-                    ClearIdentityPermissionReducer.call(selectedGuest.identity);
-                    handleClose();
-                  }}
-                  sx={{ color: "#008205" }}
-                >
-                  Revoke Moderator
-                </StyledMenuItemOrange>
-              ) : (
-                <StyledMenuItemGreen
-                  onClick={() => {
-                    SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
-                    handleClose();
-                  }}
-                >
-                  Grant Moderator
-                </StyledMenuItemGreen>
-              )}
-              <StyledMenuItemRed
+        {!selectedGuest.identity.isEqual(Identity.identity) &&
+        identityPermission &&
+        identityPermission.tag === "Owner" ? (
+          <>
+            {selectedGuestPermission?.tag === "Moderator" ? (
+              <StyledMenuItemOrange
                 onClick={() => {
-                  KickGuestReducer.call(selectedGuest.address);
+                  ClearIdentityPermissionReducer.call(selectedGuest.identity);
+                  handleClose();
+                }}
+                sx={{ color: "#008205" }}
+              >
+                Revoke Moderator
+              </StyledMenuItemOrange>
+            ) : (
+              <StyledMenuItemGreen
+                onClick={() => {
+                  SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
                   handleClose();
                 }}
               >
-                Kick Guest
-              </StyledMenuItemRed>
-            </>
-          ) : (
-            <></>
-          )}
-
-          {selectedGuest.identity.isEqual(Identity.identity) ? (<>
+                Grant Moderator
+              </StyledMenuItemGreen>
+            )}
             <StyledMenuItemRed
-                onClick={() => {
-                  KickSelfReducer.call();
-                  handleClose();
-                }}
-              >
-                Kick Self
-              </StyledMenuItemRed>
-          </>) : (<></>)}
-        </div>
-      ) : (
-        ""
-      )}
+              onClick={() => {
+                KickGuestReducer.call(selectedGuest.address);
+                handleClose();
+              }}
+            >
+              Kick Guest
+            </StyledMenuItemRed>
+          </>
+        ) : (
+          <></>
+        )}
+
+        {selectedGuest.identity.isEqual(Identity.identity) ? (
+          <>
+            <StyledMenuItemRed
+              onClick={() => {
+                KickSelfReducer.call();
+                handleClose();
+              }}
+            >
+              Kick Self
+            </StyledMenuItemRed>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
     </Menu>
   );
 };

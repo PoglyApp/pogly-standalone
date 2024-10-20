@@ -20,6 +20,12 @@ export const MarkdownEditor = (props: IProps) => {
     const imageButton = document.getElementsByClassName("rmel-icon-image");
     if (imageButton[0]) imageButton[0].parentElement?.remove();
 
+    const unbderlineButton = document.getElementsByClassName("rmel-icon-underline");
+    if (unbderlineButton[0]) unbderlineButton[0].parentElement?.remove();
+
+    const quoteButton = document.getElementsByClassName("rmel-icon-quote");
+    if (quoteButton[0]) quoteButton[0].parentElement?.remove();
+
     const linkButton = document.getElementsByClassName("rmel-icon-link");
     if (linkButton[0]) linkButton[0].parentElement?.remove();
 

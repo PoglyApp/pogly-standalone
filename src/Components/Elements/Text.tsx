@@ -6,6 +6,7 @@ import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
+import remark from "remark-gfm";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 
 interface IProp {
@@ -71,7 +72,7 @@ export const Text = (props: IProp) => {
       }}
       onDoubleClick={showTextCreationModal}
     >
-      <Markdown>{textElement.text}</Markdown>
+      <Markdown remarkPlugins={[remark]}>{textElement.text}</Markdown>
     </div>
   );
 };
