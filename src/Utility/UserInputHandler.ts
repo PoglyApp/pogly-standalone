@@ -17,8 +17,7 @@ export const UserInputHandler = (
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
   compressPaste: boolean | undefined,
-  transformRef: ReactZoomPanPinchRef | null,
-  showSpotlight: Function,
+  transformRef: ReactZoomPanPinchRef | null
 ): any => {
   const userInputs = [];
 
@@ -591,7 +590,7 @@ export const UserInputHandler = (
     },
   });
 
-  // SPOTLIGHT FEATURE 
+  // SPOTLIGHT FEATURE
   userInputs.push({
     name: "spotlight1",
     keys: "ctrl+space",
@@ -653,4 +652,18 @@ const blobToBase64 = (file: any, cb: any) => {
   reader.onerror = function (error) {
     console.log("Error uploading Image to Pogly: ", error);
   };
+};
+
+const showSpotlight = () => {
+  const modal = document.getElementById("spotlight_modal");
+  const seatch = document.getElementById("spotlight_search") as HTMLInputElement;
+
+  const isModalShowing = modal?.style.display ? true : false;
+
+  if (isModalShowing) {
+    modal?.style.removeProperty("display");
+  } else {
+    modal?.style.setProperty("display", "unset");
+    seatch.focus();
+  }
 };

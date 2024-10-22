@@ -1,4 +1,5 @@
 import { TextField } from "@mui/material";
+import { useEffect, useRef } from "react";
 
 interface IProps {
   focused: boolean;
@@ -6,6 +7,7 @@ interface IProps {
   color: string;
   onChange: Function;
   value?: string;
+  id?: string;
   defaultValue?: string;
   password?: boolean;
   placeholder?: string;
@@ -15,6 +17,7 @@ interface IProps {
 export const StyledInput = (props: IProps) => {
   return (
     <TextField
+      id={props.id}
       label={props.label}
       value={props.value}
       defaultValue={props.defaultValue}

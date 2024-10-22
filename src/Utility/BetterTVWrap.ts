@@ -22,10 +22,13 @@ export class BetterTVWrapper {
     };
   }
 
-  public async GetUserByTwitchId(twitchId: string): Promise<BetterTVUserType> {
+  public async GetUserByTwitchId(twitchId: string): Promise<BetterTVUserType | null> {
     DebugLogger("Getting BetterTV user by Twitch ID");
 
     const { data, status } = await this.ApiGET("cached/users/twitch/" + twitchId);
+
+    if (status === 404) return null;
+    if (!data) return null;
 
     return data as BetterTVUserType;
   }

@@ -5,7 +5,7 @@ import { ImageCategory } from "./Categories/ImageCategory";
 import { ChannelEmoteCategory } from "./Categories/ChannelEmoteCategory";
 import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
 import Config from "../../module_bindings/config";
 import Permissions from "../../module_bindings/permissions";
@@ -16,6 +16,10 @@ import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
 import { useAppSelector } from "../../Store/Features/store";
 import { shallowEqual } from "react-redux";
+import BetterTVEmote from "../../Types/BetterTVTypes/BetterTVEmoteType";
+import SevenTVEmote from "../../Types/SevenTVTypes/SevenTVEmoteType";
+import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
+import { SpotlightModal } from "../Modals/SpotlightModal";
 
 interface IProps {
   isDropping: boolean;
@@ -27,6 +31,12 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
   const memoizedData = useMemo(() => elementData, [elementData]);
+
+  const [channelEmotesInitialized, setChannelEmotesInitialized] = useState<boolean>(false);
+  const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
+  const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
+
+  useChannelEmotes(setSevenTVEmotes, setBetterTVEmotes, channelEmotesInitialized, setChannelEmotesInitialized);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
@@ -82,7 +92,9 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {config.streamingPlatform === "twitch" && <ChannelEmoteCategory isSearch={false} />}
+          {config.streamingPlatform === "twitch" && (
+            <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
+          )}
 
           <TenorCategory />
         </CategoryContainer>
@@ -91,6 +103,8 @@ export const ElementSelectionMenu = (props: IProps) => {
       </SelectionMenuContainer>
 
       <ElementSelectionContextMenu contextMenu={contextMenu} setContextMenu={setContextMenu} />
+
+      <SpotlightModal sevenTVEmotes={sevenTVEmotes} bttvEmotes={betterTVEmotes} />
     </>
   );
 };

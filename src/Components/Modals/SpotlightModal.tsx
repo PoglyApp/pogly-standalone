@@ -1,49 +1,121 @@
-import { Button, Dialog, DialogContent, DialogTitle, FormGroup } from "@mui/material";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { ModalContext } from "../../Contexts/ModalContext";
-import { ConfigContext } from "../../Contexts/ConfigContext";
+import { Dialog, DialogContent, FormGroup } from "@mui/material";
+import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { StyledInput } from "../StyledComponents/StyledInput";
-import Config from "../../module_bindings/config";
-import Permissions from "../../module_bindings/permissions";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import ElementData from "../../module_bindings/element_data";
 import { useAppSelector } from "../../Store/Features/store";
 import { shallowEqual } from "react-redux";
-import { ImageCategory } from "../ElementSelectionMenu/Categories/ImageCategory";
-import { ChannelEmoteCategory } from "../ElementSelectionMenu/Categories/ChannelEmoteCategory";
+import { SpotlightElement } from "../General/SpotlightElement";
+import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
+import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
+import BetterTVWrap from "../../Utility/BetterTVWrap";
+import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
+import ElementStruct from "../../module_bindings/element_struct";
+import ImageElementData from "../../module_bindings/image_element_data";
+import { LayoutContext } from "../../Contexts/LayoutContext";
+import SevenTVWrap from "../../Utility/SevenTVWrap";
+import styled from "styled-components";
 
-export const SpotlightModal = () => {
-  const { Identity } = useSpacetimeContext();
-  const { modals, setModals, closeModal } = useContext(ModalContext);
-  const config = useContext(ConfigContext);
+interface IProps {
+  sevenTVEmotes: SevenTVEmoteType[];
+  bttvEmotes: BetterTVEmoteType[];
+}
+
+export const SpotlightModal = (props: IProps) => {
+  const layoutContext = useContext(LayoutContext);
+
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
 
-  const handleOnClose = () => {
-    DebugLogger("Handling backup modal close");
-    closeModal("spotlight_modal", modals, setModals);
+  const [filteredElementData, setFilteredElementData] = useState<ElementData[]>([]);
+  const [filteredSevenTVEmotes, setFilteredSevenTVEmotes] = useState<SevenTVEmoteType[]>([]);
+  const [filteredBttvEmotes, setFilteredBttvEmotes] = useState<BetterTVEmoteType[]>([]);
+
+  const [searchTerm, setSearchTerm] = useState<string | null>();
+
+  useEffect(() => {
+    if (!searchTerm) return;
+
+    const term = searchTerm.toLowerCase();
+
+    setFilteredElementData(() =>
+      elementData.filter(
+        (data: ElementData) => data.name.toLowerCase().includes(term) && data.dataType.tag === "ImageElement"
+      )
+    );
+    setFilteredSevenTVEmotes(() =>
+      props.sevenTVEmotes.filter((data: SevenTVEmoteType) => data.name.toLowerCase().includes(term))
+    );
+    setFilteredBttvEmotes(() =>
+      props.bttvEmotes.filter((data: BetterTVEmoteType) => data.code.toLowerCase().includes(term))
+    );
+  }, [searchTerm, elementData, props.sevenTVEmotes, props.bttvEmotes]);
+
+  const AddElementDataToCanvas = (elementData: ElementData) => {
+    DebugLogger("Adding ElementData to canvas");
+
+    insertElement(
+      ElementStruct.ImageElement({
+        imageElementData: ImageElementData.RawData(elementData.data),
+        width: 128,
+        height: 128,
+      }),
+      layoutContext.activeLayout
+    );
+
+    handleOnClose();
   };
 
-  const [contextMenu, setContextMenu] = useState<any>(null);
+  const AddSevenTVElementToCanvas = (emote: SevenTVEmoteType) => {
+    DebugLogger("Adding 7TV emote to canvas");
+    var blob = SevenTVWrap.GetURLFromEmote(emote);
 
-  const strictMode = useMemo(() => Config.findByVersion(0)!.strictMode, []);
-  const permissionLevel = useMemo(
-    () => Permissions.findByIdentity(Identity.identity)?.permissionLevel,
-    [Identity.identity]
-  );
+    var image = new Image();
+    image.src = blob;
+    image.onload = function () {
+      insertElement(
+        ElementStruct.ImageElement({
+          imageElementData: ImageElementData.RawData(blob),
+          width: image.width || 128,
+          height: image.height || 128,
+        }),
+        layoutContext.activeLayout
+      );
+    };
 
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
-  const memoizedData = useMemo(() => elementData, [elementData]);
+    handleOnClose();
+  };
 
-  const memoizedStrictSettings = useMemo(
-    () => ({
-      StrictMode: strictMode,
-      Permission: permissionLevel,
-    }),
-    [strictMode, permissionLevel]
-  );
+  const AddBetterTVElementToCanvas = (emote: BetterTVEmoteType) => {
+    DebugLogger("Adding BetterTV emote to canvas");
+    var blob = BetterTVWrap.GetURLFromEmote(emote);
+
+    var image = new Image();
+    image.src = blob;
+    image.onload = function () {
+      insertElement(
+        ElementStruct.ImageElement({
+          imageElementData: ImageElementData.RawData(blob),
+          width: image.width || 128,
+          height: image.height || 128,
+        }),
+        layoutContext.activeLayout
+      );
+    };
+
+    handleOnClose();
+  };
+
+  const handleOnClose = () => {
+    DebugLogger("Handling spotlight modal close");
+    setSearchTerm("");
+    setFilteredElementData(() => []);
+    setFilteredSevenTVEmotes(() => []);
+    setFilteredBttvEmotes(() => []);
+    document.getElementById("spotlight_modal")?.style.removeProperty("display");
+    (document.getElementById("spotlight_search") as HTMLInputElement).value = "";
+  };
 
   if (isOverlay) return <></>;
 
@@ -56,33 +128,71 @@ export const SpotlightModal = () => {
           minHeight: "100px !important",
           width: "400px !important",
         },
+        display: "none",
       }}
+      id="spotlight_modal"
     >
-      <DialogContent
-        sx={{ backgroundColor: "#0a2a47", paddingTop: "25px !important", paddingBottom: "10px !important" }}
-      >
+      <DialogContent sx={{ backgroundColor: "#0a2a47", paddingTop: "25px !important" }}>
         <FormGroup>
           <StyledInput
             focused={true}
+            id="spotlight_search"
             label="Search"
             color="#ffffffa6"
-            onChange={setSearchTerm}
+            onChange={(value: string) => {
+              if (value === "") {
+                setFilteredElementData(() => []);
+                setFilteredSevenTVEmotes(() => []);
+                setFilteredBttvEmotes(() => []);
+              } else setSearchTerm(value);
+            }}
             defaultValue=""
             style={{ width: "100%" }}
           />
-
-          <ImageCategory
-            elementData={memoizedData}
-            strictSettings={memoizedStrictSettings}
-            contextMenu={contextMenu}
-            setContextMenu={setContextMenu}
-            isSearch={true}
-            searchTerm={searchTerm}
-          />
-
-          {config.streamingPlatform === "twitch" && <ChannelEmoteCategory isSearch={true} searchTerm={searchTerm} />}
         </FormGroup>
       </DialogContent>
+      <SelectionContainer id="spotlight_content">
+        {filteredElementData.map((data: ElementData) => {
+          return (
+            <SpotlightElement
+              key={"elementData_" + data.id}
+              source={data.data}
+              name={data.name}
+              type="Element Data"
+              onclick={() => AddElementDataToCanvas(data)}
+            />
+          );
+        })}
+
+        {filteredSevenTVEmotes.map((data: SevenTVEmoteType) => {
+          return (
+            <SpotlightElement
+              key={"sevenTV_" + data.id}
+              source={"https://cdn.7tv.app/emote/" + data.id + "/3x.webp"}
+              name={data.name}
+              type="SevenTV"
+              onclick={() => AddSevenTVElementToCanvas(data)}
+            />
+          );
+        })}
+
+        {filteredBttvEmotes.map((data: BetterTVEmoteType) => {
+          return (
+            <SpotlightElement
+              key={"bttv_" + data.id}
+              source={"https://cdn.betterttv.net/emote/" + data.id + "/3x.webp"}
+              name={data.code}
+              type="BetterTTV"
+              onclick={() => AddBetterTVElementToCanvas(data)}
+            />
+          );
+        })}
+      </SelectionContainer>
     </Dialog>
   );
 };
+
+const SelectionContainer = styled.div`
+  max-height: 500px;
+  overflow-x: hidden;
+`;

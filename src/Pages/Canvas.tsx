@@ -41,6 +41,9 @@ import Permissions from "../module_bindings/permissions";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { ModalContext } from "../Contexts/ModalContext";
 import { SpotlightModal } from "../Components/Modals/SpotlightModal";
+import BetterTVEmote from "../Types/BetterTVTypes/BetterTVEmoteType";
+import SevenTVEmote from "../Types/SevenTVTypes/SevenTVEmoteType";
+import { useChannelEmotes } from "../Hooks/useChannelEmotes";
 
 interface IProps {
   setActivePage: Function;
@@ -74,19 +77,19 @@ export const Canvas = (props: IProps) => {
   });
 
   const [noticeMessage, setNoticeMessage] = useState<any>();
-  
+
   const elements: Elements[] = useAppSelector((state: any) => state.elements.elements);
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
-    const initGuidelineAccept = () => {
-      if(isOverlay) return true;
-      if(permission && permission.tag === "Owner") return true;
-      if(localStorage.getItem("Accept_EditorGuidelines")) return true;
-      return false;
+  const initGuidelineAccept = () => {
+    if (isOverlay) return true;
+    if (permission && permission.tag === "Owner") return true;
+    if (localStorage.getItem("Accept_EditorGuidelines")) return true;
+    return false;
   };
 
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
-  
+
   useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
 
   useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
@@ -108,15 +111,7 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  const showSpotlight = () => {
-    DebugLogger("Opening settings modal");
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <SpotlightModal key="spotlight_modal" />,
-    ]);
-  }
-
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current, showSpotlight));
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {
@@ -181,9 +176,9 @@ export const Canvas = (props: IProps) => {
     );
   }
 
-  if (!acceptedGuidelines) { 
+  if (!acceptedGuidelines) {
     DebugLogger("Guest has not accepted guidelines");
-      return ( <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} /> );
+    return <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} />;
   }
 
   return (
@@ -193,7 +188,7 @@ export const Canvas = (props: IProps) => {
           ref={transformRef}
           limitToBounds={false}
           centerOnInit={true}
-          initialScale={.5}
+          initialScale={0.5}
           centerZoomedOut={false}
           minScale={0.05}
           maxScale={4}
@@ -206,16 +201,16 @@ export const Canvas = (props: IProps) => {
           doubleClick={{ disabled: true }}
           smooth={true}
           wheel={{
-            step: 0.1
+            step: 0.1,
           }}
         >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
 
           <TransformComponent
-              contentProps={{ id: "transformContainer" }}
-              wrapperStyle={{ width:"100vw", height:"100vh"}}
-              contentClass="grid-bg"
-            >
+            contentProps={{ id: "transformContainer" }}
+            wrapperStyle={{ width: "100vw", height: "100vh" }}
+            contentClass="grid-bg"
+          >
             <Container>
               <div
                 id="streamContent"
@@ -263,7 +258,7 @@ export const Canvas = (props: IProps) => {
               selectoTargets={selectoTargets}
             />
           </TransformComponent>
-          
+
           <ElementContextMenu
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
