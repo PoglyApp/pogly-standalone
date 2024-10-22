@@ -7,6 +7,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import {
   handleDelete,
   handleFlipElement,
+  handleHide,
   handleLocked,
   handleResetTransform,
   handleTransparency,
@@ -25,6 +26,8 @@ import Permissions from "../../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import PermissionLevel from "../../../module_bindings/permission_level";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 interface IProps {
   contextMenu: any;
@@ -312,6 +315,20 @@ export const ElementContextMenu = (props: IProps) => {
           </FormControl>
         </StyledMenuItem>
       )}
+
+      <StyledMenuItem
+        onClick={() => {
+          const number = transparency > 0 ? 0 : 100;
+          handleHide(selectedElement, setTransparency, number);
+        }}
+      >
+        {transparency > 0 ? "Hide" : "Show"}
+        {transparency > 0 ? (
+          <VisibilityOffIcon sx={{ fontSize: "20px", paddingLeft: "5px" }} />
+        ) : (
+          <VisibilityIcon sx={{ fontSize: "20px", paddingLeft: "5px" }} />
+        )}
+      </StyledMenuItem>
 
       <StyledMenuItem
         onClick={() => {
