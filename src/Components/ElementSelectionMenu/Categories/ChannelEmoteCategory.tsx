@@ -153,11 +153,10 @@ export const ChannelEmoteCategory = (props: IProps) => {
           "::-webkit-scrollbar": { width: "0", background: "transparent" },
         }}
       >
-        {props.isSearch ? (
-          <></>
-        ) : (
+        {!props.isSearch && (
           <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchEmote} defaultValue={""} />
         )}
+
         <>
           {searchEmote !== "" && sevenTVEmotes ? (
             <>
