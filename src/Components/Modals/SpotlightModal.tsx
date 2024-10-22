@@ -128,6 +128,11 @@ export const SpotlightModal = (props: IProps) => {
           minHeight: "100px !important",
           width: "400px !important",
         },
+        ".MuiPaper-root": {
+          position: "absolute",
+          top: "0",
+          marginTop: "300px",
+        },
         display: "none",
       }}
       id="spotlight_modal"
@@ -151,7 +156,7 @@ export const SpotlightModal = (props: IProps) => {
           />
         </FormGroup>
       </DialogContent>
-      <SelectionContainer id="spotlight_content">
+      <SelectionContainer id="spotlight_content" tabIndex={-1}>
         {filteredElementData.map((data: ElementData) => {
           return (
             <SpotlightElement
