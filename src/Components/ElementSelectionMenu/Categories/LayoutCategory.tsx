@@ -81,6 +81,22 @@ export const LayoutCategory = () => {
             </Button>
           )}
 
+          {!strictMode && (
+            <Button
+              variant="text"
+              startIcon={<AddCircleOutlineIcon />}
+              sx={{
+                color: "#ffffffa6",
+                textTransform: "initial",
+                justifyContent: "left",
+                width: "100%",
+              }}
+              onClick={showLayoutCreationModal}
+            >
+              Add Layout
+            </Button>
+          )}
+
           {layouts.map((layout: Layouts) => {
             return (
               <div
@@ -91,13 +107,14 @@ export const LayoutCategory = () => {
                 }}
               >
                 <Button
+                  id={layout.id + "_layout_button"}
                   variant="text"
                   sx={{
                     color: "#ffffffa6",
                     textTransform: "initial",
                     justifyContent: "left",
                     width: "100%",
-                    border: layoutContext.activeLayout.name === layout.name ? "solid 2px #022440" : "solid 2px #000C17",
+                    border: layoutContext.activeLayout.id === layout.id ? "solid 2px #022440" : "solid 2px #000C17",
                   }}
                   onClick={() => {
                     changeLayout(layout);

@@ -80,6 +80,7 @@ import DeleteAllFoldersReducer from "../module_bindings/delete_all_folders_reduc
 import UpdateElementLayoutReducer from "../module_bindings/update_element_layout_reducer";
 import UpdateElementFolderReducer from "../module_bindings/update_element_folder_reducer";
 import UpdateGuestSelectedLayoutReducer from "../module_bindings/update_guest_selected_layout_reducer";
+import DuplicateLayoutReducer from "../module_bindings/duplicate_layout_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -154,6 +155,7 @@ const useStDB = (
       AddLayoutReducer,
       AddLayoutWithIdReducer,
       UpdateLayoutNameReducer,
+      DuplicateLayoutReducer,
       SetLayoutActiveReducer,
       DeleteLayoutReducer,
       DeleteAllLayoutsReducer,
