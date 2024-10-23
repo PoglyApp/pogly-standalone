@@ -13,6 +13,7 @@ import {
   RadioGroup,
   Tab,
   Tabs,
+  Typography,
 } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -160,6 +161,10 @@ export const SettingsModal = (props: IProp) => {
     }
   };
 
+  const openInNewTab = (url: string) => {
+    window.open(url, "_blank", "noreferrer");
+  };
+
   const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
 
   if (isOverlay) return <></>;
@@ -213,6 +218,21 @@ export const SettingsModal = (props: IProp) => {
                 defaultValue={localStorage.getItem("TenorAPIKey")!}
                 password={true}
               />
+
+              <Typography
+                variant="subtitle2"
+                color="#ffffffa6"
+                onClick={() => openInNewTab("https://developers.google.com/tenor/guides/quickstart#setup")}
+                sx={{
+                  "&:hover": {
+                    cursor: "pointer",
+                  },
+                  width: "75px",
+                  paddingTop: "5px",
+                }}
+              >
+                Get API key
+              </Typography>
 
               <div style={{ display: "grid", marginTop: "10px" }}>
                 <FormControlLabel
