@@ -17,8 +17,8 @@ import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 
 interface IProps {
-  sevenTVEmotes: SevenTVEmote[];
-  betterTVEmotes: BetterTVEmote[];
+  sevenTVEmotes: SevenTVEmote[] | undefined;
+  betterTVEmotes: BetterTVEmote[] | undefined;
 }
 
 export const ChannelEmoteCategory = (props: IProps) => {
@@ -32,8 +32,10 @@ export const ChannelEmoteCategory = (props: IProps) => {
   const [maxDisplayed, setMaxDisplayed] = useState<number>(10);
 
   useEffect(() => {
-    setSevenTVEmotes(() => [...props.sevenTVEmotes]);
-    setBetterTVEmotes(() => [...props.betterTVEmotes]);
+    if(!props.sevenTVEmotes) return;
+    if(!props.betterTVEmotes) return;
+    setSevenTVEmotes(() => [...props.sevenTVEmotes!]);
+    setBetterTVEmotes(() => [...props.betterTVEmotes!]);
   }, [props.sevenTVEmotes, props.betterTVEmotes]);
 
   useEffect(() => {

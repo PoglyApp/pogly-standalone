@@ -1,6 +1,5 @@
 import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import User from "../Types/SevenTVTypes/SevenTVUserType";
-import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
 import { DebugLogger } from "./DebugLogger";
 
 interface SevenTVResponse {
@@ -73,7 +72,7 @@ export class SevenTVWrapper {
       query: "query SearchUsers($query: String!) {\n  users(query: $query) {\n    id, username}\n}",
     });
 
-    const user = (await query.data).data.users.filter((_user: User) => _user.username === username)[0];
+    const user = (await query.data).data.users.filter((_user: User) => _user.username.toLowerCase() === username.toLowerCase())[0];
 
     if (!user) return null;
 

@@ -33,8 +33,8 @@ export const ElementSelectionMenu = (props: IProps) => {
   const memoizedData = useMemo(() => elementData, [elementData]);
 
   const [channelEmotesInitialized, setChannelEmotesInitialized] = useState<boolean>(false);
-  const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
-  const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
+  const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[] | undefined>([]);
+  const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[] | undefined>([]);
 
   useChannelEmotes(setSevenTVEmotes, setBetterTVEmotes, channelEmotesInitialized, setChannelEmotesInitialized);
 
