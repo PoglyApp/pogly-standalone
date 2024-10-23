@@ -146,7 +146,12 @@ export const useOverlayElementsEvents = (
 
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
-            const htmlTag = WidgetCodeCompiler(undefined, newWidgetElement.rawData);
+            const htmlTag = WidgetCodeCompiler(
+              newWidgetElement.width,
+              newWidgetElement.height,
+              undefined,
+              newWidgetElement.rawData
+            );
 
             component.children[0].setAttribute("srcDoc", htmlTag);
           }

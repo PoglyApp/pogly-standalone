@@ -19,6 +19,7 @@ interface Row {
 interface IProps {
   variables: any[];
   setVariables: Function;
+  setError: Function;
 }
 
 export const WidgetVariableTable = (props: IProps) => {
@@ -35,6 +36,11 @@ export const WidgetVariableTable = (props: IProps) => {
   const handleVariableNameChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     DebugLogger("Handling widget variable name change");
     const { value } = event.target;
+
+    if (value === "is_overlay" || value === "widget_width" || value === "widget_height")
+      props.setError("Cannot override system variable names. Please choose a different variable name.");
+    else props.setError(null);
+
     const newRows = [...rows];
 
     newRows[index] = { ...newRows[index], variableName: value };

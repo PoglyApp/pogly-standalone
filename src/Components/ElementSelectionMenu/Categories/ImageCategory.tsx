@@ -9,7 +9,7 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import ImageElementData from "../../../module_bindings/image_element_data";
 import styled from "styled-components";
 import { ImageUploadModal } from "../../Modals/ImageUploadModal";
-import React, { useContext, useMemo, useState, useCallback, useEffect, useRef } from "react";
+import React, { useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
