@@ -16,7 +16,7 @@ export const useChannelEmotes = (
   useEffect(() => {
     if (channelEmotesInitialized) return;
 
-    DebugLogger("Initializing SevenTV emotes.");
+    DebugLogger("Initializing Channel emotes.");
 
     (async () => {
       // 7TV

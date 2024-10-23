@@ -15,6 +15,7 @@ import ImageElementData from "../../module_bindings/image_element_data";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import SevenTVWrap from "../../Utility/SevenTVWrap";
 import styled from "styled-components";
+import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmoteType[];
@@ -161,7 +162,7 @@ export const SpotlightModal = (props: IProps) => {
           return (
             <SpotlightElement
               key={"elementData_" + data.id}
-              source={data.data}
+              source={convertBinaryToDataURI(data)}
               name={data.name}
               type="Element Data"
               onclick={() => AddElementDataToCanvas(data)}
