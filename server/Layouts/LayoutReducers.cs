@@ -137,7 +137,7 @@ public partial class Module
                     Transform = element.Transform,
                     Clip = element.Clip,
                     Locked = false,
-                    LayoutId = newLayoutId,
+                    LayoutId = newLayoutId + 1,
                     FolderId = 0,
                     PlacedBy = guest.Nickname,
                     LastEditedBy = guest.Nickname,
