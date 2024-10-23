@@ -21,6 +21,7 @@ export const useChannelEmotes = (
     (async () => {
       // 7TV
       const sevenTVUserID = await SevenTVWrap.SearchForUser(config.streamName);
+      console.log(sevenTVUserID);
       if (!sevenTVUserID) {
         console.log("Could not find 7TV user ID.");
         return setChannelEmotesInitialized(true);
@@ -39,7 +40,7 @@ export const useChannelEmotes = (
       }
 
       const sevenTvEmotes = await SevenTVWrap.GetEmoteSetEmotes(emoteSetID);
-      if (!emoteSetID) {
+      if (!sevenTvEmotes) {
         console.log("Could not get 7TV emotes.");
         return setChannelEmotesInitialized(true);
       }
@@ -55,7 +56,7 @@ export const useChannelEmotes = (
         }
       }
 
-      setSevenTVEmotes(sevenTvEmotes);
+      setSevenTVEmotes([...sevenTvEmotes]);
       setChannelEmotesInitialized(true);
     })();
   }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
