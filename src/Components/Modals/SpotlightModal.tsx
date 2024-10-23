@@ -18,8 +18,8 @@ import styled from "styled-components";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProps {
-  sevenTVEmotes: SevenTVEmoteType[];
-  bttvEmotes: BetterTVEmoteType[];
+  sevenTVEmotes: SevenTVEmoteType[] | undefined;
+  bttvEmotes: BetterTVEmoteType[] | undefined;
 }
 
 export const SpotlightModal = (props: IProps) => {
@@ -30,8 +30,8 @@ export const SpotlightModal = (props: IProps) => {
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
 
   const [filteredElementData, setFilteredElementData] = useState<ElementData[]>([]);
-  const [filteredSevenTVEmotes, setFilteredSevenTVEmotes] = useState<SevenTVEmoteType[]>([]);
-  const [filteredBttvEmotes, setFilteredBttvEmotes] = useState<BetterTVEmoteType[]>([]);
+  const [filteredSevenTVEmotes, setFilteredSevenTVEmotes] = useState<SevenTVEmoteType[] | undefined>([]);
+  const [filteredBttvEmotes, setFilteredBttvEmotes] = useState<BetterTVEmoteType[] | undefined>([]);
 
   const [searchTerm, setSearchTerm] = useState<string | null>();
 
@@ -45,11 +45,14 @@ export const SpotlightModal = (props: IProps) => {
         (data: ElementData) => data.name.toLowerCase().includes(term) && data.dataType.tag === "ImageElement"
       )
     );
-    setFilteredSevenTVEmotes(() =>
-      props.sevenTVEmotes.filter((data: SevenTVEmoteType) => data.name.toLowerCase().includes(term))
+
+    setFilteredSevenTVEmotes(() => {
+        if(props.sevenTVEmotes) return props.sevenTVEmotes.filter((data: SevenTVEmoteType) => data.name.toLowerCase().includes(term));
+      }
     );
-    setFilteredBttvEmotes(() =>
-      props.bttvEmotes.filter((data: BetterTVEmoteType) => data.code.toLowerCase().includes(term))
+    setFilteredBttvEmotes(() => {
+        if(props.bttvEmotes) return props.bttvEmotes.filter((data: BetterTVEmoteType) => data.code.toLowerCase().includes(term));
+      }
     );
   }, [searchTerm, elementData, props.sevenTVEmotes, props.bttvEmotes]);
 
@@ -170,7 +173,7 @@ export const SpotlightModal = (props: IProps) => {
           );
         })}
 
-        {filteredSevenTVEmotes.map((data: SevenTVEmoteType) => {
+        {filteredSevenTVEmotes && filteredSevenTVEmotes.map((data: SevenTVEmoteType) => {
           return (
             <SpotlightElement
               key={"sevenTV_" + data.id}
@@ -182,7 +185,7 @@ export const SpotlightModal = (props: IProps) => {
           );
         })}
 
-        {filteredBttvEmotes.map((data: BetterTVEmoteType) => {
+        {filteredBttvEmotes && filteredBttvEmotes.map((data: BetterTVEmoteType) => {
           return (
             <SpotlightElement
               key={"bttv_" + data.id}

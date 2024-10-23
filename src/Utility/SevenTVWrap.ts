@@ -1,6 +1,5 @@
 import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import User from "../Types/SevenTVTypes/SevenTVUserType";
-import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
 import { DebugLogger } from "./DebugLogger";
 
 interface SevenTVResponse {

@@ -21,7 +21,6 @@ export const useChannelEmotes = (
     (async () => {
       // 7TV
       const sevenTVUserID = await SevenTVWrap.SearchForUser(config.streamName);
-      console.log(sevenTVUserID);
       if (!sevenTVUserID) {
         console.log("Could not find 7TV user ID.");
         return setChannelEmotesInitialized(true);
