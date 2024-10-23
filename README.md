@@ -79,6 +79,7 @@ For assistance with setting up Pogly, we are available in our [Discord](https://
 <a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
 <a href="https://www.twitch.tv/savix" rel="noreferrer" target="_blank" title="Savix"><img src="./images/streamers/savix.svg" /></a>
 <a href="https://www.twitch.tv/derkajohnstv" rel="noreferrer" target="_blank" title="DerkaJohnsTV"><img src="./images/streamers/derkajohnstv.svg" /></a>
+<a href="https://www.twitch.tv/pengwin" rel="noreferrer" target="_blank" title="Pengwin"><img src="./images/streamers/pengwin.svg" /></a>
 
 ## Contributing
 
