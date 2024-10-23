@@ -101,8 +101,15 @@ public partial class Module
             
             var layout = Layouts.FilterById(layoutId).First();
 
+            uint newLayoutId = 0;
+            foreach (var i in Layouts.Iter())
+            {
+                if (i.Id > newLayoutId) newLayoutId = i.Id;
+            }
+            
             var newLayout = new Layouts
             {
+                Id = newLayoutId + 1,
                 Name = layout.Name,
                 CreatedBy = guest.Nickname,
                 Active = false
@@ -110,12 +117,6 @@ public partial class Module
             
             newLayout.Insert();
             
-            uint newLayoutId = 0;
-            foreach (var i in Layouts.Iter())
-            {
-                if (i.Id > newLayoutId) newLayoutId = i.Id;
-            }
-
             var elements = Elements.FilterByLayoutId(layoutId);
             
             uint maxElementId = 0;
