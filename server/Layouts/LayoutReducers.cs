@@ -69,6 +69,7 @@ public partial class Module
                 CreatedBy = guest.Nickname,
                 Active = active
             };
+            
             newLayout.Insert();
             
             //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
@@ -78,6 +79,83 @@ public partial class Module
         catch (Exception e)
         {
             Log($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+        }
+    }
+    
+    [SpacetimeDB.Reducer]
+    public static void DuplicateLayout(ReducerContext ctx, uint layoutId)
+    {
+        string func = "DuplicateLayout";
+
+        if (ctx.Address is null) return;
+
+        try
+        {
+            if (!GetGuest(func, ctx.Address, out var guest))
+                return;
+            if (!GuestAuthenticated(func, guest)) return;
+            if (Config.FindByVersion(0)!.Value.StrictMode)
+            {
+                if (!IsGuestModerator(func, ctx.Sender)) return;
+            }
+            
+            var layout = Layouts.FilterById(layoutId).First();
+
+            uint newLayoutId = 0;
+            foreach (var i in Layouts.Iter())
+            {
+                if (i.Id > newLayoutId) newLayoutId = i.Id;
+            }
+            
+            var newLayout = new Layouts
+            {
+                Id = newLayoutId + 1,
+                Name = layout.Name,
+                CreatedBy = guest.Nickname,
+                Active = false
+            };
+            
+            newLayout.Insert();
+            
+            var elements = Elements.FilterByLayoutId(layoutId);
+            
+            uint maxElementId = 0;
+            foreach (var i in Elements.Iter())
+            {
+                if (i.Id > maxElementId) maxElementId = i.Id;
+            }
+
+            uint newIndex = maxElementId + 1;
+
+            foreach (Elements element in elements)
+            {
+                var newElement = new Elements
+                {
+                    Id = newIndex,
+                    Element = element.Element,
+                    Transparency = element.Transparency,
+                    Transform = element.Transform,
+                    Clip = element.Clip,
+                    Locked = false,
+                    LayoutId = newLayoutId + 1,
+                    FolderId = 0,
+                    PlacedBy = guest.Nickname,
+                    LastEditedBy = guest.Nickname,
+                    ZIndex = element.ZIndex
+                };
+                
+                newElement.Insert();
+
+                newIndex++;
+            }
+            
+            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
+            if(Config.FindByVersion(0)!.Value.DebugMode) 
+                Log($"[Layouts - {func}] {guest.Nickname} duplicated layout {layout.Name}!");
+        }
+        catch (Exception e)
+        {
+            Log($"[{func}] Error duplicating Layout, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
         }
     }
     

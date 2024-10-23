@@ -2,7 +2,6 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, SvgIcon } from "
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useContext, useEffect, useState } from "react";
 import SevenTVEmote from "../../../Types/SevenTVTypes/SevenTVEmoteType";
-import { useSevenTV } from "../../../Hooks/useSevenTV";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
 import ElementStruct from "../../../module_bindings/element_struct";
 import ImageElementData from "../../../module_bindings/image_element_data";
@@ -11,20 +10,20 @@ import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
-import { useBetterTV } from "../../../Hooks/useBetterTV";
 import BetterTVEmote from "../../../Types/BetterTVTypes/BetterTVEmoteType";
 import BetterTVWrap from "../../../Utility/BetterTVWrap";
 import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 
-export const ChannelEmoteCategory = () => {
+interface IProps {
+  sevenTVEmotes: SevenTVEmote[] | undefined;
+  betterTVEmotes: BetterTVEmote[] | undefined;
+}
+
+export const ChannelEmoteCategory = (props: IProps) => {
   const layoutContext = useContext(LayoutContext);
 
-  const [sevenTVInitialized, setSevenTVInitialized] = useState<boolean>(false);
-  const [betterTVInitialized, setBetterTVInitialized] = useState<boolean>(false);
-
-  const [twitchId, setTwitchId] = useState<string>();
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
   const [searchEmote, setSearchEmote] = useState<string>("");
@@ -32,8 +31,12 @@ export const ChannelEmoteCategory = () => {
   const [shownEmotes, setShownEmotes] = useState<ChannelEmote[]>([]);
   const [maxDisplayed, setMaxDisplayed] = useState<number>(10);
 
-  useSevenTV(setSevenTVEmotes, setTwitchId, sevenTVInitialized, setSevenTVInitialized);
-  useBetterTV(twitchId, setBetterTVEmotes, betterTVInitialized, setBetterTVInitialized);
+  useEffect(() => {
+    if(!props.sevenTVEmotes) return;
+    if(!props.betterTVEmotes) return;
+    setSevenTVEmotes(() => [...props.sevenTVEmotes!]);
+    setBetterTVEmotes(() => [...props.betterTVEmotes!]);
+  }, [props.sevenTVEmotes, props.betterTVEmotes]);
 
   useEffect(() => {
     if (sevenTVEmotes.length < 1) return;

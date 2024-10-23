@@ -23,8 +23,9 @@ export const Widget = (props: IProp) => {
     try {
       let htmlCode: string = "";
 
-      if (widgetElement.rawData === "") htmlCode = WidgetCodeCompiler(widgetElement.elementDataId);
-      else htmlCode = WidgetCodeCompiler(undefined, widgetElement.rawData);
+      if (widgetElement.rawData === "")
+        htmlCode = WidgetCodeCompiler(widgetElement.width, widgetElement.height, widgetElement.elementDataId);
+      else htmlCode = WidgetCodeCompiler(widgetElement.width, widgetElement.height, undefined, widgetElement.rawData);
 
       DebugLogger("Creating widget");
 
@@ -32,7 +33,7 @@ export const Widget = (props: IProp) => {
     } catch (error) {
       console.log("ERROR WHILE SPAWNING WIDGET", error);
     }
-  }, [widgetElement.elementDataId, widgetElement.rawData]);
+  }, [widgetElement.elementDataId, widgetElement.rawData, widgetElement.width, widgetElement.height]);
 
   const showWidgetCreationModal = () => {
     setModals((oldModals: any) => [
@@ -42,13 +43,12 @@ export const Widget = (props: IProp) => {
   };
 
   const renderDisplay = () => {
-    if(InRenderBounds(props.elements)) {
+    if (InRenderBounds(props.elements)) {
       return "block";
-    }
-    else {
+    } else {
       return "none";
     }
-  }
+  };
 
   return (
     <div

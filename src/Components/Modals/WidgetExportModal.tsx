@@ -46,7 +46,7 @@ export const WidgetExportModal = (props: IProps) => {
       DebugLogger("Importing widget code");
       if (props.loadByWidgetString && widgetCode) {
         try {
-          JSON.parse(widgetCode);
+          JSON.parse(unescape(widgetCode));
           setError("");
         } catch (error) {
           return setError("Widget JSON does not parse.");
@@ -54,7 +54,7 @@ export const WidgetExportModal = (props: IProps) => {
 
         closeModal("widgetImport_modal", modals, setModals);
 
-        props.loadByWidgetString(widgetCode);
+        props.loadByWidgetString(unescape(widgetCode));
       }
     } catch (error) {
       console.log("ERROR WHILE TRYING TO IMPORT WIDGET", error);

@@ -269,8 +269,15 @@ export const handleDeleteElementData = (selectedElementData: ElementData, handle
   handleClose();
 };
 
-export const handleTransparency = (selectedElement: Elements, value: any) => {
+export const handleTransparency = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
   DebugLogger("Handling element transparency");
+  setTransparencyState(value);
+  UpdateElementTransparencyReducer.call(selectedElement.id, value);
+};
+
+export const handleHide = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
+  DebugLogger("Handling element hiding/showing");
+  setTransparencyState(value);
   UpdateElementTransparencyReducer.call(selectedElement.id, value);
 };
 

@@ -13,6 +13,7 @@ import {
   Typography,
   Link,
   Alert,
+  Tooltip,
 } from "@mui/material";
 
 import Editor from "react-simple-code-editor";
@@ -47,6 +48,7 @@ import WidgetElement from "../../module_bindings/widget_element";
 import ElementStruct from "../../module_bindings/element_struct";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -78,6 +80,7 @@ export const WidgetCreationModal = (props: IProps) => {
   const [showModal, setShowModal] = useState<Boolean>(false);
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [widgetError, setWidgetError] = useState<string | null>(null);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -331,11 +334,62 @@ export const WidgetCreationModal = (props: IProps) => {
               )}
             </FormGroup>
 
-            <DialogContentText sx={{ color: "#ffffffa6", marginTop: "20px", paddingBottom: "5px" }}>
+            <DialogContentText
+              sx={{
+                color: "#ffffffa6",
+                marginTop: "20px",
+                paddingBottom: "5px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               {"Variables"}
+              <Tooltip
+                title={
+                  <div>
+                    <span>System variables:</span>
+                    <br />
+                    <strong>
+                      {"{is_overlay}"}
+                      <span> {" => If widget is currently in overlay."}</span>
+                    </strong>
+                    <br />
+                    <strong>
+                      {"{widget_width}"}
+                      <span> {" => Widget width on spawn."}</span>
+                    </strong>
+                    <br />
+                    <strong>
+                      {"{widget_height}"}
+                      <span> {" => Widget height on spawn."}</span>
+                    </strong>
+                  </div>
+                }
+              >
+                <InfoOutlineIcon sx={{ fontSize: 16, paddingLeft: "5px" }} />
+              </Tooltip>
             </DialogContentText>
 
-            <WidgetVariableTable key={variablesKey} variables={variables} setVariables={setVariables} />
+            <WidgetVariableTable
+              key={variablesKey}
+              variables={variables}
+              setVariables={setVariables}
+              setError={setWidgetError}
+            />
+
+            {widgetError && (
+              <Alert
+                variant="filled"
+                severity="warning"
+                sx={{
+                  backgroundColor: "#f57c00 !important",
+                  color: "#212121",
+                  marginBottom: "20px",
+                }}
+              >
+                {widgetError}
+              </Alert>
+            )}
 
             <StyledAccordion>
               <StyledAccordionSummary
@@ -507,6 +561,7 @@ export const WidgetCreationModal = (props: IProps) => {
                       color: "gray",
                     },
                   }}
+                  disabled={widgetError ? true : false}
                   onClick={handleSave}
                 >
                   {props.editElementDataId || props.editElementId ? "Save" : "Create"}

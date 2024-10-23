@@ -80,6 +80,7 @@ import DeleteAllFoldersReducer from "../module_bindings/delete_all_folders_reduc
 import UpdateElementLayoutReducer from "../module_bindings/update_element_layout_reducer";
 import UpdateElementFolderReducer from "../module_bindings/update_element_folder_reducer";
 import UpdateGuestSelectedLayoutReducer from "../module_bindings/update_guest_selected_layout_reducer";
+import DuplicateLayoutReducer from "../module_bindings/duplicate_layout_reducer";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -154,6 +155,7 @@ const useStDB = (
       AddLayoutReducer,
       AddLayoutWithIdReducer,
       UpdateLayoutNameReducer,
+      DuplicateLayoutReducer,
       SetLayoutActiveReducer,
       DeleteLayoutReducer,
       DeleteAllLayoutsReducer,
@@ -175,9 +177,15 @@ const useStDB = (
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
+    let stdbDomain = connectionConfig?.domain || "";
+
     const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-    const client = new SpacetimeDBClient(connectionConfig?.domain || "", connectionConfig?.module || "", stdbToken);
+    if (isOverlay && stdbDomain === "") {
+      stdbDomain = "wss://pogly.spacetimedb.com";
+    }
+
+    const client = new SpacetimeDBClient(stdbDomain, connectionConfig?.module || "", stdbToken);
     let address: Address | undefined;
 
     client?.onConnect((token: string, Identity: Identity, Address: Address) => {

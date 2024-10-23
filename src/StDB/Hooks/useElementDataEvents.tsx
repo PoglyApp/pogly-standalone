@@ -35,7 +35,7 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
       if (oldData.data !== newData.data) {
         const widgetsWithData = document.querySelectorAll(`[data-widget-element-data-id='${oldData.id.toString()}']`);
 
-        const htmlTag = WidgetCodeCompiler(undefined, newData.data);
+        const htmlTag = WidgetCodeCompiler(undefined, undefined, undefined, newData.data);
 
         widgetsWithData.forEach((widget: any) => {
           widget.src = "data:text/html;charset=utf-8," + encodeURIComponent(htmlTag);

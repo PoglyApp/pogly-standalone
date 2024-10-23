@@ -25,6 +25,7 @@ export const useLayoutEvents = (setLayouts: Function) => {
     });
 
     Layouts.onUpdate((oldLayout, newLayout) => {
+      // ACTIVITY CHANGE
       if (oldLayout.active === false && newLayout.active === true) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
         if (layoutIcon) layoutIcon.style.display = "unset";
@@ -44,6 +45,11 @@ export const useLayoutEvents = (setLayouts: Function) => {
       if (oldLayout.active === true && newLayout.active === false) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
         if (layoutIcon) layoutIcon.style.display = "none";
+      }
+
+      if (oldLayout.name !== newLayout.name) {
+        const layoutButton = document.getElementById(newLayout.id + "_layout_button");
+        if (layoutButton) layoutButton.innerText = newLayout.name;
       }
     });
 

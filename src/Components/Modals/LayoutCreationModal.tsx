@@ -4,8 +4,13 @@ import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
 import AddLayoutReducer from "../../module_bindings/add_layout_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import UpdateLayoutNameReducer from "../../module_bindings/update_layout_name_reducer";
 
-export const LayoutCreationModal = () => {
+interface IProps {
+  layoutId?: number;
+}
+
+export const LayoutCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [layoutName, setLayoutName] = useState<string>("");
@@ -34,6 +39,12 @@ export const LayoutCreationModal = () => {
     handleOnClose();
   };
 
+  const updateLayout = () => {
+    DebugLogger("Updating layout");
+    UpdateLayoutNameReducer.call(props.layoutId!, layoutName);
+    handleOnClose();
+  };
+
   const handleOnClose = () => {
     DebugLogger("Closing layout creation modal");
     closeModal("layoutCreation_modal", modals, setModals);
@@ -41,7 +52,9 @@ export const LayoutCreationModal = () => {
 
   return (
     <Dialog open={true} onClose={handleOnClose}>
-      <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>Create new layout</DialogTitle>
+      <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
+        {props.layoutId ? "Rename layout" : "Create new layout"}
+      </DialogTitle>
       <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
         <FormGroup sx={{ gap: "20px" }}>
           <StyledInput
@@ -89,9 +102,15 @@ export const LayoutCreationModal = () => {
               color: "gray",
             },
           }}
-          onClick={saveLayout}
+          onClick={() => {
+            if (props.layoutId) {
+              updateLayout();
+            } else {
+              saveLayout();
+            }
+          }}
         >
-          Create
+          {props.layoutId ? "Update" : "Create"}
         </Button>
       </DialogActions>
     </Dialog>

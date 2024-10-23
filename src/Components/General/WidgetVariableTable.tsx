@@ -9,6 +9,12 @@ import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { HexColorPicker } from "react-colorful";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import ElementData from "../../module_bindings/element_data";
+import { useAppSelector } from "../../Store/Features/store";
+import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
+import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
+import { SpotlightElement } from "./SpotlightElement";
+import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface Row {
   variableName: string;
@@ -19,6 +25,7 @@ interface Row {
 interface IProps {
   variables: any[];
   setVariables: Function;
+  setError: Function;
 }
 
 export const WidgetVariableTable = (props: IProps) => {
@@ -27,14 +34,45 @@ export const WidgetVariableTable = (props: IProps) => {
   const [showPickers, setShowPickers] = useState<{ [key: number]: boolean }>({});
   const colorInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
+  const [searchTerm, setSearchTerm] = useState<string | null>();
+
+  const [filteredElementData, setFilteredElementData] = useState<ElementData[]>([]);
+  const [filteredSevenTVEmotes, setFilteredSevenTVEmotes] = useState<SevenTVEmoteType[]>([]);
+  const [filteredBttvEmotes, setFilteredBttvEmotes] = useState<BetterTVEmoteType[]>([]);
+
+  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
+
   useEffect(() => {
     DebugLogger("Setting widget variables");
     props.setVariables(() => rows);
   }, [rows, props]);
 
+  useEffect(() => {
+    if (!searchTerm) return;
+
+    const term = searchTerm.toLowerCase();
+
+    setFilteredElementData(() =>
+      elementData.filter(
+        (data: ElementData) => data.name.toLowerCase().includes(term) && data.dataType.tag === "ImageElement"
+      )
+    );
+    /*setFilteredSevenTVEmotes(() =>
+      props.sevenTVEmotes.filter((data: SevenTVEmoteType) => data.name.toLowerCase().includes(term))
+    );
+    setFilteredBttvEmotes(() =>
+      props.bttvEmotes.filter((data: BetterTVEmoteType) => data.code.toLowerCase().includes(term))
+    );*/
+  }, [searchTerm, elementData /*, props.sevenTVEmotes, props.bttvEmotes*/]);
+
   const handleVariableNameChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     DebugLogger("Handling widget variable name change");
     const { value } = event.target;
+
+    if (value === "is_overlay" || value === "widget_width" || value === "widget_height")
+      props.setError("Cannot override system variable names. Please choose a different variable name.");
+    else props.setError(null);
+
     const newRows = [...rows];
 
     newRows[index] = { ...newRows[index], variableName: value };
@@ -54,13 +92,15 @@ export const WidgetVariableTable = (props: IProps) => {
       variableValue:
         variableType === VariableValueType.boolean || variableType === VariableValueType.toggle ? false : "",
     };
+
     setRows(() => newRows);
   };
 
   const handleVariableValueChange = (
     index: number,
     event?: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    color?: string
+    color?: string,
+    image?: string
   ) => {
     DebugLogger("Handling widget variable value change");
     const newRows = [...rows];
@@ -68,6 +108,13 @@ export const WidgetVariableTable = (props: IProps) => {
     if (color) {
       newRows[index] = { ...newRows[index], variableValue: color };
       colorInputRefs.current[index]!.value = color;
+    } else if (image || image === "") {
+      newRows[index] = { ...newRows[index], variableValue: image };
+
+      setSearchTerm("");
+      setFilteredElementData(() => []);
+      setFilteredSevenTVEmotes(() => []);
+      setFilteredBttvEmotes(() => []);
     } else if (event) {
       const { value, type } = event.target;
 
@@ -149,6 +196,7 @@ export const WidgetVariableTable = (props: IProps) => {
                     <option value={VariableValueType.boolean}>Boolean</option>
                     <option value={VariableValueType.toggle}>Toggle</option>
                     <option value={VariableValueType.color}>Color</option>
+                    <option value={VariableValueType.image}>Image</option>
                   </StyledSelect>
                 </StyledTd>
                 <StyledTd>
@@ -206,6 +254,59 @@ export const WidgetVariableTable = (props: IProps) => {
                             onChange={(color) => handleVariableValueChange(index, undefined, color)}
                           />
                         </Popover>
+                      )}
+                    </div>
+                  )}
+
+                  {row.variableType.toString() === VariableValueType.image.toString() && (
+                    <div>
+                      {row.variableValue !== "" ? (
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                          <img
+                            src={row.variableValue as string}
+                            alt="variable_image"
+                            style={{ width: "32px", height: "32px" }}
+                            onClick={() => {
+                              handleVariableValueChange(index, undefined, undefined, "");
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <StyledInput
+                            type="text"
+                            placeholder="Search..."
+                            defaultValue={row.variableValue as string}
+                            style={{ color: "#ffffffa6" }}
+                            onChange={(event) => {
+                              if (event.target.value === "") {
+                                setFilteredElementData(() => []);
+                                setFilteredSevenTVEmotes(() => []);
+                                setFilteredBttvEmotes(() => []);
+                              } else setSearchTerm(event.target.value);
+                            }}
+                          />
+                          <div style={{ position: "absolute", display: "flex", width: "157px" }}>
+                            <div style={{ width: "100%" }}>
+                              {filteredElementData.map((data: ElementData) => {
+                                const name = data.name.length > 8 ? data.name.substring(0, 8) + "..." : data.name;
+                                const image = convertBinaryToDataURI(data);
+
+                                return (
+                                  <SpotlightElement
+                                    key={"elementData_" + data.id}
+                                    source={image}
+                                    name={name}
+                                    type="Element Data"
+                                    onclick={() => {
+                                      handleVariableValueChange(index, undefined, undefined, image);
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}

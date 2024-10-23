@@ -1,6 +1,5 @@
 import Emote from "../Types/SevenTVTypes/SevenTVEmoteType";
 import User from "../Types/SevenTVTypes/SevenTVUserType";
-import UserId from "../Types/SevenTVTypes/SevenTVUserIdType";
 import { DebugLogger } from "./DebugLogger";
 
 interface SevenTVResponse {
@@ -63,38 +62,55 @@ export class SevenTVWrapper {
     };
   }
 
-  public async GetSevenTVId(username: string): Promise<UserId> {
+  public async SearchForUser(username: string): Promise<string | null> {
     DebugLogger("Getting 7TV ID");
-    const data = this.GqlApiPOST({
+    const query = await this.GqlApiPOST({
       operationName: "SearchUsers",
       variables: {
-        query: `${username}`,
+        query: `${username.toLowerCase()}`,
       },
-      query: "query SearchUsers($query: String!) {\n  users(query: $query) {\n    id}\n}",
+      query: "query SearchUsers($query: String!) {\n  users(query: $query) {\n    id, username}\n}",
     });
 
-    return (await data).data as UserId;
+    const user = (await query.data).data.users.filter(
+      (_user: User) => _user.username.toLowerCase() === username.toLowerCase()
+    )[0];
+
+    if (!user) return null;
+
+    return user.id;
   }
 
-  public async GetUserById(userId: string): Promise<User> {
+  public async GetUserById(userId: string): Promise<User | null> {
     DebugLogger("Getting 7TV user ID");
     const { data, status } = await this.ApiGET("users/" + userId);
+
+    if (status === 404) return null;
 
     return data as User;
   }
 
-  public async GetEmoteSetId(userId: string): Promise<string> {
+  public async GetEmoteSetId(userId: string): Promise<string[] | null> {
     DebugLogger("Getting 7TV emote set ID");
     const userObj = await this.GetUserById(userId);
 
-    return userObj.emote_sets[0].id;
+    if (!userObj) return null;
+
+    return userObj.emote_sets.map((set: any) => set.id);
   }
 
-  public async GetEmoteSetEmotes(emoteSetId: string): Promise<Emote[]> {
+  public async GetEmoteSetEmotes(emoteSetId: string[]): Promise<Emote[]> {
     DebugLogger("Getting 7TV emote set emotes");
-    const { data, status } = await this.ApiGET("emote-sets/" + emoteSetId);
 
-    return data.emotes as Emote[];
+    let emotes: Emote[] = [];
+
+    for (const setId of emoteSetId) {
+      const { data, status } = await this.ApiGET("emote-sets/" + setId);
+
+      if (data.emotes) emotes = [...emotes, ...data.emotes];
+    }
+
+    return emotes;
   }
 
   public GetURLFromEmote(emote: Emote): string {

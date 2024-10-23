@@ -590,6 +590,42 @@ export const UserInputHandler = (
     },
   });
 
+  // SPOTLIGHT FEATURE
+  userInputs.push({
+    name: "spotlight1",
+    keys: "ctrl+space",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("user opened spotlight");
+      event.preventDefault();
+
+      try {
+        DebugLogger("Opening settings modal");
+        showSpotlight();
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
+  // SPOTLIGHT FEATURE (alt hotkey)
+  userInputs.push({
+    name: "spotlight2",
+    keys: "ctrl+k",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("user opened spotlight");
+      event.preventDefault();
+
+      try {
+        DebugLogger("Opening settings modal");
+        showSpotlight();
+      } catch {
+        console.log("Pogly encountered an issue when attempting to move canvas up!");
+      }
+    },
+  });
+
   return userInputs;
 };
 
@@ -616,4 +652,18 @@ const blobToBase64 = (file: any, cb: any) => {
   reader.onerror = function (error) {
     console.log("Error uploading Image to Pogly: ", error);
   };
+};
+
+const showSpotlight = () => {
+  const modal = document.getElementById("spotlight_modal");
+  const seatch = document.getElementById("spotlight_search") as HTMLInputElement;
+
+  const isModalShowing = modal?.style.display ? true : false;
+
+  if (isModalShowing) {
+    modal?.style.removeProperty("display");
+  } else {
+    modal?.style.setProperty("display", "unset");
+    seatch.focus();
+  }
 };
