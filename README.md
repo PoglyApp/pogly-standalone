@@ -83,6 +83,7 @@ For assistance with setting up Pogly, we are available in our [Discord](https://
 <a href="https://www.twitch.tv/totless" rel="noreferrer" target="_blank" title="Totless"><img src="./images/streamers/totless.svg" /></a>
 <a href="https://www.twitch.tv/fubuki_vr" rel="noreferrer" target="_blank" title="Fubuki_Vr"><img src="./images/streamers/fubuki_vr.svg" /></a>
 <a href="https://www.twitch.tv/uberhaxornova" rel="noreferrer" target="_blank" title="UberHaxorNova"><img src="./images/streamers/uberhaxornova.svg" /></a>
+<a href="https://www.twitch.tv/sp00nerism" rel="noreferrer" target="_blank" title="Sp00nerism"><img src="./images/streamers/sp00nerism.svg" /></a>
 
 ## Contributing
 
