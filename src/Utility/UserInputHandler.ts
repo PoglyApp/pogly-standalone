@@ -211,7 +211,7 @@ export const UserInputHandler = (
             } else {
               const textElement: ElementStruct = ElementStruct.TextElement({
                 text: text,
-                size: 12,
+                size: 72,
                 color: "#FFFFFF",
                 font: "Roboto",
                 css: "",
