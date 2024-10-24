@@ -80,6 +80,8 @@ For assistance with setting up Pogly, we are available in our [Discord](https://
 <a href="https://www.twitch.tv/savix" rel="noreferrer" target="_blank" title="Savix"><img src="./images/streamers/savix.svg" /></a>
 <a href="https://www.twitch.tv/derkajohnstv" rel="noreferrer" target="_blank" title="DerkaJohnsTV"><img src="./images/streamers/derkajohnstv.svg" /></a>
 <a href="https://www.twitch.tv/pengwin" rel="noreferrer" target="_blank" title="Pengwin"><img src="./images/streamers/pengwin.svg" /></a>
+<a href="https://www.twitch.tv/totless" rel="noreferrer" target="_blank" title="Totless"><img src="./images/streamers/totless.svg" /></a>
+<a href="https://www.twitch.tv/fubuki_vr" rel="noreferrer" target="_blank" title="Fubuki_Vr"><img src="./images/streamers/fubuki_vr.svg" /></a>
 
 ## Contributing
 
