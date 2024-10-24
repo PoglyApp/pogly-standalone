@@ -16,6 +16,7 @@ import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 export const UserInputHandler = (
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
+  selectoElements: Array<SVGElement | HTMLElement>,
   compressPaste: boolean | undefined,
   transformRef: ReactZoomPanPinchRef | null
 ): any => {
@@ -48,11 +49,8 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        if (!selectedElement) return;
-
         DebugLogger("Deleting element");
-
-        DeleteElementReducer.call(selectedElement.Elements.id);
+        selectoElements.forEach((e) => DeleteElementReducer.call(Number(e.id)));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to Delete an element!");
       }
