@@ -90,27 +90,21 @@ export class SevenTVWrapper {
     return data as User;
   }
 
-  public async GetEmoteSetId(userId: string): Promise<string[] | null> {
+  public async GetEmoteSetId(userId: string): Promise<string | null> {
     DebugLogger("Getting 7TV emote set ID");
     const userObj = await this.GetUserById(userId);
 
     if (!userObj) return null;
 
-    return userObj.emote_sets.map((set: any) => set.id);
+    return userObj.connections.filter(x => x.platform.toLowerCase().includes("twitch"))[0].emote_set_id;
   }
 
-  public async GetEmoteSetEmotes(emoteSetId: string[]): Promise<Emote[]> {
+  public async GetEmoteSetEmotes(emoteSetId: string): Promise<Emote[]> {
     DebugLogger("Getting 7TV emote set emotes");
 
-    let emotes: Emote[] = [];
+    const { data, status } = await this.ApiGET("emote-sets/" + emoteSetId);
 
-    for (const setId of emoteSetId) {
-      const { data, status } = await this.ApiGET("emote-sets/" + setId);
-
-      if (data.emotes) emotes = [...emotes, ...data.emotes];
-    }
-
-    return emotes;
+    return data.emotes as Emote[];
   }
 
   public GetURLFromEmote(emote: Emote): string {
