@@ -2,8 +2,8 @@ name: Docker
 
 on:
   push:
-    branches: [main]
-    tags: ['v*']
+    branches: ["**"]
+    tags: ["v*"]
     paths-ignore:
       - "**/README.md"
       - "**/images/streamers/*.svg"

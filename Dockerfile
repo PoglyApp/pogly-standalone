@@ -8,11 +8,8 @@ RUN apt-get update && apt-get install -y binaryen \
     && dotnet workload install wasi-experimental
 
 COPY server .
-# The single ampersand is intentional, we need the server running when we publish the module
-# the build takes long enough for the server to start, this may break in the future if the server takes forever to start.
-RUN spacetime start /stdb \
-    & spacetime build \
-    && spacetime publish -w /app/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm -s local pogly
+RUN spacetime build \
+    && mv /app/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
 
 FROM node:20-alpine AS web
 WORKDIR /app
@@ -26,12 +23,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=web /app/build /usr/share/caddy
-COPY --from=module /root/.spacetime/conf /etc/spacetime
-COPY --from=module /stdb /stdb
+COPY --from=module /usr/bin/spacetime /usr/bin/spacetime
+COPY --from=module /app/pogly.wasm /app/pogly.wasm
 COPY docker/Caddyfile /etc/caddy/
-COPY docker/start.sh /app/start.sh
+COPY docker/entrypoint.sh /app/entrypoint.sh
 
-ENTRYPOINT ["/bin/sh", "/app/start.sh"]
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]
 EXPOSE 80/tcp
 VOLUME /stdb
-VOLUME /etc/spacetime
+VOLUME /etc/spacetimedb
+ENV MODULES=pogly
