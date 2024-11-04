@@ -51,7 +51,7 @@ export const SettingsModal = (props: IProp) => {
   const { Runtime, Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
-  const isPoglyInstance: Boolean = window.location.href.includes("standalone.pogly.gg");
+  const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
