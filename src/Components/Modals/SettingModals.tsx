@@ -51,6 +51,8 @@ export const SettingsModal = (props: IProp) => {
   const { Runtime, Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
+  const isPoglyInstance: Boolean = window.location.href.includes("standalone.pogly.gg");
+
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
@@ -71,11 +73,9 @@ export const SettingsModal = (props: IProp) => {
     settings.compressPaste != null ? settings.compressPaste : true
   );
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  let overlayURL = window.location.origin + "/overlay?domain=" + Runtime?.domain + "&module=" + Runtime?.module;
+  let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
 
-  if (config.authentication && Runtime?.authKey) {
-    overlayURL = overlayURL + "&auth=" + Runtime.authKey;
-  }
+  if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
 
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);

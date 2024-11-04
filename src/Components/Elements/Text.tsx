@@ -25,6 +25,8 @@ export const Text = (props: IProp) => {
   const [textOutline, setTextOutline] = useState<string>("");
   const [customCss, setCustomCss] = useState<object>();
 
+  const [fontFamily, setFontFamily] = useState<string>("");
+
   useEffect(() => {
     if (!textElement.css) return;
 
@@ -33,6 +35,7 @@ export const Text = (props: IProp) => {
     setTextShadow(isOverlay ? css.shadow : css.shadow);
     setTextOutline(isOverlay ? css.outline : css.outline);
     setCustomCss(isOverlay ? parseCustomCss(css.custom) : parseCustomCss(css.custom));
+    setFontFamily(textElement.font);
   }, [textElement, isOverlay]);
 
   useEffect(() => {
@@ -40,6 +43,8 @@ export const Text = (props: IProp) => {
     try {
       const fontJSON = JSON.parse(textElement.font);
       ApplyCustomFont(fontJSON, targetRef.current);
+
+      setFontFamily(fontJSON.fontFamily);
     } catch (error) {}
   }, [textElement.font]);
 
@@ -64,7 +69,7 @@ export const Text = (props: IProp) => {
         opacity: props.elements.transparency / 100 <= 0.2 && !isOverlay ? 0.2 : props.elements.transparency / 100,
         fontSize: textElement.size,
         transform: props.elements.transform,
-        fontFamily: textElement.font,
+        fontFamily: `'${fontFamily}'`,
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
         textShadow: textShadow,
         WebkitTextStroke: textOutline,

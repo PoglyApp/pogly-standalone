@@ -42,6 +42,8 @@ export const InitialSetupModal = (props: IProp) => {
   const [initializing, setInitializing] = useState<boolean>(false);
   const [defaultElements, setDefaultElements] = useState<string>("");
 
+  const isPoglyInstance: Boolean = window.location.href.includes("standalone.pogly.gg");
+
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
   const [copyAuthButtonText, setAuthButtonText] = useState("Copy Auth Token");
 
@@ -55,17 +57,12 @@ export const InitialSetupModal = (props: IProp) => {
 
   useEffect(() => {
     DebugLogger("Creating overlay URL");
-    let baseUrl =
-      window.location.origin +
-      "/overlay?domain=" +
-      props.connectionConfig.domain +
-      "&module=" +
-      props.connectionConfig.module;
+    let baseUrl = window.location.origin + "/overlay?module=" + props.connectionConfig.module;
 
-    if (authentication) baseUrl = baseUrl + "&auth=" + authKey;
+    if (!isPoglyInstance) baseUrl = baseUrl + "&domain=" + props.connectionConfig.domain;
 
     setOverlayURL(baseUrl);
-  }, [authKey, authentication, props.connectionConfig]);
+  }, [authKey, authentication, props.connectionConfig, isPoglyInstance]);
 
   const handleAuthKeyChange = (text: any) => {
     DebugLogger("Handling auth key change");
@@ -73,13 +70,12 @@ export const InitialSetupModal = (props: IProp) => {
       setError(badCharError);
       return;
     }
-      if (error === badCharError) setError("");
+    if (error === badCharError) setError("");
 
-      setAuthKey(text);
+    setAuthKey(text);
   };
 
   const handleSave = () => {
-    console.log(authKey);
     DebugLogger("Saving instance settings");
     const regex = new RegExp("^[0-9]+$");
 
