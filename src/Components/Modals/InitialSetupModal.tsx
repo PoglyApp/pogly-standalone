@@ -65,7 +65,7 @@ export const InitialSetupModal = (props: IProp) => {
     if (!isPoglyInstance) baseUrl = baseUrl + "&domain=" + Runtime?.domain;
 
     setOverlayURL(baseUrl);
-  }, [authKey, authentication, props.connectionConfig, isPoglyInstance]);
+  }, [authKey, authentication, props.connectionConfig, isPoglyInstance, Runtime?.domain, Runtime?.module]);
 
   const handleAuthKeyChange = (text: any) => {
     DebugLogger("Handling auth key change");

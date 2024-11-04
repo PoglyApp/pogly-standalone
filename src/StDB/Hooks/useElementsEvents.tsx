@@ -142,8 +142,9 @@ export const useElementsEvents = (
             try {
               const fontJSON = JSON.parse(newTextElement.font);
               ApplyCustomFont(fontJSON, component);
+              component.style.fontFamily = `'${fontJSON.fontFamily}'`;
             } catch (error) {
-              component.style.fontFamily = newTextElement.font;
+              component.style.fontFamily = `'${newTextElement.font}'`;
             }
           }
 
