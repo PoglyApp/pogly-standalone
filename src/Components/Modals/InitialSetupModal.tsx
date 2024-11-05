@@ -20,7 +20,6 @@ import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigTy
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   config: Config;
@@ -30,8 +29,6 @@ interface IProp {
 }
 
 export const InitialSetupModal = (props: IProp) => {
-  const { Runtime } = useSpacetimeContext();
-
   const [platform, setPlatform] = useState<string>(props.config.streamingPlatform);
   const [channel, setChannel] = useState<string>(props.config.streamName);
   const [debug, setDebug] = useState<boolean>(props.config.debugMode);
@@ -45,7 +42,7 @@ export const InitialSetupModal = (props: IProp) => {
   const [initializing, setInitializing] = useState<boolean>(false);
   const [defaultElements, setDefaultElements] = useState<string>("");
 
-  const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = props.connectionConfig.domain === "wss://pogly.spacetimedb.com";
 
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
   const [copyAuthButtonText, setAuthButtonText] = useState("Copy Auth Token");
@@ -60,12 +57,12 @@ export const InitialSetupModal = (props: IProp) => {
 
   useEffect(() => {
     DebugLogger("Creating overlay URL");
-    let baseUrl = window.location.origin + "/overlay?module=" + Runtime?.module;
+    let baseUrl = window.location.origin + "/overlay?module=" + props.connectionConfig.module;
 
-    if (!isPoglyInstance) baseUrl = baseUrl + "&domain=" + Runtime?.domain;
+    if (!isPoglyInstance) baseUrl = baseUrl + "&domain=" + props.connectionConfig.domain;
 
     setOverlayURL(baseUrl);
-  }, [authKey, authentication, props.connectionConfig, isPoglyInstance, Runtime?.domain, Runtime?.module]);
+  }, [authKey, authentication, props.connectionConfig, isPoglyInstance]);
 
   const handleAuthKeyChange = (text: any) => {
     DebugLogger("Handling auth key change");
