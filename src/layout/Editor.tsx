@@ -29,12 +29,14 @@ export const Editor: React.FC = () => {
           className="flex p-4 pb-3 mb-10 rounded-xl"
           style={{ color: "#5c5f6a", backgroundColor: "#1e212b", height: "100%" }}
         >
-          <Button icon={<Image size={45} />} className="mr-3" />
-          <Button icon={<Code size={45} />} className="mr-3" />
-          <Button icon={<Type size={45} />} />
+          <Button icon={<Image size={45} />} className="mr-3" border={true} tooltip="Add image" />
+          <Button icon={<Code size={45} />} className="mr-3" border={true} tooltip="Add widget" />
+          <Button icon={<Type size={45} />} border={true} tooltip="Add text" />
         </div>
 
-        <Button icon={<Settings size={45} />} className=" mr-4 mb-3 self-end" />
+        <div className="self-center mt-2">
+          <Button icon={<Settings size={45} />} className="mr-4" border={true} tooltip="Settings" />
+        </div>
       </div>
     </div>
   );

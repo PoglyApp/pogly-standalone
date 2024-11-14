@@ -8,6 +8,13 @@ html {
   color: #edf1ff !important;
 }
 
+body {
+  height: 100vh;
+  padding-top: 1px;
+
+  overflow-x: hidden;
+}
+
 @layer base {
   :root {
     --foreground: 224 71.4% 4.1%;
@@ -74,4 +81,19 @@ html {
 
 .bullet:before {
   content: "• ";
+}
+
+.highlight:hover:not(:focus) {
+  background-color: #3c566a;
+  border-color: #82a5ff !important;
+}
+
+.deleteHighlight:hover:not(:focus) {
+  background-color: #3c566a;
+  border-color: #f0044b !important;
+}
+
+input:focus {
+  outline: none !important;
+  border: solid 2px #82a5ff !important;
 }

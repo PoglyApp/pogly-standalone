@@ -14,13 +14,15 @@ export const TextInput = (props: IProps) => {
       )}
 
       <input
-        className="rounded-sm"
+        className="rounded-sm highlight"
         style={{
           backgroundColor: "#10121a",
           color: "#edf1ff",
           paddingLeft: "8px",
           paddingTop: "3px",
           paddingBottom: "3px",
+          borderWidth: "2px",
+          borderColor: "transparent",
           ...props.style,
         }}
         defaultValue={props.defaultValue}

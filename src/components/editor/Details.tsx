@@ -61,8 +61,11 @@ export const Details: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="self-end ml-3 p-2 rounded-lg" style={{ backgroundColor: "#10121a" }}>
-          <Button style={{ color: "#f0044b", height: "24px" }} icon={<Trash2 />} />
+        <div
+          className="self-end ml-3 p-2 rounded-lg deleteHighlight"
+          style={{ backgroundColor: "#10121a", borderColor: "transparent", borderWidth: "2px" }}
+        >
+          <Button style={{ color: "#f0044b", height: "24px" }} icon={<Trash2 />} tooltip="Delete element" />
         </div>
       </div>
     </Container>
