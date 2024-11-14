@@ -31,6 +31,7 @@ export const Tooltip = (props: IProps) => {
       className="relative flex items-center"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{ width: "fit-content", height: "fit-content" }}
     >
       {props.children}
       {hovered && (

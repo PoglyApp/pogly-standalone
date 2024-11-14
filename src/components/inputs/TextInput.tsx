@@ -1,5 +1,6 @@
 interface IProps {
-  defaultValue: string;
+  defaultValue?: string;
+  placeholder?: string;
   label?: any;
   style?: any;
 }
@@ -26,6 +27,7 @@ export const TextInput = (props: IProps) => {
           ...props.style,
         }}
         defaultValue={props.defaultValue}
+        placeholder={props.placeholder}
       />
     </div>
   );
