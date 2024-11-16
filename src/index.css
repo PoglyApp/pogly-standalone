@@ -12,7 +12,11 @@ body {
   height: 100vh;
   padding-top: 1px;
 
-  overflow-x: hidden;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
 }
 
 @layer base {
@@ -96,4 +100,12 @@ body {
 input:focus {
   outline: none !important;
   border: solid 2px #82a5ff !important;
+}
+
+.editor {
+  pointer-events: none;
+}
+
+.editor * {
+  pointer-events: auto;
 }
