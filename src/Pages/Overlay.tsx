@@ -40,6 +40,7 @@ export const Overlay = (props: IProps) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");
+    const transparent = urlParams.get("transparent");
 
     ClearRefreshOverlayRequestsReducer.call();
 
@@ -49,6 +50,11 @@ export const Overlay = (props: IProps) => {
     } else {
       DebugLogger("Getting layout by active ID");
       setActiveLayout(Layouts.filterByActive(true).next().value);
+    }
+
+    if (transparent != null) {
+      document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
+      document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
     }
   }, []);
 
@@ -63,12 +69,7 @@ export const Overlay = (props: IProps) => {
         <>
           <div className="elementContent">
             {canvasElements.map((element: CanvasElementType) => {
-              
-              return (
-                <div key={element.Elements.id.toString()}>
-                  {element.Component}
-                </div>
-              );
+              return <div key={element.Elements.id.toString()}>{element.Component}</div>;
             })}
           </div>
         </>
