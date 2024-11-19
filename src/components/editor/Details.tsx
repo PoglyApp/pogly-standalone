@@ -6,7 +6,12 @@ import { Trash2 } from "lucide-react";
 
 export const Details: React.FC = () => {
   return (
-    <Container className="mr-10 float-right absolute mt-16" style={{ right: "0" }} title="details" subTitle="Pog">
+    <Container
+      className="mr-10 float-right absolute mt-16 enablePointerEvents"
+      style={{ right: "0" }}
+      title="details"
+      subTitle="Pog"
+    >
       <div>
         <span style={{ color: "#edf1ff" }}>properties</span>
         <div className="mt-2">

@@ -21,21 +21,18 @@ export const Editor: React.FC = () => {
 
   return (
     <>
-      <div className="absolute editor" style={{ width: "100vw", height: "100vh", zIndex: "2" }}>
+      <div className="absolute disablePointerEvents" style={{ width: "100vw", height: "100vh", zIndex: "2" }}>
         <div>
           <Logo />
         </div>
 
         <div>
-          <div className="flex">
-            <Layouts />
-            <Details />
-          </div>
-
+          <Details />
+          <Layouts />
           <Layers />
         </div>
 
-        <div className="absolute flex justify-between" style={{ bottom: "0", width: "100%" }}>
+        <div className="absolute flex justify-between enablePointerEvents" style={{ bottom: "0", width: "100%" }}>
           <FooterLinks />
 
           <SelectionButtons />

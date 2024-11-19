@@ -4,7 +4,7 @@ import { LayerElement } from "./LayerElement";
 
 export const Layers: React.FC = () => {
   return (
-    <Container className="ml-5 mt-8" title="layers">
+    <Container className="ml-5 mt-8 enablePointerEvents" title="layers">
       <LayerElement type={LayerElementType.Image} text="Kekw" />
       <LayerElement type={LayerElementType.Image} text="Pog" />
       <LayerElement type={LayerElementType.Image} text="Peeposit" />

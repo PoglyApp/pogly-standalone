@@ -4,7 +4,7 @@ import { LayoutDashboard } from "lucide-react";
 
 export const Layouts: React.FC = () => {
   return (
-    <Container className="ml-5 mt-14" style={{ height: "fit-content" }} title="layouts">
+    <Container className="ml-5 mt-14 enablePointerEvents" style={{ height: "fit-content" }} title="layouts">
       <Dropdown style={{ width: "300px" }} icon={<LayoutDashboard />} />
     </Container>
   );

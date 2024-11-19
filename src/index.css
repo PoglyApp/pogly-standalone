@@ -106,6 +106,10 @@ input:focus {
   pointer-events: none;
 }
 
-.editor * {
+.disablePointerEvents {
+  pointer-events: none;
+}
+
+.enablePointerEvents {
   pointer-events: auto;
 }
