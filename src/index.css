@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 html {
+  @apply font-geist;
   background-color: #10121a;
-  font-family: "Courier New", Courier, monospace;
   color: #edf1ff !important;
 }
 
