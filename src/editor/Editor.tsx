@@ -33,21 +33,18 @@ export const Editor: React.FC = () => {
           <Layers />
         </div>
 
-        <div className="absolute flex justify-between enablePointerEvents" style={{ bottom: "0", width: "100%" }}>
-          <FooterLinks />
+        <FooterLinks />
 
-          <SelectionButtons />
+        <SelectionButtons />
 
-          <div className="self-center mt-2">
-            <Button
-              icon={<Settings size={45} />}
-              className="mr-4"
-              border={true}
-              tooltip="Settings"
-              onclick={() => {}}
-            />
-          </div>
-        </div>
+        <Button
+          icon={<Settings size={45} />}
+          className="mr-4 mb-5 fixed enablePointerEvents"
+          style={{ bottom: "0", right: "0" }}
+          border={true}
+          tooltip="Settings"
+          onclick={() => {}}
+        />
       </Container>
 
       <main className="relative" style={{ zIndex: "1" }}>

@@ -8,7 +8,10 @@ export const SelectionButtons: React.FC = () => {
   const [showSelectionMenu, setShowSelectionMenu] = useState<boolean>(false);
 
   return (
-    <div className="flex justify-center" style={{ height: "fit-content" }}>
+    <div
+      className="block absolute enablePointerEvents"
+      style={{ height: "fit-content", width: "fit-content", bottom: "0", right: "50%" }}
+    >
       <div
         className="flex p-4 pb-3 mb-10 rounded-xl"
         style={{ color: "#5c5f6a", backgroundColor: "#1e212b", height: "100%" }}

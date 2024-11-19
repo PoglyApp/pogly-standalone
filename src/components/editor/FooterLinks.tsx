@@ -4,7 +4,7 @@ import { Button } from "../inputs/Button";
 
 export const FooterLinks: React.FC = () => {
   return (
-    <div className="ml-4 mb-3 inline-block self-end" style={{ color: "#7e828c" }}>
+    <div className="ml-4 mb-3 absolute enablePointerEvents" style={{ color: "#7e828c", bottom: "0" }}>
       <div className="flex space-x-2">
         <Button icon={<Certificate size={30} />} border={true} tooltip="Changelog" onclick={() => {}} />
         <Button icon={<Bug size={30} />} border={true} tooltip="Report a bug" onclick={() => {}} />
