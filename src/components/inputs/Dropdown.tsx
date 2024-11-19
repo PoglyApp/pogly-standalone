@@ -13,7 +13,7 @@ interface IProps {
   style?: any;
 }
 
-export const Dropdown = (props: IProps) => {
+export const Dropdown = ({ icon, style }: IProps) => {
   const [selectedLayout, setSelectedLayout] = useState("default");
 
   return (
@@ -21,10 +21,10 @@ export const Dropdown = (props: IProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           className="flex items-center justify-between  hover:bg-gray-800 rounded-md px-3 py-1.5"
-          style={{ backgroundColor: "#10121a", color: "#edf1ff", ...props.style }}
+          style={{ backgroundColor: "#10121a", color: "#edf1ff", ...style }}
         >
           <span className="flex items-center gap-2">
-            {props.icon && <div className="w-4 h-4  rounded flex items-center justify-center">{props.icon}</div>}
+            {icon && <div className="w-4 h-4  rounded flex items-center justify-center">{icon}</div>}
             <span className="text-sm">{selectedLayout}</span>
           </span>
           <ChevronDown className="w-4 h-4 " style={{ color: "#52555e" }} />

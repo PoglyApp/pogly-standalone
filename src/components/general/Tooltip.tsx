@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 
 interface IProps {
   text: string;
   children: any;
 }
 
-export const Tooltip = (props: IProps) => {
+export const Tooltip = ({ text, children }: IProps) => {
   const [hovered, setHovered] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState("bottom-full mb-2");
   const tooltipRef = useRef<any>(null);
@@ -33,16 +34,21 @@ export const Tooltip = (props: IProps) => {
       onMouseLeave={() => setHovered(false)}
       style={{ width: "fit-content", height: "fit-content" }}
     >
-      {props.children}
+      {children}
       {hovered && (
-        <div
+        <Container
           ref={tooltipRef}
           className={`absolute ${tooltipPosition} px-2 py-1 text-sm  rounded shadow-lg whitespace-nowrap`}
-          style={{ backgroundColor: "#82a5ff", color: "#10121a", borderRadius: "10px" }}
         >
-          {props.text}
-        </div>
+          {text}
+        </Container>
       )}
     </div>
   );
 };
+
+const Container = styled.div`
+  background-color: #82a5ff;
+  color: #10121a;
+  border-radius: 10px;
+`;

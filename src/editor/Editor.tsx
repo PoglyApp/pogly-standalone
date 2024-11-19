@@ -7,6 +7,7 @@ import { Details } from "@/components/editor/Details";
 import { Settings } from "lucide-react";
 import { SelectionButtons } from "@/components/editor/element_picker/SelectionButtons";
 import { Outlet } from "react-router-dom";
+import styled from "styled-components";
 
 export const Editor: React.FC = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -21,7 +22,7 @@ export const Editor: React.FC = () => {
 
   return (
     <>
-      <div className="absolute disablePointerEvents" style={{ width: "100vw", height: "100vh", zIndex: "2" }}>
+      <Container className="absolute disablePointerEvents">
         <div>
           <Logo />
         </div>
@@ -47,7 +48,7 @@ export const Editor: React.FC = () => {
             />
           </div>
         </div>
-      </div>
+      </Container>
 
       <main className="relative" style={{ zIndex: "1" }}>
         <Outlet />
@@ -55,3 +56,9 @@ export const Editor: React.FC = () => {
     </>
   );
 };
+
+const Container = styled.div`
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+`;

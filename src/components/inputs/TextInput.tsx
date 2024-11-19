@@ -1,3 +1,5 @@
+import styled from "styled-components";
+
 interface IProps {
   defaultValue?: string;
   placeholder?: string;
@@ -5,30 +7,33 @@ interface IProps {
   style?: any;
 }
 
-export const TextInput = (props: IProps) => {
+export const TextInput = ({ defaultValue, placeholder, label, style }: IProps) => {
   return (
     <div>
-      {props.label && (
+      {label && (
         <label className="pr-2" style={{ color: "#edf1ff" }}>
-          {props.label}
+          {label}
         </label>
       )}
 
-      <input
+      <StyledInput
         className="rounded-sm highlight"
         style={{
-          backgroundColor: "#10121a",
-          color: "#edf1ff",
-          paddingLeft: "8px",
-          paddingTop: "3px",
-          paddingBottom: "3px",
-          borderWidth: "2px",
-          borderColor: "transparent",
-          ...props.style,
+          ...style,
         }}
-        defaultValue={props.defaultValue}
-        placeholder={props.placeholder}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
       />
     </div>
   );
 };
+
+const StyledInput = styled.input`
+  background-color: #10121a;
+  color: #edf1ff;
+  padding-left: 8px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-width: 2px;
+  border-color: transparent;
+`;

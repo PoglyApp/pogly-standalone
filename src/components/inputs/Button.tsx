@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { Tooltip } from "../general/Tooltip";
 
 interface IProps {
@@ -12,25 +13,28 @@ interface IProps {
   className?: string;
 }
 
-export const Button = (props: IProps) => {
+export const Button = ({ tooltip, onclick, icon, text, border, fontSize, fontColor, style, className }: IProps) => {
   return (
-    <Tooltip text={props.tooltip}>
-      <div className={props.className} style={{ color: "#7e828c", ...props.style }} onClick={() => props.onclick()}>
-        <button
-          className={"text-2xl" + (props.border ? " highlight" : "")}
+    <Tooltip text={tooltip}>
+      <div className={className} style={{ color: "#7e828c", ...style }} onClick={() => onclick()}>
+        <StyledButton
+          className={"text-2xl" + (border ? " highlight" : "")}
           style={{
-            height: "100%",
-            borderStyle: "solid",
-            borderRadius: "10px",
-            borderWidth: "2px",
-            borderColor: "transparent",
-            fontSize: props.fontSize,
-            color: props.fontColor,
+            fontSize: fontSize,
+            color: fontColor,
           }}
         >
-          {props.icon} {props.text}
-        </button>
+          {icon} {text}
+        </StyledButton>
       </div>
     </Tooltip>
   );
 };
+
+const StyledButton = styled.button`
+  height: 100%;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: transparent;
+`;

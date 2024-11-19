@@ -6,10 +6,10 @@ interface IProps {
   style?: any;
 }
 
-export const Container = (props: IProps) => {
+export const Container = ({ children, title, subTitle, className, style }: IProps) => {
   return (
-    <div className={props.className} style={{ width: "fit-content", ...props.style }}>
-      {props.title && (
+    <div className={className} style={{ width: "fit-content", ...style }}>
+      {title && (
         <div
           className="pl-5"
           style={{
@@ -19,17 +19,17 @@ export const Container = (props: IProps) => {
             width: "100%",
           }}
         >
-          {props.title}
+          {title}
 
-          {props.subTitle && (
+          {subTitle && (
             <span className="pl-2" style={{ fontSize: "12px", color: "#82a5ff" }}>
-              {props.subTitle}
+              {subTitle}
             </span>
           )}
         </div>
       )}
       <div className="rounded-xl p-5" style={{ backgroundColor: "#1e212b", width: "100%", height: "100%" }}>
-        {props.children}
+        {children}
       </div>
     </div>
   );
