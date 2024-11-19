@@ -23,15 +23,11 @@ export const Editor: React.FC = () => {
   return (
     <>
       <Container className="absolute disablePointerEvents">
-        <div>
-          <Logo />
-        </div>
+        <Logo />
 
-        <div>
-          <Details />
-          <Layouts />
-          <Layers />
-        </div>
+        <Details />
+        <Layouts />
+        <Layers />
 
         <FooterLinks />
 
