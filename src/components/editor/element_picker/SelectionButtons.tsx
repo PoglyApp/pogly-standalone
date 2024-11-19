@@ -10,7 +10,7 @@ export const SelectionButtons: React.FC = () => {
   return (
     <div
       className="block absolute enablePointerEvents"
-      style={{ height: "fit-content", width: "fit-content", bottom: "0", right: "50%" }}
+      style={{ height: "fit-content", width: "fit-content", bottom: "0", right: "46vw" }}
     >
       <div
         className="flex p-4 pb-3 mb-10 rounded-xl"
