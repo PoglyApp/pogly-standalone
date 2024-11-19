@@ -43,9 +43,9 @@ export const CanvasContainer = ({ children, transformRef }: IProps) => {
 
 const Container = styled.div`
   height: 1080px;
-  margin-top: -607px;
+  margin-top: -540px;
   width: 1920px;
-  margin-left: -742px;
+  margin-left: -960px;
   position: fixed;
   z-index: -1;
   left: 50%;
