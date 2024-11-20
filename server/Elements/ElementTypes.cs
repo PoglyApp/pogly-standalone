@@ -2,7 +2,7 @@
 
 public partial class Module
 {
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct TextElement
     {
         public string Text;
@@ -12,7 +12,7 @@ public partial class Module
         public string Css;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct ImageElement
     {
         public ImageElementData ImageElementData;
@@ -20,7 +20,7 @@ public partial class Module
         public int Height;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct WidgetElement
     {
         public uint ElementDataId;
@@ -29,9 +29,9 @@ public partial class Module
         public string RawData;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial record ElementStruct : SpacetimeDB.TaggedEnum<(TextElement TextElement, ImageElement ImageElement, WidgetElement WidgetElement)> {}
     
-    [SpacetimeDB.Type]
+    [Type]
     public partial record ImageElementData: SpacetimeDB.TaggedEnum<(uint ElementDataId, string RawData)> {}
 }

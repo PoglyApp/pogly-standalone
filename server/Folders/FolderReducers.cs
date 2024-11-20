@@ -1,27 +1,24 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void AddFolder(ReducerContext ctx, string name, string icon)
     {
         string func = "AddFolder";
 
-        if (ctx.Address is null) return;
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
 
         try
         {
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
-            if (!GuestAuthenticated(func, guest)) return;
-            if (Config.FindByVersion(0)!.Value.StrictMode)
-            {
-                if (!IsGuestModerator(func, ctx.Sender)) return;
-            }
-
             uint maxId = 0;
-            foreach (var i in Folders.Iter())
+            foreach (var i in ctx.Db.Folders.Iter())
             {
                 if (i.Id > maxId) maxId = i.Id;
             }
@@ -33,168 +30,177 @@ public partial class Module
                 Name = name,
                 CreatedBy = guest.Nickname
             };
-            newFolder.Insert();
+            ctx.Db.Folders.Insert(newFolder);
             
-            //TODO: Add AutitLog() ChangeStruct types and methods for Folders
-            if(Config.FindByVersion(0)!.Value.DebugMode) 
-                Log($"[Folders - {func}] {guest.Nickname} added folder {name}!");
+            //TODO: Add AuditLog() ChangeStruct types and methods for Folders
+            if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
+                Log.Info($"[Folders - {func}] {guest.Nickname} added folder {name}!");
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error adding new Folder, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+            Log.Error($"[{func}] Error adding new Folder, requested by {ctx.CallerIdentity}! " + e.Message);
         }
     }
 
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void UpdateFolderName(ReducerContext ctx, uint folderId, string name)
     {
         string func = "UpdateFolderName";
 
-        if (ctx.Address is null) return;
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
 
         try
         {
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
-            if (!GuestAuthenticated(func, guest)) return;
-            if (Config.FindByVersion(0)!.Value.StrictMode)
-            {
-                if (!IsGuestModerator(func, ctx.Sender)) return;
-            }
+            var oldFolder = ctx.Db.Folders.Id.Find(folderId);
 
-            var oldFolder = Folders.FilterById(folderId).First();
-            var newFolder = oldFolder;
-            newFolder.Name = name;
-            Folders.UpdateById(folderId, newFolder);
+            if (oldFolder.HasValue)
+            {
+                var newFolder = oldFolder.Value;
+                newFolder.Name = name;
+                ctx.Db.Folders.Id.Update(newFolder);
             
-            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
-            if(Config.FindByVersion(0)!.Value.DebugMode) 
-                Log($"[Folders - {func}] {guest.Nickname} updated folderId {folderId} name to {name}!");
+                //TODO: Add AuditLog() ChangeStruct types and methods for Layouts
+                if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
+                    Log.Info($"[Folders - {func}] {guest.Nickname} updated folderId {folderId} name to {name}!");
+            }
+            else
+            {
+                Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.CallerIdentity}! Couldn't find existing Folder!");
+            }
+            
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+            Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.CallerIdentity}! " + e.Message);
         }
     }
     
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void UpdateFolderIcon(ReducerContext ctx, uint folderId, string icon)
     {
         string func = "UpdateFolderIcon";
 
-        if (ctx.Address is null) return;
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
 
         try
         {
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
-            if (!GuestAuthenticated(func, guest)) return;
-            if (Config.FindByVersion(0)!.Value.StrictMode)
-            {
-                if (!IsGuestModerator(func, ctx.Sender)) return;
-            }
+            var oldFolder = ctx.Db.Folders.Id.Find(folderId);
 
-            var oldFolder = Folders.FilterById(folderId).First();
-            var newFolder = oldFolder;
-            newFolder.Icon = icon;
-            Folders.UpdateById(folderId, newFolder);
+            if (oldFolder.HasValue)
+            {
+                var newFolder = oldFolder.Value;
+                newFolder.Icon = icon;
+                ctx.Db.Folders.Id.Update(newFolder);
             
-            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
-            if(Config.FindByVersion(0)!.Value.DebugMode) 
-                Log($"[Folders - {func}] {guest.Nickname} updated folderId {folderId} icon to {icon}!");
+                //TODO: Add AuditLog() ChangeStruct types and methods for Layouts
+                if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
+                    Log.Info($"[Folders - {func}] {guest.Nickname} updated folderId {folderId} icon to {icon}!");
+            }
+            else
+            {
+                Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.CallerIdentity}! Couldn't find existing Folder!");
+            }
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+            Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.CallerIdentity}! " + e.Message);
         }
     }
 
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void DeleteFolder(ReducerContext ctx, uint folderId, bool preserveElements = true)
     {
         string func = "DeleteFolder";
 
-        if (ctx.Address is null) return;
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
 
         try
         {
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
-            if (!GuestAuthenticated(func, guest)) return;
-            if (Config.FindByVersion(0)!.Value.StrictMode)
-            {
-                if (!IsGuestModerator(func, ctx.Sender)) return;
-            }
-
-            foreach (var e in Elements.Query(x => x.FolderId == folderId))
+            foreach (var e in ctx.Db.Elements.Iter().Where(x => x.FolderId == folderId))
             {
                 if (preserveElements)
                 {
                     var newE = e;
                     newE.FolderId = null;
-                    Elements.UpdateById(e.Id, newE);
+                    ctx.Db.Elements.Id.Update(newE);
                 }
                 else
                 {
-                    Elements.DeleteById(e.Id);
+                    ctx.Db.Elements.Id.Delete(e.Id);
                 }
             }
 
-            Folders.DeleteById(folderId);
+            ctx.Db.Folders.Id.Delete(folderId);
             
-            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
-            if(Config.FindByVersion(0)!.Value.DebugMode) 
-                Log($"[Folders - {func}] {guest.Nickname} deleted folderId {folderId}!");
+            //TODO: Add AuditLog() ChangeStruct types and methods for Layouts
+            if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
+                Log.Info($"[Folders - {func}] {guest.Nickname} deleted folderId {folderId}!");
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error deleting folderId {folderId}, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+            Log.Error($"[{func}] Error deleting folderId {folderId}, requested by {ctx.CallerIdentity}! " + e.Message);
         }
     }
     
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void DeleteAllFolders(ReducerContext ctx, bool preserveElements = true)
     {
         string func = "DeleteAllFolders";
 
-        if (ctx.Address is null) return;
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
 
         try
         {
-            if (!GetGuest(func, ctx.Address, out var guest))
-                return;
-            if (!GuestAuthenticated(func, guest)) return;
-            if (Config.FindByVersion(0)!.Value.StrictMode)
-            {
-                if (!IsGuestModerator(func, ctx.Sender)) return;
-            }
-
-            foreach (var e in Elements.Iter())
+            foreach (var e in ctx.Db.Elements.Iter())
             {
                 if (preserveElements)
                 {
                     var newE = e;
                     newE.FolderId = null;
-                    Elements.UpdateById(e.Id, newE);
+                    ctx.Db.Elements.Id.Update(newE);
                 }
                 else
                 {
-                    Elements.DeleteById(e.Id);
+                    ctx.Db.Elements.Id.Delete(e.Id);
                 }
             }
 
-            foreach (var folder in Folders.Iter())
+            foreach (var folder in ctx.Db.Folders.Iter())
             {
-                Folders.DeleteById(folder.Id);
+                ctx.Db.Folders.Id.Delete(folder.Id);
             }   
             
-            //TODO: Add AutitLog() ChangeStruct types and methods for Layouts
-            if(Config.FindByVersion(0)!.Value.DebugMode) 
-                Log($"[Folders - {func}] {guest.Nickname} deleted all folders!");
+            //TODO: Add AuditLog() ChangeStruct types and methods for Layouts
+            if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
+                Log.Info($"[Folders - {func}] {guest.Nickname} deleted all folders!");
         }
         catch (Exception e)
         {
-            Log($"[{func}] Error deleting all folders, requested by {ctx.Sender}! " + e.Message, LogLevel.Error);
+            Log.Error($"[{func}] Error deleting all folders, requested by {ctx.CallerIdentity}! " + e.Message);
         }
     }
 }

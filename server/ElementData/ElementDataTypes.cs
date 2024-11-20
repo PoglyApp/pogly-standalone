@@ -1,7 +1,7 @@
 ﻿using SpacetimeDB;
 public partial class Module
 {
-    [SpacetimeDB.Type]
+    [Type]
     public enum DataType
     {
         TextElement,

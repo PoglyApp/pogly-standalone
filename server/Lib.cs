@@ -1,153 +1,142 @@
 using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 static partial class Module
 {
-    [SpacetimeDB.Reducer(ReducerKind.Init)]
+    // =============================
+    // ===== REDUCER TEMPLATE ======
+    // =============================
+    /*
+    [Reducer]
+    public static void UpdateThing(ReducerContext ctx, string thing)
+    {
+        //Name for Logging
+        string func = "UpdateThing";
+    
+        //Basic sanity checks
+        if (ctx.CallerAddress is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+    
+        //Permission level check
+        if (!IsGuestOwner(func, ctx)) return;
+    
+        //Get existing thing (Using Config table as example)
+        var oldThing = ctx.Db.Config.Version.Find(0);
+    
+        //Check if thing is has value
+        if (oldThing.HasValue)
+        {
+            //Do stuff
+            var newThing = oldThing.Value;
+            newThing.EditorGuidelines = "New thing!";
+            ctx.Db.Config.Version.Update(newThing);
+            Log.Info($"[{func}] Thing stuff success!");
+        }
+        else
+        {
+            //Error - thing doesnt have value
+            Log.Error($"[{func}] Error doing thing - old thing missing value");
+        }
+    }
+    */
+    
+    [Reducer(ReducerKind.Init)]
     public static void Init(ReducerContext ctx)
     {
-        Configure(ctx);
-        
         try
         {
-            //if (Config.FindByVersion(0)!.Value.Authentication) StartAuthWorker();
+            Configure(ctx);
+            Log.Info($"[Init] Server successfully started!");
             
-            Log($"[Init] Server successfully started!",LogLevel.Info);
         }
         catch (Exception e)
         {
-            Log($"[Init] Sever encountered a fatal error on start! " + e.Message,LogLevel.Panic);
+            Log.Exception($"[Init] Sever encountered a fatal error on start! " + e.Message);
         }
     }
 
-    [SpacetimeDB.Reducer(ReducerKind.Connect)]
+    [Reducer(ReducerKind.ClientConnected)]
     public static void OnConnect(ReducerContext ctx)
     {
-        //if (Config.FindByVersion(0)!.Value.Authentication && !IsAuthWorking()) StartAuthWorker(); 
-        Log($"[OnConnect] New guest connected {ctx.Sender} at {ctx.Address}!", LogLevel.Info);
+        Log.Info($"[OnConnect] New guest connected {ctx.CallerIdentity} at {ctx.CallerAddress!.Value}!");
     }
 
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void Connect(ReducerContext ctx)
     {
         try
         {
-            if (ctx.Address is null) throw new Exception("Guest with Null Address tried to Connect!");
+            if (ctx.CallerAddress is null) throw new Exception("Guest with Null Address tried to Connect!");
             
             var random = new Random();
             var color = $"#{random.Next(0x1000000):X6}";
 
-            var guest = new Guests
+            var guest = ctx.Db.Guests.Insert(new Guests
             {
-                Address = ctx.Address,
-                Identity = ctx.Sender,
+                Address = ctx.CallerAddress.Value,
+                Identity = ctx.CallerIdentity,
                 Nickname = "",
                 Color = color,
                 SelectedElementId = 0,
-                SelectedLayoutId = GetActiveLayout(),
+                SelectedLayoutId = GetActiveLayout(ctx),
                 PositionX = -1,
                 PositionY = -1,
-                Authenticated = !Config.FindByVersion(0)!.Value.Authentication
-            };
-            guest.Insert();
+                Authenticated = !ctx.Db.Config.Version.Find(0)!.Value.Authentication
+            });
             
-            Log($"[Connect] New guest {ctx.Sender} inserted into Guest table!", LogLevel.Info);
-            LogAudit(ctx,"OnConnect",GetEmptyStruct(),GetChangeStructFromGuest(guest), Config.FindByVersion(0)!.Value.DebugMode);
+            Log.Info($"[Connect] New guest {ctx.CallerIdentity} inserted into Guest table!");
+            LogAudit(ctx,"OnConnect",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log($"[OnConnect] Error during connection with client {ctx.Sender}! " + e.Message,LogLevel.Error);
+            Log.Info($"[OnConnect] Error during connection with client {ctx.CallerIdentity}! " + e.Message);
         }
     }
 
-    [SpacetimeDB.Reducer(ReducerKind.Disconnect)]
+    [Reducer(ReducerKind.ClientDisconnected)]
     public static void OnDisconnect(ReducerContext ctx)
     {
         try
         {
-            if (ctx.Address is null) throw new Exception($"Address missing for disconnecting Guest");
-            var guest = Guests.FindByAddress(ctx.Address);
+            if (ctx.CallerAddress is null) throw new Exception($"Address missing for disconnecting Guest");
+            var guest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
             if (guest is null)
                 throw new Exception("Identity did not have Guest entry");
+
+            ctx.Db.Guests.Address.Delete(guest.Value.Address);
             
-            Guests.DeleteByAddress(guest.Value.Address);
-            
-            Log($"[OnDisconnect] Guest {ctx.Sender} at {ctx.Address} has disconnected.", LogLevel.Info);
-            LogAudit(ctx,"OnDisconnect",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), Config.FindByVersion(0)!.Value.DebugMode);
+            Log.Info($"[OnDisconnect] Guest {ctx.CallerIdentity} at {ctx.CallerAddress.Value} has disconnected.");
+            LogAudit(ctx,"OnDisconnect",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log($"[OnDisconnect] Error during disconnection with client {ctx.Sender}- they may not have been deleted from guests properly! " + e.Message,LogLevel.Error);
+            Log.Error($"[OnDisconnect] Error during disconnection with client {ctx.CallerIdentity}- they may not have been deleted from guests properly! " + e.Message);
         }
     }
     
-    [SpacetimeDB.Reducer]
+    [Reducer]
     public static void KeepAlive(ReducerContext ctx, KeepAliveWorker arg)
     {
         try
         {
-            var heartbeat = Heartbeat.FilterById(0).First();
-            heartbeat.Tick = ctx.Time.Second;
+            var heartbeat = ctx.Db.Heartbeat.Id.Find(0);
 
-            Heartbeat.UpdateById(0, heartbeat);
-        }
-        catch (Exception e)
-        {
-            Log("Encountered error with heartbeat: " + e.Message, LogLevel.Error);
-        }
-    }
+            if (heartbeat.HasValue)
+            {
+                var newHeartbeat = heartbeat.Value;
+                newHeartbeat.Tick = ctx.Timestamp.Second;
 
-    //Dirty workaround - forgive me jesus
-    [SpacetimeDB.Reducer]
-    public static void RefreshOverlay(ReducerContext ctx)
-    {
-        try
-        {
-            new Heartbeat
-            {
-                Id = (uint) ctx.Time.ToUnixTimeSeconds(),
-                ServerIdentity = ctx.Sender,
-                Tick = 1337
-            }.Insert();
-        }
-        catch (Exception e)
-        {
-            Log("Encountered an error forcing an overlay Refresh: " + e.Message, LogLevel.Error);
-        }
-    }
-    
-    [SpacetimeDB.Reducer]
-    public static void RefreshOverlayClearStorage(ReducerContext ctx)
-    {
-        try
-        {
-            new Heartbeat
-            {
-                Id = (uint) ctx.Time.ToUnixTimeSeconds(),
-                ServerIdentity = ctx.Sender,
-                Tick = 69420
-            }.Insert();
-        }
-        catch (Exception e)
-        {
-            Log("Encountered an error forcing an overlay Refresh: " + e.Message, LogLevel.Error);
-        }
-    }
-
-    [SpacetimeDB.Reducer]
-    public static void ClearRefreshOverlayRequests(ReducerContext ctx)
-    {
-        try
-        {
-            foreach (var request in Heartbeat.Iter())
-            {
-                if (request.Tick == 1337) Heartbeat.DeleteById(request.Id);
-                if (request.Tick == 69420) Heartbeat.DeleteById(request.Id);
+                ctx.Db.Heartbeat.Id.Update(newHeartbeat);
             }
+            else
+            {
+                Log.Error("[KeepAlive] Encountered an error updating heartbeat - could not find default heartbeat!");
+            }
+            
         }
         catch (Exception e)
         {
-            Log("Encountered an error clearing overlay requests: " + e.Message, LogLevel.Error);
+            Log.Error("Encountered error with heartbeat: " + e.Message);
         }
     }
 }
