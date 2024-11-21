@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "gen bindings": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ./server"
   },
   "dependencies": {
+    "@clockworklabs/spacetimedb-sdk": "^1.0.0-rc1.0",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",

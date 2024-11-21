@@ -56,9 +56,9 @@ static partial class Module
     }
 
     [Reducer(ReducerKind.ClientConnected)]
-    public static void OnConnect(ReducerContext ctx)
+    public static void GuestConnected(ReducerContext ctx)
     {
-        Log.Info($"[OnConnect] New guest connected {ctx.CallerIdentity} at {ctx.CallerAddress!.Value}!");
+        Log.Info($"[GuestConnected] New guest connected {ctx.CallerIdentity} at {ctx.CallerAddress!.Value}!");
     }
 
     [Reducer]
@@ -85,16 +85,16 @@ static partial class Module
             });
             
             Log.Info($"[Connect] New guest {ctx.CallerIdentity} inserted into Guest table!");
-            LogAudit(ctx,"OnConnect",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
+            LogAudit(ctx,"GuestConnected",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log.Info($"[OnConnect] Error during connection with client {ctx.CallerIdentity}! " + e.Message);
+            Log.Info($"[GuestConnected] Error during connection with client {ctx.CallerIdentity}! " + e.Message);
         }
     }
 
     [Reducer(ReducerKind.ClientDisconnected)]
-    public static void OnDisconnect(ReducerContext ctx)
+    public static void GuestDisconnected(ReducerContext ctx)
     {
         try
         {
@@ -105,12 +105,12 @@ static partial class Module
 
             ctx.Db.Guests.Address.Delete(guest.Value.Address);
             
-            Log.Info($"[OnDisconnect] Guest {ctx.CallerIdentity} at {ctx.CallerAddress.Value} has disconnected.");
-            LogAudit(ctx,"OnDisconnect",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
+            Log.Info($"[GuestDisconnected] Guest {ctx.CallerIdentity} at {ctx.CallerAddress.Value} has disconnected.");
+            LogAudit(ctx,"GuestDisconnected",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log.Error($"[OnDisconnect] Error during disconnection with client {ctx.CallerIdentity}- they may not have been deleted from guests properly! " + e.Message);
+            Log.Error($"[GuestDisconnected] Error during disconnection with client {ctx.CallerIdentity}- they may not have been deleted from guests properly! " + e.Message);
         }
     }
     
