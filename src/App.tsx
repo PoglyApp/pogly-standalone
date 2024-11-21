@@ -3,8 +3,11 @@ import { Editor } from "./editor/Editor";
 import { Canvas } from "./pages/Canvas";
 import { Overlay } from "./pages/Overlay";
 import { NotFound } from "./pages/404";
+import useSpacetimeDB from "./spacetimedb/useSpacetimeDB";
 
 export const App: React.FC = () => {
+  const client = useSpacetimeDB();
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Editor />}>
