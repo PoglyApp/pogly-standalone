@@ -87,6 +87,9 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/fubuki_vr" rel="noreferrer" target="_blank" title="Fubuki_Vr"><img src="./images/streamers/fubuki_vr.svg" /></a>
 <a href="https://www.twitch.tv/uberhaxornova" rel="noreferrer" target="_blank" title="UberHaxorNova"><img src="./images/streamers/uberhaxornova.svg" /></a>
 <a href="https://www.twitch.tv/sp00nerism" rel="noreferrer" target="_blank" title="Sp00nerism"><img src="./images/streamers/sp00nerism.svg" /></a>
+<a href="https://www.twitch.tv/kohrean" rel="noreferrer" target="_blank" title="Kohrean"><img src="./images/streamers/kohrean.svg" /></a>
+<a href="https://www.twitch.tv/boshiitime" rel="noreferrer" target="_blank" title="BoshiiTime"><img src="./images/streamers/boshiitime.svg" /></a>
+<a href="https://www.twitch.tv/kromia" rel="noreferrer" target="_blank" title="Kromia"><img src="./images/streamers/kromia.svg" /></a>
 
 ## Contributing
 
