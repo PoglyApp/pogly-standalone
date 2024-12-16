@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-    <a href="https://discord.gg/CXCj2TGS6b"><img height="25" src="./images/social/discord.svg" alt="Discord" /></a>
+    <a href="https://discord.gg/pogly"><img height="25" src="./images/social/discord.svg" alt="Discord" /></a>
     &nbsp;
     <a href="https://www.twitch.tv/poglygg"><img height="25" src="./images/social/twitch.svg" alt="Twitch" /></a>
     &nbsp;
@@ -55,11 +55,11 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 For installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md).
 There are both provider-hosted and self-hosted methods available.
 
-For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
+For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/pogly).
 
 ## Used by
 
-Want to be included in this list? Let us know in our [Discord](https://discord.gg/uPQsBaVdB7)!
+Want to be included in this list? Let us know in our [Discord](https://discord.gg/pogly)!
 
 <a href="https://www.twitch.tv/shroud" rel="noreferrer" target="_blank" title="Shroud"><img src="./images/streamers/shroud.svg" /></a>
 <a href="https://www.twitch.tv/mizkif" rel="noreferrer" target="_blank" title="Mizkif"><img src="./images/streamers/mizkif.svg" /></a>
