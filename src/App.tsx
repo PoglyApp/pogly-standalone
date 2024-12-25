@@ -4,9 +4,17 @@ import { Canvas } from "./pages/Canvas";
 import { Overlay } from "./pages/Overlay";
 import { NotFound } from "./pages/404";
 import useSpacetimeDB from "./spacetimedb/useSpacetimeDB";
+import { useState } from "react";
+import { UserType } from "./types/UserType.ts";
+import { UserContext } from "./contexts/UserContext.ts";
 
 export const App: React.FC = () => {
-  const client = useSpacetimeDB();
+  const [user, setUser] = useState<UserType | undefined>(undefined);
+
+  useSpacetimeDB(user, setUser);
+
+  // TODO: Add loading screen
+  if (!user) return <></>;
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -27,5 +35,9 @@ export const App: React.FC = () => {
     }
   );
 
-  return <RouterProvider future={{ v7_startTransition: true }} router={router} />;
+  return (
+    <UserContext.Provider value={user}>
+      <RouterProvider future={{ v7_startTransition: true }} router={router} />
+    </UserContext.Provider>
+  );
 };

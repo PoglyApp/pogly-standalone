@@ -219,6 +219,8 @@ import { GuestsTableHandle } from "./guests_table.ts";
 export { GuestsTableHandle };
 import { HeartbeatTableHandle } from "./heartbeat_table.ts";
 export { HeartbeatTableHandle };
+import { KeepAliveWorkerTableHandle } from "./keep_alive_worker_table.ts";
+export { KeepAliveWorkerTableHandle };
 import { LayoutsTableHandle } from "./layouts_table.ts";
 export { LayoutsTableHandle };
 import { OverlayCommandTableHandle } from "./overlay_command_table.ts";
@@ -267,6 +269,8 @@ import { ImageElement } from "./image_element_type.ts";
 export { ImageElement };
 import { ImageElementData } from "./image_element_data_type.ts";
 export { ImageElementData };
+import { KeepAliveWorker } from "./keep_alive_worker_type.ts";
+export { KeepAliveWorker };
 import { Layouts } from "./layouts_type.ts";
 export { Layouts };
 import { OverlayCommand } from "./overlay_command_type.ts";
@@ -323,6 +327,11 @@ const REMOTE_MODULE = {
       tableName: "Heartbeat",
       rowType: Heartbeat.getTypeScriptAlgebraicType(),
       primaryKey: "Id",
+    },
+    KeepAliveWorker: {
+      tableName: "KeepAliveWorker",
+      rowType: KeepAliveWorker.getTypeScriptAlgebraicType(),
+      primaryKey: "ScheduledId",
     },
     Layouts: {
       tableName: "Layouts",
@@ -1225,15 +1234,19 @@ export class RemoteReducers {
     this.connection.offReducer("IssueOverlayCommand", callback);
   }
 
-  keepAlive() {
-    this.connection.callReducer("KeepAlive", new Uint8Array(0), this.setCallReducerFlags.keepAliveFlags);
+  keepAlive(arg: KeepAliveWorker) {
+    const __args = { arg };
+    let __writer = new BinaryWriter(1024);
+    KeepAlive.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("KeepAlive", __argsBuffer, this.setCallReducerFlags.keepAliveFlags);
   }
 
-  onKeepAlive(callback: (ctx: EventContext) => void) {
+  onKeepAlive(callback: (ctx: EventContext, arg: KeepAliveWorker) => void) {
     this.connection.onReducer("KeepAlive", callback);
   }
 
-  removeOnKeepAlive(callback: (ctx: EventContext) => void) {
+  removeOnKeepAlive(callback: (ctx: EventContext, arg: KeepAliveWorker) => void) {
     this.connection.offReducer("KeepAlive", callback);
   }
 
@@ -2459,6 +2472,10 @@ export class RemoteTables {
 
   get heartbeat(): HeartbeatTableHandle {
     return new HeartbeatTableHandle(this.connection.clientCache.getOrCreateTable<Heartbeat>(REMOTE_MODULE.tables.Heartbeat));
+  }
+
+  get keepAliveWorker(): KeepAliveWorkerTableHandle {
+    return new KeepAliveWorkerTableHandle(this.connection.clientCache.getOrCreateTable<KeepAliveWorker>(REMOTE_MODULE.tables.KeepAliveWorker));
   }
 
   get layouts(): LayoutsTableHandle {
