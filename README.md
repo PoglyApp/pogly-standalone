@@ -94,6 +94,8 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/krisuna" rel="noreferrer" target="_blank" title="Krisuna"><img src="./images/streamers/krisuna.svg" /></a>
 <a href="https://www.twitch.tv/echotheneko" rel="noreferrer" target="_blank" title="EchoTheNeko"><img src="./images/streamers/echotheneko.svg" /></a>
 <a href="https://www.twitch.tv/greywolf" rel="noreferrer" target="_blank" title="greywolf"><img src="./images/streamers/greywolf.svg" /></a>
+<a href="https://www.twitch.tv/shyfox_vr" rel="noreferrer" target="_blank" title="shyfox_vr"><img src="./images/streamers/shyfoxvr.svg" /></a>
+
 
 ## Contributing
 
