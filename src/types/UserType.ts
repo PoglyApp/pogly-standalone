@@ -1,3 +1,4 @@
+import { DBConnection } from "@/module_bindings";
 import { Address, Identity } from "@clockworklabs/spacetimedb-sdk";
 
 export interface UserType {
@@ -5,5 +6,5 @@ export interface UserType {
   Identity: Identity;
   Token: string;
   Nickname: string;
-  Connected: boolean;
+  Client: DBConnection;
 }

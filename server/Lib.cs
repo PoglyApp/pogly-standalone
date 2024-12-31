@@ -120,19 +120,19 @@ static partial class Module
         try
         {
             var heartbeat = ctx.Db.Heartbeat.Id.Find(0);
-
-            if (heartbeat.HasValue)
+            
+            if (heartbeat is not null)
             {
                 var newHeartbeat = heartbeat.Value;
                 newHeartbeat.Tick = ctx.Timestamp.Second;
 
                 ctx.Db.Heartbeat.Id.Update(newHeartbeat);
+                Log.Info("Heartbeat Updated!");
             }
             else
             {
                 Log.Error("[KeepAlive] Encountered an error updating heartbeat - could not find default heartbeat!");
             }
-            
         }
         catch (Exception e)
         {
