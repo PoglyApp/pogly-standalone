@@ -29,7 +29,7 @@ export const Tooltip = ({ text, children }: IProps) => {
 
   return (
     <div
-      className="relative flex items-center"
+      className="relative flex"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{ width: "fit-content", height: "fit-content" }}

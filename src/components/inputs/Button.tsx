@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Tooltip } from "../general/Tooltip";
 
 interface IProps {
-  tooltip: string;
+  tooltip?: string;
   onclick: Function;
   icon?: any;
   text?: string;
@@ -14,11 +14,26 @@ interface IProps {
 }
 
 export const Button = ({ tooltip, onclick, icon, text, border, fontSize, fontColor, style, className }: IProps) => {
+  
+  if(!tooltip) return (
+    <div className={className} style={{ color: "#7e828c", ...style }} onClick={() => onclick()}>
+        <StyledButton
+          className={ (border ? " highlight" : "")}
+          style={{
+            fontSize: fontSize,
+            color: fontColor,
+          }}
+        >
+          {icon} {text}
+        </StyledButton>
+      </div>
+  );
+  
   return (
     <Tooltip text={tooltip}>
       <div className={className} style={{ color: "#7e828c", ...style }} onClick={() => onclick()}>
         <StyledButton
-          className={"text-2xl" + (border ? " highlight" : "")}
+          className={ (border ? " highlight" : "")}
           style={{
             fontSize: fontSize,
             color: fontColor,

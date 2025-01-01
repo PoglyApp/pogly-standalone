@@ -8,7 +8,7 @@ interface IProps {
 
 export const Container = ({ children, title, subTitle, className, style }: IProps) => {
   return (
-    <div className={className} style={{ width: "fit-content", ...style }}>
+    <div className={className} style={{ ...style }}>
       {title && (
         <div
           className="pl-5"

@@ -26,7 +26,7 @@ export const Layers: React.FC = () => {
   }
 
   return (
-    <Container className="ml-5 mt-8 enablePointerEvents" title="layers">
+    <Container className="ml-5 mt-8 enablePointerEvents" title="layers" style={{ width: "fit-content" }}>
       <div className="flex">
         <div>
           <LayerElement type={LayerElementType.Image} text="Kekw" />

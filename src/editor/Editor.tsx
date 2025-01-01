@@ -34,7 +34,7 @@ export const Editor: React.FC = () => {
         <SelectionButtons />
 
         <Button
-          icon={<Settings size={45} />}
+          icon={<Settings className="2xl:w-24 xl:w-18 lg:w-14 md:w-10 sm:w-6 h-auto" />}
           className="mr-4 mb-5 fixed enablePointerEvents"
           style={{ bottom: "0", right: "0" }}
           border={true}

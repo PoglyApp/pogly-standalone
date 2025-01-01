@@ -25,9 +25,9 @@ export const Layouts = () => {
   }
 
   return (
-    <Container className="ml-5 mt-14 enablePointerEvents" style={{ height: "fit-content" }} title="layouts">
+    <Container className="ml-5 mt-14 enablePointerEvents" style={{ width: "fit-content", height: "fit-content" }} title="layouts">
       <div className="flex items-end">
-        <Dropdown style={{ width: "300px" }} icon={<LayoutDashboard />} />
+        <Dropdown className="2xl:w-[500px] xl:w-[400px] lg:w-[300px] md:w-[200px] sm:w-[150px]" icon={<LayoutDashboard />} />
         <Button
           icon={<StyledChevronLeft />}
           onclick={() => {

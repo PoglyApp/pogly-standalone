@@ -5,9 +5,10 @@ interface IProps {
   placeholder?: string;
   label?: any;
   style?: any;
+  className?: string;
 }
 
-export const TextInput = ({ defaultValue, placeholder, label, style }: IProps) => {
+export const TextInput = ({ defaultValue, placeholder, label, style, className }: IProps) => {
   return (
     <div>
       {label && (
@@ -17,7 +18,7 @@ export const TextInput = ({ defaultValue, placeholder, label, style }: IProps) =
       )}
 
       <StyledInput
-        className="rounded-sm highlight"
+        className={ className }
         style={{
           ...style,
         }}
