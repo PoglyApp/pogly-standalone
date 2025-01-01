@@ -62,7 +62,7 @@ export default {
       },
     },
     screens: {
-      'sm': '1280px',   // 720p
+      'sm': '0px',   // 720p
       'md': '1920px',   // 1080p
       'lg': '2560px',   // 1440p
       'xl': '3840px',   // 4k
