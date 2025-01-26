@@ -247,13 +247,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 2;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -281,13 +281,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x += 7;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -315,13 +315,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 2;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -349,13 +349,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.x -= 7;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -383,13 +383,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 2;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -418,13 +418,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y -= 7;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -452,13 +452,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 2;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");
@@ -486,13 +486,13 @@ export const UserInputHandler = (
 
         let coords = GetCoordsFromTransform(element.transform);
         coords.y += 7;
-        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY);
+        const newTransform = GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY);
 
         updateElementTransformNoViewportAdjustment(element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
-          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.scaleX, coords.scaleY)
+          GetTransformFromCoords(coords.x, coords.y, coords.rotation, coords.rotationAfterX, coords.rotationAfterY, coords.scaleX, coords.scaleY)
         );
       } catch {
         console.log("Pogly encountered an issue when attempting to Nudge an element!");

@@ -31,6 +31,8 @@ export const CursorComponent = (props: IProp) => {
       parseFloat(positionX) * state.scale,
       parseFloat(positionY) * state.scale,
       0,
+      false,
+      false,
       null,
       null
     );

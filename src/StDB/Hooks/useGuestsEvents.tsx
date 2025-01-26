@@ -69,6 +69,8 @@ export const useGuestsEvents = (
           newGuest.positionX * transformRef.current.instance.transformState.scale,
           newGuest.positionY * transformRef.current.instance.transformState.scale,
           0,
+          false,
+          false,
           null,
           null
         );
