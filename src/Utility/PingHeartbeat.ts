@@ -11,7 +11,7 @@ export const StartHeartbeat = () => {
   heartbeatInterval = setInterval(() => {
     try {
       PingHeartbeatReducer.call(); 
-      console.log("ping");
+      //console.log("ping");
     } catch (error) {
       console.error("Failed to send heartbeat ping:", error);
       StopHeartbeat(); 

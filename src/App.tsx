@@ -33,6 +33,7 @@ import ConnectReducer from "./module_bindings/connect_reducer";
 import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 import { DebugLogger } from "./Utility/DebugLogger";
 import { StartHeartbeat } from "./Utility/PingHeartbeat";
+import { Error } from "./Pages/Error";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -139,6 +140,7 @@ export const App: React.FC = () => {
       <Route
         path="/"
         element={<Header activePage={activePage} setActivePage={setActivePage} onlineVersion={versionNumber} />}
+        errorElement={<Error />}
       >
         {/*TODO: Home page*/}
         {/*<Route index element={<Home />} />*/}
