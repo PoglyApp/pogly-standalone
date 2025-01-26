@@ -35,7 +35,7 @@ export const ImageUploadModal = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [imageName, setImageName] = useState<string>("");
-  const [isUrl, setIsUrl] = useState<boolean>(false);
+  const [isUrl, setIsUrl] = useState<boolean>(settings.urlAsDefault ? settings.urlAsDefault : false);
 
   const [file, setFile] = useState<any>(null);
   const [isFileGif, setIsFileGif] = useState<boolean>(false);
@@ -193,7 +193,12 @@ export const ImageUploadModal = (props: IProps) => {
                       File
                     </Button>
                     <Button
-                      sx={{ borderColor: "#ffffffa6", borderBottom: "none", borderRadius: "0px", color: "#ffffffa6" }}
+                      sx={{
+                        borderColor: "#ffffffa6",
+                        borderBottom: "none",
+                        borderRadius: "0px",
+                        color: "#ffffffa6",
+                      }}
                       onClick={() => setIsUrl(true)}
                     >
                       URL
@@ -323,6 +328,10 @@ const Input = styled.input`
   color: #ffffffa6;
 
   max-width: 250px;
+
+  &::placeholder {
+    color: #ffffff81;
+  }
 `;
 
 const StyledFileInputName = styled.input`

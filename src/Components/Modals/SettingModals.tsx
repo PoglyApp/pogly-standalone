@@ -62,6 +62,9 @@ export const SettingsModal = (props: IProp) => {
   const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
     stream.style.pointerEvents === "none" ? false : true
   );
+  const [urlAsDefault, setUrlAsDefault] = useState<boolean>(
+    settings.urlAsDefault != null ? settings.urlAsDefault : false
+  );
 
   // ADVANCED
   const [compressUpload, setCompressUpload] = useState<boolean>(
@@ -111,6 +114,7 @@ export const SettingsModal = (props: IProp) => {
     newSettings.cursorName = cursorNameCheckbox;
     newSettings.compressUpload = compressUpload;
     newSettings.compressPaste = compressPaste;
+    newSettings.urlAsDefault = urlAsDefault;
 
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
@@ -248,6 +252,21 @@ export const SettingsModal = (props: IProp) => {
                     />
                   }
                   label="Stream player interactable"
+                />
+
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6", paddingTop: "1px" },
+                  }}
+                  sx={{ alignItems: "start" }}
+                  control={
+                    <Checkbox
+                      onChange={(event: any, checked: boolean) => setUrlAsDefault(checked)}
+                      defaultChecked={urlAsDefault}
+                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
+                    />
+                  }
+                  label="Set URL as default upload type"
                 />
               </div>
 
