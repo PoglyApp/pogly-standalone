@@ -12,6 +12,7 @@ import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import UpdateElementTransparencyReducer from "../module_bindings/update_element_transparency_reducer";
 
 export const UserInputHandler = (
   activeLayout: Layouts,
@@ -53,6 +54,42 @@ export const UserInputHandler = (
         selectoElements.forEach((e) => DeleteElementReducer.call(Number(e.id)));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to Delete an element!");
+      }
+    },
+  });
+
+  // SHOW SELECTED ELEMENT(S) WITH PAGE UP
+  userInputs.push({
+    name: "showElement",
+    keys: "pageup",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed PAGE UP");
+      event.preventDefault();
+
+      try {
+        DebugLogger("showing element(s)");
+        selectoElements.forEach((e) => UpdateElementTransparencyReducer.call(Number(e.id),100));
+      } catch (error) {
+        console.log("Pogly encountered an issue when attempting to show an element(s)!");
+      }
+    },
+  });
+
+  // HIDE SELECTED ELEMENT(S) WITH PAGE UP
+  userInputs.push({
+    name: "hideElement",
+    keys: "pagedown",
+    action: "keydown",
+    callback: (event: any) => {
+      DebugLogger("User pressed PAGE DOWN");
+      event.preventDefault();
+
+      try {
+        DebugLogger("hiding element(s)");
+        selectoElements.forEach((e) => UpdateElementTransparencyReducer.call(Number(e.id),0));
+      } catch (error) {
+        console.log("Pogly encountered an issue when attempting to hide an element(s)!");
       }
     },
   });
