@@ -62,12 +62,15 @@ export const ChooseInstanceModal = (props: IProp) => {
 
       const qSwap = localStorage.getItem("poglyQuickSwap");
       let existingSwap: QuickSwapType[] = [];
+
       try {
         if (qSwap) existingSwap = JSON.parse(qSwap);
       } catch (error) {
         //do nothing
       }
-      const newConnection: QuickSwapType = { domain: domain, module: moduleName, auth: authKey };
+
+      const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: null, auth: authKey };
+
       if (existingSwap) {
         if (existingSwap.some((x) => x.module === moduleName)) return;
         existingSwap.push(newConnection);
@@ -169,9 +172,9 @@ export const ChooseInstanceModal = (props: IProp) => {
 
       <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}>
         <div style={{ position: "fixed" }}>
-        <p style={{ margin: "0", paddingLeft: "10px", fontSize: "12px", color: "#ffffffa6" }}>
-          Version: {process.env.REACT_APP_VERSION}
-        </p>
+          <p style={{ margin: "0", paddingLeft: "10px", fontSize: "12px", color: "#ffffffa6" }}>
+            Version: {process.env.REACT_APP_VERSION}
+          </p>
         </div>
         <div>
           <Button

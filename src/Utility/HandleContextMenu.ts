@@ -72,3 +72,18 @@ export const HandleGuestListContextMenu = (event: any, setContextMenu: Function,
       : null
   );
 };
+
+export const HandleQuickSwapContextMenu = (event: any, setContextMenu: Function, contextMenu: any, module: string) => {
+  DebugLogger("Handling quick swap context menu");
+  event.preventDefault();
+
+  setContextMenu(
+    contextMenu === null
+      ? {
+          module: module,
+          mouseX: event.clientX - 3,
+          mouseY: event.clientY - 2,
+        }
+      : null
+  );
+};
