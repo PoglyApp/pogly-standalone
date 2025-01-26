@@ -1,3 +1,18 @@
+body {
+  -khtml-user-select: auto !important;
+  -o-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+}
+html {
+  -khtml-user-select: auto !important;
+  -o-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+}
+
 .card {
     width: 100%;
     height: 100%;
