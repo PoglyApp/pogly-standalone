@@ -81,6 +81,8 @@ import UpdateElementLayoutReducer from "../module_bindings/update_element_layout
 import UpdateElementFolderReducer from "../module_bindings/update_element_folder_reducer";
 import UpdateGuestSelectedLayoutReducer from "../module_bindings/update_guest_selected_layout_reducer";
 import DuplicateLayoutReducer from "../module_bindings/duplicate_layout_reducer";
+import PingHeartbeatReducer from "../module_bindings/ping_heartbeat_reducer";
+import { StopHeartbeat } from "../Utility/PingHeartbeat";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -173,7 +175,8 @@ const useStDB = (
       UpdateFolderIconReducer,
       DeleteFolderReducer,
       DeleteAllFoldersReducer,
-      UpdateGuestSelectedLayoutReducer
+      UpdateGuestSelectedLayoutReducer,
+      PingHeartbeatReducer
     );
 
     const stdbToken = localStorage.getItem("stdbToken") || "";
@@ -248,10 +251,12 @@ const useStDB = (
     client?.onError((...args: any[]) => {
       if (args[0].type === "close") {
         setDisconnected(true);
+        StopHeartbeat();
         return;
       }
 
       setError(true);
+      StopHeartbeat();
       console.log("Error with SpacetimeDB: ", args);
     });
 

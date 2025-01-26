@@ -32,6 +32,7 @@ import { LayoutContext } from "./Contexts/LayoutContext";
 import ConnectReducer from "./module_bindings/connect_reducer";
 import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 import { DebugLogger } from "./Utility/DebugLogger";
+import { StartHeartbeat } from "./Utility/PingHeartbeat";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -309,9 +310,11 @@ export const App: React.FC = () => {
     if (timeout) clearTimeout(timeout);
   }
 
-  // Step 5) Redo final subscriptions ONLY ONCE
+  // Step 5) Redo final subscriptions ONLY ONCE && Start client heartbeat
   if (!stdbInitialized) {
     if (stdbInitialized || stdbSubscriptions) return <Loading text="Loading data..." />;
+    DebugLogger("Starting Client->Server heartbeat!");
+    StartHeartbeat();
     DebugLogger("Redoing subscriptions");
     SetSubscriptions(spacetime.Client, setStdbSubscriptions);
   }
