@@ -41,6 +41,7 @@ import DeleteAllElementDataReducer from "../../module_bindings/delete_all_elemen
 import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
 import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
 import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
+import { ModeratorListModal } from "./ModeratorListModal";
 
 interface IProp {
   onlineVersion: string;
@@ -153,6 +154,10 @@ export const SettingsModal = (props: IProp) => {
     setModals((oldModals: any) => [...oldModals, <BackupModal key="backup_modal" download={true} />]);
   };
 
+  const showModeratorListModal = () => {
+    setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
+  };
+
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
 
@@ -180,7 +185,7 @@ export const SettingsModal = (props: IProp) => {
       onClose={() => closeModal("settings_modal", modals, setModals)}
       sx={{
         ".MuiDialog-paper": {
-          height: "580px !important",
+          height: "630px !important",
           width: "420px !important",
         },
       }}
@@ -635,6 +640,19 @@ export const SettingsModal = (props: IProp) => {
                   onClick={showInstancePassword}
                 >
                   Update Instance Password
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#00ad03",
+                    borderColor: "#00ad03cc",
+                    "&:hover": { borderColor: "#00ad03" },
+                    marginTop: "10px",
+                  }}
+                  onClick={showModeratorListModal}
+                >
+                  Moderator list
                 </Button>
               </div>
             </SettingsTabPanel>
