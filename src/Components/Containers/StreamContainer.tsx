@@ -12,17 +12,17 @@ export const StreamContainer = () => {
 
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides) return;
+    if (!streamOverrides || !Runtime) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime?.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
 
     if (!currentOverride) return;
 
     console.log(currentOverride.override);
 
     setStreamOverride(currentOverride.override);
-  }, []);
+  }, [Runtime]);
 
   return (
     <>

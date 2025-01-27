@@ -121,26 +121,26 @@ export const SettingsModal = (props: IProp) => {
 
     const streamOverrides = localStorage.getItem("streamOverride");
 
-    if (streamOverrides) {
+    if (streamOverrides && Runtime) {
       let oldList = JSON.parse(streamOverrides);
-      let oldOverride = oldList.find((obj: any) => obj.module === Runtime?.module);
+      let oldOverride = oldList.find((obj: any) => obj.module === Runtime.module);
 
       if (!oldOverride && !streamOverride) return;
 
       if (oldOverride) {
         if (!streamOverride) {
-          oldList = oldList.filter((obj: any) => obj.module !== Runtime?.module);
+          oldList = oldList.filter((obj: any) => obj.module !== Runtime.module);
         } else {
           oldOverride.override = streamOverride;
         }
       } else {
-        oldList.push({ module: Runtime?.module, override: streamOverride });
+        oldList.push({ module: Runtime.module, override: streamOverride });
       }
 
       localStorage.setItem("streamOverride", JSON.stringify(oldList));
     } else {
-      if (streamOverride) {
-        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime?.module, override: streamOverride }]));
+      if (streamOverride && Runtime) {
+        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime.module, override: streamOverride }]));
       }
     }
 
@@ -179,15 +179,15 @@ export const SettingsModal = (props: IProp) => {
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
 
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides) return;
+    if (!streamOverrides || !Runtime) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime?.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
 
     if (!currentOverride) return;
 
     setStreamOverride(currentOverride.override);
-  }, [settings, setSettings]);
+  }, [settings, setSettings, Runtime]);
 
   function clearConnectionSettings() {
     localStorage.removeItem("stdbConnectDomain");
