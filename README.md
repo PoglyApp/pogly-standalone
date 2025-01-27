@@ -23,13 +23,13 @@
     &nbsp;
     <a href="https://github.com/clockworklabs/spacetimedb"><img src="https://img.shields.io/badge/powered_by-SpacetimeDB-000000.svg?style=flat-square" /></a>
     &nbsp;
-	<img src="https://img.shields.io/badge/version-v0.1.3_beta-9f9f9f.svg?style=flat-square" />
+	<img src="https://img.shields.io/badge/version-v0.2.1_beta-9f9f9f.svg?style=flat-square" />
     &nbsp;
     <a href="https://github.com/PoglyApp/pogly-standalone/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-50C878.svg?style=flat-square" /></a>
 </p>
 
 <p align="center">
-    <a href="https://discord.gg/CXCj2TGS6b"><img height="25" src="./images/social/discord.svg" alt="Discord" /></a>
+    <a href="https://discord.gg/pogly"><img height="25" src="./images/social/discord.svg" alt="Discord" /></a>
     &nbsp;
     <a href="https://www.twitch.tv/poglygg"><img height="25" src="./images/social/twitch.svg" alt="Twitch" /></a>
     &nbsp;
@@ -55,7 +55,7 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 For installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md).
 There are both provider-hosted and self-hosted methods available.
 
-For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/uPQsBaVdB7).
+For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/pogly).
 
 ## Used by
 
