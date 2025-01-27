@@ -61,9 +61,9 @@ export const SpotlightModal = (props: IProps) => {
 
     insertElement(
       ElementStruct.ImageElement({
-        imageElementData: ImageElementData.RawData(elementData.data),
-        width: 128,
-        height: 128,
+        imageElementData: ImageElementData.ElementDataId(elementData.id),
+        width: elementData.dataWidth || 128,
+        height: elementData.dataHeight || 128,
       }),
       layoutContext.activeLayout
     );

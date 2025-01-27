@@ -2,7 +2,7 @@
 
 First off, thank you for considering contributing to Pogly Standalone! It's people like you who make this project a great tool for streamers.
 
-If you have any questions regarding development, feel free to join our [Discord server](https://discord.gg/uPQsBaVdB7)!
+If you have any questions regarding development, feel free to join our [Discord server](https://discord.gg/pogly)!
 
 ## How Can I Contribute?
 

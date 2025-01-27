@@ -285,7 +285,7 @@ export const WidgetCreationModal = (props: IProps) => {
               <Typography color="#ffffffa6" fontSize={14}>
                 Find community made widgets in{" "}
                 <Link
-                  href="https://discord.gg/uPQsBaVdB7"
+                  href="https://discord.gg/pogly"
                   target="_blank"
                   rel="noreferrer"
                   underline="always"
