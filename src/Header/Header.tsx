@@ -14,8 +14,6 @@ import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import { QuickSwapType } from "../Types/General/QuickSwapType";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import { QuickSwapMenu } from "./QuickswapMenu";
 
 interface IProps {
@@ -26,8 +24,6 @@ interface IProps {
 
 export const Header = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-
-  const { Client } = useSpacetimeContext();
 
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 

@@ -81,6 +81,8 @@ export const SettingsModal = (props: IProp) => {
     overlayURL = overlayURL + "&auth=" + Runtime.authKey;
   }
 
+  const [streamOverride, setStreamOverride] = useState<string>("");
+
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);
   const [tabValue, setTabValue] = useState<number>(0);
@@ -117,6 +119,52 @@ export const SettingsModal = (props: IProp) => {
     newSettings.compressPaste = compressPaste;
     newSettings.urlAsDefault = urlAsDefault;
 
+    const streamOverrides = localStorage.getItem("streamOverride");
+
+    if (streamOverrides) {
+      let oldList = JSON.parse(streamOverrides);
+      let oldOverride = oldList.find((obj: any) => obj.module === Runtime?.module);
+
+      if (!oldOverride && !streamOverride) return;
+
+      if (oldOverride) {
+        if (!streamOverride) {
+          oldList = oldList.filter((obj: any) => obj.module !== Runtime?.module);
+        } else {
+          oldOverride.override = streamOverride;
+        }
+      } else {
+        oldList.push({ module: Runtime?.module, override: streamOverride });
+      }
+
+      localStorage.setItem("streamOverride", JSON.stringify(oldList));
+    } else {
+      if (streamOverride) {
+        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime?.module, override: streamOverride }]));
+      }
+    }
+
+    /*const newOverride = { module: Runtime?.module, override: streamOverride };
+
+    let oldList = JSON.parse(streamOverrides);
+
+    if (streamOverride === "") {
+      oldList = oldList.filter((obj: any) => obj.module !== Runtime?.module);
+    } else {
+      const oldEntry = oldList.find((obj: any) => obj.module === Runtime?.module);
+
+      console.log("test");
+
+      if (oldEntry) {
+        oldEntry.override = streamOverride;
+      } else {
+        oldList.push(newOverride);
+      }
+    }
+    console.log(oldList.filter((obj: any) => obj.module !== Runtime?.module));
+
+    localStorage.setItem("streamOverride", JSON.stringify(oldList));*/
+
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
 
@@ -129,6 +177,16 @@ export const SettingsModal = (props: IProp) => {
     const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
 
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
+
+    const streamOverrides = localStorage.getItem("streamOverride");
+    if (!streamOverrides) return;
+
+    const overrideJson = JSON.parse(streamOverrides);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime?.module);
+
+    if (!currentOverride) return;
+
+    setStreamOverride(currentOverride.override);
   }, [settings, setSettings]);
 
   function clearConnectionSettings() {
@@ -406,6 +464,17 @@ export const SettingsModal = (props: IProp) => {
               >
                 Clear Connection Settings
               </Button>
+            </div>
+
+            <div style={{ marginTop: "15px" }}>
+              <StyledInput
+                focused={false}
+                label="Local stream container override"
+                color="#ffffffa6"
+                onChange={setStreamOverride}
+                defaultValue={streamOverride}
+                style={{ width: "100%" }}
+              />
             </div>
           </SettingsTabPanel>
           <SettingsTabPanel value={tabValue} index={2}>
