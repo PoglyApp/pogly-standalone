@@ -15,6 +15,8 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 import { marked } from "marked";
+import ImageElement from "../../module_bindings/image_element";
+import ImageElementData from "../../module_bindings/image_element_data";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -129,6 +131,19 @@ export const useOverlayElementsEvents = (
             });
           }
           break;
+
+          case "ImageElement":
+          const oldImageElement: ImageElement = oldElement.element.value as ImageElement;
+          const newImageElement: ImageElement = newElement.element.value as ImageElement;
+
+          const oldImageData: ImageElementData = oldImageElement.imageElementData;
+          const newImageData: ImageElementData = newImageElement.imageElementData;
+
+          if (oldImageData.value !== newImageData.value) {
+            component.children[0].setAttribute("src", newImageData.value.toString());
+          }
+          break;
+
 
         case "WidgetElement":
           const oldWidgetElement: WidgetElement = oldElement.element.value as WidgetElement;
