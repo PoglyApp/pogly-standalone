@@ -41,6 +41,7 @@ import DeleteAllElementDataReducer from "../../module_bindings/delete_all_elemen
 import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
 import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
 import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
+import { ModeratorListModal } from "./ModeratorListModal";
 
 interface IProp {
   onlineVersion: string;
@@ -64,6 +65,9 @@ export const SettingsModal = (props: IProp) => {
   const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
     stream.style.pointerEvents === "none" ? false : true
   );
+  const [urlAsDefault, setUrlAsDefault] = useState<boolean>(
+    settings.urlAsDefault != null ? settings.urlAsDefault : false
+  );
 
   // ADVANCED
   const [compressUpload, setCompressUpload] = useState<boolean>(
@@ -76,6 +80,8 @@ export const SettingsModal = (props: IProp) => {
   let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
 
   if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
+
+  const [streamOverride, setStreamOverride] = useState<string>("");
 
   // DEBUG
   const [debugCheckbox, setDebugCheckbox] = useState<boolean>(settings.debug != null ? settings.debug : false);
@@ -111,6 +117,53 @@ export const SettingsModal = (props: IProp) => {
     newSettings.cursorName = cursorNameCheckbox;
     newSettings.compressUpload = compressUpload;
     newSettings.compressPaste = compressPaste;
+    newSettings.urlAsDefault = urlAsDefault;
+
+    const streamOverrides = localStorage.getItem("streamOverride");
+
+    if (streamOverrides && Runtime) {
+      let oldList = JSON.parse(streamOverrides);
+      let oldOverride = oldList.find((obj: any) => obj.module === Runtime.module);
+
+      if (!oldOverride && !streamOverride) return;
+
+      if (oldOverride) {
+        if (!streamOverride) {
+          oldList = oldList.filter((obj: any) => obj.module !== Runtime.module);
+        } else {
+          oldOverride.override = streamOverride;
+        }
+      } else {
+        oldList.push({ module: Runtime.module, override: streamOverride });
+      }
+
+      localStorage.setItem("streamOverride", JSON.stringify(oldList));
+    } else {
+      if (streamOverride && Runtime) {
+        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime.module, override: streamOverride }]));
+      }
+    }
+
+    /*const newOverride = { module: Runtime?.module, override: streamOverride };
+
+    let oldList = JSON.parse(streamOverrides);
+
+    if (streamOverride === "") {
+      oldList = oldList.filter((obj: any) => obj.module !== Runtime?.module);
+    } else {
+      const oldEntry = oldList.find((obj: any) => obj.module === Runtime?.module);
+
+      console.log("test");
+
+      if (oldEntry) {
+        oldEntry.override = streamOverride;
+      } else {
+        oldList.push(newOverride);
+      }
+    }
+    console.log(oldList.filter((obj: any) => obj.module !== Runtime?.module));
+
+    localStorage.setItem("streamOverride", JSON.stringify(oldList));*/
 
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
@@ -124,7 +177,17 @@ export const SettingsModal = (props: IProp) => {
     const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
 
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
-  }, [settings, setSettings]);
+
+    const streamOverrides = localStorage.getItem("streamOverride");
+    if (!streamOverrides || !Runtime) return;
+
+    const overrideJson = JSON.parse(streamOverrides);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
+
+    if (!currentOverride) return;
+
+    setStreamOverride(currentOverride.override);
+  }, [settings, setSettings, Runtime]);
 
   function clearConnectionSettings() {
     localStorage.removeItem("stdbConnectDomain");
@@ -147,6 +210,10 @@ export const SettingsModal = (props: IProp) => {
 
   const showDownloadModal = () => {
     setModals((oldModals: any) => [...oldModals, <BackupModal key="backup_modal" download={true} />]);
+  };
+
+  const showModeratorListModal = () => {
+    setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
   const handleStreamPlayerInteractable = () => {
@@ -176,7 +243,7 @@ export const SettingsModal = (props: IProp) => {
       onClose={() => closeModal("settings_modal", modals, setModals)}
       sx={{
         ".MuiDialog-paper": {
-          height: "580px !important",
+          height: "630px !important",
           width: "420px !important",
         },
       }}
@@ -248,6 +315,21 @@ export const SettingsModal = (props: IProp) => {
                     />
                   }
                   label="Stream player interactable"
+                />
+
+                <FormControlLabel
+                  componentsProps={{
+                    typography: { color: "#ffffffa6", paddingTop: "1px" },
+                  }}
+                  sx={{ alignItems: "start" }}
+                  control={
+                    <Checkbox
+                      onChange={(event: any, checked: boolean) => setUrlAsDefault(checked)}
+                      defaultChecked={urlAsDefault}
+                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
+                    />
+                  }
+                  label="Set URL as default upload type"
                 />
               </div>
 
@@ -382,6 +464,17 @@ export const SettingsModal = (props: IProp) => {
               >
                 Clear Connection Settings
               </Button>
+            </div>
+
+            <div style={{ marginTop: "15px" }}>
+              <StyledInput
+                focused={false}
+                label="Local stream container override"
+                color="#ffffffa6"
+                onChange={setStreamOverride}
+                defaultValue={streamOverride}
+                style={{ width: "100%" }}
+              />
             </div>
           </SettingsTabPanel>
           <SettingsTabPanel value={tabValue} index={2}>
@@ -616,6 +709,19 @@ export const SettingsModal = (props: IProp) => {
                   onClick={showInstancePassword}
                 >
                   Update Instance Password
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#00ad03",
+                    borderColor: "#00ad03cc",
+                    "&:hover": { borderColor: "#00ad03" },
+                    marginTop: "10px",
+                  }}
+                  onClick={showModeratorListModal}
+                >
+                  Moderator list
                 </Button>
               </div>
             </SettingsTabPanel>

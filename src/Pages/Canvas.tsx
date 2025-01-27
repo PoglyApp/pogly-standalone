@@ -111,7 +111,7 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, settings.compressPaste, transformRef.current));
+  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, selectoTargets, settings.compressPaste, transformRef.current));
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {

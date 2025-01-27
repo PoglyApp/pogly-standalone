@@ -1,7 +1,7 @@
-import { AppBar, Box, Button, Menu, MenuItem, Tab, Tabs, Typography } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
+import { useContext, useState } from "react";
 import styled from "styled-components";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
 import { SettingsModal } from "../Components/Modals/SettingModals";
 import SecurityIcon from "@mui/icons-material/Security";
@@ -14,8 +14,7 @@ import Dropzone from "react-dropzone";
 import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import { QuickSwapType } from "../Types/General/QuickSwapType";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { QuickSwapMenu } from "./QuickswapMenu";
 
 interface IProps {
   activePage: Number;
@@ -25,23 +24,13 @@ interface IProps {
 
 export const Header = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const currentModule = localStorage.getItem("stdbConnectModule") || "";
-
-  const { Client } = useSpacetimeContext();
 
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 
-  const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
   const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
 
   const { setModals } = useContext(ModalContext);
-
-  useEffect(() => {
-    const modules = localStorage.getItem("poglyQuickSwap");
-
-    if (modules) setQuickSwapModules(JSON.parse(modules));
-  }, []);
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
@@ -54,15 +43,6 @@ export const Header = (props: IProps) => {
   const showEditorGuidelines = () => {
     DebugLogger("Opening editor guidelines modal");
     setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
-  };
-
-  const swapModule = (module: QuickSwapType) => {
-    DebugLogger("Swapping module via quick swap menu");
-    localStorage.setItem("stdbConnectDomain", module.domain);
-    localStorage.setItem("stdbConnectModule", module.module);
-    localStorage.setItem("stdbConnectModuleAuthKey", module.auth);
-    Client.disconnect();
-    window.location.reload();
   };
 
   if (isOverlay) {
@@ -136,29 +116,11 @@ export const Header = (props: IProps) => {
           )}
         </Dropzone>
 
-        <Menu
-          id="quickswap-menu"
-          anchorEl={quickSwapMenuAnchor}
-          open={quickSwapMenuOpen}
-          onClose={() => setQuickSwapMenuAnchor(null)}
-          MenuListProps={{
-            "aria-labelledby": "quickswap-button",
-          }}
-        >
-          {quickSwapModules.length > 0 ? (
-            quickSwapModules.map((module) => (
-              <StyledMenuItem
-                key={module.module}
-                onClick={() => swapModule(module)}
-                disabled={currentModule === module.module ? true : false}
-              >
-                {module.module}
-              </StyledMenuItem>
-            ))
-          ) : (
-            <span style={{ padding: "10px" }}>No saved modules</span>
-          )}
-        </Menu>
+        <QuickSwapMenu
+          quickSwapMenuAnchor={quickSwapMenuAnchor}
+          quickSwapMenuOpen={quickSwapMenuOpen}
+          setQuickSwapMenuAnchor={setQuickSwapMenuAnchor}
+        />
       </StyledBox>
       <main>
         <Outlet />

@@ -28,6 +28,7 @@ import PermissionLevel from "../../../module_bindings/permission_level";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal";
 
 interface IProps {
   contextMenu: any;
@@ -109,6 +110,14 @@ export const ElementContextMenu = (props: IProps) => {
         <WidgetCreationModal key="widgetCreation_modal" editElementId={selectedElement?.id} />,
       ]);
     }
+  };
+
+  const openUpdateSourceModal = () => {
+    DebugLogger("Opening update source modal");
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <UpdateElementSourceModal key="textCreation_modal" selectedElement={selectedElement!} />,
+    ]);
   };
 
   if (!selectedElement) return <></>;
@@ -342,7 +351,7 @@ export const ElementContextMenu = (props: IProps) => {
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
       {showExamine && element && (
-        <>
+        <div>
           {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" && (
             <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
               Image: {ElementData.findById(element.element.value.imageElementData.value)?.name || ""}
@@ -363,10 +372,24 @@ export const ElementContextMenu = (props: IProps) => {
           <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
             Added by: {element.placedBy}
           </Paper>
-        </>
+        </div>
       )}
 
       <Divider component="li" variant="fullWidth" sx={{ border: "solid 1px #001529e6" }} />
+      {selectedElement.element.tag === "ImageElement" && (
+        <>
+          {strictMode && !permissions ? (
+            <Tooltip title="Strict mode is enabled and preventing you from updating the source. Ask the instance owner!">
+              <StyledDisabledMenuItem>
+                <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingRight: "5px" }} />
+                Update source
+              </StyledDisabledMenuItem>
+            </Tooltip>
+          ) : (
+            <StyledMenuItem onClick={openUpdateSourceModal}>Update source</StyledMenuItem>
+          )}
+        </>
+      )}
 
       {strictMode && !permissions ? (
         <Tooltip title="Strict mode is enabled and preventing you from deleting elements. Ask the instance owner!">
@@ -414,6 +437,17 @@ const StyledDeleteMenuItem = styled(MenuItem)`
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
   color: #681c1c;
+
+  margin-left: 5px;
+  margin-right: 5px;
+
+  padding-left: 5px;
+
+  cursor: not-allowed;
+`;
+
+const StyledDisabledMenuItem = styled(MenuItem)`
+  color: #ffffff75;
 
   margin-left: 5px;
   margin-right: 5px;

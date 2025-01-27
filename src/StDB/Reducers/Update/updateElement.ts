@@ -18,6 +18,8 @@ export const updateElement = (
     transformCoords.x,
     transformCoords.y,
     transformCoords.rotation,
+    transformCoords.rotationAfterX,
+    transformCoords.rotationAfterY,
     transformCoords.scaleX,
     transformCoords.scaleY
   );

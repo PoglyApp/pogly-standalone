@@ -201,6 +201,8 @@ export const MoveableComponent = (props: IProp) => {
       warpable={false}
       clippable={false}
       throttleResize={1}
+      throttleDrag={1}
+      throttleRotate={1}
       // DRAG EVENTS
       onDrag={(event) => {
         event.target.style.transform = event.transform;

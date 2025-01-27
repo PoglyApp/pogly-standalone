@@ -150,4 +150,10 @@ static partial class Module
             Log("Encountered an error clearing overlay requests: " + e.Message, LogLevel.Error);
         }
     }
+
+    [SpacetimeDB.Reducer]
+    public static void PingHeartbeat(ReducerContext ctx)
+    {
+        //do nothing - haha smile! :3
+    }
 }

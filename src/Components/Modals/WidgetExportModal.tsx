@@ -126,4 +126,8 @@ const StyledTextarea = styled.textarea`
   color: #ffffffa6;
   border-color: #ffffffa6;
   padding: 8px;
+
+  &::placeholder {
+    color: #ffffff81;
+  }
 `;

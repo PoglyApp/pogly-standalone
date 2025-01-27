@@ -10,6 +10,8 @@ export const updateElementTransform = (elementId: number, transform: string) => 
     transformCoords.x,
     transformCoords.y,
     transformCoords.rotation,
+    transformCoords.rotationAfterX,
+    transformCoords.rotationAfterY,
     transformCoords.scaleX,
     transformCoords.scaleY
   );
@@ -23,6 +25,8 @@ export const updateElementTransformNoViewportAdjustment = (elementId: number, tr
     transformCoords.x,
     transformCoords.y,
     transformCoords.rotation,
+    transformCoords.rotationAfterX,
+    transformCoords.rotationAfterY,
     transformCoords.scaleX,
     transformCoords.scaleY
   );
