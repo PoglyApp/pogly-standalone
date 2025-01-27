@@ -44,6 +44,14 @@ export const useChannelEmotes = (
         return setChannelEmotesInitialized(true);
       }
 
+      const globalSevenTvEmotes = await SevenTVWrap.GetEmoteSetEmotes("global");
+      if (!globalSevenTvEmotes) {
+        console.log("Could not get 7TV global emotes.");
+        return setChannelEmotesInitialized(true);
+      }
+
+      const allSevenTvEmotes = [...sevenTvEmotes, ...globalSevenTvEmotes];
+
       // BTTV
       if (sevenTVUser.connections[0]) {
         const bttvUser = await BetterTVWrap.GetUserByTwitchId(sevenTVUser.connections[0].id);
@@ -55,7 +63,7 @@ export const useChannelEmotes = (
         }
       }
 
-      setSevenTVEmotes(sevenTvEmotes);
+      setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
   }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
