@@ -4,6 +4,8 @@ import Config from "../module_bindings/config";
 import { ConfigContext } from "../Contexts/ConfigContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import BetterTVWrap from "../Utility/BetterTVWrap";
+import SevenTVEmoteType from "../Types/SevenTVTypes/SevenTVEmoteType";
+import BetterTVEmoteType from "../Types/BetterTVTypes/BetterTVEmoteType";
 
 export const useChannelEmotes = (
   setSevenTVEmotes: Function,
@@ -50,14 +52,18 @@ export const useChannelEmotes = (
         return setChannelEmotesInitialized(true);
       }
 
-      const allSevenTvEmotes = [...sevenTvEmotes, ...globalSevenTvEmotes];
+      const allSevenTvEmotes = [...sevenTvEmotes, ...globalSevenTvEmotes].filter(
+        (e: SevenTVEmoteType, index, arr: SevenTVEmoteType[]) => index === arr.findIndex(x => x.id === e.id)
+      );
 
       // BTTV
       if (sevenTVUser.connections[0]) {
         const bttvUser = await BetterTVWrap.GetUserByTwitchId(sevenTVUser.connections[0].id);
 
         if (bttvUser) {
-          const bttvEmotes = [...bttvUser.channelEmotes, ...bttvUser.sharedEmotes];
+          const bttvEmotes = [...bttvUser.channelEmotes, ...bttvUser.sharedEmotes].filter(
+            (e: BetterTVEmoteType, index, arr: BetterTVEmoteType[]) => index === arr.findIndex(x => x.id === e.id)
+          );
 
           setBTTVEmotes(bttvEmotes);
         }
