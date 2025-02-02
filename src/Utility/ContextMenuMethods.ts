@@ -58,7 +58,7 @@ export const handleEditTransform = (type: TransformType, setTransformType: Funct
   }
 };
 
-export const handleFlipElement = (vertical: boolean, selectedElement: Elements, handleClose: Function) => {
+export const handleFlipElement = (vertical: boolean, selectedElement: Elements, handleClose?: Function) => {
   DebugLogger("Handling element flip");
   const element = document.getElementById(selectedElement.id.toString());
 
@@ -88,7 +88,7 @@ export const handleFlipElement = (vertical: boolean, selectedElement: Elements, 
 
   element.style.transform = transformString;
 
-  handleClose();
+  if (handleClose) handleClose();
 };
 
 export const handleResetTransform = (elements: Elements, type: TransformType, handleClose: Function) => {
