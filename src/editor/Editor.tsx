@@ -5,7 +5,7 @@ import { Layers } from "@/components/editor/layers/Layers";
 import { Layouts } from "@/components/editor/Layouts";
 import { Details } from "@/components/editor/Details";
 import { Settings } from "lucide-react";
-import { SelectionButtons } from "@/components/editor/element_picker/SelectionButtons";
+import { ElementPicker } from "@/components/editor/element_picker/ElementPicker";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 
@@ -31,7 +31,7 @@ export const Editor: React.FC = () => {
 
         <FooterLinks />
 
-        <SelectionButtons />
+        <ElementPicker />
 
         <Button
           icon={<Settings className="2xl:w-24 xl:w-18 lg:w-14 md:w-10 sm:w-6 h-auto" />}
