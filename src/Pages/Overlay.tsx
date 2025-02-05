@@ -60,6 +60,7 @@ export const Overlay = (props: IProps) => {
 
   if (disconnected || props.disconnected) {
     DebugLogger("Overlay is disconnected");
+    localStorage.removeItem("stdbToken");
     window.location.reload();
   }
 
