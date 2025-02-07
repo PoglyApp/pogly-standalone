@@ -188,7 +188,7 @@ const useStDB = (
       stdbDomain = "wss://pogly.spacetimedb.com";
     }
 
-    const client = new SpacetimeDBClient(stdbDomain, connectionConfig?.module || "", stdbToken);
+    const client = new SpacetimeDBClient(stdbDomain, connectionConfig?.module || "", isOverlay ? "" : stdbToken);
     let address: Address | undefined;
 
     client?.onConnect((token: string, Identity: Identity, Address: Address) => {
@@ -197,7 +197,7 @@ const useStDB = (
         setAddress(Address);
         address = Address;
         setStdbClient(client);
-        localStorage.setItem("stdbToken", token);
+        if(!isOverlay) localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + Identity.toHexString() + "] @ [" + Address.toHexString() + "]");
         client?.subscribe([
           "SELECT * FROM Heartbeat",
