@@ -8,16 +8,23 @@ import { UserContext } from "./contexts/UserContext.ts";
 import { useState } from "react";
 import { useConnectEvents } from "./spacetimedb/hooks/useConnectEvents.tsx";
 import { UserType } from "./types/UserType.ts";
+import { useGetConnectionConfig } from "./hooks/useGetConnectionConfig.tsx";
+import { ConnectionConfigType } from "./types/config_types/ConnectionConfigType.ts";
+import { ChooseInstanceContainer } from "./components/connection/ChooseInstanceContainer.tsx";
 
 export const App: React.FC = () => {
   const [stdbInit, setStdbInit] = useState<boolean>(false);
   const [authentication, setAuthentication] = useState<boolean>(false);
   const [subscriptionsInit, setSubscriptionsInit] = useState<boolean>(false);
+
+  const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
+
   const stdb = useSpacetimeDB(stdbInit, setStdbInit);
+  useGetConnectionConfig(setConnectionConfig);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const authKey = "password"; // todo
-  const nickname = "testing123" //todo
+  const nickname = "testing123"; //todo
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -39,10 +46,13 @@ export const App: React.FC = () => {
   );
 
   // 1) Check connection settings config & if null then <ChooseInstanceModal>
-  // todo
+  if (!connectionConfig) {
+    return <ChooseInstanceContainer />;
+  }
 
   // 2) Check if spacetime is initialized properly, if yes, register events - check identity, address, error
-  if (!stdb.Identity || !stdb.Address || stdb.Error || !stdb.Client || !stdb.Token) return <>SpacetimeDB is initializing...</>;
+  if (!stdb.Identity || !stdb.Address || stdb.Error || !stdb.Client || !stdb.Token)
+    return <>SpacetimeDB is initializing...</>;
   useConnectEvents(stdb.Client, authKey, setAuthentication);
 
   // 3) Check if spacetime is connected to the instance - check config table for instance settings
@@ -53,12 +63,11 @@ export const App: React.FC = () => {
   stdb.Client.reducers.connect();
 
   // 5) Check if user is authenticated (authentication happens in useConnectEvents)
-  if (!isOverlay && configSettings.authentication && !authentication) return <>Not authenticated! Reload...</> // todo error/reload modal
+  if (!isOverlay && configSettings.authentication && !authentication) return <>Not authenticated! Reload...</>; // todo error/reload modal
 
   // 6) Redo final subscriptions - subscribe to all tables
   if (!subscriptionsInit) {
-    stdb.Client
-      .subscriptionBuilder()
+    stdb.Client.subscriptionBuilder()
       .onApplied(() => {
         setSubscriptionsInit(true);
       })
@@ -71,11 +80,12 @@ export const App: React.FC = () => {
         "SELECT * FROM Permissions",
         "SELECT * FROM Layouts",
       ]);
-      return <>Loading data...</>;
+    return <>Loading data...</>;
   }
-  
+
   // 7) Check if nickname is set, otherwise, set
-  if (stdb.Client.db.guests.address.find(stdb.Address)?.nickname === "") stdb.Client.reducers.updateGuestNickname(nickname);
+  if (stdb.Client.db.guests.address.find(stdb.Address)?.nickname === "")
+    stdb.Client.reducers.updateGuestNickname(nickname);
   //todo nickname modal
 
   // 8) Check if instance is setup, otherwise start first-time-setup modal
@@ -87,8 +97,8 @@ export const App: React.FC = () => {
     Identity: stdb.Identity,
     Token: stdb.Token,
     Nickname: nickname,
-    Client: stdb.Client
-  }
+    Client: stdb.Client,
+  };
 
   return (
     <UserContext.Provider value={user}>
