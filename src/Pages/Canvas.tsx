@@ -1,9 +1,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { styled } from "styled-components";
-import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import { CursorsContainer } from "../Components/Containers/CursorsContainer";
 import { MoveableComponent } from "../Components/General/MoveableComponent";
-import { StreamContainer } from "../Components/Containers/StreamContainer";
+import StreamContainer from "../Components/Containers/StreamContainer";
 import Elements from "../module_bindings/elements";
 import { useElementDataEvents } from "../StDB/Hooks/useElementDataEvents";
 import { useElementsEvents } from "../StDB/Hooks/useElementsEvents";
@@ -40,10 +39,6 @@ import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import Permissions from "../module_bindings/permissions";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { ModalContext } from "../Contexts/ModalContext";
-import { SpotlightModal } from "../Components/Modals/SpotlightModal";
-import BetterTVEmote from "../Types/BetterTVTypes/BetterTVEmoteType";
-import SevenTVEmote from "../Types/SevenTVTypes/SevenTVEmoteType";
-import { useChannelEmotes } from "../Hooks/useChannelEmotes";
 
 interface IProps {
   setActivePage: Function;
@@ -57,7 +52,6 @@ export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { setModals } = useContext(ModalContext);
   const { Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
@@ -111,7 +105,9 @@ export const Canvas = (props: IProps) => {
 
   useNotice(setNoticeMessage);
 
-  useHotkeys(UserInputHandler(layoutContext.activeLayout, selected, selectoTargets, settings.compressPaste, transformRef.current));
+  useHotkeys(
+    UserInputHandler(layoutContext.activeLayout, selected, selectoTargets, settings.compressPaste, transformRef.current)
+  );
 
   useEffect(() => {
     if (!layoutContext.activeLayout) {

@@ -8,9 +8,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   FormControlLabel,
+  InputLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Tab,
   Tabs,
   Typography,
@@ -67,6 +71,9 @@ export const SettingsModal = (props: IProp) => {
   );
   const [urlAsDefault, setUrlAsDefault] = useState<boolean>(
     settings.urlAsDefault != null ? settings.urlAsDefault : false
+  );
+  const [streamQuality, setStreamQuality] = useState<string>(
+    localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "720p60"
   );
 
   // ADVANCED
@@ -144,27 +151,6 @@ export const SettingsModal = (props: IProp) => {
       }
     }
 
-    /*const newOverride = { module: Runtime?.module, override: streamOverride };
-
-    let oldList = JSON.parse(streamOverrides);
-
-    if (streamOverride === "") {
-      oldList = oldList.filter((obj: any) => obj.module !== Runtime?.module);
-    } else {
-      const oldEntry = oldList.find((obj: any) => obj.module === Runtime?.module);
-
-      console.log("test");
-
-      if (oldEntry) {
-        oldEntry.override = streamOverride;
-      } else {
-        oldList.push(newOverride);
-      }
-    }
-    console.log(oldList.filter((obj: any) => obj.module !== Runtime?.module));
-
-    localStorage.setItem("streamOverride", JSON.stringify(oldList));*/
-
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
 
@@ -226,6 +212,12 @@ export const SettingsModal = (props: IProp) => {
       setStreamPlayerInteractable(false);
       stream.style.pointerEvents = "none";
     }
+  };
+
+  const handleStreamQuality = (event: any) => {
+    setStreamQuality(event.target.value);
+    localStorage.setItem("streamQuality", event.target.value);
+    window.location.reload();
   };
 
   const openInNewTab = (url: string) => {
@@ -332,6 +324,29 @@ export const SettingsModal = (props: IProp) => {
                   label="Set URL as default upload type"
                 />
               </div>
+
+              {config.streamingPlatform === "twitch" && (
+                <FormControl fullWidth sx={{ color: "#ffffffa6 !important", marginTop: "15px" }}>
+                  <InputLabel id="qualityselector" sx={{ color: "#ffffffa6", ":focus": { color: "red !important" } }}>
+                    Stream quality
+                  </InputLabel>
+                  <Select
+                    labelId="qualityselector"
+                    label="Stream quality"
+                    value={streamQuality}
+                    onChange={(event) => {
+                      handleStreamQuality(event);
+                    }}
+                    sx={{ ".MuiSvgIcon-root": { fill: "#ffffffa6", "&:focus": { color: "red !important" } } }}
+                  >
+                    <MenuItem value={"chunked"}>1080p60 (Source)</MenuItem>
+                    <MenuItem value={"720p60"}>720p60</MenuItem>
+                    <MenuItem value={"480p"}>480p</MenuItem>
+                    <MenuItem value={"360p"}>360p</MenuItem>
+                    <MenuItem value={"160p"}>160p</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
 
               {props.onlineVersion !== `${process.env.REACT_APP_VERSION}` && (
                 <Alert

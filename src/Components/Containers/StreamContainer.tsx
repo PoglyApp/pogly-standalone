@@ -1,10 +1,10 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import Config from "../../module_bindings/config";
-import { TwitchPlayerNonInteractive } from "react-twitch-embed";
+import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
-export const StreamContainer = () => {
+const StreamContainer = () => {
   const config: Config = useContext(ConfigContext);
   const { Runtime } = useSpacetimeContext();
 
@@ -19,22 +19,25 @@ export const StreamContainer = () => {
 
     if (!currentOverride) return;
 
-    console.log(currentOverride.override);
-
     setStreamOverride(currentOverride.override);
   }, [Runtime]);
+
+  const streamOnReady = (player: TwitchPlayerInstance) => {
+    player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
+  };
 
   return (
     <>
       {config.streamingPlatform === "twitch" && !streamOverride && (
-        <TwitchPlayerNonInteractive
-          style={{ zIndex: 0, pointerEvents: "none" }}
+        <TwitchPlayer
+          style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
           height="100%"
           width="100%"
           id="stream"
           channel={config.streamName}
           autoplay
           muted
+          onReady={streamOnReady}
         />
       )}
 
@@ -70,9 +73,11 @@ export const StreamContainer = () => {
           id="stream"
           src={streamOverride}
           allowFullScreen
-          title="KickStream"
+          title="OverrideStream"
         />
       )}
     </>
   );
 };
+
+export default memo(StreamContainer, (prevProps, nextProps) => true);
