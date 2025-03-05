@@ -99,6 +99,9 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/greywolf" rel="noreferrer" target="_blank" title="greywolf"><img src="./images/streamers/greywolf.svg" /></a>
 <a href="https://www.twitch.tv/shyfox_vr" rel="noreferrer" target="_blank" title="shyfox_vr"><img src="./images/streamers/shyfoxvr.svg" /></a>
 <a href="https://www.twitch.tv/supertf" rel="noreferrer" target="_blank" title="supertf"><img src="./images/streamers/supertf.svg" /></a>
+<a href="https://www.twitch.tv/amedoll" rel="noreferrer" target="_blank" title="AmeDoll"><img src="./images/streamers/amedoll.svg" /></a>
+<a href="https://www.twitch.tv/sakurasassi" rel="noreferrer" target="_blank" title="SakuraSassi"><img src="./images/streamers/sakurasassi.svg" /></a>
+<a href="https://www.twitch.tv/asby" rel="noreferrer" target="_blank" title="Asby"><img src="./images/streamers/asby.svg" /></a>
 
 ## Contributing
 
