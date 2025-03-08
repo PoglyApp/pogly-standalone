@@ -100,6 +100,8 @@ import { KickGuest } from "./kick_guest_reducer.ts";
 export { KickGuest };
 import { KickSelf } from "./kick_self_reducer.ts";
 export { KickSelf };
+import { PingHeartbeat } from "./ping_heartbeat_reducer.ts";
+export { PingHeartbeat };
 import { SendMessage } from "./send_message_reducer.ts";
 export { SendMessage };
 import { SetConfig } from "./set_config_reducer.ts";
@@ -480,6 +482,10 @@ const REMOTE_MODULE = {
       reducerName: "KickSelf",
       argsType: KickSelf.getTypeScriptAlgebraicType(),
     },
+    PingHeartbeat: {
+      reducerName: "PingHeartbeat",
+      argsType: PingHeartbeat.getTypeScriptAlgebraicType(),
+    },
     SendMessage: {
       reducerName: "SendMessage",
       argsType: SendMessage.getTypeScriptAlgebraicType(),
@@ -721,6 +727,7 @@ export type Reducer = never
 | { name: "KeepAlive", args: KeepAlive }
 | { name: "KickGuest", args: KickGuest }
 | { name: "KickSelf", args: KickSelf }
+| { name: "PingHeartbeat", args: PingHeartbeat }
 | { name: "SendMessage", args: SendMessage }
 | { name: "SetConfig", args: SetConfig }
 | { name: "SetIdentityPermission", args: SetIdentityPermission }
@@ -1281,6 +1288,18 @@ export class RemoteReducers {
 
   removeOnKickSelf(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("KickSelf", callback);
+  }
+
+  pingHeartbeat() {
+    this.connection.callReducer("PingHeartbeat", new Uint8Array(0), this.setCallReducerFlags.pingHeartbeatFlags);
+  }
+
+  onPingHeartbeat(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("PingHeartbeat", callback);
+  }
+
+  removeOnPingHeartbeat(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("PingHeartbeat", callback);
   }
 
   sendMessage(chatMessage: string) {
@@ -2164,6 +2183,11 @@ export class SetReducerFlags {
   kickSelfFlags: CallReducerFlags = 'FullUpdate';
   kickSelf(flags: CallReducerFlags) {
     this.kickSelfFlags = flags;
+  }
+
+  pingHeartbeatFlags: CallReducerFlags = 'FullUpdate';
+  pingHeartbeat(flags: CallReducerFlags) {
+    this.pingHeartbeatFlags = flags;
   }
 
   sendMessageFlags: CallReducerFlags = 'FullUpdate';

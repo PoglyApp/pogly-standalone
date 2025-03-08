@@ -139,4 +139,10 @@ static partial class Module
             Log.Error("Encountered error with heartbeat: " + e.Message);
         }
     }
+
+    [Reducer]
+    public static void PingHeartbeat(ReducerContext ctx)
+    {
+        //do nothing
+    }
 }
