@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SpacetimeDBClient, Identity, Address } from "@clockworklabs/spacetimedb-sdk";
+import { DbConnectionImpl, Identity, ConnectionId} from "@clockworklabs/spacetimedb-sdk";
 import Heartbeat from "../module_bindings/heartbeat";
 import Guests from "../module_bindings/guests";
 import Elements from "../module_bindings/elements";
@@ -92,11 +92,11 @@ const useStDB = (
   setInstanceConfigured: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
-  const [address, setAddress] = useState<Address>();
+  const [address, setAddress] = useState<ConnectionId>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
-  const [stdbClient, setStdbClient] = useState<SpacetimeDBClient>();
+  const [stdbClient, setStdbClient] = useState<Db>();
 
   useEffect(() => {
     if (!connectionConfig) return;
