@@ -1,14 +1,11 @@
-﻿using System.Net;
-using System.Runtime.InteropServices.JavaScript;
-using SpacetimeDB;
-using static SpacetimeDB.Runtime;
+﻿using SpacetimeDB;
 
 public partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Heartbeat")]
     public partial struct Heartbeat
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        [PrimaryKey]
         public uint Id;
         
         public Identity ServerIdentity;
@@ -16,13 +13,17 @@ public partial class Module
         public int Tick;
     }
 
-    [SpacetimeDB.Table(Public = false, Scheduled = "KeepAlive")]
-    public partial struct KeepAliveWorker { }
+    [Table(Public = false, Scheduled = "KeepAlive", Name = "KeepAliveWorker")]
+    public partial struct KeepAliveWorker
+    {
+        [PrimaryKey] [AutoInc] public ulong Id;
+        public ScheduleAt ScheduledAt;
+    }
     
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Config")]
     public partial struct Config
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        [PrimaryKey]
         public uint Version;
 
         public Identity OwnerIdentity;
@@ -37,22 +38,19 @@ public partial class Module
         public bool ConfigInit;
     }
 
-    [SpacetimeDB.Table(Public = false)]
-    public partial struct _AuthenticationKey
+    [Table(Public = false, Name = "AuthenticationKey")]
+    public partial struct AuthenticationKey
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        [PrimaryKey]
         public uint Version;
 
         public string Key;
     }
     
-    // [SpacetimeDB.Table(Public = false, Scheduled = "AuthenticateDoWork")]
-    // public partial struct AuthenticationWorker { }
-    
-    [SpacetimeDB.Table(Public = false)]
+    [Table(Public = false, Name = "ZIndex")]
     public partial struct ZIndex
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        [PrimaryKey]
         public uint Version;
 
         public int Min;

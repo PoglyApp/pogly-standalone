@@ -2,7 +2,7 @@
 
 public partial class Module
 {
-    [SpacetimeDB.Type]
+    [Type]
     public enum PermissionLevel
     {
         None,

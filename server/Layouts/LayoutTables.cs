@@ -1,17 +1,18 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Layouts")]
     public partial struct Layouts
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
+        [PrimaryKey]
+        [AutoInc]
         public uint Id;
 
         public string Name;
         public string CreatedBy;
 
+        [SpacetimeDB.Index.BTree(Name = "ActiveLayout")]
         public bool Active;
     }
 }

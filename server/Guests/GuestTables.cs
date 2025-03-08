@@ -1,13 +1,12 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Guests")]
     public partial struct Guests
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
-        public Address Address;
+        [PrimaryKey]
+        public ConnectionId Address;
         
         public Identity Identity;
 
@@ -22,10 +21,10 @@ public partial class Module
         public bool Authenticated;
     }
 
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Permissions")]
     public partial struct Permissions
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+        [PrimaryKey]
         public Identity Identity;
 
         public PermissionLevel PermissionLevel;
