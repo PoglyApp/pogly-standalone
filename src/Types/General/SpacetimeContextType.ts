@@ -1,9 +1,9 @@
-import { Identity, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
-import Guests from "../../module_bindings/guests";
+import { Identity } from "@clockworklabs/spacetimedb-sdk";
 import { ConnectionConfigType } from "../ConfigTypes/ConnectionConfigType";
+import { DbConnection, Guests } from "../../module_bindings";
 
 export type SpacetimeContextType = {
-  Client: SpacetimeDBClient;
+  Client: DbConnection;
   Identity: Guests;
   Runtime: ConnectionConfigType | undefined;
   Elements: number[];

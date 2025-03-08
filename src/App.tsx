@@ -16,7 +16,6 @@ import { SetNicknameModal } from "./Components/Modals/SetNicknameModal";
 import { ToastContainer } from "react-toastify";
 import { useGetVersionNumber } from "./Hooks/useGetVersionNumber";
 import { Loading } from "./Components/General/Loading";
-import Guests from "./module_bindings/guests";
 import { ErrorRefreshModal } from "./Components/Modals/ErrorRefreshModal";
 import { SetSubscriptions } from "./Utility/SetSubscriptions";
 import { SpacetimeContext } from "./Contexts/SpacetimeContext";
@@ -24,16 +23,13 @@ import { ConfigContext } from "./Contexts/ConfigContext";
 import { SettingsContext } from "./Contexts/SettingsContext";
 import { ModalContext } from "./Contexts/ModalContext";
 import { CanvasInitializedType } from "./Types/General/CanvasInitializedType";
-import UpdateGuestNicknameReducer from "./module_bindings/update_guest_nickname_reducer";
 import { NotFound } from "./Pages/NotFound";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
-import Layouts from "./module_bindings/layouts";
 import { LayoutContext } from "./Contexts/LayoutContext";
-import ConnectReducer from "./module_bindings/connect_reducer";
-import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 import { DebugLogger } from "./Utility/DebugLogger";
 import { StartHeartbeat } from "./Utility/PingHeartbeat";
 import { Error } from "./Pages/Error";
+import { Guests, Layouts } from "./module_bindings";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -86,7 +82,6 @@ export const App: React.FC = () => {
     connectionConfig,
     setStdbConnected,
     setStdbAuthenticated,
-    setStdbInitialized,
     setInstanceConfigured
   );
 
@@ -103,13 +98,13 @@ export const App: React.FC = () => {
     const nickname: string = localStorage.getItem("nickname") || "";
 
     if (nickname) {
-      UpdateGuestNicknameReducer.call(nickname);
+      spacetime.Client.reducers.updateGuestNickname(nickname);
 
       setNickname(nickname);
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = Guests.findByAddress(spacetime.Address);
+    const guest = spacetime.Client.db.guests.address.find(spacetime.Address);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
@@ -131,8 +126,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (isWidget) return;
     if (!stdbInitialized) return;
+    if (!spacetime.Client) return;
+
     DebugLogger("Setting active layout");
-    if (!activeLayout) setActiveLayout(Layouts.filterByActive(true).next().value);
+
+    if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find(l => l.active === true));
   }, [activeLayout, stdbInitialized, isWidget]);
 
   const router = createBrowserRouter(
@@ -257,7 +255,7 @@ export const App: React.FC = () => {
       );
     }
 
-    const alreadyLogged = Guests.findByAddress(spacetime.Address);
+    const alreadyLogged = spacetime.Client.db.guests.address.find(spacetime.Address);
 
     if (!isOverlay && alreadyLogged) {
       DebugLogger("Guest already logged in");
@@ -274,7 +272,7 @@ export const App: React.FC = () => {
       );
     }
 
-    ConnectReducer.call();
+    spacetime.Client.reducers.connect();
 
     return <Loading text="Connecting to Instance" />;
   }
@@ -300,7 +298,7 @@ export const App: React.FC = () => {
 
     if (!stdbAuthenticated) {
       DebugLogger("Not authenticated");
-      if (spacetime.InstanceConfig.authentication) AuthenticateReducer.call(connectionConfig.authKey);
+      if (spacetime.InstanceConfig.authentication) spacetime.Client.reducers.authenticate(connectionConfig.authKey);
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
         setStdbAuthTimeout(!stdbAuthenticatedRef.current);
@@ -318,7 +316,7 @@ export const App: React.FC = () => {
     DebugLogger("Starting Client->Server heartbeat!");
     StartHeartbeat();
     DebugLogger("Redoing subscriptions");
-    SetSubscriptions(spacetime.Client, setStdbSubscriptions);
+    SetSubscriptions(spacetime.Client, setStdbInitialized, setStdbSubscriptions);
   }
 
   // Step 6) Is SpacetimeDB fully initialized?
