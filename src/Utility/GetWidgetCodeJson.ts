@@ -1,10 +1,15 @@
-import ElementData from "../module_bindings/element_data";
+import { useContext } from "react";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import { DebugLogger } from "./DebugLogger";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const GetWidgetCodeJsonByElementDataID = (elementDataId: number) => {
+  const spacetime = useContext(SpacetimeContext);
+  if(!spacetime?.Client) return;
+
   DebugLogger("Getting widget code JSON by element data ID");
-  const widgetData = ElementData.findById(elementDataId);
+  const widgetData = spacetime.Client.db.elementData.id.find(elementDataId);
+  
   if (!widgetData) return;
   const jsonObject = JSON.parse(widgetData.data);
 

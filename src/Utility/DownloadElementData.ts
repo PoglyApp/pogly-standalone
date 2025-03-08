@@ -1,8 +1,7 @@
-import ElementData from "../module_bindings/element_data";
-import Elements from "../module_bindings/elements";
-import Layouts from "../module_bindings/layouts";
-import Config from "../module_bindings/config";
+import { useContext } from "react";
+import { Config } from "../module_bindings";
 import { DebugLogger } from "./DebugLogger";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const DownloadElementData = (
   downData: boolean,
@@ -13,10 +12,13 @@ export const DownloadElementData = (
   setModals: any,
   closeModal: any
 ) => {
+  const spacetime = useContext(SpacetimeContext);
+  if(!spacetime?.Client) return;
+
   DebugLogger("Downloading element data");
-  const blobData = JSON.stringify(ElementData.all());
-  const blobElements = JSON.stringify(Elements.all());
-  const blobLayouts = JSON.stringify(Layouts.all());
+  const blobData = JSON.stringify(spacetime.Client.db.elementData.iter());
+  const blobElements = JSON.stringify(spacetime.Client.db.elements.iter());
+  const blobLayouts = JSON.stringify(spacetime.Client.db.layouts.iter());
 
   const data = new Blob(
     [

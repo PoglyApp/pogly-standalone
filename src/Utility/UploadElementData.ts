@@ -1,16 +1,12 @@
-import AddElementDataArrayWithIdReducer from "../module_bindings/add_element_data_array_with_id_reducer";
-import AddElementDataReducer from "../module_bindings/add_element_data_reducer";
-import AddElementDataWithIdReducer from "../module_bindings/add_element_data_with_id_reducer";
-import AddElementToLayoutReducer from "../module_bindings/add_element_to_layout_reducer";
-import AddLayoutWithIdReducer from "../module_bindings/add_layout_with_id_reducer";
-import ElementData from "../module_bindings/element_data";
-import ElementStruct from "../module_bindings/element_struct";
-import Elements from "../module_bindings/elements";
-import ImageElementData from "../module_bindings/image_element_data";
-import Layouts from "../module_bindings/layouts";
+import { useContext } from "react";
 import { DebugLogger } from "./DebugLogger";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { ElementData, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 
 export const UploadElementDataFromFile = (backupFile: any) => {
+  const spacetime = useContext(SpacetimeContext);
+  if(!spacetime?.Client) return;
+
   DebugLogger("Uploading element data from file");
   let reader = new FileReader();
   let data;
@@ -24,7 +20,7 @@ export const UploadElementDataFromFile = (backupFile: any) => {
     data = reader.result.toString();
     var elements = JSON.parse(data) as any[];
     elements.forEach((e) => {
-      AddElementDataReducer.call(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+      spacetime.Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
     });
   };
 
@@ -35,14 +31,20 @@ export const UploadElementDataFromFile = (backupFile: any) => {
 };
 
 export const UploadElementDataFromString = (data: string) => {
+  const spacetime = useContext(SpacetimeContext);
+  if(!spacetime?.Client) return;
+
   DebugLogger("Uploading element data from string");
   var elements = JSON.parse(data) as any[];
   elements.forEach((e) => {
-    AddElementDataReducer.call(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+    spacetime.Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
   });
 };
 
 export const UploadBackupFromFile = (backupFile: any) => {
+  const spacetime = useContext(SpacetimeContext);
+  if(!spacetime?.Client) return;
+
   DebugLogger("Uploading backup from a file");
   let reader = new FileReader();
   let data;
@@ -62,10 +64,10 @@ export const UploadBackupFromFile = (backupFile: any) => {
 
     let maxLayout = 0;
     let maxData = 0;
-    Layouts.all().forEach((l) => {
+    Array.from(spacetime.Client.db.layouts.iter()).forEach((l: Layouts) => {
       if (l.id > maxLayout) maxLayout = l.id;
     });
-    ElementData.all().forEach((d) => {
+    Array.from(spacetime.Client.db.elementData.iter()).forEach((d: ElementData) => {
       if (d.id > maxData) maxData = d.id;
     });
 
@@ -73,9 +75,9 @@ export const UploadBackupFromFile = (backupFile: any) => {
       const upData: ElementData[] = JSON.parse(backup.data) as ElementData[];
       upData.forEach((e) => {
         if(e.byteArray) {
-          AddElementDataArrayWithIdReducer.call(e.id, e.name, e.dataType, e.data, e.byteArray, e.dataWidth || 128, e.dataHeight || 128);
+          spacetime.Client.reducers.addElementDataArrayWithId(e.id, e.name, e.dataType, e.data, e.byteArray, e.dataWidth || 128, e.dataHeight || 128);
         } else {
-          AddElementDataWithIdReducer.call(e.id, e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+          spacetime.Client.reducers.addElementDataWithId(e.id, e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
         }
       });
     }
@@ -83,7 +85,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
     if (backup.layouts) {
       const upLayouts: Layouts[] = JSON.parse(backup.layouts) as Layouts[];
       upLayouts.reverse().forEach((e) => {
-        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") AddLayoutWithIdReducer.call(e.id, e.name, false);
+        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") spacetime.Client.reducers.addLayoutWithId(e.id, e.name, false);
       });
     }
 
@@ -130,7 +132,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
             break;
         }
 
-        AddElementToLayoutReducer.call(newElementStruct, e.transparency, e.transform, e.clip, layoutId, null);
+        spacetime.Client.reducers.addElementToLayout(newElementStruct, e.transparency, e.transform, e.clip, layoutId, undefined);
       });
     }
   };

@@ -1,20 +1,11 @@
-import Elements from "../module_bindings/elements";
-import ElementData from "../module_bindings/element_data";
 import { updateElementStruct } from "../StDB/Reducers/Update/updateElementStruct";
 import { updateElementTransform } from "../StDB/Reducers/Update/updateElementTransform";
 import { getTransformValues } from "./GetTransformValues";
-import ElementStruct from "../module_bindings/element_struct";
-import UpdateElementStructReducer from "../module_bindings/update_element_struct_reducer";
-import ImageElementData from "../module_bindings/image_element_data";
-import WidgetElement from "../module_bindings/widget_element";
-import DeleteElementReducer from "../module_bindings/delete_element_reducer";
-import DeleteElementDataByIdReducer from "../module_bindings/delete_element_data_by_id_reducer";
-import UpdateElementLockedReducer from "../module_bindings/update_element_locked_reducer";
-import UpdateElementTransparencyReducer from "../module_bindings/update_element_transparency_reducer";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
-import UpdateWidgetElementRawDataReducer from "../module_bindings/update_widget_element_raw_data_reducer";
-import UpdateWidgetElementDataIdReducer from "../module_bindings/update_widget_element_data_id_reducer";
 import { DebugLogger } from "./DebugLogger";
+import { ElementData, Elements, ElementStruct, ImageElementData, WidgetElement } from "../module_bindings";
+import { useContext } from "react";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 interface TransformObject {
   transformFunction: string;
@@ -92,6 +83,8 @@ export const handleFlipElement = (vertical: boolean, selectedElement: Elements, 
 };
 
 export const handleResetTransform = (elements: Elements, type: TransformType, handleClose: Function) => {
+  const spacetime = useContext(SpacetimeContext);
+
   DebugLogger("Handling transform reset");
   const element = document.getElementById(elements.id.toString());
 
@@ -107,7 +100,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
             case "ElementDataId":
               const dataId: ImageElementData.ElementDataId = imageElement.value
                 .imageElementData as ImageElementData.ElementDataId;
-              const imgElementData: ElementData | undefined = ElementData.findById(dataId.value);
+              const imgElementData: ElementData | undefined = spacetime?.Client.db.elementData.id.find(dataId.value);
 
               if (imgElementData !== undefined) {
                 const newWidth = imgElementData.dataWidth;
@@ -151,7 +144,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
 
         case "WidgetElement":
           const widgetElement: ElementStruct = elements.element as ElementStruct.WidgetElement;
-          const wgtElementData: ElementData | undefined = ElementData.findById(widgetElement.value.elementDataId);
+          const wgtElementData: ElementData | undefined = spacetime?.Client.db.elementData.id.find(widgetElement.value.elementDataId);
 
           if (wgtElementData !== undefined) {
             const newWidth = wgtElementData.dataWidth;
@@ -222,20 +215,23 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
 
 export const handleLocked = (selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement) return;
+  const spacetime = useContext(SpacetimeContext);
+
   DebugLogger("Handling locked");
   const lockedBool = document.getElementById(selectedElement.id.toString())?.getAttribute("data-locked") === "true";
 
-  UpdateElementLockedReducer.call(selectedElement.id, !lockedBool);
+  spacetime?.Client.reducers.updateElementLocked(selectedElement.id, !lockedBool);
 
   handleClose();
 };
 
 export const handleToggle = (selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling toggle");
 
   //const size = ViewportToStdbSize(selectedElement.element.value.width,selectedElement.element.value.height);
-  const element = Elements.findById(selectedElement.id);
+  const element = spacetime?.Client.db.elements.id.find(selectedElement.id);
 
   if (!element) return;
 
@@ -246,7 +242,7 @@ export const handleToggle = (selectedElement: Elements, handleClose: Function) =
     rawData: (element.element.value as WidgetElement).rawData,
   });
 
-  UpdateElementStructReducer.call(selectedElement.id, widgetStruct);
+  spacetime?.Client.reducers.updateElementStruct(selectedElement.id, widgetStruct);
   handleClose();
 };
 
@@ -256,34 +252,39 @@ export const handleDelete = (
   setSelectoTargets: Function,
   handleClose: Function
 ) => {
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling element deletion");
-  DeleteElementReducer.call(selectedElement.id);
+  spacetime?.Client.reducers.deleteElement(selectedElement.id);
   setSelected(undefined);
   setSelectoTargets([]);
   handleClose();
 };
 
 export const handleDeleteElementData = (selectedElementData: ElementData, handleClose: Function) => {
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling element data deletion");
-  DeleteElementDataByIdReducer.call(selectedElementData.id);
+  spacetime?.Client.reducers.deleteElementDataById(selectedElementData.id);
   handleClose();
 };
 
 export const handleTransparency = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling element transparency");
   setTransparencyState(value);
-  UpdateElementTransparencyReducer.call(selectedElement.id, value);
+  spacetime?.Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
 export const handleHide = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling element hiding/showing");
   setTransparencyState(value);
-  UpdateElementTransparencyReducer.call(selectedElement.id, value);
+  spacetime?.Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
 export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVariableType, handleClose: Function) => {
+  const spacetime = useContext(SpacetimeContext);
   DebugLogger("Handling widget toggle");
-  const widgetElement: WidgetElement = Elements.findById(selectedElementId)?.element.value as WidgetElement;
+  const widgetElement: WidgetElement = spacetime?.Client.db.elements.id.find(selectedElementId)?.element.value as WidgetElement;
 
   if (widgetElement.rawData) {
     const rawDataJson = JSON.parse(widgetElement.rawData);
@@ -293,9 +294,9 @@ export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVa
 
     rawDataJson.variables[variableIndex].variableValue = !rawDataJson.variables[variableIndex].variableValue;
 
-    UpdateWidgetElementRawDataReducer.call(selectedElementId, JSON.stringify(rawDataJson));
+    spacetime?.Client.reducers.updateWidgetElementRawData(selectedElementId, JSON.stringify(rawDataJson));
   } else {
-    const elementData: ElementData = ElementData.findById(widgetElement.elementDataId)!;
+    const elementData: ElementData = spacetime?.Client.db.elementData.id.find(widgetElement.elementDataId)!;
 
     const elementDataJson = JSON.parse(elementData.data);
 
@@ -305,8 +306,8 @@ export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVa
 
     elementDataJson.variables[variableIndex].variableValue = !elementDataJson.variables[variableIndex].variableValue;
 
-    UpdateWidgetElementRawDataReducer.call(selectedElementId, JSON.stringify(elementDataJson));
-    UpdateWidgetElementDataIdReducer.call(selectedElementId, elementData.id);
+    spacetime?.Client.reducers.updateWidgetElementRawData(selectedElementId, JSON.stringify(elementDataJson));
+    spacetime?.Client.reducers.updateWidgetElementDataId(selectedElementId, elementData.id);
   }
 
   handleClose();

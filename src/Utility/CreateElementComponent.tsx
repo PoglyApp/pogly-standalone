@@ -1,10 +1,10 @@
-import Elements from "../module_bindings/elements";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { Text } from "../Components/Elements/Text";
 import { Image } from "../Components/Elements/Image";
 import { Widget } from "../Components/Elements/Widget";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { DebugLogger } from "./DebugLogger";
+import { Elements } from "../module_bindings";
 
 export const CreateOffsetElementComponent = (elements: Elements) => {
   DebugLogger("Creating offset element component");

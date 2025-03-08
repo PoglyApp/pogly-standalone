@@ -1,9 +1,14 @@
-import { SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 import { DebugLogger } from "./DebugLogger";
+import { DbConnection } from "../module_bindings";
 
-export const SetSubscriptions = (client: SpacetimeDBClient, setStdbSubscriptions: Function) => {
+export const SetSubscriptions = (client: DbConnection, setStdbInitialized: Function, setStdbSubscriptions: Function) => {
   DebugLogger("Subscribing to tables");
-  client.subscribe([
+  client.subscriptionBuilder()
+    .onApplied(() => {
+      setStdbInitialized(true);
+      setStdbSubscriptions(true);
+    })
+    .subscribe([
     "SELECT * FROM Heartbeat",
     "SELECT * FROM Guests",
     "SELECT * FROM Elements",
@@ -11,7 +16,6 @@ export const SetSubscriptions = (client: SpacetimeDBClient, setStdbSubscriptions
     "SELECT * FROM Config",
     "SELECT * FROM Permissions",
     "SELECT * FROM Layouts",
-  ]);
-  setStdbSubscriptions(true);
+    ]);
   return true;
 };

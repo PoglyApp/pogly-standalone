@@ -1,4 +1,4 @@
-import ElementData from "../module_bindings/element_data";
+import { ElementData } from "../module_bindings";
 
 export const convertDataURIToBinary = (dataURI: any) => {
     var base64Index = dataURI.indexOf(';base64,') + ';base64,'.length;
