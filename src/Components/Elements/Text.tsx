@@ -73,6 +73,7 @@ export const Text = (props: IProp) => {
         backgroundColor: props.elements.transparency / 100 <= 0.2 && !isOverlay ? "rgba(245, 39, 39, 0.8)" : "",
         textShadow: textShadow,
         WebkitTextStroke: textOutline,
+        whiteSpace: "nowrap",
         ...customCss,
       }}
       onDoubleClick={showTextCreationModal}
