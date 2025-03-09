@@ -54,6 +54,8 @@ import { Authenticate } from "./authenticate_reducer.ts";
 export { Authenticate };
 import { ClearIdentityPermission } from "./clear_identity_permission_reducer.ts";
 export { ClearIdentityPermission };
+import { ClearRefreshOverlayRequests } from "./clear_refresh_overlay_requests_reducer.ts";
+export { ClearRefreshOverlayRequests };
 import { CompleteOverlayCommand } from "./complete_overlay_command_reducer.ts";
 export { CompleteOverlayCommand };
 import { Connect } from "./connect_reducer.ts";
@@ -102,6 +104,10 @@ import { KickSelf } from "./kick_self_reducer.ts";
 export { KickSelf };
 import { PingHeartbeat } from "./ping_heartbeat_reducer.ts";
 export { PingHeartbeat };
+import { RefreshOverlay } from "./refresh_overlay_reducer.ts";
+export { RefreshOverlay };
+import { RefreshOverlayClearStorage } from "./refresh_overlay_clear_storage_reducer.ts";
+export { RefreshOverlayClearStorage };
 import { SendMessage } from "./send_message_reducer.ts";
 export { SendMessage };
 import { SetConfig } from "./set_config_reducer.ts";
@@ -390,6 +396,10 @@ const REMOTE_MODULE = {
       reducerName: "ClearIdentityPermission",
       argsType: ClearIdentityPermission.getTypeScriptAlgebraicType(),
     },
+    ClearRefreshOverlayRequests: {
+      reducerName: "ClearRefreshOverlayRequests",
+      argsType: ClearRefreshOverlayRequests.getTypeScriptAlgebraicType(),
+    },
     CompleteOverlayCommand: {
       reducerName: "CompleteOverlayCommand",
       argsType: CompleteOverlayCommand.getTypeScriptAlgebraicType(),
@@ -485,6 +495,14 @@ const REMOTE_MODULE = {
     PingHeartbeat: {
       reducerName: "PingHeartbeat",
       argsType: PingHeartbeat.getTypeScriptAlgebraicType(),
+    },
+    RefreshOverlay: {
+      reducerName: "RefreshOverlay",
+      argsType: RefreshOverlay.getTypeScriptAlgebraicType(),
+    },
+    RefreshOverlayClearStorage: {
+      reducerName: "RefreshOverlayClearStorage",
+      argsType: RefreshOverlayClearStorage.getTypeScriptAlgebraicType(),
     },
     SendMessage: {
       reducerName: "SendMessage",
@@ -704,6 +722,7 @@ export type Reducer = never
 | { name: "AddLayoutWithId", args: AddLayoutWithId }
 | { name: "Authenticate", args: Authenticate }
 | { name: "ClearIdentityPermission", args: ClearIdentityPermission }
+| { name: "ClearRefreshOverlayRequests", args: ClearRefreshOverlayRequests }
 | { name: "CompleteOverlayCommand", args: CompleteOverlayCommand }
 | { name: "Connect", args: Connect }
 | { name: "DeleteAllElementData", args: DeleteAllElementData }
@@ -728,6 +747,8 @@ export type Reducer = never
 | { name: "KickGuest", args: KickGuest }
 | { name: "KickSelf", args: KickSelf }
 | { name: "PingHeartbeat", args: PingHeartbeat }
+| { name: "RefreshOverlay", args: RefreshOverlay }
+| { name: "RefreshOverlayClearStorage", args: RefreshOverlayClearStorage }
 | { name: "SendMessage", args: SendMessage }
 | { name: "SetConfig", args: SetConfig }
 | { name: "SetIdentityPermission", args: SetIdentityPermission }
@@ -952,6 +973,18 @@ export class RemoteReducers {
 
   removeOnClearIdentityPermission(callback: (ctx: ReducerEventContext, identity: Identity) => void) {
     this.connection.offReducer("ClearIdentityPermission", callback);
+  }
+
+  clearRefreshOverlayRequests() {
+    this.connection.callReducer("ClearRefreshOverlayRequests", new Uint8Array(0), this.setCallReducerFlags.clearRefreshOverlayRequestsFlags);
+  }
+
+  onClearRefreshOverlayRequests(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("ClearRefreshOverlayRequests", callback);
+  }
+
+  removeOnClearRefreshOverlayRequests(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("ClearRefreshOverlayRequests", callback);
   }
 
   completeOverlayCommand(commandId: number) {
@@ -1300,6 +1333,30 @@ export class RemoteReducers {
 
   removeOnPingHeartbeat(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("PingHeartbeat", callback);
+  }
+
+  refreshOverlay() {
+    this.connection.callReducer("RefreshOverlay", new Uint8Array(0), this.setCallReducerFlags.refreshOverlayFlags);
+  }
+
+  onRefreshOverlay(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("RefreshOverlay", callback);
+  }
+
+  removeOnRefreshOverlay(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("RefreshOverlay", callback);
+  }
+
+  refreshOverlayClearStorage() {
+    this.connection.callReducer("RefreshOverlayClearStorage", new Uint8Array(0), this.setCallReducerFlags.refreshOverlayClearStorageFlags);
+  }
+
+  onRefreshOverlayClearStorage(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("RefreshOverlayClearStorage", callback);
+  }
+
+  removeOnRefreshOverlayClearStorage(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("RefreshOverlayClearStorage", callback);
   }
 
   sendMessage(chatMessage: string) {
@@ -2080,6 +2137,11 @@ export class SetReducerFlags {
     this.clearIdentityPermissionFlags = flags;
   }
 
+  clearRefreshOverlayRequestsFlags: CallReducerFlags = 'FullUpdate';
+  clearRefreshOverlayRequests(flags: CallReducerFlags) {
+    this.clearRefreshOverlayRequestsFlags = flags;
+  }
+
   completeOverlayCommandFlags: CallReducerFlags = 'FullUpdate';
   completeOverlayCommand(flags: CallReducerFlags) {
     this.completeOverlayCommandFlags = flags;
@@ -2188,6 +2250,16 @@ export class SetReducerFlags {
   pingHeartbeatFlags: CallReducerFlags = 'FullUpdate';
   pingHeartbeat(flags: CallReducerFlags) {
     this.pingHeartbeatFlags = flags;
+  }
+
+  refreshOverlayFlags: CallReducerFlags = 'FullUpdate';
+  refreshOverlay(flags: CallReducerFlags) {
+    this.refreshOverlayFlags = flags;
+  }
+
+  refreshOverlayClearStorageFlags: CallReducerFlags = 'FullUpdate';
+  refreshOverlayClearStorage(flags: CallReducerFlags) {
+    this.refreshOverlayClearStorageFlags = flags;
   }
 
   sendMessageFlags: CallReducerFlags = 'FullUpdate';
