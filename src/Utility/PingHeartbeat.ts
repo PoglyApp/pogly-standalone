@@ -1,9 +1,8 @@
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { DbConnection } from "../module_bindings";
 
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
-export const StartHeartbeat = () => {
-  const { Client } = useSpacetimeContext();
+export const StartHeartbeat = (Client: DbConnection) => {
 
   if (heartbeatInterval) {
     //console.warn("Heartbeat already running.");

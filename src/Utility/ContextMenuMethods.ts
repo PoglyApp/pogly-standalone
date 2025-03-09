@@ -3,7 +3,7 @@ import { updateElementTransform } from "../StDB/Reducers/Update/updateElementTra
 import { getTransformValues } from "./GetTransformValues";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import { DebugLogger } from "./DebugLogger";
-import { ElementData, Elements, ElementStruct, ImageElementData, WidgetElement } from "../module_bindings";
+import { DbConnection, ElementData, Elements, ElementStruct, ImageElementData, WidgetElement } from "../module_bindings";
 import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 interface TransformObject {
@@ -48,7 +48,7 @@ export const handleEditTransform = (type: TransformType, setTransformType: Funct
   }
 };
 
-export const handleFlipElement = (vertical: boolean, selectedElement: Elements, handleClose?: Function) => {
+export const handleFlipElement = (Client: DbConnection,vertical: boolean, selectedElement: Elements, handleClose?: Function) => {
   DebugLogger("Handling element flip");
   const element = document.getElementById(selectedElement.id.toString());
 
@@ -74,16 +74,14 @@ export const handleFlipElement = (vertical: boolean, selectedElement: Elements, 
 
   const transformString = updatedTransform.map((obj) => `${obj.transformFunction}(${obj.transformValue})`).join(" ");
 
-  updateElementTransform(selectedElement.id, transformString);
+  updateElementTransform(Client, selectedElement.id, transformString);
 
   element.style.transform = transformString;
 
   if (handleClose) handleClose();
 };
 
-export const handleResetTransform = (elements: Elements, type: TransformType, handleClose: Function) => {
-  const { Client } = useSpacetimeContext();
-
+export const handleResetTransform = (Client: DbConnection, elements: Elements, type: TransformType, handleClose: Function) => {
   DebugLogger("Handling transform reset");
   const element = document.getElementById(elements.id.toString());
 
@@ -182,7 +180,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
         .map((obj) => (obj ? `${obj.transformFunction}(${obj.transformValue})` : null))
         .join(" ");
 
-      updateElementTransform(elements.id, transformString_Rotation);
+      updateElementTransform(Client, elements.id, transformString_Rotation);
 
       element.style.transform = transformString_Rotation;
       break;
@@ -212,9 +210,8 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
   handleClose();
 };
 
-export const handleLocked = (selectedElement: Elements, handleClose: Function) => {
+export const handleLocked = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement) return;
-  const { Client } = useSpacetimeContext();
 
   DebugLogger("Handling locked");
   const lockedBool = document.getElementById(selectedElement.id.toString())?.getAttribute("data-locked") === "true";
@@ -224,9 +221,8 @@ export const handleLocked = (selectedElement: Elements, handleClose: Function) =
   handleClose();
 };
 
-export const handleToggle = (selectedElement: Elements, handleClose: Function) => {
+export const handleToggle = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
-  const { Client } = useSpacetimeContext();
   DebugLogger("Handling toggle");
 
   //const size = ViewportToStdbSize(selectedElement.element.value.width,selectedElement.element.value.height);
@@ -246,12 +242,12 @@ export const handleToggle = (selectedElement: Elements, handleClose: Function) =
 };
 
 export const handleDelete = (
+  Client: DbConnection,
   selectedElement: Elements,
   setSelected: Function,
   setSelectoTargets: Function,
   handleClose: Function
 ) => {
-  const { Client } = useSpacetimeContext();
   DebugLogger("Handling element deletion");
   Client.reducers.deleteElement(selectedElement.id);
   setSelected(undefined);
@@ -259,29 +255,25 @@ export const handleDelete = (
   handleClose();
 };
 
-export const handleDeleteElementData = (selectedElementData: ElementData, handleClose: Function) => {
-  const { Client } = useSpacetimeContext();
+export const handleDeleteElementData = (Client: DbConnection, selectedElementData: ElementData, handleClose: Function) => {
   DebugLogger("Handling element data deletion");
   Client.reducers.deleteElementDataById(selectedElementData.id);
   handleClose();
 };
 
-export const handleTransparency = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
-  const { Client } = useSpacetimeContext();
+export const handleTransparency = (Client: DbConnection, selectedElement: Elements, setTransparencyState: Function, value: any) => {
   DebugLogger("Handling element transparency");
   setTransparencyState(value);
   Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
-export const handleHide = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
-  const { Client } = useSpacetimeContext();
+export const handleHide = (Client: DbConnection, selectedElement: Elements, setTransparencyState: Function, value: any) => {
   DebugLogger("Handling element hiding/showing");
   setTransparencyState(value);
   Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
-export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVariableType, handleClose: Function) => {
-  const { Client } = useSpacetimeContext();
+export const handleWidgetToggle = (Client: DbConnection, selectedElementId: number, variable: WidgetVariableType, handleClose: Function) => {
   DebugLogger("Handling widget toggle");
   const widgetElement: WidgetElement = Client.db.elements.id.find(selectedElementId)?.element.value as WidgetElement;
 

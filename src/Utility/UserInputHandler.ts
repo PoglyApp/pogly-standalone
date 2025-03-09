@@ -292,7 +292,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -342,7 +342,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -392,7 +392,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -442,7 +442,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -492,7 +492,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -543,7 +543,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -593,7 +593,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -643,7 +643,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -794,7 +794,7 @@ export const UserInputHandler = (
     callback: (event: any) => {
       event.preventDefault();
 
-      handleFlipElement(false, selectedElement!.Elements);
+      handleFlipElement(Client, false, selectedElement!.Elements);
     },
   });
 
@@ -805,7 +805,7 @@ export const UserInputHandler = (
     callback: (event: any) => {
       event.preventDefault();
 
-      handleFlipElement(true, selectedElement!.Elements);
+      handleFlipElement(Client, true, selectedElement!.Elements);
     },
   });
 
