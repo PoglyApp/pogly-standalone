@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Identity, ConnectionId} from "@clockworklabs/spacetimedb-sdk";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
 import { Config, DbConnection, ErrorContext } from "../module_bindings";
@@ -13,11 +13,10 @@ const useStDB = (
   setInstanceConfigured: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
-  const [address, setAddress] = useState<ConnectionId>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
-  const [stdbClient, setStdbClient] = useState<DbConnection>();
+  const clientRef = useRef<DbConnection>();
 
   useEffect(() => {
     if (!connectionConfig) return;
@@ -35,8 +34,7 @@ const useStDB = (
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
         setIdentity(identity);
-        setAddress(DbCtx.connectionId);
-        setStdbClient(DbCtx);
+        clientRef.current = DbCtx;
         if(!isOverlay) localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
@@ -75,10 +73,11 @@ const useStDB = (
       .build();
       
     const onSubscriptionsApplied = () => {
+      
       try {
-        if(!stdbClient) return;
+        if(!clientRef.current) return;
 
-        const fetchedConfig = stdbClient.db.config.version.find(0);
+        const fetchedConfig = clientRef.current.db.config.version.find(0);
         
         if(!fetchedConfig) {
           setError(true);
@@ -89,23 +88,22 @@ const useStDB = (
   
         setConfig(fetchedConfig);
   
-        if(!stdbClient.connectionId) {
+        if(!clientRef.current.connectionId) {
           setError(true);
           return;
         }
   
-        SetStdbConnected(client, address!, fetchedConfig, setStdbConnected, setStdbAuthenticated);
+        SetStdbConnected(clientRef.current, fetchedConfig, setStdbConnected, setStdbAuthenticated);
       } catch {
         console.log("initialStateSync failed:", error);
       }
     }
 
-  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbAuthenticated]);
+  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbAuthenticated, error]);
 
   return {
-    Client: stdbClient,
+    Client: clientRef.current,
     Identity: identity,
-    Address: address,
     InstanceConfig: config,
     Error: error,
     Disconnected: disconnected,

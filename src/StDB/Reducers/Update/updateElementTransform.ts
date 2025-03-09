@@ -2,10 +2,9 @@ import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { DbConnection } from "../../../module_bindings";
 
-export const updateElementTransform = (elementId: number, transform: string) => {
-  const { Client } = useSpacetimeContext();
+export const updateElementTransform = (Client: DbConnection, elementId: number, transform: string) => {
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -20,8 +19,7 @@ export const updateElementTransform = (elementId: number, transform: string) => 
   Client.reducers.updateElementTransform(elementId, newTransform);
 };
 
-export const updateElementTransformNoViewportAdjustment = (elementId: number, transform: string) => {
-  const { Client } = useSpacetimeContext();
+export const updateElementTransformNoViewportAdjustment = (Client: DbConnection, elementId: number, transform: string) => {
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,

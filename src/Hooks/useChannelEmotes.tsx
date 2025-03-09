@@ -1,11 +1,11 @@
 import { useContext, useEffect } from "react";
 import SevenTVWrap from "../Utility/SevenTVWrap";
-import Config from "../module_bindings/config";
 import { ConfigContext } from "../Contexts/ConfigContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import BetterTVWrap from "../Utility/BetterTVWrap";
 import SevenTVEmoteType from "../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../Types/BetterTVTypes/BetterTVEmoteType";
+import { Config } from "../module_bindings";
 
 export const useChannelEmotes = (
   setSevenTVEmotes: Function,
