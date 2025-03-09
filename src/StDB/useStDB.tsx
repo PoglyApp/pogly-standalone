@@ -31,8 +31,6 @@ const useStDB = (
     if (isOverlay && stdbDomain === "") {
       stdbDomain = "wss://pogly.spacetimedb.com";
     }
-    
-    let address: ConnectionId | undefined;
 
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
@@ -96,7 +94,7 @@ const useStDB = (
           return;
         }
   
-        SetStdbConnected(client, address, fetchedConfig, setStdbConnected, setStdbAuthenticated);
+        SetStdbConnected(client, address!, fetchedConfig, setStdbConnected, setStdbAuthenticated);
       } catch {
         console.log("initialStateSync failed:", error);
       }
