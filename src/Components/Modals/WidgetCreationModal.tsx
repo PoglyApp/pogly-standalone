@@ -24,15 +24,10 @@ import "prismjs/components/prism-css";
 import "prismjs/themes/prism-solarizedlight.css";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ElementDataType } from "../../Types/General/ElementDataType";
-import DataType from "../../module_bindings/data_type";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
-import ElementData from "../../module_bindings/element_data";
 import { WidgetVariableTable } from "../General/WidgetVariableTable";
-import PermissionLevel from "../../module_bindings/permission_level";
-import Permissions from "../../module_bindings/permissions";
-import Config from "../../module_bindings/config";
 import { updateElementData } from "../../StDB/Reducers/Update/updateElementData";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "styled-components";
@@ -43,12 +38,10 @@ import {
   StringifyRawDataWidgetCode,
 } from "../../Utility/GetWidgetCodeJson";
 import { WidgetVariableType } from "../../Types/General/WidgetVariableType";
-import Elements from "../../module_bindings/elements";
-import WidgetElement from "../../module_bindings/widget_element";
-import ElementStruct from "../../module_bindings/element_struct";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
+import { DataType, ElementStruct, PermissionLevel, WidgetElement } from "../../module_bindings";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -62,7 +55,7 @@ interface IProps {
 }
 
 export const WidgetCreationModal = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [widgetName, setWidgetName] = useState<string>("");
@@ -85,8 +78,8 @@ export const WidgetCreationModal = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
-    StrictMode: Config.findByVersion(0)!.strictMode,
-    Permission: Permissions.findByIdentity(Identity.identity)?.permissionLevel,
+    StrictMode: Client.db.config.version.find(0)!.strictMode,
+    Permission: Client.db.permissions.identity.find(Identity.identity)?.permissionLevel,
   };
 
   const loadByElementDataID = useCallback(() => {
@@ -94,7 +87,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
     try {
       DebugLogger("Loading widget by element data ID");
-      const elementData = ElementData.findById(props.editElementDataId);
+      const elementData = Client.db.elementData.id.find(props.editElementDataId);
       if (!elementData) return;
 
       const jsonObject = JSON.parse(elementData.data);
@@ -120,7 +113,7 @@ export const WidgetCreationModal = (props: IProps) => {
     try {
       DebugLogger("Loading widget by element ID");
 
-      const element = Elements.findById(props.editElementId);
+      const element = Client.db.elements.id.find(props.editElementId);
       if (!element) return;
       const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
@@ -178,7 +171,7 @@ export const WidgetCreationModal = (props: IProps) => {
     try {
       DebugLogger("Saving widget");
       if (props.editElementId) {
-        const element = Elements.findById(props.editElementId);
+        const element = Client.db.elements.id.find(props.editElementId);
         if (!element) return;
         const widgetStruct: ElementStruct = element.element as ElementStruct;
 

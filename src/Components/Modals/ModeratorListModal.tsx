@@ -4,25 +4,26 @@ import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import Permissions from "../../module_bindings/permissions";
-import ClearIdentityPermissionReducer from "../../module_bindings/clear_identity_permission_reducer";
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Permissions } from "../../module_bindings";
 
 export const ModeratorListModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [moderators, setModerators] = useState<Permissions[]>([]);
 
   useEffect(() => {
-    const permissions: Permissions[] = Permissions.all();
+    const permissions: Permissions[] = Array.from(Client.db.permissions.iter());
     const filterModerators = permissions.filter((obj: Permissions) => obj.permissionLevel.tag === "Moderator");
 
     setModerators(() => filterModerators);
   }, []);
 
   const handleDeletePermission = (identity: Identity) => {
-    ClearIdentityPermissionReducer.call(identity);
+    Client.reducers.clearIdentityPermission(identity);
 
     const newList = moderators.filter((mod: Permissions) => mod.identity !== identity);
 

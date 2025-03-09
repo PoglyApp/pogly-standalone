@@ -19,12 +19,8 @@ import {
   Accordion,
 } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
-import ElementStruct from "../../module_bindings/element_struct";
 import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
 import { ModalContext } from "../../Contexts/ModalContext";
-import TextElement from "../../module_bindings/text_element";
-import Elements from "../../module_bindings/elements";
-import UpdateTextElementTextReducer from "../../module_bindings/update_text_element_text_reducer";
 import { updateTextElement } from "../../StDB/Reducers/Update/updateTextElement";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import styled from "styled-components";
@@ -39,6 +35,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { ElementStruct, TextElement } from "../../module_bindings";
 
 interface IProps {
   editElementId?: number;
@@ -55,6 +53,7 @@ const hightlightWithLineNumbers = (input: string, language: any, languageString:
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
+  const { Client } = useSpacetimeContext();
 
   const [text, setText] = useState<string>("");
 
@@ -91,7 +90,7 @@ export const TextCreationModal = (props: IProps) => {
     DebugLogger("Initializing text creation modal");
     if (!props.editElementId) return setShowModal(true);
 
-    const textElement = Elements.findById(props.editElementId);
+    const textElement = Client.db.elements.id.find(props.editElementId);
     if (!textElement) return;
 
     const textStruct: TextElement = textElement.element.value as TextElement;
@@ -160,7 +159,7 @@ export const TextCreationModal = (props: IProps) => {
     setError("");
 
     if (props.editElementId) {
-      UpdateTextElementTextReducer.call(props.editElementId, newText);
+      Client.reducers.updateTextElementText(props.editElementId, newText);
     }
   };
 

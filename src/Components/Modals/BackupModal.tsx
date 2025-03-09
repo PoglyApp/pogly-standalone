@@ -19,10 +19,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
-import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
-import DeleteAllLayoutsReducer from "../../module_bindings/delete_all_layouts_reducer";
-import DeleteAllFoldersReducer from "../../module_bindings/delete_all_folders_reducer";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   download: boolean;
@@ -30,6 +27,7 @@ interface IProps {
 
 export const BackupModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
   const config = useContext(ConfigContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -77,10 +75,10 @@ export const BackupModal = (props: IProps) => {
       closeModal("backup_modal", modals, setModals);
     } else {
       DebugLogger("Uploading backup data - clearing existing data");
-      DeleteAllElementsReducer.call();
-      DeleteAllElementDataReducer.call();
-      DeleteAllLayoutsReducer.call(false);
-      DeleteAllFoldersReducer.call(false);
+      Client.reducers.deleteAllElements();
+      Client.reducers.deleteAllElementData();
+      Client.reducers.deleteAllLayouts(false);
+      Client.reducers.deleteAllFolders(false);
       UploadBackupFromFile(file);
       closeModal("backup_modal", modals, setModals);
     }

@@ -2,7 +2,6 @@ import { Dialog, DialogContent, FormGroup } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { StyledInput } from "../StyledComponents/StyledInput";
-import ElementData from "../../module_bindings/element_data";
 import { useAppSelector } from "../../Store/Features/store";
 import { shallowEqual } from "react-redux";
 import { SpotlightElement } from "../General/SpotlightElement";
@@ -10,12 +9,12 @@ import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import BetterTVWrap from "../../Utility/BetterTVWrap";
 import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../module_bindings/element_struct";
-import ImageElementData from "../../module_bindings/image_element_data";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import SevenTVWrap from "../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
+import { ElementData, ElementStruct, ImageElementData } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmoteType[] | undefined;

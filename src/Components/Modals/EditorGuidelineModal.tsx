@@ -1,18 +1,16 @@
 import { useContext, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import Permissions from "../../module_bindings/permissions";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import Config from "../../module_bindings/config";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import Markdown from "react-markdown";
 import remark from "remark-gfm";
 import styled from "styled-components";
-import UpdateEditorGuidelinesReducer from "../../module_bindings/update_editor_guidelines_reducer";
+import { Config } from "../../module_bindings";
 
 interface IProp {
   setAcceptedGuidelines?: Function;
@@ -22,8 +20,8 @@ export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { Identity, Client } = useSpacetimeContext();
+  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
   const [guidelineText, setGuidelineText] = useState<string>(config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
@@ -39,7 +37,7 @@ export const EditorGuidelineModal = (props: IProp) => {
   const saveGuidelines = () => {
     if (permission && permission.tag !== "Owner") return;
     DebugLogger("Saved editor guidelines");
-    UpdateEditorGuidelinesReducer.call(guidelineText);
+    Client.reducers.updateEditorGuidelines(guidelineText);
     closeModal("guideline_modal", modals, setModals);
   };
 

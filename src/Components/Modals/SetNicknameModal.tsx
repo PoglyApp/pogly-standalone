@@ -1,6 +1,5 @@
 import { Identity } from "@clockworklabs/spacetimedb-sdk";
 import { useEffect, useState } from "react";
-import Guests from "../../module_bindings/guests";
 import {
   Alert,
   Checkbox,
@@ -14,10 +13,11 @@ import {
 } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { StyledButton } from "../StyledComponents/StyledButton";
-import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { DbConnection, Guests } from "../../module_bindings";
 
 interface IProps {
+  client: DbConnection;
   identity?: Identity;
   setNickname: Function;
 }
@@ -41,9 +41,9 @@ export const SetNicknameModal = (props: IProps) => {
     DebugLogger("Handling log in");
     if (!props.identity || !nickname || nickname === "") return;
 
-    const alreadyExists = Array.from(Guests.filterByNickname(nickname));
+    const alreadyExists = Array.from(props.client.db.guests.iter()).find((g: Guests) => g.nickname === nickname);
 
-    if (alreadyExists.length > 0) {
+    if (alreadyExists) {
       DebugLogger("Nickname taken");
       return setError("That nickname is taken.");
     } else {
@@ -52,7 +52,7 @@ export const SetNicknameModal = (props: IProps) => {
 
     if (rememberMe) localStorage.setItem("nickname", nickname);
 
-    UpdateGuestNicknameReducer.call(nickname);
+    props.client.reducers.updateGuestNickname(nickname);
     props.setNickname(nickname);
   };
 

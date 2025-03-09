@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
 import { ElementDataType } from "../../Types/General/ElementDataType";
-import DataType from "../../module_bindings/data_type";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { CompressImage } from "../../Utility/CompressImage";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { DataType } from "../../module_bindings";
 
 interface IProps {
   dragnAndDropFile?: any;

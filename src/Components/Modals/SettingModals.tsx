@@ -33,19 +33,12 @@ import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
-import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import Permissions from "../../module_bindings/permissions";
 import { InstancePasswordModal } from "./InstancePasswordModal";
-import Config from "../../module_bindings/config";
 import { SettingsTabPanel } from "../Settings/SettingsTabPanel";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
-import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
-import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
-import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
-import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
 import { ModeratorListModal } from "./ModeratorListModal";
+import { Config } from "../../module_bindings";
 
 interface IProp {
   onlineVersion: string;
@@ -53,8 +46,8 @@ interface IProp {
 
 export const SettingsModal = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
-  const { Runtime, Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { Runtime, Identity, Client } = useSpacetimeContext();
+  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
 
@@ -105,7 +98,7 @@ export const SettingsModal = (props: IProp) => {
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
-    UpdateGuestNicknameReducer.call(nicknameInput);
+    Client.reducers.updateGuestNickname(nicknameInput);
 
     if (permission && permission.tag === "Owner") {
       const doUpdate =
@@ -115,7 +108,7 @@ export const SettingsModal = (props: IProp) => {
         auth !== config.authentication ||
         strictMode !== config.strictMode;
 
-      if (doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
+      if (doUpdate) Client.reducers.updateConfig(platform, streamName, updateHz, auth, strictMode);
     }
 
     let newSettings = settings;
@@ -553,7 +546,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#b23927" },
                   marginTop: "10px",
                 }}
-                onClick={() => DeleteAllElementsReducer.call()}
+                onClick={() => Client.reducers.deleteAllElements()}
               >
                 Delete all elements
               </Button>
@@ -568,8 +561,8 @@ export const SettingsModal = (props: IProp) => {
                   marginTop: "10px",
                 }}
                 onClick={() => {
-                  DeleteAllElementsReducer.call();
-                  DeleteAllElementDataReducer.call();
+                  Client.reducers.deleteAllElements();
+                  Client.reducers.deleteAllElementData();
                 }}
               >
                 Delete all element data
@@ -584,7 +577,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => RefreshOverlayReducer.call()}
+                onClick={() => Client.reducers.refreshOverlay()}
               >
                 Force refresh canvas
               </Button>
@@ -598,7 +591,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => RefreshOverlayClearStorageReducer.call()}
+                onClick={() => Client.reducers.refreshOverlayClearStorage()}
               >
                 Force hard refresh canvas
               </Button>

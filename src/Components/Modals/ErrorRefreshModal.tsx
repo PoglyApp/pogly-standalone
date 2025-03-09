@@ -2,8 +2,8 @@ import { Dialog, DialogContent, DialogContentText, DialogTitle } from "@mui/mate
 import { useEffect, useState } from "react";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ClearConnectionSettings } from "../../Utility/ClearConnectionSettings";
-import KickSelfReducer from "../../module_bindings/kick_self_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   type: string; //should be "timer" or "button"
@@ -16,6 +16,7 @@ interface IProp {
 }
 
 export const ErrorRefreshModal = (props: IProp) => {
+  const { Client } = useSpacetimeContext();
   const [timer, setTimer] = useState<number>(props.refreshTimer || 5);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -38,7 +39,7 @@ export const ErrorRefreshModal = (props: IProp) => {
 
   const handleClick = () => {
     DebugLogger("Handling refresh click");
-    if (props.kickSelf) KickSelfReducer.call();
+    if (props.kickSelf) Client.reducers.kickSelf();
 
     window.location.reload();
   };

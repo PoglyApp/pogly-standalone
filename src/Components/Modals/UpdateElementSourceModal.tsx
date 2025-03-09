@@ -3,12 +3,9 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
-import Elements from "../../module_bindings/elements";
-import ImageElement from "../../module_bindings/image_element";
-import ElementData from "../../module_bindings/element_data";
-import ImageElementData from "../../module_bindings/image_element_data";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
-import ElementStruct from "../../module_bindings/element_struct";
+import { Elements, ElementStruct, ImageElement, ImageElementData } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   selectedElement: Elements;
@@ -16,6 +13,7 @@ interface IProps {
 
 export const UpdateElementSourceModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [element, setElement] = useState<Elements>();
@@ -25,13 +23,13 @@ export const UpdateElementSourceModal = (props: IProps) => {
     if (!props.selectedElement) return;
     if (props.selectedElement.element.tag !== "ImageElement") return;
 
-    const oldElement: Elements = Elements.findById(props.selectedElement.id)!;
+    const oldElement: Elements = Client.db.elements.id.find(props.selectedElement.id)!;
     setElement(oldElement);
 
     const imageElement = oldElement.element.value as ImageElement;
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
-      setSource(ElementData.findById(imageElement.imageElementData.value)!.data);
+      setSource(Client.db.elementData.id.find(imageElement.imageElementData.value)!.data);
     } else {
       setSource(imageElement.imageElementData.value);
     }

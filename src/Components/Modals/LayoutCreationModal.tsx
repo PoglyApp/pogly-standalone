@@ -2,9 +2,8 @@ import { useContext, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, FormGroup, Button, DialogActions, Alert } from "@mui/material";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
-import AddLayoutReducer from "../../module_bindings/add_layout_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import UpdateLayoutNameReducer from "../../module_bindings/update_layout_name_reducer";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   layoutId?: number;
@@ -12,6 +11,7 @@ interface IProps {
 
 export const LayoutCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
 
   const [layoutName, setLayoutName] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -35,13 +35,13 @@ export const LayoutCreationModal = (props: IProps) => {
 
   const saveLayout = () => {
     DebugLogger("Saving layout");
-    AddLayoutReducer.call(layoutName, false);
+    Client.reducers.addLayout(layoutName, false);
     handleOnClose();
   };
 
   const updateLayout = () => {
     DebugLogger("Updating layout");
-    UpdateLayoutNameReducer.call(props.layoutId!, layoutName);
+    Client.reducers.updateLayoutName(props.layoutId!, layoutName);
     handleOnClose();
   };
 

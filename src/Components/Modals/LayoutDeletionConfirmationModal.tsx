@@ -15,12 +15,12 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
-import Layouts from "../../module_bindings/layouts";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DeleteLayoutReducer from "../../module_bindings/delete_layout_reducer";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Layouts } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   layout: Layouts;
@@ -28,6 +28,7 @@ interface IProp {
 
 export const LayoutDeletionConfirmationModal = (props: IProp) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { Client } = useSpacetimeContext();
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -37,7 +38,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
   const [layouts, setLayouts] = useState<Layouts[]>();
 
   useEffect(() => {
-    const fetchedLayouts = Layouts.all();
+    const fetchedLayouts = Array.from(Client.db.layouts.iter());
     DebugLogger("Fetching layouts for deletion");
 
     setLayouts(() =>
@@ -49,7 +50,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
 
   const handleDeleteLayout = () => {
     DebugLogger("Deleting layout");
-    const doesLayoutStillExist = Layouts.filterById(preserveTo).next().value;
+    const doesLayoutStillExist = Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.id === preserveTo);
 
     if (!doesLayoutStillExist) {
       DebugLogger("Layout no longer exists");
@@ -65,7 +66,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
       });
     }
 
-    DeleteLayoutReducer.call(props.layout.id, preserveElements, preserveTo);
+    Client.reducers.deleteLayout(props.layout.id, preserveElements, preserveTo);
     handleOnClose();
   };
 

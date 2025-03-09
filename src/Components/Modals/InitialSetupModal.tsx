@@ -13,15 +13,15 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import Config from "../../module_bindings/config";
-import SetConfigReducer from "../../module_bindings/set_config_reducer";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigType";
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Config, DbConnection } from "../../module_bindings";
 
 interface IProp {
+  client: DbConnection;
   config: Config;
   connectionConfig: ConnectionConfigType;
   setInstanceConfigured: Function;
@@ -85,7 +85,7 @@ export const InitialSetupModal = (props: IProp) => {
       return setError("Update Hz has to be a number.");
     }
 
-    SetConfigReducer.call(
+    props.client.reducers.setConfig(
       platform,
       channel,
       debug,
@@ -97,7 +97,7 @@ export const InitialSetupModal = (props: IProp) => {
     );
 
     (async () => {
-      UploadElementDataFromString(defaultElements);
+      UploadElementDataFromString(props.client, defaultElements);
       setInitializing(true);
     })();
 
