@@ -143,7 +143,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
 
         case "WidgetElement":
           const widgetElement: ElementStruct = elements.element as ElementStruct.WidgetElement;
-          const wgtElementData: ElementData | undefined = spacetime?.Client.db.elementData.id.find(widgetElement.value.elementDataId);
+          const wgtElementData: ElementData | undefined = Client.db.elementData.id.find(widgetElement.value.elementDataId);
 
           if (wgtElementData !== undefined) {
             const newWidth = wgtElementData.dataWidth;

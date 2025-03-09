@@ -81,7 +81,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
     if (backup.layouts) {
       const upLayouts: Layouts[] = JSON.parse(backup.layouts) as Layouts[];
       upLayouts.reverse().forEach((e) => {
-        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") spacetime.Client.reducers.addLayoutWithId(e.id, e.name, false);
+        if (e.id !== 1 || e.name !== "Default" || e.createdBy !== "Server") Client.reducers.addLayoutWithId(e.id, e.name, false);
       });
     }
 
