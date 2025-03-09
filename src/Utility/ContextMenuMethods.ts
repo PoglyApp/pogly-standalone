@@ -111,7 +111,7 @@ export const handleResetTransform = (Client: DbConnection, elements: Elements, t
                   imageElementData: dataId,
                 });
 
-                updateElementStruct(elements.id, newImageElement);
+                updateElementStruct(Client, elements.id, newImageElement);
               }
               break;
 
@@ -132,7 +132,7 @@ export const handleResetTransform = (Client: DbConnection, elements: Elements, t
                   imageElementData: rawData,
                 });
 
-                updateElementStruct(elements.id, newImageElement);
+                updateElementStruct(Client, elements.id, newImageElement);
                 image.remove();
               };
               break;
@@ -156,7 +156,7 @@ export const handleResetTransform = (Client: DbConnection, elements: Elements, t
               elementDataId: widgetElement.value.elementDataId,
             });
 
-            updateElementStruct(elements.id, newWidgetElement);
+            updateElementStruct(Client, elements.id, newWidgetElement);
           }
           break;
 
@@ -164,7 +164,7 @@ export const handleResetTransform = (Client: DbConnection, elements: Elements, t
           const textElement: ElementStruct = elements.element as ElementStruct.TextElement;
           element.style.width = `auto`;
           element.style.height = `auto`;
-          updateElementStruct(elements.id, textElement);
+          updateElementStruct(Client, elements.id, textElement);
           break;
       }
       break;

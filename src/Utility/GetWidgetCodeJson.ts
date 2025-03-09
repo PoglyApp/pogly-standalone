@@ -1,9 +1,8 @@
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import { DebugLogger } from "./DebugLogger";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { DbConnection } from "../module_bindings";
 
-export const GetWidgetCodeJsonByElementDataID = (elementDataId: number) => {
-  const { Client } = useSpacetimeContext();
+export const GetWidgetCodeJsonByElementDataID = (Client: DbConnection, elementDataId: number) => {
 
   DebugLogger("Getting widget code JSON by element data ID");
   const widgetData = Client.db.elementData.id.find(elementDataId);

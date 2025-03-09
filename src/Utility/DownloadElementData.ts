@@ -1,8 +1,8 @@
-import { Config } from "../module_bindings";
+import { Config, DbConnection } from "../module_bindings";
 import { DebugLogger } from "./DebugLogger";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const DownloadElementData = (
+  Client: DbConnection,
   downData: boolean,
   downElement: boolean,
   downLayout: boolean,
@@ -11,7 +11,6 @@ export const DownloadElementData = (
   setModals: any,
   closeModal: any
 ) => {
-  const { Client } = useSpacetimeContext();
 
   DebugLogger("Downloading element data");
   const blobData = JSON.stringify(Client.db.elementData.iter());

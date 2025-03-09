@@ -8,17 +8,16 @@ import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { handleFlipElement } from "./ContextMenuMethods";
-import { Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { DbConnection, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 
 export const UserInputHandler = (
+  Client: DbConnection,
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
   selectoElements: Array<SVGElement | HTMLElement>,
   compressPaste: boolean | undefined,
   transformRef: ReactZoomPanPinchRef | null
 ): any => {
-  const { Client } = useSpacetimeContext();
   const userInputs = [];
 
   // GO HOME
@@ -201,6 +200,7 @@ export const UserInputHandler = (
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
               DebugLogger("Inserting new element");
               insertElement(
+                Client,
                 ElementStruct.ImageElement({
                   imageElementData: ImageElementData.RawData(result.r as string),
                   width: result.w,
@@ -234,6 +234,7 @@ export const UserInputHandler = (
 
               image.onload = async function () {
                 insertElement(
+                  Client, 
                   ElementStruct.ImageElement({
                     imageElementData: ImageElementData.RawData(text as string),
                     width: image.width,
@@ -252,7 +253,7 @@ export const UserInputHandler = (
                 css: "",
               });
 
-              insertElement(textElement, activeLayout);
+              insertElement(Client, textElement, activeLayout);
             }
           }
         }

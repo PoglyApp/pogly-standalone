@@ -1,15 +1,15 @@
 import { DebugLogger } from "./DebugLogger";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { DbConnection } from "../module_bindings";
 
 // "Compiler" is a very generous term for what this method does
 export const WidgetCodeCompiler = (
+  Client: DbConnection,
   widgetWidth?: Number,
   widgetHeight?: Number,
   elementDataId?: number,
   rawData?: string
 ) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const { Client } = useSpacetimeContext();
 
   DebugLogger("'Compiling' widget");
   let widgetData: any = rawData ? JSON.parse(rawData) : null;

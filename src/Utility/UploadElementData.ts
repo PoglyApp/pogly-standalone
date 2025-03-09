@@ -1,9 +1,7 @@
 import { DebugLogger } from "./DebugLogger";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import { DbConnection, ElementData, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 
-export const UploadElementDataFromFile = (backupFile: any) => {
-  const { Client } = useSpacetimeContext();
+export const UploadElementDataFromFile = (Client: DbConnection, backupFile: any) => {
 
   DebugLogger("Uploading element data from file");
   let reader = new FileReader();
@@ -37,8 +35,7 @@ export const UploadElementDataFromString = (Client: DbConnection, data: string) 
   });
 };
 
-export const UploadBackupFromFile = (backupFile: any) => {
-  const { Client } = useSpacetimeContext();
+export const UploadBackupFromFile = (Client: DbConnection, backupFile: any) => {
 
   DebugLogger("Uploading backup from a file");
   let reader = new FileReader();
