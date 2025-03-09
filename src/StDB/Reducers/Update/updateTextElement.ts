@@ -1,8 +1,6 @@
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import { ElementStruct, TextElement } from "../../../module_bindings";
+import { DbConnection, ElementStruct, TextElement } from "../../../module_bindings";
 
-export const updateTextElement = (elementId: number, elementStruct: ElementStruct) => {
-  const { Client } = useSpacetimeContext();
+export const updateTextElement = (Client: DbConnection, elementId: number, elementStruct: ElementStruct) => {
   const textElement = Client.db.elements.id.find(elementId);
   if (!textElement) return;
 

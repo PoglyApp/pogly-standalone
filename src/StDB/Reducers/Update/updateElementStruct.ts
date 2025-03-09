@@ -1,9 +1,7 @@
-import { ElementStruct, ImageElement, TextElement, WidgetElement } from "../../../module_bindings";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { DbConnection, ElementStruct, ImageElement, TextElement, WidgetElement } from "../../../module_bindings";
 
 
-export const updateElementStruct = (elementId: number, element: ElementStruct) => {
-  const { Client } = useSpacetimeContext();
+export const updateElementStruct = (Client: DbConnection, elementId: number, element: ElementStruct) => {
   switch (element.tag) {
     case "TextElement":
       const textElement: TextElement = element.value as TextElement;

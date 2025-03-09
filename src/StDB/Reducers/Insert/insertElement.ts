@@ -1,19 +1,18 @@
-import { DataType, ElementStruct, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../../module_bindings";
+import { DataType, DbConnection, ElementStruct, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../../module_bindings";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const insertElement = (
+  Client: DbConnection,
   elementStruct: ElementStruct,
   activeLayout: Layouts,
   transparency?: number,
   transform?: string,
   clip?: string
 ) => {
-  const { Client } = useSpacetimeContext();
   DebugLogger("Inserting new element");
 
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 1100px)");

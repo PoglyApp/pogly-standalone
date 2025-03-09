@@ -1,11 +1,9 @@
-import { DataType } from "../../../module_bindings";
+import { DataType, DbConnection } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { convertDataURIToBinary } from "../../../Utility/ImageConversion";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
-export const insertElementData = (elementData: ElementDataType) => {
-  const { Client } = useSpacetimeContext();
+export const insertElementData = (Client: DbConnection, elementData: ElementDataType) => {
   DebugLogger("Inserting new element data");
 
   switch (elementData.DataType) {

@@ -1,9 +1,7 @@
-import { DataType } from "../../../module_bindings";
+import { DataType, DbConnection } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
-export const updateElementData = (dataId: number, elementData: ElementDataType) => {
-  const { Client } = useSpacetimeContext();
+export const updateElementData = (Client: DbConnection, dataId: number, elementData: ElementDataType) => {
   switch (elementData.DataType) {
     case DataType.TextElement:
       Client.reducers.updateElementData(
