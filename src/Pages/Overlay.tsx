@@ -7,11 +7,11 @@ import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { Loading } from "../Components/General/Loading";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
-import Layouts from "../module_bindings/layouts";
 import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
-import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
+import { Layouts } from "../module_bindings";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 interface IProps {
   disconnected: boolean;
@@ -23,6 +23,7 @@ export const Overlay = (props: IProps) => {
     overlayElementEventsInitialized: false,
     overlayGuestEventsInitialized: false,
   });
+  const { Client } = useSpacetimeContext();
 
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
@@ -42,14 +43,14 @@ export const Overlay = (props: IProps) => {
     const layoutParam = urlParams.get("layout");
     const transparent = urlParams.get("transparent");
 
-    ClearRefreshOverlayRequestsReducer.call();
+    Client.reducers.clearRefreshOverlayRequests();
 
     if (layoutParam) {
       DebugLogger("Getting layout by name");
-      setActiveLayout(Layouts.filterByName(layoutParam).next().value);
+      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.name === layoutParam));
     } else {
       DebugLogger("Getting layout by active ID");
-      setActiveLayout(Layouts.filterByActive(true).next().value);
+      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
     }
 
     if (transparent != null) {

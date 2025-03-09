@@ -3,7 +3,6 @@ import { styled } from "styled-components";
 import { CursorsContainer } from "../Components/Containers/CursorsContainer";
 import { MoveableComponent } from "../Components/General/MoveableComponent";
 import StreamContainer from "../Components/Containers/StreamContainer";
-import Elements from "../module_bindings/elements";
 import { useElementDataEvents } from "../StDB/Hooks/useElementDataEvents";
 import { useElementsEvents } from "../StDB/Hooks/useElementsEvents";
 import useFetchElement from "../StDB/Hooks/useFetchElements";
@@ -12,7 +11,6 @@ import { useGuestsEvents } from "../StDB/Hooks/useGuestsEvents";
 import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
-import Config from "../module_bindings/config";
 import { Loading } from "../Components/General/Loading";
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { SelectoComponent } from "../Components/General/SelectoComponent";
@@ -23,22 +21,18 @@ import { HandleElementContextMenu } from "../Utility/HandleContextMenu";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
 import { ConfigContext } from "../Contexts/ConfigContext";
-import UpdateGuestPositionReducer from "../module_bindings/update_guest_position_reducer";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
-import Layouts from "../module_bindings/layouts";
 import { LayoutContext } from "../Contexts/LayoutContext";
-import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 import { useHotkeys } from "reakeys";
 import { UserInputHandler } from "../Utility/UserInputHandler";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
-import Permissions from "../module_bindings/permissions";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { ModalContext } from "../Contexts/ModalContext";
+import { Config, Elements, Layouts } from "../module_bindings";
 
 interface IProps {
   setActivePage: Function;
@@ -52,8 +46,8 @@ export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { Identity, Client } = useSpacetimeContext();
+  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -112,7 +106,7 @@ export const Canvas = (props: IProps) => {
   useEffect(() => {
     if (!layoutContext.activeLayout) {
       DebugLogger("Setting active layout");
-      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
+      layoutContext.setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
     }
 
     DebugLogger("Layout context updated");
@@ -120,7 +114,7 @@ export const Canvas = (props: IProps) => {
     setSelected(undefined);
     setSelectoTargets(() => []);
 
-    UpdateGuestSelectedElementReducer.call(0);
+    Client.reducers.updateGuestSelectedElement(0);
   }, [layoutContext]);
 
   useEffect(() => {
@@ -141,7 +135,7 @@ export const Canvas = (props: IProps) => {
     const x = (event.clientX - streamRect.left) / transformRef.current.instance.transformState.scale;
     const y = (event.clientY - streamRect.top) / transformRef.current.instance.transformState.scale;
 
-    UpdateGuestPositionReducer.call(x, y);
+    Client.reducers.updateGuestPosition(x, y);
 
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
