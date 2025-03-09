@@ -139,6 +139,60 @@ static partial class Module
             Log.Error("Encountered error with heartbeat: " + e.Message);
         }
     }
+    
+    //dirty workaround until OverlayCommand is implemented
+    [Reducer]
+    public static void RefreshOverlay(ReducerContext ctx)
+    {
+        try
+        {
+            ctx.Db.Heartbeat.Insert(new Heartbeat
+            {
+                Id = (uint) ctx.Timestamp.ToStd().ToUnixTimeSeconds(),
+                ServerIdentity = ctx.Sender,
+                Tick = 1337
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error forcing an overlay Refresh: " + e.Message);
+        }
+    }
+    
+    [Reducer]
+    public static void RefreshOverlayClearStorage(ReducerContext ctx)
+    {
+        try
+        {
+            ctx.Db.Heartbeat.Insert(new Heartbeat
+            {
+                Id = (uint) ctx.Timestamp.ToStd().ToUnixTimeSeconds(),
+                ServerIdentity = ctx.Sender,
+                Tick = 69420
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error forcing an overlay Refresh: " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void ClearRefreshOverlayRequests(ReducerContext ctx)
+    {
+        try
+        {
+            foreach (var request in ctx.Db.Heartbeat.Iter())
+            {
+                if (request.Tick == 1337) ctx.Db.Heartbeat.Delete(request);
+                if (request.Tick == 69420) ctx.Db.Heartbeat.Delete(request);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error clearing overlay requests: " + e.Message);
+        }
+    }
 
     [Reducer]
     public static void PingHeartbeat(ReducerContext ctx)
