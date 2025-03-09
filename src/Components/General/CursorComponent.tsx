@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import CssFilterConverter from "css-filter-converter";
-import Guests from "../../module_bindings/guests";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { GetCoordsFromTransform, GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { useTransformContext, useTransformEffect } from "react-zoom-pan-pinch";
+import { Guests } from "../../module_bindings";
 
 interface IProp {
   guest: Guests;

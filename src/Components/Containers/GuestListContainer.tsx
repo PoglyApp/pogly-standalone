@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
-import Guests from "../../module_bindings/guests";
 import styled from "styled-components";
-import Config from "../../module_bindings/config";
 import { Avatar, Menu } from "@mui/material";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Config, Guests } from "../../module_bindings";
 
 export const GuestListContainer = () => {
   const config: Config = useContext(ConfigContext);

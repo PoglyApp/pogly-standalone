@@ -2,7 +2,6 @@ import { Accordion, AccordionDetails, AccordionSummary, Button } from "@mui/mate
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
-import Layouts from "../../../module_bindings/layouts";
 import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
 import { useContext, useState } from "react";
@@ -14,29 +13,26 @@ import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import UpdateGuestSelectedLayoutReducer from "../../../module_bindings/update_guest_selected_layout_reducer";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Config from "../../../module_bindings/config";
-import Permissions from "../../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { Layouts, PermissionLevel } from "../../../module_bindings";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
 
   const changeLayout = (layout: Layouts) => {
-    UpdateGuestSelectedLayoutReducer.call(layout.id);
+    Client.reducers.updateGuestSelectedLayout(layout.id);
     layoutContext.setActiveLayout(layout);
   };
 

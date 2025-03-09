@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import handleElementBorder from "../../Utility/HandleElementBorder";
-import ElementData from "../../module_bindings/element_data";
-import Elements from "../../module_bindings/elements";
-import ImageElement from "../../module_bindings/image_element";
 import { useAppSelector } from "../../Store/Features/store";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
+import { ElementData, Elements, ImageElement } from "../../module_bindings";
 
 interface IProp {
   elements: Elements;

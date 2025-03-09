@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
-import Guests from "../../module_bindings/guests";
 import { CursorComponent } from "../General/CursorComponent";
-import Config from "../../module_bindings/config";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutContext } from "../../Contexts/LayoutContext";
+import { Config, Guests } from "../../module_bindings";
 
 export const CursorsContainer = () => {
   const { Identity } = useSpacetimeContext();

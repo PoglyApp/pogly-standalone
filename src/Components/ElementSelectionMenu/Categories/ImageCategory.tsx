@@ -2,21 +2,18 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, Skeleton, Toolti
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ImageIcon from "@mui/icons-material/Image";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ElementData from "../../../module_bindings/element_data";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import styled from "styled-components";
 import { ImageUploadModal } from "../../Modals/ImageUploadModal";
 import React, { useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { convertBinaryToDataURI } from "../../../Utility/ImageConversion";
+import { ElementData, ElementStruct, ImageElementData, PermissionLevel } from "../../../module_bindings";
 
 interface IProps {
   elementData: ElementData[];

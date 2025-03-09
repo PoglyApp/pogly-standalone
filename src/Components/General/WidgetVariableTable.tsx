@@ -9,12 +9,12 @@ import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { HexColorPicker } from "react-colorful";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import ElementData from "../../module_bindings/element_data";
 import { useAppSelector } from "../../Store/Features/store";
 import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import { SpotlightElement } from "./SpotlightElement";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
+import { ElementData } from "../../module_bindings";
 
 interface Row {
   variableName: string;

@@ -3,13 +3,12 @@ import Moveable, { OnDragGroup, OnRotateGroup } from "react-moveable";
 import Selecto from "react-selecto";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
-import Config from "../../module_bindings/config";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GetCoordsFromTransform } from "../../Utility/ConvertCoordinates";
-import UpdateWidgetElementSizeReducer from "../../module_bindings/update_widget_element_size_reducer";
-import UpdateImageElementSizeReducer from "../../module_bindings/update_image_element_size_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Config } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   transformSelect: any;
@@ -22,6 +21,7 @@ interface IProp {
 export const MoveableComponent = (props: IProp) => {
   const { settings } = useContext(SettingsContext);
   const config: Config = useContext(ConfigContext);
+  const { Client } = useSpacetimeContext();
 
   const debugText = document.getElementById("debug-text" + props.selected?.Elements.id);
   const stream = document.getElementById("stream")?.getBoundingClientRect();
@@ -71,7 +71,7 @@ export const MoveableComponent = (props: IProp) => {
 
     DebugLogger("Updating element transform");
 
-    updateElementTransform(props.selected.Elements.id, event.lastEvent.style.transform);
+    updateElementTransform(Client, props.selected.Elements.id, event.lastEvent.style.transform);
   };
 
   let transformWaitUntil = 0;
@@ -98,6 +98,7 @@ export const MoveableComponent = (props: IProp) => {
 
     updateElementTransform(
       //props.selected.Elements.id,
+      Client,
       event.target.id,
       event.target.style.transform
     );
@@ -112,7 +113,7 @@ export const MoveableComponent = (props: IProp) => {
 
     e.events.forEach((ev) => {
       ev.target.style.transform = ev.transform;
-      updateElementTransform(parseInt(ev.target.id), ev.target.style.transform);
+      updateElementTransform(Client, parseInt(ev.target.id), ev.target.style.transform);
     });
 
     transformMultiWaitUntil = Date.now() + 1000 / config.updateHz;
@@ -131,16 +132,16 @@ export const MoveableComponent = (props: IProp) => {
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
 
-        UpdateImageElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
+        Client.reducers.updateImageElementSize(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
 
       case "WidgetElement":
 
-        UpdateWidgetElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
+        Client.reducers.updateWidgetElementSize(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
     }
 
-    updateElementTransform(props.selected.Elements.id, event.target.style.transform);
+    updateElementTransform(Client, props.selected.Elements.id, event.target.style.transform);
   };
 
   let resizeWaitUntil = 0;
@@ -156,16 +157,16 @@ export const MoveableComponent = (props: IProp) => {
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
 
-        UpdateImageElementSizeReducer.call(event.target.id, event.width, event.height);
+        Client.reducers.updateImageElementSize(event.target.id, event.width, event.height);
         break;
 
       case "WidgetElement":
 
-        UpdateWidgetElementSizeReducer.call(event.target.id, event.width, event.height);
+        Client.reducers.updateWidgetElementSize(event.target.id, event.width, event.height);
         break;
     }
 
-    updateElementTransform(event.target.id, event.target.style.transform);
+    updateElementTransform(Client, event.target.id, event.target.style.transform);
 
     resizeWaitUntil = Date.now() + 1000 / config.updateHz;
   };

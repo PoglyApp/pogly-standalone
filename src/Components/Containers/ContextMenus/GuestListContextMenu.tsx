@@ -1,14 +1,8 @@
 import { Menu, MenuItem, Paper } from "@mui/material";
-import Guests from "../../../module_bindings/guests";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
 import styled from "styled-components";
-import SetIdentityPermissionModeratorReducer from "../../../module_bindings/set_identity_permission_moderator_reducer";
-import ClearIdentityPermissionReducer from "../../../module_bindings/clear_identity_permission_reducer";
-import KickGuestReducer from "../../../module_bindings/kick_guest_reducer";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import KickSelfReducer from "../../../module_bindings/kick_self_reducer";
+import { Guests, PermissionLevel } from "../../../module_bindings";
 
 interface IProps {
   contextMenu: any;
@@ -16,13 +10,13 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
-  const identityPermission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { Identity, Client } = useSpacetimeContext();
+  const identityPermission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
   let selectedGuestPermission: PermissionLevel | undefined;
   if (selectedGuest !== null && selectedGuest.identity)
-    selectedGuestPermission = Permissions.findByIdentity(selectedGuest.identity)?.permissionLevel;
+    selectedGuestPermission = Client.db.permissions.identity.find(selectedGuest.identity)?.permissionLevel;
 
   const handleClose = () => {
     DebugLogger("Handling close context");
@@ -62,7 +56,7 @@ export const GuestListContextMenu = (props: IProps) => {
             {selectedGuestPermission?.tag === "Moderator" ? (
               <StyledMenuItemOrange
                 onClick={() => {
-                  ClearIdentityPermissionReducer.call(selectedGuest.identity);
+                  Client.reducers.clearIdentityPermission(selectedGuest.identity);
                   handleClose();
                 }}
                 sx={{ color: "#008205" }}
@@ -72,7 +66,7 @@ export const GuestListContextMenu = (props: IProps) => {
             ) : (
               <StyledMenuItemGreen
                 onClick={() => {
-                  SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
+                  Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
                   handleClose();
                 }}
               >
@@ -81,7 +75,7 @@ export const GuestListContextMenu = (props: IProps) => {
             )}
             <StyledMenuItemRed
               onClick={() => {
-                KickGuestReducer.call(selectedGuest.address);
+                Client.reducers.kickGuest(selectedGuest.address);
                 handleClose();
               }}
             >
@@ -96,7 +90,7 @@ export const GuestListContextMenu = (props: IProps) => {
           <>
             <StyledMenuItemRed
               onClick={() => {
-                KickSelfReducer.call();
+                Client.reducers.kickSelf();
                 handleClose();
               }}
             >

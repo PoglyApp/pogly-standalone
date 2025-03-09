@@ -1,8 +1,8 @@
 import Selecto from "react-selecto";
 import Moveable from "react-moveable";
 import { toast } from "react-toastify";
-import Elements from "../../module_bindings/elements";
-import UpdateGuestSelectedElementReducer from "../../module_bindings/update_guest_selected_element_reducer";
+import { Elements } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   moveableRef: React.RefObject<Moveable>;
@@ -14,6 +14,8 @@ interface IProp {
 }
 
 export const SelectoComponent = (props: IProp) => {
+  const { Client } = useSpacetimeContext();
+
   return (
     <Selecto
       ref={props.selectoRef}
@@ -62,7 +64,7 @@ export const SelectoComponent = (props: IProp) => {
 
         if (e.selected.length === 0) {
           props.setSelected(undefined);
-          UpdateGuestSelectedElementReducer.call(0);
+          Client.reducers.updateGuestSelectedElement(0);
         }
 
         if (e.selected.length === 1) {
@@ -76,7 +78,7 @@ export const SelectoComponent = (props: IProp) => {
           });
 
           if (document.getElementById(selectedElement[0].id.toString())?.getAttribute("data-locked") !== "true")
-            UpdateGuestSelectedElementReducer.call(selectedElement[0].id);
+            Client.reducers.updateGuestSelectedElement(selectedElement[0].id);
         }
 
         if (anyLockedElements > 0) {

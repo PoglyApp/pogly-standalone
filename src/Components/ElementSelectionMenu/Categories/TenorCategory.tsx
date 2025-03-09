@@ -6,11 +6,10 @@ import { StyledInput } from "../../StyledComponents/StyledInput";
 import styled from "styled-components";
 import TenorSearchResponseType from "../../../Types/TenorTypes/TenorSearchResponseType";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ElementStruct, ImageElementData } from "../../../module_bindings";
 
 export const TenorCategory = () => {
   const layoutContext = useContext(LayoutContext);

@@ -2,15 +2,12 @@ import { Menu, MenuItem, Paper, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import styled from "styled-components";
 import { handleDeleteElementData } from "../../../Utility/ContextMenuMethods";
-import ElementData from "../../../module_bindings/element_data";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import Config from "../../../module_bindings/config";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
+import { ElementData, PermissionLevel } from "../../../module_bindings";
 
 interface IProps {
   contextMenu: any;
@@ -19,11 +16,11 @@ interface IProps {
 
 export const ElementSelectionContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -77,7 +74,7 @@ export const ElementSelectionContextMenu = (props: IProps) => {
       ) : (
         <StyledDeleteMenuItem
           onClick={() => {
-            handleDeleteElementData(selectedElementData, handleClose);
+            handleDeleteElementData(Client, selectedElementData, handleClose);
           }}
         >
           Delete

@@ -3,16 +3,14 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import WidgetsIcon from "@mui/icons-material/Widgets";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import ElementData from "../../../module_bindings/element_data";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
 import React, { useContext, useMemo, useCallback } from "react";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ElementData, ElementStruct, PermissionLevel } from "../../../module_bindings";
 
 interface IProps {
   elementData: ElementData[];

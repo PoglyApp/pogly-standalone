@@ -1,7 +1,6 @@
 import { Divider, FormControl, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import Elements from "../../../module_bindings/elements";
 import { CanvasElementType } from "../../../Types/General/CanvasElementType";
 import LockIcon from "@mui/icons-material/Lock";
 import {
@@ -18,17 +17,13 @@ import { ModalContext } from "../../../Contexts/ModalContext";
 import { TextCreationModal } from "../../Modals/TextCreationModal";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { WidgetVariableType } from "../../../Types/General/WidgetVariableType";
-import WidgetElement from "../../../module_bindings/widget_element";
-import ElementData from "../../../module_bindings/element_data";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import Config from "../../../module_bindings/config";
-import Permissions from "../../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal";
+import { ElementData, Elements, PermissionLevel, WidgetElement } from "../../../module_bindings";
 
 interface IProps {
   contextMenu: any;
@@ -40,13 +35,13 @@ interface IProps {
 }
 
 export const ElementContextMenu = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const { setModals } = useContext(ModalContext);
 
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;
 
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const [transformEdit, setTransformEdit] = useState("Scale");
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
@@ -60,18 +55,18 @@ export const ElementContextMenu = (props: IProps) => {
   const locked = document.getElementById(selectedElement?.id.toString() || "null")?.getAttribute("data-locked");
 
   let element: Elements | undefined;
-  if (selectedElement) element = Elements.findById(selectedElement.id);
+  if (selectedElement) element = Client.db.elements.id.find(selectedElement.id);
 
   useEffect(() => {
-    if (selectedElement) setTransparency(Elements.findById(selectedElement.id)!.transparency.valueOf());
+    if (selectedElement) setTransparency(Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
     if (selectedElement?.element.tag !== "WidgetElement") return;
 
     DebugLogger("Setting widget data");
 
-    const widgetElement: WidgetElement = Elements.findById(selectedElement.id)?.element.value as WidgetElement;
+    const widgetElement: WidgetElement = Client.db.elements.id.find(selectedElement.id)?.element.value as WidgetElement;
 
     if (widgetElement.rawData === "") {
-      const elementData = ElementData.findById(widgetElement.elementDataId);
+      const elementData = Client.db.elementData.id.find(widgetElement.elementDataId);
 
       if (!elementData) return;
 
@@ -188,13 +183,13 @@ export const ElementContextMenu = (props: IProps) => {
             </MenuItem>
             <StyledMenuItem
               value={"Scale"}
-              onClick={() => handleResetTransform(selectedElement, TransformType.Scale, handleClose)}
+              onClick={() => handleResetTransform(Client, selectedElement, TransformType.Scale, handleClose)}
             >
               Scale
             </StyledMenuItem>
             <StyledMenuItem
               value={"Rotation"}
-              onClick={() => handleResetTransform(selectedElement, TransformType.Rotation, handleClose)}
+              onClick={() => handleResetTransform(Client, selectedElement, TransformType.Rotation, handleClose)}
             >
               Rotation
             </StyledMenuItem>
@@ -235,7 +230,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Vertical"}
               onClick={() => {
-                handleFlipElement(true, selectedElement, handleClose);
+                handleFlipElement(Client, true, selectedElement, handleClose);
               }}
             >
               Vertical
@@ -243,7 +238,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Horizontal"}
               onClick={() => {
-                handleFlipElement(false, selectedElement, handleClose);
+                handleFlipElement(Client, false, selectedElement, handleClose);
               }}
             >
               Horizontal
@@ -276,7 +271,7 @@ export const ElementContextMenu = (props: IProps) => {
                 value={transparency}
                 aria-label="Small"
                 valueLabelDisplay="on"
-                onChange={(event, number) => handleTransparency(selectedElement, setTransparency, number)}
+                onChange={(event, number) => handleTransparency(Client, selectedElement, setTransparency, number)}
               />
             </StyledMenuItem>
           </StyledSelect>
@@ -312,7 +307,7 @@ export const ElementContextMenu = (props: IProps) => {
                   <StyledMenuItem
                     value={variable.variableName}
                     onClick={() => {
-                      handleWidgetToggle(selectedElement.id, variable, handleClose);
+                      handleWidgetToggle(Client, selectedElement.id, variable, handleClose);
                     }}
                     key={variable.variableName + "_variable"}
                   >
@@ -328,7 +323,7 @@ export const ElementContextMenu = (props: IProps) => {
       <StyledMenuItem
         onClick={() => {
           const number = transparency > 0 ? 0 : 100;
-          handleHide(selectedElement, setTransparency, number);
+          handleHide(Client, selectedElement, setTransparency, number);
         }}
       >
         {transparency > 0 ? "Hide" : "Show"}
@@ -341,7 +336,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       <StyledMenuItem
         onClick={() => {
-          handleLocked(selectedElement, handleClose);
+          handleLocked(Client, selectedElement, handleClose);
         }}
       >
         {locked === "true" ? "Locked" : "Lock"}
@@ -354,7 +349,7 @@ export const ElementContextMenu = (props: IProps) => {
         <div>
           {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" && (
             <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-              Image: {ElementData.findById(element.element.value.imageElementData.value)?.name || ""}
+              Image: {Client.db.elementData.id.find(element.element.value.imageElementData.value)?.name || ""}
             </Paper>
           )}
 
@@ -401,7 +396,7 @@ export const ElementContextMenu = (props: IProps) => {
       ) : (
         <StyledDeleteMenuItem
           onClick={() => {
-            handleDelete(selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
+            handleDelete(Client, selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
           }}
         >
           Delete

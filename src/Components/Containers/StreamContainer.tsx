@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext, memo } from "react";
-import Config from "../../module_bindings/config";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Config } from "../../module_bindings";
 
 const StreamContainer = () => {
   const config: Config = useContext(ConfigContext);

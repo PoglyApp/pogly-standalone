@@ -2,17 +2,13 @@ import { Menu, MenuItem, Paper, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
-import SetLayoutActiveReducer from "../../../module_bindings/set_layout_active_reducer";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import Config from "../../../module_bindings/config";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import DuplicateLayoutReducer from "../../../module_bindings/duplicate_layout_reducer";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
+import { PermissionLevel } from "../../../module_bindings";
 
 interface IProps {
   contextMenu: any;
@@ -21,16 +17,16 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
 
   const [showExamine, setShowExamine] = useState(false);
 
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const handleSetActive = () => {
     DebugLogger("Changing active layout");
-    SetLayoutActiveReducer.call(props.contextMenu.layout.id);
+    Client.reducers.setLayoutActive(props.contextMenu.layout.id);
     handleClose();
   };
 
@@ -44,7 +40,7 @@ export const LayoutContextMenu = (props: IProps) => {
 
   const cloneLayout = () => {
     DebugLogger("Cloning layout");
-    DuplicateLayoutReducer.call(props.contextMenu.layout.id);
+    Client.reducers.duplicateLayout(props.contextMenu.layout.id);
     handleClose();
   };
 

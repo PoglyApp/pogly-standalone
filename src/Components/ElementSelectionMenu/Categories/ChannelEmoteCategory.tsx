@@ -3,8 +3,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useContext, useEffect, useState } from "react";
 import SevenTVEmote from "../../../Types/SevenTVTypes/SevenTVEmoteType";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import SevenTVWrap from "../../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
@@ -15,6 +13,7 @@ import BetterTVWrap from "../../../Utility/BetterTVWrap";
 import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ElementStruct, ImageElementData } from "../../../module_bindings";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmote[] | undefined;

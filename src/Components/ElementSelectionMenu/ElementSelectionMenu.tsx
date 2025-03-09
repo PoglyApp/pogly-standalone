@@ -1,4 +1,3 @@
-import ElementData from "../../module_bindings/element_data";
 import { styled } from "styled-components";
 import { TextCategory } from "./Categories/TextCategory";
 import { ImageCategory } from "./Categories/ImageCategory";
@@ -7,8 +6,6 @@ import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
 import { useContext, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
-import Config from "../../module_bindings/config";
-import Permissions from "../../module_bindings/permissions";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
@@ -20,13 +17,14 @@ import BetterTVEmote from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import SevenTVEmote from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
 import { SpotlightModal } from "../Modals/SpotlightModal";
+import { Config, ElementData } from "../../module_bindings";
 
 interface IProps {
   isDropping: boolean;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const config: Config = useContext(ConfigContext);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
@@ -40,9 +38,9 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode = useMemo(() => Config.findByVersion(0)!.strictMode, []);
+  const strictMode = useMemo(() => Client.db.config.version.find(0)!.strictMode, []);
   const permissionLevel = useMemo(
-    () => Permissions.findByIdentity(Identity.identity)?.permissionLevel,
+    () => Client.db.permissions.identity.find(Identity.identity)?.permissionLevel,
     [Identity.identity]
   );
 
