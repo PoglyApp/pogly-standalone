@@ -89,7 +89,6 @@ export const App: React.FC = () => {
     if (isWidget) return;
     if (!stdbInitialized) return;
     if (!spacetime.Identity) return;
-    if (!spacetime.Address) return;
     if (!spacetime.Client) return;
     if (!spacetime.Runtime) return;
 
@@ -104,7 +103,7 @@ export const App: React.FC = () => {
     }
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
-    const guest = spacetime.Client.db.guests.address.find(spacetime.Address);
+    const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
 
     setSpacetimeContext({
@@ -115,7 +114,7 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Address, spacetime.Client, spacetime.Runtime, isWidget]);
+  }, [stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime, isWidget]);
 
   useEffect(() => {
     if (isWidget) return;
@@ -130,8 +129,8 @@ export const App: React.FC = () => {
 
     DebugLogger("Setting active layout");
 
-    if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find(l => l.active === true));
-  }, [activeLayout, stdbInitialized, isWidget]);
+    if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
+  }, [activeLayout, stdbInitialized, isWidget, spacetime.Client]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -205,7 +204,7 @@ export const App: React.FC = () => {
     return <Loading text="Retreiving Identity" />;
   }
 
-  if (!spacetime.Address) {
+  if (!spacetime.Client.connectionId) {
     DebugLogger("Waiting for SpacetimeDB address");
     if (spacetime.Error) {
       DebugLogger("Failed to load SpacetimeDB address");
@@ -255,7 +254,7 @@ export const App: React.FC = () => {
       );
     }
 
-    const alreadyLogged = spacetime.Client.db.guests.address.find(spacetime.Address);
+    const alreadyLogged = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
 
     if (!isOverlay && alreadyLogged) {
       DebugLogger("Guest already logged in");
@@ -314,7 +313,7 @@ export const App: React.FC = () => {
   if (!stdbInitialized) {
     if (stdbInitialized || stdbSubscriptions) return <Loading text="Loading data..." />;
     DebugLogger("Starting Client->Server heartbeat!");
-    StartHeartbeat();
+    StartHeartbeat(spacetime.Client);
     DebugLogger("Redoing subscriptions");
     SetSubscriptions(spacetime.Client, setStdbInitialized, setStdbSubscriptions);
   }
@@ -333,7 +332,7 @@ export const App: React.FC = () => {
   // Step 7) Has nickname been set?
   if (!nickname) {
     DebugLogger("Nickname has not been set");
-    return <SetNicknameModal identity={spacetime.Identity} setNickname={setNickname} />;
+    return <SetNicknameModal client={spacetime.Client} identity={spacetime.Identity} setNickname={setNickname} />;
   }
 
   // Step 8) Has the Pogly Instance been configured?
@@ -341,6 +340,7 @@ export const App: React.FC = () => {
     DebugLogger("Pogly Instance is not configured");
     return (
       <InitialSetupModal
+        client={spacetime.Client}
         config={spacetime.InstanceConfig}
         connectionConfig={connectionConfig}
         setInstanceConfigured={setInstanceConfigured}
