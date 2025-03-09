@@ -1,22 +1,18 @@
 import { useEffect, useRef } from "react";
-import Elements from "../../module_bindings/elements";
 import { useAppDispatch } from "../../Store/Features/store";
 import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import TextElement from "../../module_bindings/text_element";
-import WidgetElement from "../../module_bindings/widget_element";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
-import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 import { marked } from "marked";
-import ImageElement from "../../module_bindings/image_element";
-import ImageElementData from "../../module_bindings/image_element_data";
+import { Elements, EventContext, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useOverlayElementsEvents = (
   layout: Layouts | undefined,
@@ -24,6 +20,7 @@ export const useOverlayElementsEvents = (
   setCanvasInitialized: Function
 ) => {
   const dispatch = useAppDispatch();
+  const { Client } = useSpacetimeContext();
 
   const activeLayout = useRef<Layouts>();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -39,8 +36,8 @@ export const useOverlayElementsEvents = (
 
     DebugLogger("Initializing overlay element events");
 
-    Elements.onInsert((element, reducerEvent) => {
-      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
+    Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+      if (!ctx.event) return;
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 
@@ -50,7 +47,7 @@ export const useOverlayElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate(async (oldElement, newElement) => {
+    Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -201,8 +198,8 @@ export const useOverlayElementsEvents = (
       }
     });
 
-    Elements.onDelete((element, reducerEvent) => {
-      if (!reducerEvent) return;
+    Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
+      if (!ctx.event) return;
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 

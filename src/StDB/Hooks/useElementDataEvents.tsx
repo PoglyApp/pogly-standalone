@@ -1,21 +1,23 @@
 import { useEffect } from "react";
-import ElementData from "../../module_bindings/element_data";
 import { addElementData, removeElementData, updateElementData } from "../../Store/Features/ElementDataSlice";
 import { useAppDispatch } from "../../Store/Features/store";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { ElementData, EventContext } from "../../module_bindings";
 
 export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const dispatch = useAppDispatch();
+  const { Client } = useSpacetimeContext();
 
   useEffect(() => {
     if (canvasInitialized.elementDataEventsInitialized) return;
 
     DebugLogger("Initializing element data events");
 
-    ElementData.onInsert((element, reducerEvent) => {
-      if (!reducerEvent) return;
+    Client.db.elementData.onInsert((ctx: EventContext, element: ElementData) => {
+      if (ctx.event) return;
 
       const imageSkeleton = document.getElementById("imageSkeleton");
       if (imageSkeleton) imageSkeleton.style.display = "none";
@@ -23,7 +25,7 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
       dispatch(addElementData(element));
     });
 
-    ElementData.onUpdate((oldData, newData, reducerEvent) => {
+    Client.db.elementData.onUpdate((ctx: EventContext, oldData: ElementData, newData: ElementData) => {
       // UPDATE WIDGET NAME
       if (oldData.name !== newData.name) {
         const widgetButton = document.querySelectorAll(`[data-widget-selection-button='${oldData.id.toString()}']`)[0];
@@ -45,9 +47,7 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
       dispatch(updateElementData(newData));
     });
 
-    ElementData.onDelete((element, reducerEvent) => {
-      if (!reducerEvent) return;
-
+    Client.db.elementData.onDelete((ctx: EventContext, element: ElementData) => {
       dispatch(removeElementData(element));
     });
 

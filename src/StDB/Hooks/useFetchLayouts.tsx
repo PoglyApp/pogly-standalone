@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import Layouts from "../../module_bindings/layouts";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 const useFetchLayouts = (setLayouts: Function) => {
+  const { Client } = useSpacetimeContext();
+
   useEffect(() => {
     DebugLogger("Fetching layouts");
-    const fetchedLayouts = Layouts.all();
+    const fetchedLayouts = Array.from(Client.db.layouts.iter());
 
     setLayouts(
       fetchedLayouts.sort((a: any, b: any) => {

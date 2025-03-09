@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Guests from "../../module_bindings/guests";
 import { useAppDispatch } from "../../Store/Features/store";
 import { addGuest, removeGuest, updateGuest, updateGuestLayout } from "../../Store/Features/GuestSlice";
 import handleElementBorder from "../../Utility/HandleElementBorder";
@@ -9,13 +8,14 @@ import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { EventContext, Guests } from "../../module_bindings";
 
 export const useGuestsEvents = (
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function,
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
@@ -27,11 +27,11 @@ export const useGuestsEvents = (
 
     DebugLogger("Initializing guest events");
 
-    Guests.onInsert((newGuest) => {
+    Client.db.guests.onInsert((ctx: EventContext, newGuest: Guests) => {
       dispatch(addGuest(newGuest));
     });
 
-    Guests.onUpdate((oldGuest, newGuest) => {
+    Client.db.guests.onUpdate((ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
       if (newGuest.address.toHexString() === Identity.address.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
@@ -87,7 +87,7 @@ export const useGuestsEvents = (
       }
     });
 
-    Guests.onDelete((guest, reducerEvent) => {
+    Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
       toast.success(`${guest.nickname === "" ? "Streamer" : guest.nickname} disconnected!`, {
         position: "bottom-right",
         autoClose: 2000,

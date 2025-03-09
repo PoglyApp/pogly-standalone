@@ -1,26 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import Elements from "../../module_bindings/elements";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
 import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
-import ElementData from "../../module_bindings/element_data";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import TextElement from "../../module_bindings/text_element";
-import WidgetElement from "../../module_bindings/widget_element";
 import Selecto from "react-selecto";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
-import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
-import ImageElement from "../../module_bindings/image_element";
-import ImageElementData from "../../module_bindings/image_element_data";
+import { ElementData, Elements, EventContext, ImageElement, ImageElementData, Layouts, Reducer, TextElement, WidgetElement } from "../../module_bindings";
+import { Event, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -31,7 +26,7 @@ export const useElementsEvents = (
   setCanvasInitialized: Function,
   layout: Layouts | undefined
 ) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
 
   const dispatch = useAppDispatch();
 
@@ -53,9 +48,9 @@ export const useElementsEvents = (
 
     DebugLogger("Initializing element events");
 
-    Elements.onInsert((element, reducerEvent) => {
+    Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+      if (!ctx.event) return;
       if (!activeLayout.current) return;
-      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
       if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
@@ -64,7 +59,7 @@ export const useElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate(async (oldElement, newElement, reducerEvent) => {
+    Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -208,7 +203,9 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerAddress?.toHexString() === Identity.address.toHexString() || !component) return;
+      if(ctx.event.tag === "Reducer") {
+        if(ctx.event.value.callerConnectionId?.toHexString() === Identity.address.toHexString() || !component) return;
+      }
 
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
@@ -231,8 +228,7 @@ export const useElementsEvents = (
       }
     });
 
-    Elements.onDelete((element, reducerEvent) => {
-      if (!reducerEvent) return;
+    Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 

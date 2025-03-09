@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import Layouts from "../../module_bindings/layouts";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { EventContext, Layouts } from "../../module_bindings";
+import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setActiveLayout: Function) => {
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
@@ -13,25 +14,28 @@ export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setAct
 
   useEffect(() => {
     if (eventsInitialized) return;
+    const { Client } = useSpacetimeContext();
 
     DebugLogger("Initializing overlay layout events");
 
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");
 
-    Layouts.onInsert((newLayout) => {});
+    Client.db.layouts.onInsert((ctx: EventContext, newLayout: Layouts) => {
+      //Nothing yet!
+    });
 
-    Layouts.onUpdate((oldLayout, newLayout) => {
+    Client.db.layouts.onUpdate((ctx: EventContext, oldLayout: Layouts, newLayout: Layouts) => {
       if (oldLayout.active === false && newLayout.active === true && !layoutParam) {
         setActiveLayout(newLayout);
       }
     });
 
-    Layouts.onDelete((layout) => {
+    Client.db.layouts.onDelete((ctx: EventContext, oldLayout: Layouts) => {
       if (!activeLayoutRef.current) return;
-      if (layout.id !== activeLayoutRef.current.id) return;
+      if (oldLayout.id !== activeLayoutRef.current.id) return;
 
-      setActiveLayout(Layouts.filterByActive(true).next().value);
+      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => {l.active===true}));
     });
 
     setEventsInitialized(true);

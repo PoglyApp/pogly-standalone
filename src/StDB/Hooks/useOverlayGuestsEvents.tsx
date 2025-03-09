@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Guests from "../../module_bindings/guests";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";

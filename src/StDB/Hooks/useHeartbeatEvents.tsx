@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import Heartbeat from "../../module_bindings/heartbeat";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { EventContext, Heartbeat } from "../../module_bindings";
 
 export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
 
   useEffect(() => {
     if (!Identity || canvasInitialized.elementEventsInitialized) return;
@@ -14,7 +14,7 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
 
     let internalBeat = 0;
 
-    Heartbeat.onInsert((beat: Heartbeat) => {
+    Client.db.heartbeat.onInsert((ctx: EventContext, beat: Heartbeat) => {
       const isOverlay: Boolean = window.location.href.includes("/overlay");
 
       if (isOverlay && beat.tick === 1337) window.location.reload();
@@ -25,7 +25,7 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
       }
     });
 
-    Heartbeat.onUpdate((oldElement, newElement, reducerEvent) => {
+    Client.db.heartbeat.onUpdate((ctx: EventContext, oldElement: Heartbeat, newElement: Heartbeat) => {
       internalBeat = newElement.tick;
     });
   }, [Identity, canvasInitialized.elementEventsInitialized]);
