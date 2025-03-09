@@ -14,7 +14,7 @@ interface IProp {
 export const Image = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [imageData, setImageData] = useState<string>("");
@@ -24,7 +24,7 @@ export const Image = (props: IProp) => {
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(Identity.address, props.elements.id.toString());
+    handleElementBorder(Client, Identity.address, props.elements.id.toString());
     DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {

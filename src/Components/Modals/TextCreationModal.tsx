@@ -326,10 +326,10 @@ export const TextCreationModal = (props: IProps) => {
 
     if (!props.editElementId) {
       DebugLogger("Inserting new text");
-      insertElement(textElement, layoutContext.activeLayout);
+      insertElement(Client, textElement, layoutContext.activeLayout);
     } else {
       DebugLogger("Updating old text");
-      updateTextElement(props.editElementId, textElement);
+      updateTextElement(Client, props.editElementId, textElement);
     }
 
     if (close) handleOnClose();

@@ -45,7 +45,7 @@ export const UpdateElementSourceModal = (props: IProps) => {
       height: imageElement.height,
     });
 
-    updateElementStruct(props.selectedElement.id, newImageElement);
+    updateElementStruct(Client, props.selectedElement.id, newImageElement);
 
     handleOnClose();
   };

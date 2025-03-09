@@ -71,7 +71,7 @@ export const BackupModal = (props: IProps) => {
   const handleUpload = () => {
     if(!deleteOnUpload) {
       DebugLogger("Uploading backup data");
-      UploadBackupFromFile(file);
+      UploadBackupFromFile(Client, file);
       closeModal("backup_modal", modals, setModals);
     } else {
       DebugLogger("Uploading backup data - clearing existing data");
@@ -79,14 +79,14 @@ export const BackupModal = (props: IProps) => {
       Client.reducers.deleteAllElementData();
       Client.reducers.deleteAllLayouts(false);
       Client.reducers.deleteAllFolders(false);
-      UploadBackupFromFile(file);
+      UploadBackupFromFile(Client, file);
       closeModal("backup_modal", modals, setModals);
     }
   };
 
   const handleDownload = () => {
     DebugLogger("Handling download data");
-    DownloadElementData(downData, downElement, downLayout, config, modals, setModals, closeModal);
+    DownloadElementData(Client, downData, downElement, downLayout, config, modals, setModals, closeModal);
   };
 
   if (isOverlay) return <></>;

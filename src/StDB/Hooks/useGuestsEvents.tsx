@@ -53,10 +53,10 @@ export const useGuestsEvents = (
       // IF SELECTED ELEMENT IS UPDATED
       if (oldGuest.selectedElementId !== newGuest.selectedElementId) {
         // Handle old element
-        handleElementBorder(Identity.address, oldGuest.selectedElementId.toString());
+        handleElementBorder(Client, Identity.address, oldGuest.selectedElementId.toString());
 
         // Handle new element
-        handleElementBorder(Identity.address, newGuest.selectedElementId.toString());
+        handleElementBorder(Client, Identity.address, newGuest.selectedElementId.toString());
       }
 
       // IF CURSOR POSITION IS UPDATED
@@ -99,7 +99,7 @@ export const useGuestsEvents = (
         theme: "dark",
       });
 
-      handleElementBorder(Identity.address, guest.selectedElementId.toString());
+      handleElementBorder(Client, Identity.address, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
 

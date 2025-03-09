@@ -28,7 +28,7 @@ interface IProps {
 }
 
 export const ImageUploadModal = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Client } = useSpacetimeContext();
   const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -131,7 +131,7 @@ export const ImageUploadModal = (props: IProps) => {
     const imageSkeleton = document.getElementById("imageSkeleton");
     if (imageSkeleton) imageSkeleton.style.display = "block";
 
-    insertElementData(newElementData);
+    insertElementData(Client, newElementData);
     handleOnClose();
   };
 

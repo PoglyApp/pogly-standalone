@@ -119,7 +119,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
       let widgetData: any = null;
 
-      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(widgetStruct.elementDataId);
+      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(Client, widgetStruct.elementDataId);
       else widgetData = JSON.parse(widgetStruct.rawData);
 
       setWidgetName(widgetData.widgetName || "");
@@ -188,7 +188,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
         (widgetStruct.value as WidgetElement).rawData = widgetJson;
 
-        updateElementStruct(props.editElementId, widgetStruct);
+        updateElementStruct(Client, props.editElementId, widgetStruct);
 
         return handleOnClose();
       }
@@ -205,9 +205,9 @@ export const WidgetCreationModal = (props: IProps) => {
       };
 
       if (!props.editElementDataId) {
-        insertElementData(newElementData);
+        insertElementData(Client, newElementData);
       } else {
-        updateElementData(props.editElementDataId, newElementData);
+        updateElementData(Client, props.editElementDataId, newElementData);
       }
 
       handleOnClose();
