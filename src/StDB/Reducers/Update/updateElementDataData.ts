@@ -1,21 +1,22 @@
+import { DataType } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
-import DataType from "../../../module_bindings/data_type";
-import UpdateElementDataDataReducer from "../../../module_bindings/update_element_data_data_reducer";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const updateElementDataData = (dataId: number, elementData: ElementDataType) => {
+  const { Client } = useSpacetimeContext();
   switch (elementData.DataType) {
     case DataType.TextElement:
-      UpdateElementDataDataReducer.call(dataId, elementData.Data);
+      Client.reducers.updateElementDataData(dataId, elementData.Data);
       break;
 
     case DataType.ImageElement:
       getBase64(elementData.Data, (result: any) => {
-        UpdateElementDataDataReducer.call(dataId, result);
+        Client.reducers.updateElementDataData(dataId, result);
       });
       break;
 
     case DataType.WidgetElement:
-      UpdateElementDataDataReducer.call(dataId, elementData.Data);
+      Client.reducers.updateElementDataData(dataId, elementData.Data);
       break;
   }
 };

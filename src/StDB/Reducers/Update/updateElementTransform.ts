@@ -2,9 +2,10 @@ import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
-import UpdateElementTransformReducer from "../../../module_bindings/update_element_transform_reducer";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const updateElementTransform = (elementId: number, transform: string) => {
+  const { Client } = useSpacetimeContext();
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -16,10 +17,11 @@ export const updateElementTransform = (elementId: number, transform: string) => 
     transformCoords.scaleY
   );
 
-  UpdateElementTransformReducer.call(elementId, newTransform);
+  Client.reducers.updateElementTransform(elementId, newTransform);
 };
 
 export const updateElementTransformNoViewportAdjustment = (elementId: number, transform: string) => {
+  const { Client } = useSpacetimeContext();
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -31,5 +33,5 @@ export const updateElementTransformNoViewportAdjustment = (elementId: number, tr
     transformCoords.scaleY
   );
 
-  UpdateElementTransformReducer.call(elementId, newTransform);
+  Client.reducers.updateElementTransform(elementId, newTransform);
 };

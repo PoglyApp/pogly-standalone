@@ -1,16 +1,16 @@
-import AddElementDataArrayReducer from "../../../module_bindings/add_element_data_array_reducer";
-import AddElementDataReducer from "../../../module_bindings/add_element_data_reducer";
-import DataType from "../../../module_bindings/data_type";
+import { DataType } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { convertDataURIToBinary } from "../../../Utility/ImageConversion";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const insertElementData = (elementData: ElementDataType) => {
+  const { Client } = useSpacetimeContext();
   DebugLogger("Inserting new element data");
 
   switch (elementData.DataType) {
     case DataType.TextElement:
-      AddElementDataReducer.call(
+      Client.reducers.addElementData(
         elementData.Name,
         elementData.DataType,
         elementData.Data,
@@ -25,7 +25,7 @@ export const insertElementData = (elementData: ElementDataType) => {
         image.src = elementData.Data;
 
         image.onload = async function () {
-          AddElementDataReducer.call(
+          Client.reducers.addElementData(
             elementData.Name,
             elementData.DataType,
             elementData.Data,
@@ -37,13 +37,13 @@ export const insertElementData = (elementData: ElementDataType) => {
       } else {
         getBase64(elementData.Data, (result: { r: any; w: number; h: number }) => {
           const arr = convertDataURIToBinary(result.r);
-          AddElementDataArrayReducer.call(elementData.Name, elementData.DataType, "", arr, result.w, result.h);
+          Client.reducers.addElementDataArray(elementData.Name, elementData.DataType, "", arr, result.w, result.h);
         });
       }
       break;
 
     case DataType.WidgetElement:
-      AddElementDataReducer.call(
+      Client.reducers.addElementData(
         elementData.Name,
         elementData.DataType,
         elementData.Data,

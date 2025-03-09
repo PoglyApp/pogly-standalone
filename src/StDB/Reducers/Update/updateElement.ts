@@ -1,5 +1,5 @@
-import ElementStruct from "../../../module_bindings/element_struct";
-import UpdateElementReducer from "../../../module_bindings/update_element_reducer";
+import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { ElementStruct } from "../../../module_bindings";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
@@ -13,6 +13,7 @@ export const updateElement = (
   clip?: string,
   locked?: boolean
 ) => {
+  const { Client } = useSpacetimeContext();
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 0px)");
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -24,7 +25,7 @@ export const updateElement = (
     transformCoords.scaleY
   );
 
-  UpdateElementReducer.call(
+  Client.reducers.updateElement(
     elementId,
     element,
     transparency || 100,
