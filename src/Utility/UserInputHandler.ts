@@ -9,8 +9,7 @@ import { DebugLogger } from "./DebugLogger";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { handleFlipElement } from "./ContextMenuMethods";
 import { Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
-import { useContext } from "react";
-import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const UserInputHandler = (
   activeLayout: Layouts,
@@ -19,7 +18,7 @@ export const UserInputHandler = (
   compressPaste: boolean | undefined,
   transformRef: ReactZoomPanPinchRef | null
 ): any => {
-  const spacetime = useContext(SpacetimeContext);
+  const { Client } = useSpacetimeContext();
   const userInputs = [];
 
   // GO HOME
@@ -50,7 +49,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("Deleting element");
-        selectoElements.forEach((e) => spacetime?.Client.reducers.deleteElement(Number(e.id)));
+        selectoElements.forEach((e) => Client.reducers.deleteElement(Number(e.id)));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to Delete an element!");
       }
@@ -68,7 +67,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("showing element(s)");
-        selectoElements.forEach((e) => spacetime?.Client.reducers.updateElementTransparency(Number(e.id), 100));
+        selectoElements.forEach((e) => Client.reducers.updateElementTransparency(Number(e.id), 100));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to show an element(s)!");
       }
@@ -86,7 +85,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("hiding element(s)");
-        selectoElements.forEach((e) => spacetime?.Client.reducers.updateElementTransparency(Number(e.id), 0));
+        selectoElements.forEach((e) => Client.reducers.updateElementTransparency(Number(e.id), 0));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to hide an element(s)!");
       }
@@ -105,12 +104,12 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
         DebugLogger("Deleting and copying element");
 
-        spacetime?.Client.reducers.deleteElement(selectedElement.Elements.id);
+        Client.reducers.deleteElement(selectedElement.Elements.id);
       } catch {
         console.log("Pogly encountered an issue when attempting to Cut an element!");
       }
@@ -129,7 +128,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
         DebugLogger("Duplicating element");
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element)
           insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
@@ -151,7 +150,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
         DebugLogger("Copying element");
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
       } catch {
@@ -275,7 +274,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -325,7 +324,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -375,7 +374,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -425,7 +424,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -475,7 +474,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -526,7 +525,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -576,7 +575,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -626,7 +625,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = spacetime?.Client.db.elements.id.find(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 

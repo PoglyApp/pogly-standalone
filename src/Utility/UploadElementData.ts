@@ -1,11 +1,9 @@
-import { useContext } from "react";
 import { DebugLogger } from "./DebugLogger";
-import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import { ElementData, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 
 export const UploadElementDataFromFile = (backupFile: any) => {
-  const spacetime = useContext(SpacetimeContext);
-  if(!spacetime?.Client) return;
+  const { Client } = useSpacetimeContext();
 
   DebugLogger("Uploading element data from file");
   let reader = new FileReader();
@@ -20,7 +18,7 @@ export const UploadElementDataFromFile = (backupFile: any) => {
     data = reader.result.toString();
     var elements = JSON.parse(data) as any[];
     elements.forEach((e) => {
-      spacetime.Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+      Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
     });
   };
 
@@ -31,19 +29,17 @@ export const UploadElementDataFromFile = (backupFile: any) => {
 };
 
 export const UploadElementDataFromString = (data: string) => {
-  const spacetime = useContext(SpacetimeContext);
-  if(!spacetime?.Client) return;
+  const { Client } = useSpacetimeContext();
 
   DebugLogger("Uploading element data from string");
   var elements = JSON.parse(data) as any[];
   elements.forEach((e) => {
-    spacetime.Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+    Client.reducers.addElementData(e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
   });
 };
 
 export const UploadBackupFromFile = (backupFile: any) => {
-  const spacetime = useContext(SpacetimeContext);
-  if(!spacetime?.Client) return;
+  const { Client } = useSpacetimeContext();
 
   DebugLogger("Uploading backup from a file");
   let reader = new FileReader();
@@ -64,10 +60,10 @@ export const UploadBackupFromFile = (backupFile: any) => {
 
     let maxLayout = 0;
     let maxData = 0;
-    Array.from(spacetime.Client.db.layouts.iter()).forEach((l: Layouts) => {
+    Array.from(Client.db.layouts.iter()).forEach((l: Layouts) => {
       if (l.id > maxLayout) maxLayout = l.id;
     });
-    Array.from(spacetime.Client.db.elementData.iter()).forEach((d: ElementData) => {
+    Array.from(Client.db.elementData.iter()).forEach((d: ElementData) => {
       if (d.id > maxData) maxData = d.id;
     });
 
@@ -75,9 +71,9 @@ export const UploadBackupFromFile = (backupFile: any) => {
       const upData: ElementData[] = JSON.parse(backup.data) as ElementData[];
       upData.forEach((e) => {
         if(e.byteArray) {
-          spacetime.Client.reducers.addElementDataArrayWithId(e.id, e.name, e.dataType, e.data, e.byteArray, e.dataWidth || 128, e.dataHeight || 128);
+          Client.reducers.addElementDataArrayWithId(e.id, e.name, e.dataType, e.data, e.byteArray, e.dataWidth || 128, e.dataHeight || 128);
         } else {
-          spacetime.Client.reducers.addElementDataWithId(e.id, e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
+          Client.reducers.addElementDataWithId(e.id, e.name, e.dataType, e.data, e.dataWidth || 128, e.dataHeight || 128);
         }
       });
     }
@@ -132,7 +128,7 @@ export const UploadBackupFromFile = (backupFile: any) => {
             break;
         }
 
-        spacetime.Client.reducers.addElementToLayout(newElementStruct, e.transparency, e.transform, e.clip, layoutId, undefined);
+        Client.reducers.addElementToLayout(newElementStruct, e.transparency, e.transform, e.clip, layoutId, undefined);
       });
     }
   };

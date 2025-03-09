@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
 export const StartHeartbeat = () => {
-  const spacetime = useContext(SpacetimeContext);
+  const { Client } = useSpacetimeContext();
 
   if (heartbeatInterval) {
     //console.warn("Heartbeat already running.");
@@ -13,7 +12,7 @@ export const StartHeartbeat = () => {
 
   heartbeatInterval = setInterval(() => {
     try {
-      spacetime?.Client.reducers.pingHeartbeat(); 
+      Client.reducers.pingHeartbeat(); 
       //console.log("ping");
     } catch (error) {
       console.error("Failed to send heartbeat ping:", error);

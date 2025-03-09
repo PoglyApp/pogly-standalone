@@ -1,6 +1,5 @@
-import { useContext } from "react";
 import { DebugLogger } from "./DebugLogger";
-import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 // "Compiler" is a very generous term for what this method does
 export const WidgetCodeCompiler = (
@@ -10,14 +9,14 @@ export const WidgetCodeCompiler = (
   rawData?: string
 ) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const spacetime = useContext(SpacetimeContext);
+  const { Client } = useSpacetimeContext();
 
   DebugLogger("'Compiling' widget");
   let widgetData: any = rawData ? JSON.parse(rawData) : null;
 
   if (!widgetData) {
     if (!elementDataId) return "";
-    const elementData = spacetime?.Client.db.elementData.id.find(elementDataId);
+    const elementData = Client.db.elementData.id.find(elementDataId);
     
     if (!elementData) return "";
     const data = elementData.data;
