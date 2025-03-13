@@ -2,9 +2,8 @@ FROM clockworklabs/spacetime:latest AS module
 WORKDIR /app
 
 COPY --chown=spacetime:spacetime server .
-RUN ls -lah
-RUN spacetime build 
-RUN mv /app/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
+RUN spacetime build \
+    && mv /app/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
 
 FROM node:20-alpine AS web
 WORKDIR /app
