@@ -4,6 +4,7 @@ import { EventContext, Layouts } from "../../module_bindings";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setActiveLayout: Function) => {
+  const { Client } = useSpacetimeContext();
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
   const activeLayoutRef = useRef<Layouts | undefined>(activeLayout);
 
@@ -14,7 +15,6 @@ export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setAct
 
   useEffect(() => {
     if (eventsInitialized) return;
-    const { Client } = useSpacetimeContext();
 
     DebugLogger("Initializing overlay layout events");
 
@@ -35,7 +35,7 @@ export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setAct
       if (!activeLayoutRef.current) return;
       if (oldLayout.id !== activeLayoutRef.current.id) return;
 
-      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => {l.active===true}));
+      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active===true));
     });
 
     setEventsInitialized(true);

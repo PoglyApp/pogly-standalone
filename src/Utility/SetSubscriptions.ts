@@ -1,12 +1,14 @@
 import { DebugLogger } from "./DebugLogger";
-import { DbConnection } from "../module_bindings";
+import { DbConnection, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
+import { SubscriptionEventContextInterface } from "@clockworklabs/spacetimedb-sdk";
 
 export const SetSubscriptions = (client: DbConnection, setStdbInitialized: Function, setStdbSubscriptions: Function) => {
   DebugLogger("Subscribing to tables");
+  
   client.subscriptionBuilder()
-    .onApplied(() => {
-      setStdbInitialized(true);
+    .onApplied((ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>) => {
       setStdbSubscriptions(true);
+      console.log(ctx.db.elementData.iter());
     })
     .subscribe([
     "SELECT * FROM Heartbeat",
@@ -17,5 +19,5 @@ export const SetSubscriptions = (client: DbConnection, setStdbInitialized: Funct
     "SELECT * FROM Permissions",
     "SELECT * FROM Layouts",
     ]);
-  return true;
+    setStdbInitialized(true);
 };

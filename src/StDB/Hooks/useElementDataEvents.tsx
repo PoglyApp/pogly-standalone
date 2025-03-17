@@ -17,7 +17,7 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
     DebugLogger("Initializing element data events");
 
     Client.db.elementData.onInsert((ctx: EventContext, element: ElementData) => {
-      if (ctx.event) return;
+      if (!ctx.event) return;
 
       const imageSkeleton = document.getElementById("imageSkeleton");
       if (imageSkeleton) imageSkeleton.style.display = "none";
@@ -48,6 +48,8 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
     });
 
     Client.db.elementData.onDelete((ctx: EventContext, element: ElementData) => {
+      if (!ctx.event) return;
+      
       dispatch(removeElementData(element));
     });
 

@@ -14,7 +14,7 @@ import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
-import { ElementData, Elements, EventContext, ImageElement, ImageElementData, Layouts, Reducer, TextElement, WidgetElement } from "../../module_bindings";
+import { ElementData, Elements, EventContext, ImageElement, ImageElementData, Layouts, Reducer, ReducerEventContext, TextElement, WidgetElement } from "../../module_bindings";
 import { Event, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export const useElementsEvents = (
@@ -188,7 +188,7 @@ export const useElementsEvents = (
 
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
-            const htmlTag = WidgetCodeCompiler(
+            const htmlTag = WidgetCodeCompiler(Client,
               newWidgetElement.width,
               newWidgetElement.height,
               undefined,

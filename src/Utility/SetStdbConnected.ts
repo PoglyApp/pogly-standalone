@@ -1,6 +1,5 @@
 import { DebugLogger } from "./DebugLogger";
 import { Config, DbConnection, EventContext, Guests } from "../module_bindings";
-import { ConnectionId } from "@clockworklabs/spacetimedb-sdk";
 
 export const SetStdbConnected = (
   client: DbConnection,
