@@ -114,7 +114,7 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
-  }, [stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime, isWidget]);
+  }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime, isWidget]);
 
   useEffect(() => {
     if (isWidget) return;
@@ -128,7 +128,6 @@ export const App: React.FC = () => {
     if (!spacetime.Client) return;
 
     DebugLogger("Setting active layout");
-
     if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
   }, [activeLayout, stdbInitialized, isWidget, spacetime.Client]);
 
@@ -311,7 +310,6 @@ export const App: React.FC = () => {
 
   // Step 5) Redo final subscriptions ONLY ONCE && Start client heartbeat
   if (!stdbInitialized) {
-    if (stdbInitialized || stdbSubscriptions) return <Loading text="Loading data..." />;
     DebugLogger("Starting Client->Server heartbeat!");
     StartHeartbeat(spacetime.Client);
     DebugLogger("Redoing subscriptions");
@@ -319,11 +317,11 @@ export const App: React.FC = () => {
   }
 
   // Step 6) Is SpacetimeDB fully initialized?
-  if (!stdbInitialized) {
-    DebugLogger("Waiting for SpacetimeDB to fully initialize");
-    return <Loading text="Loading Data" />;
+  if(!stdbSubscriptions) {
+    DebugLogger("Waiting for subscriptions");
+    return <Loading text="Loading data..." />;
   }
-
+  
   if (!spacetimeContext) {
     DebugLogger("Waiting for SpacetimeDB context");
     return <Loading text="Loading Canvas" />;

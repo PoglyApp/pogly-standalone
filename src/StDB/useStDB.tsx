@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Identity, ConnectionId} from "@clockworklabs/spacetimedb-sdk";
+import { Identity, ConnectionId, SubscriptionEventContextInterface} from "@clockworklabs/spacetimedb-sdk";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
-import { Config, DbConnection, ErrorContext } from "../module_bindings";
+import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { StopHeartbeat } from "../Utility/PingHeartbeat";
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
@@ -16,7 +16,7 @@ const useStDB = (
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
-  const clientRef = useRef<DbConnection>();
+  const [client, setClient] = useState<DbConnection>();
 
   useEffect(() => {
     if (!connectionConfig) return;
@@ -34,7 +34,7 @@ const useStDB = (
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
         setIdentity(identity);
-        clientRef.current = DbCtx;
+        setClient(DbCtx);
         if(!isOverlay) localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
@@ -72,12 +72,9 @@ const useStDB = (
       .onDisconnect(onDisconnect)
       .build();
       
-    const onSubscriptionsApplied = () => {
-      
+    const onSubscriptionsApplied = (ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>) => {
       try {
-        if(!clientRef.current) return;
-
-        const fetchedConfig = clientRef.current.db.config.version.find(0);
+        const fetchedConfig = ctx.db.config.version.find(0);
         
         if(!fetchedConfig) {
           setError(true);
@@ -88,12 +85,7 @@ const useStDB = (
   
         setConfig(fetchedConfig);
   
-        if(!clientRef.current.connectionId) {
-          setError(true);
-          return;
-        }
-  
-        SetStdbConnected(clientRef.current, fetchedConfig, setStdbConnected, setStdbAuthenticated);
+        SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
       } catch {
         console.log("initialStateSync failed:", error);
       }
@@ -102,7 +94,7 @@ const useStDB = (
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbAuthenticated, error]);
 
   return {
-    Client: clientRef.current,
+    Client: client,
     Identity: identity,
     InstanceConfig: config,
     Error: error,

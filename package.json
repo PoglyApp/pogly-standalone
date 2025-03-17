@@ -3,7 +3,7 @@
   "version": "0.2.2",
   "private": true,
   "dependencies": {
-    "@clockworklabs/spacetimedb-sdk": "^1.0.2",
+    "@clockworklabs/spacetimedb-sdk": "^1.0.3",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@reduxjs/toolkit": "^2.0.1",
