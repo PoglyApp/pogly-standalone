@@ -12,6 +12,7 @@ import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
+import UpdateGuestNicknameReducer from "../module_bindings/update_guest_nickname_reducer";
 
 interface IProps {
   disconnected: boolean;
@@ -41,6 +42,7 @@ export const Overlay = (props: IProps) => {
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");
     const transparent = urlParams.get("transparent");
+    const nickname = urlParams.get("nickname");
 
     ClearRefreshOverlayRequestsReducer.call();
 
@@ -55,6 +57,10 @@ export const Overlay = (props: IProps) => {
     if (transparent != null) {
       document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
       document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    }
+
+    if (nickname != null) {
+      UpdateGuestNicknameReducer.call(nickname);
     }
   }, []);
 

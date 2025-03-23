@@ -56,7 +56,7 @@ export const GuestListContainer = () => {
     <>
       <Container id="GuestList">
         {displayedGuests.map((guest: Guests) => {
-          if ((config.authentication && guest.authenticated) || !config.authentication) {
+          if (config.authentication || !config.authentication) {
             //Authentication Enabled - Guest Authenticated
             if (guest.nickname !== "") {
               return (
