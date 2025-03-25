@@ -88,6 +88,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (isWidget) return;
     if (!stdbInitialized) return;
+    if (!stdbSubscriptions) return;
     if (!spacetime.Identity) return;
     if (!spacetime.Client) return;
     if (!spacetime.Runtime) return;
@@ -125,11 +126,12 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (isWidget) return;
     if (!stdbInitialized) return;
+    if (!stdbSubscriptions) return;
     if (!spacetime.Client) return;
 
     DebugLogger("Setting active layout");
     if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
-  }, [activeLayout, stdbInitialized, isWidget, spacetime.Client]);
+  }, [activeLayout, stdbInitialized, stdbSubscriptions, isWidget, spacetime.Client]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(

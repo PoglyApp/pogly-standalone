@@ -19,5 +19,6 @@ export const SetSubscriptions = (client: DbConnection, setStdbInitialized: Funct
     "SELECT * FROM Permissions",
     "SELECT * FROM Layouts",
     ]);
+    
     setStdbInitialized(true);
 };
