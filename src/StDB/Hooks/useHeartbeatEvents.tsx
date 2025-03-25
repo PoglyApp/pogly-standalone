@@ -28,5 +28,5 @@ export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => 
     Client.db.heartbeat.onUpdate((ctx: EventContext, oldElement: Heartbeat, newElement: Heartbeat) => {
       internalBeat = newElement.tick;
     });
-  }, [Identity, canvasInitialized.elementEventsInitialized]);
+  }, [Identity, canvasInitialized.elementEventsInitialized, Client]);
 };

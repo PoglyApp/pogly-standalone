@@ -60,7 +60,7 @@ const useFetchElement = (
 
     setFetchedLayout(layout);
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch]);
+  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch, Client]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

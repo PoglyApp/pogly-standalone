@@ -16,7 +16,7 @@ export const useConfigEvents = (canvasInitialized: CanvasInitializedType) => {
     Client.db.config.onUpdate((ctx: EventContext, oldConfig: Config, newConfig: Config) => {
       if(oldConfig !== newConfig) setReload(!reload);
     });
-  }, [Identity, reload, setReload, canvasInitialized.elementEventsInitialized]);
+  }, [Identity, reload, setReload, canvasInitialized.elementEventsInitialized, Client]);
 
   return reload;
 };

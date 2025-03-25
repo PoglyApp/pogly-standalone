@@ -249,5 +249,6 @@ export const useElementsEvents = (
     setSelectoTargets,
     layout,
     dispatch,
+    Client
   ]);
 };

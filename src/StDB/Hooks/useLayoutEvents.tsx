@@ -65,5 +65,5 @@ export const useLayoutEvents = (setLayouts: Function) => {
     });
 
     setEventsInitialized(true);
-  }, [eventsInitialized, setLayouts, layoutContext]);
+  }, [eventsInitialized, setLayouts, layoutContext, Client]);
 };

@@ -46,7 +46,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
         return a.id - b.id;
       })
     );
-  }, []);
+  }, [Client]);
 
   const handleDeleteLayout = () => {
     DebugLogger("Deleting layout");

@@ -140,7 +140,7 @@ export const TextCreationModal = (props: IProps) => {
     }
 
     setShowModal(true);
-  }, [props.editElementId]);
+  }, [props.editElementId, Client]);
 
   useEffect(() => {
     setError("");

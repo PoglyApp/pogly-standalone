@@ -118,6 +118,7 @@ export const useGuestsEvents = (
     setCanvasInitialized,
     dispatch,
     Identity.selectedLayoutId,
+    Client
   ]);
 
   return disconnected;

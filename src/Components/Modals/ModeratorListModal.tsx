@@ -20,7 +20,7 @@ export const ModeratorListModal = () => {
     const filterModerators = permissions.filter((obj: Permissions) => obj.permissionLevel.tag === "Moderator");
 
     setModerators(() => filterModerators);
-  }, []);
+  }, [Client]);
 
   const handleDeletePermission = (identity: Identity) => {
     Client.reducers.clearIdentityPermission(identity);

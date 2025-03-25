@@ -54,5 +54,5 @@ export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, s
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementDataEventsInitialized: true }));
-  }, [canvasInitialized.elementDataEventsInitialized, setCanvasInitialized, dispatch]);
+  }, [canvasInitialized.elementDataEventsInitialized, setCanvasInitialized, dispatch, Client]);
 };

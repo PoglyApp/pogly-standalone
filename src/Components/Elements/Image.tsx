@@ -44,7 +44,8 @@ export const Image = (props: IProp) => {
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
-    Identity.address
+    Identity.address,
+    Client
   ]);
 
   const renderDisplay = () => {

@@ -24,7 +24,7 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
     dispatch(initGuests(guests));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestFetchInitialized: true }));
-  }, [Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch]);
+  }, [Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch, Client]);
 };
 
 export default useFetchGuests;

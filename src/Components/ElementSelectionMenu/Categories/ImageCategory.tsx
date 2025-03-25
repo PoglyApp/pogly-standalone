@@ -54,7 +54,7 @@ export const ImageCategory = React.memo((props: IProps) => {
         closeModal("spotlight_modal", modals, setModals);
       }
     },
-    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals]
+    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals, Client]
   );
 
   const filteredElements = useMemo(() => {

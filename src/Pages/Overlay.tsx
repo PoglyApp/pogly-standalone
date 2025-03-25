@@ -57,7 +57,7 @@ export const Overlay = (props: IProps) => {
       document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
       document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
     }
-  }, []);
+  }, [Client]);
 
   if (disconnected || props.disconnected) {
     DebugLogger("Overlay is disconnected");

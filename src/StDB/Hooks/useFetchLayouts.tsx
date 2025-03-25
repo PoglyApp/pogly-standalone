@@ -14,7 +14,7 @@ const useFetchLayouts = (setLayouts: Function) => {
         return a.id - b.id;
       })
     );
-  }, [setLayouts]);
+  }, [setLayouts, Client]);
 };
 
 export default useFetchLayouts;

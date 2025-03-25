@@ -33,7 +33,7 @@ export const UpdateElementSourceModal = (props: IProps) => {
     } else {
       setSource(imageElement.imageElementData.value);
     }
-  }, [props.selectedElement]);
+  }, [props.selectedElement, Client]);
 
   const handleSave = () => {
     const newImageElementData: ImageElementData = { tag: "RawData", value: source };

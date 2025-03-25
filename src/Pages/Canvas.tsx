@@ -115,7 +115,7 @@ export const Canvas = (props: IProps) => {
     setSelectoTargets(() => []);
 
     Client.reducers.updateGuestSelectedElement(0);
-  }, [layoutContext]);
+  }, [layoutContext, Client]);
 
   useEffect(() => {
     DebugLogger("Setting active page");

@@ -51,7 +51,7 @@ export const WidgetCategory = React.memo((props: IProps) => {
         layoutContext.activeLayout
       );
     },
-    [layoutContext.activeLayout]
+    [layoutContext.activeLayout, Client]
   );
 
   return (

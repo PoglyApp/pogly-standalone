@@ -38,10 +38,10 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode = useMemo(() => Client.db.config.version.find(0)!.strictMode, []);
+  const strictMode = useMemo(() => Client.db.config.version.find(0)!.strictMode, [Client]);
   const permissionLevel = useMemo(
     () => Client.db.permissions.identity.find(Identity.identity)?.permissionLevel,
-    [Identity.identity]
+    [Identity.identity, Client]
   );
 
   const memoizedStrictSettings = useMemo(

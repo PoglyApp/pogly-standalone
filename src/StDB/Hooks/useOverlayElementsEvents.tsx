@@ -208,5 +208,5 @@ export const useOverlayElementsEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch, isOverlay]);
+  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch, isOverlay, Client]);
 };

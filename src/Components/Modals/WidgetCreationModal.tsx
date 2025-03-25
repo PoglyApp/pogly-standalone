@@ -106,7 +106,7 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT DATA ID", error);
     }
-  }, [props]);
+  }, [props, Client]);
 
   const loadByElementID = useCallback(() => {
     if (!props.editElementId) return;
@@ -136,7 +136,7 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT ID", error);
     }
-  }, [props]);
+  }, [props, Client]);
 
   const loadByWidgetString = (widgetString: string) => {
     try {
