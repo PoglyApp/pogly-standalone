@@ -37,7 +37,6 @@ export const App: React.FC = () => {
   const [versionNumber, setVersionNumber] = useState<string>("");
   const [activePage, setActivePage] = useState<Number>(0);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const isWidget: Boolean = window.location.href.includes("/widget");
 
   // CANVAS
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -78,15 +77,9 @@ export const App: React.FC = () => {
   useGetVersionNumber(setVersionNumber);
   useGetConnectionConfig(setConnectionConfig);
 
-  const spacetime = useStDB(
-    connectionConfig,
-    setStdbConnected,
-    setStdbAuthenticated,
-    setInstanceConfigured
-  );
+  const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setInstanceConfigured);
 
   useEffect(() => {
-    if (isWidget) return;
     if (!stdbInitialized) return;
     if (!stdbSubscriptions) return;
     if (!spacetime.Identity) return;
@@ -115,23 +108,22 @@ export const App: React.FC = () => {
       ElementData: [],
       Guests: [],
     });
-  }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime, isWidget]);
+  }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime]);
 
   useEffect(() => {
-    if (isWidget) return;
     DebugLogger("Setting SpacetimeDB authenticated ref");
     stdbAuthenticatedRef.current = stdbAuthenticated;
-  }, [stdbAuthenticated, isWidget]);
+  }, [stdbAuthenticated]);
 
   useEffect(() => {
-    if (isWidget) return;
     if (!stdbInitialized) return;
     if (!stdbSubscriptions) return;
     if (!spacetime.Client) return;
 
     DebugLogger("Setting active layout");
-    if (!activeLayout) setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
-  }, [activeLayout, stdbInitialized, stdbSubscriptions, isWidget, spacetime.Client]);
+    if (!activeLayout)
+      setActiveLayout(Array.from(spacetime.Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
+  }, [activeLayout, stdbInitialized, stdbSubscriptions, spacetime.Client]);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -158,10 +150,6 @@ export const App: React.FC = () => {
       </Route>
     )
   );
-
-  if (isWidget) {
-    return <RouterProvider router={router} />;
-  }
 
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
@@ -268,6 +256,7 @@ export const App: React.FC = () => {
                 Either multiple tabs are open, or an error occurred and your identity is still signed in."
           clearSettings={true}
           kickSelf={true}
+          client={spacetime.Client}
         />
       );
     }
@@ -319,11 +308,11 @@ export const App: React.FC = () => {
   }
 
   // Step 6) Is SpacetimeDB fully initialized?
-  if(!stdbSubscriptions) {
+  if (!stdbSubscriptions) {
     DebugLogger("Waiting for subscriptions");
     return <Loading text="Loading data..." />;
   }
-  
+
   if (!spacetimeContext) {
     DebugLogger("Waiting for SpacetimeDB context");
     return <Loading text="Loading Canvas" />;

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ClearConnectionSettings } from "../../Utility/ClearConnectionSettings";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { DbConnection } from "../../module_bindings/index";
 
 interface IProp {
   type: string; //should be "timer" or "button"
@@ -13,10 +13,10 @@ interface IProp {
   contentText: string;
   clearSettings: boolean;
   kickSelf?: boolean;
+  client?: DbConnection;
 }
 
 export const ErrorRefreshModal = (props: IProp) => {
-  const { Client } = useSpacetimeContext();
   const [timer, setTimer] = useState<number>(props.refreshTimer || 5);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -39,7 +39,7 @@ export const ErrorRefreshModal = (props: IProp) => {
 
   const handleClick = () => {
     DebugLogger("Handling refresh click");
-    if (props.kickSelf) Client.reducers.kickSelf();
+    if (props.kickSelf && props.client) props.client.reducers.kickSelf();
 
     window.location.reload();
   };
