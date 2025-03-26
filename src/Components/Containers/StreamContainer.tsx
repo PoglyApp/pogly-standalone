@@ -25,16 +25,14 @@ const StreamContainer = () => {
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
+    const warningSetting = localStorage.getItem("contentWarning");
+    if (warningSetting) return;
 
     setTimeout(function () {
       if (player.getPlayerState().playback === "Ready") {
-        const warningSetting = localStorage.getItem("contentWarning");
-
-        if (!warningSetting) {
-          document.getElementById("contentWarning")?.style.setProperty("display", "flex");
-        }
+        document.getElementById("contentWarning")?.style.setProperty("display", "flex");
       }
-    }, 3000);
+    }, 1000);
   };
 
   const handleCloseWarning = () => {
