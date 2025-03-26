@@ -1,8 +1,9 @@
-import { useState, useEffect, useContext, memo } from "react";
+import { useState, useEffect, useContext, memo, useRef } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Config } from "../../module_bindings";
+import styled from "styled-components";
 
 const StreamContainer = () => {
   const config: Config = useContext(ConfigContext);
@@ -24,10 +25,44 @@ const StreamContainer = () => {
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
+
+    setTimeout(function () {
+      if (player.getPlayerState().playback === "Ready") {
+        const warningSetting = localStorage.getItem("contentWarning");
+
+        if (!warningSetting) {
+          document.getElementById("contentWarning")?.style.setProperty("display", "flex");
+        }
+      }
+    }, 3000);
+  };
+
+  const handleCloseWarning = () => {
+    localStorage.setItem("contentWarning", "true");
+    document.getElementById("contentWarning")?.style.setProperty("display", "none");
   };
 
   return (
     <>
+      <StreamWarning id="contentWarning">
+        <p style={{ margin: "0px", fontSize: "30px", paddingLeft: "10px" }}>
+          Unable to view the stream? You can make the player interactive from settings!
+        </p>
+        <a
+          style={{
+            right: "0",
+            alignSelf: "center",
+            paddingRight: "20px",
+            cursor: "pointer",
+            textDecoration: "underline",
+            position: "absolute",
+          }}
+          onClick={handleCloseWarning}
+        >
+          Don't show this again
+        </a>
+      </StreamWarning>
+
       {config.streamingPlatform === "twitch" && !streamOverride && (
         <TwitchPlayer
           style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
@@ -79,5 +114,20 @@ const StreamContainer = () => {
     </>
   );
 };
+
+const StreamWarning = styled.div`
+  background-color: #c27707;
+  color: #ffffffd9 !important;
+  align-content: center;
+
+  border-style: solid;
+  border-color: #a76707;
+  border-radius: 0px !important;
+
+  height: 40px;
+  margin-bottom: 0px;
+
+  display: none;
+`;
 
 export default memo(StreamContainer, (prevProps, nextProps) => true);
