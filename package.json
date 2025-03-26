@@ -2,6 +2,7 @@
   "name": "pogly-standalone",
   "version": "0.2.2",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@clockworklabs/spacetimedb-sdk": "^1.0.3",
     "@mui/icons-material": "^5.15.18",
@@ -38,9 +39,10 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "gen bindings": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ./server"
+    "start": "vite",
+    "build": "vite build",
+    "gen bindings": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ./server",
+    "dev": "vite"
   },
   "eslintConfig": {
     "extends": [
@@ -69,6 +71,10 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/markdown-it": "^14.1.2",
-    "@types/prismjs": "^1.26.4"
+    "@types/prismjs": "^1.26.4",
+    "@types/node": "^22.13.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.1.0",
+    "vite-tsconfig-paths": "^4.3.2"
   }
 }
