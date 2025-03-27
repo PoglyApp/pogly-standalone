@@ -88,7 +88,7 @@ export const ChooseInstanceModal = (props: IProp) => {
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
+      <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6", width: "370px", textAlign: "center" }}>
         Connect to Pogly Standalone instance
       </DialogTitle>
 
@@ -177,6 +177,23 @@ export const ChooseInstanceModal = (props: IProp) => {
           </p>
         </div>
         <div>
+          <Button
+            variant="outlined"
+            sx={{
+              color: "#ffffffa6",
+              marginRight: "10px",
+              borderColor: "#6441a5",
+              backgroundColor: "#6441a5",
+              "&:hover": { borderColor: "#6441a5b2", backgroundColor: "#6441a5b2" },
+              "&:disabled": {
+                borderColor: "gray",
+                color: "gray",
+              },
+            }}
+            onClick={handleSave}
+          >
+            <img style={{ width: "16px", height: "16px" }} src="./assets/twitch.png" />
+          </Button>
           <Button
             disabled={moduleName === "" ? true : false}
             variant="outlined"
