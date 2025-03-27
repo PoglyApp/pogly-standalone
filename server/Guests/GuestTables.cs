@@ -27,6 +27,7 @@ public partial class Module
         [PrimaryKey]
         public Identity Identity;
 
+        public string Nickname;
         public PermissionLevel PermissionLevel;
     }
 }

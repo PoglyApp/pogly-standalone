@@ -49,20 +49,11 @@ export const ModeratorListModal = () => {
             </div>
           ) : (
             <>
-              <Alert
-                variant="filled"
-                severity="warning"
-                sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "400px" }}
-              >
-                Due to an oversight, unfortunately we cannot link offline moderators to nicknames at this time - will be
-                fixed in a future update.
-              </Alert>
-
               {moderators.map((mod: Permissions) => {
                 return (
                   <Container key={"mod_" + mod.identity.toHexString().substring(0, 5)}>
                     <StyledDeleteIcon onClick={() => handleDeletePermission(mod.identity)} />
-                    <IdentitySpan>{mod.identity.toHexString().substring(0, 40)}...</IdentitySpan>
+                    <IdentitySpan>{mod.nickname === "" ? mod.nickname : "Unknown..."}</IdentitySpan>
                   </Container>
                 );
               })}

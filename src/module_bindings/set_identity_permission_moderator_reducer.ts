@@ -33,6 +33,7 @@ import {
 
 export type SetIdentityPermissionModerator = {
   identity: Identity,
+  nickname: string,
 };
 
 /**
@@ -46,6 +47,7 @@ export namespace SetIdentityPermissionModerator {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("identity", AlgebraicType.createIdentityType()),
+      new ProductTypeElement("nickname", AlgebraicType.createStringType()),
     ]);
   }
 

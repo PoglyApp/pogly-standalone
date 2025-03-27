@@ -1391,35 +1391,35 @@ export class RemoteReducers {
     this.connection.offReducer("SetConfig", callback);
   }
 
-  setIdentityPermission(identity: Identity, permissionLevel: PermissionLevel) {
-    const __args = { identity, permissionLevel };
+  setIdentityPermission(identity: Identity, permissionLevel: PermissionLevel, nickname: string) {
+    const __args = { identity, permissionLevel, nickname };
     let __writer = new BinaryWriter(1024);
     SetIdentityPermission.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("SetIdentityPermission", __argsBuffer, this.setCallReducerFlags.setIdentityPermissionFlags);
   }
 
-  onSetIdentityPermission(callback: (ctx: ReducerEventContext, identity: Identity, permissionLevel: PermissionLevel) => void) {
+  onSetIdentityPermission(callback: (ctx: ReducerEventContext, identity: Identity, permissionLevel: PermissionLevel, nickname: string) => void) {
     this.connection.onReducer("SetIdentityPermission", callback);
   }
 
-  removeOnSetIdentityPermission(callback: (ctx: ReducerEventContext, identity: Identity, permissionLevel: PermissionLevel) => void) {
+  removeOnSetIdentityPermission(callback: (ctx: ReducerEventContext, identity: Identity, permissionLevel: PermissionLevel, nickname: string) => void) {
     this.connection.offReducer("SetIdentityPermission", callback);
   }
 
-  setIdentityPermissionEditor(identity: Identity) {
-    const __args = { identity };
+  setIdentityPermissionEditor(identity: Identity, nickname: string) {
+    const __args = { identity, nickname };
     let __writer = new BinaryWriter(1024);
     SetIdentityPermissionEditor.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("SetIdentityPermissionEditor", __argsBuffer, this.setCallReducerFlags.setIdentityPermissionEditorFlags);
   }
 
-  onSetIdentityPermissionEditor(callback: (ctx: ReducerEventContext, identity: Identity) => void) {
+  onSetIdentityPermissionEditor(callback: (ctx: ReducerEventContext, identity: Identity, nickname: string) => void) {
     this.connection.onReducer("SetIdentityPermissionEditor", callback);
   }
 
-  removeOnSetIdentityPermissionEditor(callback: (ctx: ReducerEventContext, identity: Identity) => void) {
+  removeOnSetIdentityPermissionEditor(callback: (ctx: ReducerEventContext, identity: Identity, nickname: string) => void) {
     this.connection.offReducer("SetIdentityPermissionEditor", callback);
   }
 
@@ -1439,19 +1439,19 @@ export class RemoteReducers {
     this.connection.offReducer("SetIdentityPermissionEditorByName", callback);
   }
 
-  setIdentityPermissionModerator(identity: Identity) {
-    const __args = { identity };
+  setIdentityPermissionModerator(identity: Identity, nickname: string) {
+    const __args = { identity, nickname };
     let __writer = new BinaryWriter(1024);
     SetIdentityPermissionModerator.getTypeScriptAlgebraicType().serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("SetIdentityPermissionModerator", __argsBuffer, this.setCallReducerFlags.setIdentityPermissionModeratorFlags);
   }
 
-  onSetIdentityPermissionModerator(callback: (ctx: ReducerEventContext, identity: Identity) => void) {
+  onSetIdentityPermissionModerator(callback: (ctx: ReducerEventContext, identity: Identity, nickname: string) => void) {
     this.connection.onReducer("SetIdentityPermissionModerator", callback);
   }
 
-  removeOnSetIdentityPermissionModerator(callback: (ctx: ReducerEventContext, identity: Identity) => void) {
+  removeOnSetIdentityPermissionModerator(callback: (ctx: ReducerEventContext, identity: Identity, nickname: string) => void) {
     this.connection.offReducer("SetIdentityPermissionModerator", callback);
   }
 

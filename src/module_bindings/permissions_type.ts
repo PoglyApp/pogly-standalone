@@ -34,6 +34,7 @@ import { PermissionLevel as __PermissionLevel } from "./permission_level_type";
 
 export type Permissions = {
   identity: Identity,
+  nickname: string,
   permissionLevel: __PermissionLevel,
 };
 
@@ -48,6 +49,7 @@ export namespace Permissions {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("identity", AlgebraicType.createIdentityType()),
+      new ProductTypeElement("nickname", AlgebraicType.createStringType()),
       new ProductTypeElement("permissionLevel", __PermissionLevel.getTypeScriptAlgebraicType()),
     ]);
   }
