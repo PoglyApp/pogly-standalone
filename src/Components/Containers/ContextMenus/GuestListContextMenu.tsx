@@ -66,7 +66,7 @@ export const GuestListContextMenu = (props: IProps) => {
             ) : (
               <StyledMenuItemGreen
                 onClick={() => {
-                  Client.reducers.setIdentityPermissionModerator(selectedGuest.identity, selectedGuest.nickname);
+                  Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
                   handleClose();
                 }}
               >

@@ -8,6 +8,7 @@ public partial class Module
         [PrimaryKey]
         public ConnectionId Address;
         
+        [SpacetimeDB.Index.BTree(Name = "Identity")]
         public Identity Identity;
 
         public string Nickname;

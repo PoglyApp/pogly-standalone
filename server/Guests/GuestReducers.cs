@@ -226,7 +226,7 @@ public partial class Module
     }
 
     [Reducer]
-    public static void SetIdentityPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel, string nickname)
+    public static void SetIdentityPermission(ReducerContext ctx, Identity identity, PermissionLevel permissionLevel)
     {
         string func = "SetIdentityPermission";
 
@@ -238,13 +238,14 @@ public partial class Module
         try
         {
             var perm = ctx.Db.Permissions.Identity.Find(identity);
+            var targetGuest = ctx.Db.Guests.Identity.Filter(identity).First();
             
             if (perm is null)
             {
                 ctx.Db.Permissions.Insert(new Permissions
                 {
                     Identity = identity,
-                    Nickname = nickname,
+                    Nickname = targetGuest.Nickname,
                     PermissionLevel = permissionLevel
                 });
             } 
@@ -252,7 +253,7 @@ public partial class Module
             {
                 var newPerm = perm.Value;
                 newPerm.PermissionLevel = permissionLevel;
-                newPerm.Nickname = nickname;
+                newPerm.Nickname = targetGuest.Nickname;
                 ctx.Db.Permissions.Identity.Update(newPerm);
             }
         }
@@ -312,15 +313,15 @@ public partial class Module
     }
 
     [Reducer]
-    public static void SetIdentityPermissionModerator(ReducerContext ctx, Identity identity, string nickname)
+    public static void SetIdentityPermissionModerator(ReducerContext ctx, Identity identity)
     {
-        SetIdentityPermission(ctx, identity, PermissionLevel.Moderator, nickname);
+        SetIdentityPermission(ctx, identity, PermissionLevel.Moderator);
     }
 
     [Reducer]
-    public static void SetIdentityPermissionEditor(ReducerContext ctx, Identity identity, string nickname)
+    public static void SetIdentityPermissionEditor(ReducerContext ctx, Identity identity)
     {
-        SetIdentityPermission(ctx, identity, PermissionLevel.Editor, nickname);
+        SetIdentityPermission(ctx, identity, PermissionLevel.Editor);
     }
     
     [Reducer]
@@ -328,13 +329,13 @@ public partial class Module
     {
         var id = ctx.Db.Guests.Iter().FirstOrDefault(g => g.Nickname == nickname).Identity;
         Log.Info($"{nickname} - {id.ToString()}");
-        SetIdentityPermission(ctx, id, PermissionLevel.Moderator, nickname);
+        SetIdentityPermission(ctx, id, PermissionLevel.Moderator);
     }
 
     [Reducer]
     public static void SetIdentityPermissionEditorByName(ReducerContext ctx, string nickname)
     {
-        SetIdentityPermission(ctx, ctx.Db.Guests.Iter().FirstOrDefault(g => g.Nickname == nickname).Identity, PermissionLevel.Editor, nickname);
+        SetIdentityPermission(ctx, ctx.Db.Guests.Iter().FirstOrDefault(g => g.Nickname == nickname).Identity, PermissionLevel.Editor);
     }
 
     [Reducer]
