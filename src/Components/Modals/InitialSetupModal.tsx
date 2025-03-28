@@ -25,7 +25,6 @@ interface IProp {
   config: Config;
   connectionConfig: ConnectionConfigType;
   setInstanceConfigured: Function;
-  versionNumber: string;
 }
 
 export const InitialSetupModal = (props: IProp) => {

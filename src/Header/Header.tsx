@@ -16,14 +16,8 @@ import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/Element
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
 
-interface IProps {
-  activePage: Number;
-  setActivePage: Function;
-  onlineVersion: string;
-}
-
-export const Header = (props: IProps) => {
-  const isOverlay: Boolean = window.location.href.includes("/overlay");
+export const Header = () => {
+  const isCanvas: Boolean = window.location.href.includes("/canvas");
 
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 
@@ -34,10 +28,7 @@ export const Header = (props: IProps) => {
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
-    setModals((oldModals: any) => [
-      ...oldModals,
-      <SettingsModal key="settings_modal" onlineVersion={props.onlineVersion} />,
-    ]);
+    setModals((oldModals: any) => [...oldModals, <SettingsModal key="settings_modal" />]);
   };
 
   const showEditorGuidelines = () => {
@@ -45,7 +36,7 @@ export const Header = (props: IProps) => {
     setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
   };
 
-  if (isOverlay) {
+  if (!isCanvas) {
     return (
       <main>
         <Outlet />

@@ -13,17 +13,13 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { Layouts } from "../module_bindings";
 import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
-interface IProps {
-  disconnected: boolean;
-}
-
-export const Overlay = (props: IProps) => {
+export const Overlay = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
     overlayElementDataEventsInitialized: false,
     overlayElementEventsInitialized: false,
     overlayGuestEventsInitialized: false,
   });
-  const { Client } = useSpacetimeContext();
+  const { Client, Disconnected } = useSpacetimeContext();
 
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
@@ -34,7 +30,7 @@ export const Overlay = (props: IProps) => {
   useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
   useOverlayElementsEvents(activeLayout, canvasInitialized, setCanvasInitialized);
   useOverlayLayoutEvents(activeLayout, setActiveLayout);
-  const disconnected = useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
+  const userDisconnected = useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
 
   useHeartbeatEvents(canvasInitialized);
 
@@ -59,7 +55,7 @@ export const Overlay = (props: IProps) => {
     }
   }, [Client]);
 
-  if (disconnected || props.disconnected) {
+  if (userDisconnected || Disconnected) {
     DebugLogger("Overlay is disconnected");
     localStorage.removeItem("stdbToken");
     window.location.reload();

@@ -34,19 +34,20 @@ import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { Config, Elements, Layouts } from "../module_bindings";
 
-interface IProps {
-  setActivePage: Function;
-  canvasInitialized: CanvasInitializedType;
-  setCanvasInitialized: Function;
-  disconnected: boolean;
-}
+export const Canvas = () => {
+  const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
+    elementsFetchInitialized: false,
+    elementEventsInitialized: false,
+    elementDataEventsInitialized: false,
+    guestFetchInitialized: false,
+    guestEventsInitialized: false,
+  });
 
-export const Canvas = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Identity, Client } = useSpacetimeContext();
+  const { Identity, Client, Disconnected } = useSpacetimeContext();
   const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
@@ -78,24 +79,24 @@ export const Canvas = (props: IProps) => {
 
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
 
-  useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
+  useFetchElement(layoutContext.activeLayout, canvasInitialized, setCanvasInitialized);
 
-  useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
+  useElementDataEvents(canvasInitialized, setCanvasInitialized);
   useElementsEvents(
     selectoRef,
     selected,
     setSelected,
     setSelectoTargets,
-    props.canvasInitialized,
-    props.setCanvasInitialized,
+    canvasInitialized,
+    setCanvasInitialized,
     layoutContext.activeLayout
   );
 
-  const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
-  useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
+  const userDisconnected = useGuestsEvents(canvasInitialized, setCanvasInitialized, transformRef);
+  useFetchGuests(canvasInitialized, setCanvasInitialized);
 
-  useHeartbeatEvents(props.canvasInitialized);
-  const configReload = useConfigEvents(props.canvasInitialized);
+  useHeartbeatEvents(canvasInitialized);
+  const configReload = useConfigEvents(canvasInitialized);
 
   useNotice(setNoticeMessage);
 
@@ -113,7 +114,7 @@ export const Canvas = (props: IProps) => {
   useEffect(() => {
     if (!layoutContext.activeLayout) {
       DebugLogger("Setting active layout");
-      layoutContext.setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
+      //layoutContext.setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
     }
 
     DebugLogger("Layout context updated");
@@ -123,12 +124,6 @@ export const Canvas = (props: IProps) => {
 
     Client.reducers.updateGuestSelectedElement(0);
   }, [layoutContext, Client]);
-
-  useEffect(() => {
-    DebugLogger("Setting active page");
-    props.setActivePage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.setActivePage]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -147,7 +142,7 @@ export const Canvas = (props: IProps) => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (disconnected || props.disconnected) {
+  if (userDisconnected || Disconnected) {
     DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
@@ -180,7 +175,7 @@ export const Canvas = (props: IProps) => {
 
   return (
     <div className="mouseContainer" onMouseMove={onMouseMove}>
-      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
+      {Object.values(canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
         <TransformWrapper
           ref={transformRef}
           limitToBounds={false}

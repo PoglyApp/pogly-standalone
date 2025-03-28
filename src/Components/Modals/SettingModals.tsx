@@ -39,12 +39,9 @@ import { SettingsTabPanel } from "../Settings/SettingsTabPanel";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { ModeratorListModal } from "./ModeratorListModal";
 import { Config } from "../../module_bindings";
+import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
 
-interface IProp {
-  onlineVersion: string;
-}
-
-export const SettingsModal = (props: IProp) => {
+export const SettingsModal = () => {
   const config: Config = useContext(ConfigContext);
   const { Runtime, Identity, Client } = useSpacetimeContext();
   const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
@@ -53,6 +50,8 @@ export const SettingsModal = (props: IProp) => {
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
+
+  const [versionNumber, setVersionNumber] = useState<string>();
 
   // GENERAL
   const stream = document.getElementById("stream")!;
@@ -94,6 +93,8 @@ export const SettingsModal = (props: IProp) => {
   const [updateHz, setUpdateHz] = useState<number>(config.updateHz);
   const [auth, setAuth] = useState<boolean>(config.authentication);
   const [strictMode, setStrictMode] = useState<boolean>(config.strictMode);
+
+  useGetVersionNumber(setVersionNumber);
 
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
@@ -341,7 +342,7 @@ export const SettingsModal = (props: IProp) => {
                 </FormControl>
               )}
 
-              {props.onlineVersion !== `${process.env.REACT_APP_VERSION}` && (
+              {versionNumber !== `${process.env.REACT_APP_VERSION}` && (
                 <Alert
                   variant="filled"
                   severity="warning"

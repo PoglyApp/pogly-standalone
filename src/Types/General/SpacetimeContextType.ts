@@ -9,4 +9,5 @@ export type SpacetimeContextType = {
   Elements: number[];
   ElementData: number[];
   Guests: Identity[];
+  Disconnected: Boolean;
 };
