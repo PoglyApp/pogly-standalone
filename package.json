@@ -14,6 +14,7 @@
     "@types/react-dom": "^18.2.18",
     "browser-image-compression": "^2.0.2",
     "css-filter-converter": "^1.0.109",
+    "jwt-decode": "^4.0.0",
     "markdown-it": "^14.1.0",
     "marked": "^14.1.2",
     "prismjs": "^1.29.0",
@@ -71,8 +72,8 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/markdown-it": "^14.1.2",
-    "@types/prismjs": "^1.26.4",
     "@types/node": "^22.13.4",
+    "@types/prismjs": "^1.26.4",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^4.3.2"

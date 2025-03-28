@@ -22,7 +22,7 @@ const useStDB = (
     if (!connectionConfig) return;
     DebugLogger("Initializing SpacetimeDB");
 
-    const stdbToken = localStorage.getItem("stdbToken") || "";
+    const stdbToken = localStorage.getItem("twitchIdToken") || localStorage.getItem("stdbToken") || "";
     let stdbDomain = connectionConfig?.domain || "";
 
     const isOverlay: Boolean = window.location.href.includes("/overlay");

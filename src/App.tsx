@@ -30,6 +30,8 @@ import { DebugLogger } from "./Utility/DebugLogger";
 import { StartHeartbeat } from "./Utility/PingHeartbeat";
 import { Error } from "./Pages/Error";
 import { Guests, Layouts } from "./module_bindings";
+import { Callback } from "./Pages/Callback";
+import { jwtDecode } from "jwt-decode";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -37,6 +39,7 @@ export const App: React.FC = () => {
   const [versionNumber, setVersionNumber] = useState<string>("");
   const [activePage, setActivePage] = useState<Number>(0);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const isCallback: Boolean = window.location.href.includes("/callback");
 
   // CANVAS
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -80,6 +83,7 @@ export const App: React.FC = () => {
   const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setInstanceConfigured);
 
   useEffect(() => {
+    if (!connectionConfig) return;
     if (!stdbInitialized) return;
     if (!stdbSubscriptions) return;
     if (!spacetime.Identity) return;
@@ -88,7 +92,9 @@ export const App: React.FC = () => {
 
     DebugLogger("Setting nickname and Spacetime context");
 
-    const nickname: string = localStorage.getItem("nickname") || "";
+    let nickname: string = localStorage.getItem("nickname") || "";
+
+    if(connectionConfig.token !== null) nickname = (jwtDecode(connectionConfig.token) as any).preferred_username;
 
     if (nickname) {
       spacetime.Client.reducers.updateGuestNickname(nickname);
@@ -150,6 +156,10 @@ export const App: React.FC = () => {
       </Route>
     )
   );
+
+  if(isCallback) {
+    return (<Callback />);
+  }
 
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
@@ -340,20 +350,20 @@ export const App: React.FC = () => {
 
   // Step 9) Load Pogly
   return (
-    <SpacetimeContext.Provider value={spacetimeContext}>
-      <ConfigContext.Provider value={spacetime.InstanceConfig}>
-        <SettingsContext.Provider value={{ settings, setSettings }}>
-          <LayoutContext.Provider value={{ activeLayout: activeLayout, setActiveLayout: setActiveLayout }}>
-            <ModalContext.Provider value={{ modals, setModals, closeModal }}>
-              {modals.map((modal) => {
-                return modal;
-              })}
-              <RouterProvider router={router} />
-              <ToastContainer />
-            </ModalContext.Provider>
-          </LayoutContext.Provider>
-        </SettingsContext.Provider>
-      </ConfigContext.Provider>
-    </SpacetimeContext.Provider>
+      <SpacetimeContext.Provider value={spacetimeContext}>
+        <ConfigContext.Provider value={spacetime.InstanceConfig}>
+          <SettingsContext.Provider value={{ settings, setSettings }}>
+            <LayoutContext.Provider value={{ activeLayout: activeLayout, setActiveLayout: setActiveLayout }}>
+              <ModalContext.Provider value={{ modals, setModals, closeModal }}>
+                {modals.map((modal) => {
+                  return modal;
+                })}
+                <RouterProvider router={router} />
+                <ToastContainer />
+              </ModalContext.Provider>
+            </LayoutContext.Provider>
+          </SettingsContext.Provider>
+        </ConfigContext.Provider>
+      </SpacetimeContext.Provider>
   );
 };
