@@ -4,7 +4,6 @@ import { initGuests } from "../../Store/Features/GuestSlice";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Guests } from "../../module_bindings";
 
 const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
