@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../../Store/Features/store";
 import { addGuest, removeGuest, updateGuest, updateGuestLayout } from "../../Store/Features/GuestSlice";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { DebugLogger } from "../../Utility/DebugLogger";
@@ -15,7 +15,7 @@ export const useGuestsEvents = (
   setCanvasInitialized: Function,
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
@@ -27,12 +27,12 @@ export const useGuestsEvents = (
 
     DebugLogger("Initializing guest events");
 
-    Client.db.guests.onInsert((ctx: EventContext, newGuest: Guests) => {
+    spacetimeDB.Client.db.guests.onInsert((ctx: EventContext, newGuest: Guests) => {
       dispatch(addGuest(newGuest));
     });
 
-    Client.db.guests.onUpdate((ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
-      if (newGuest.address.toHexString() === Identity.address.toHexString()) return;
+    spacetimeDB.Client.db.guests.onUpdate((ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
+      if (newGuest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
       if (oldGuest.nickname === "" && newGuest.nickname !== "") {
@@ -53,10 +53,10 @@ export const useGuestsEvents = (
       // IF SELECTED ELEMENT IS UPDATED
       if (oldGuest.selectedElementId !== newGuest.selectedElementId) {
         // Handle old element
-        handleElementBorder(Client, Identity.address, oldGuest.selectedElementId.toString());
+        handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, oldGuest.selectedElementId.toString());
 
         // Handle new element
-        handleElementBorder(Client, Identity.address, newGuest.selectedElementId.toString());
+        handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, newGuest.selectedElementId.toString());
       }
 
       // IF CURSOR POSITION IS UPDATED
@@ -87,7 +87,7 @@ export const useGuestsEvents = (
       }
     });
 
-    Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
+    spacetimeDB.Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
       toast.success(`${guest.nickname === "" ? "Streamer" : guest.nickname} disconnected!`, {
         position: "bottom-right",
         autoClose: 2000,
@@ -99,11 +99,11 @@ export const useGuestsEvents = (
         theme: "dark",
       });
 
-      handleElementBorder(Client, Identity.address, guest.selectedElementId.toString());
+      handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
 
-      if (guest.address.toHexString() === Identity.address.toHexString()) {
+      if (guest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) {
         setDisconnected(true);
       }
     });
@@ -111,14 +111,14 @@ export const useGuestsEvents = (
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestEventsInitialized: true }));
   }, [
     canvasInitialized.guestEventsInitialized,
-    Identity.identity,
-    Identity.address,
+    spacetimeDB.Identity.identity,
+    spacetimeDB.Identity.address,
     isOverlay,
     transformRef,
     setCanvasInitialized,
     dispatch,
-    Identity.selectedLayoutId,
-    Client
+    spacetimeDB.Identity.selectedLayoutId,
+    spacetimeDB.Client
   ]);
 
   return disconnected;

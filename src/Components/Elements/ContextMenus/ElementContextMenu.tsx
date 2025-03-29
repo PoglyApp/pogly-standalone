@@ -18,7 +18,7 @@ import { TextCreationModal } from "../../Modals/TextCreationModal";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { WidgetVariableType } from "../../../Types/General/WidgetVariableType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -35,13 +35,13 @@ interface IProps {
 }
 
 export const ElementContextMenu = (props: IProps) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { setModals } = useContext(ModalContext);
 
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;
 
-  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const [transformEdit, setTransformEdit] = useState("Scale");
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
@@ -55,18 +55,18 @@ export const ElementContextMenu = (props: IProps) => {
   const locked = document.getElementById(selectedElement?.id.toString() || "null")?.getAttribute("data-locked");
 
   let element: Elements | undefined;
-  if (selectedElement) element = Client.db.elements.id.find(selectedElement.id);
+  if (selectedElement) element = spacetimeDB.Client.db.elements.id.find(selectedElement.id);
 
   useEffect(() => {
-    if (selectedElement) setTransparency(Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
+    if (selectedElement) setTransparency(spacetimeDB.Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
     if (selectedElement?.element.tag !== "WidgetElement") return;
 
     DebugLogger("Setting widget data");
 
-    const widgetElement: WidgetElement = Client.db.elements.id.find(selectedElement.id)?.element.value as WidgetElement;
+    const widgetElement: WidgetElement = spacetimeDB.Client.db.elements.id.find(selectedElement.id)?.element.value as WidgetElement;
 
     if (widgetElement.rawData === "") {
-      const elementData = Client.db.elementData.id.find(widgetElement.elementDataId);
+      const elementData = spacetimeDB.Client.db.elementData.id.find(widgetElement.elementDataId);
 
       if (!elementData) return;
 
@@ -84,7 +84,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       setWidgetVariables(() => (toggleVariables.length > 0 ? toggleVariables : null));
     }
-  }, [props.contextMenu, selectedElement?.element.tag, selectedElement?.id, selectedElement, Client]);
+  }, [props.contextMenu, selectedElement?.element.tag, selectedElement?.id, selectedElement, spacetimeDB.Client]);
 
   const handleClose = () => {
     DebugLogger("Handling close context");
@@ -183,13 +183,13 @@ export const ElementContextMenu = (props: IProps) => {
             </MenuItem>
             <StyledMenuItem
               value={"Scale"}
-              onClick={() => handleResetTransform(Client, selectedElement, TransformType.Scale, handleClose)}
+              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Scale, handleClose)}
             >
               Scale
             </StyledMenuItem>
             <StyledMenuItem
               value={"Rotation"}
-              onClick={() => handleResetTransform(Client, selectedElement, TransformType.Rotation, handleClose)}
+              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Rotation, handleClose)}
             >
               Rotation
             </StyledMenuItem>
@@ -230,7 +230,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Vertical"}
               onClick={() => {
-                handleFlipElement(Client, true, selectedElement, handleClose);
+                handleFlipElement(spacetimeDB.Client, true, selectedElement, handleClose);
               }}
             >
               Vertical
@@ -238,7 +238,7 @@ export const ElementContextMenu = (props: IProps) => {
             <StyledMenuItem
               value={"Horizontal"}
               onClick={() => {
-                handleFlipElement(Client, false, selectedElement, handleClose);
+                handleFlipElement(spacetimeDB.Client, false, selectedElement, handleClose);
               }}
             >
               Horizontal
@@ -271,7 +271,7 @@ export const ElementContextMenu = (props: IProps) => {
                 value={transparency}
                 aria-label="Small"
                 valueLabelDisplay="on"
-                onChange={(event, number) => handleTransparency(Client, selectedElement, setTransparency, number)}
+                onChange={(event, number) => handleTransparency(spacetimeDB.Client, selectedElement, setTransparency, number)}
               />
             </StyledMenuItem>
           </StyledSelect>
@@ -307,7 +307,7 @@ export const ElementContextMenu = (props: IProps) => {
                   <StyledMenuItem
                     value={variable.variableName}
                     onClick={() => {
-                      handleWidgetToggle(Client, selectedElement.id, variable, handleClose);
+                      handleWidgetToggle(spacetimeDB.Client, selectedElement.id, variable, handleClose);
                     }}
                     key={variable.variableName + "_variable"}
                   >
@@ -323,7 +323,7 @@ export const ElementContextMenu = (props: IProps) => {
       <StyledMenuItem
         onClick={() => {
           const number = transparency > 0 ? 0 : 100;
-          handleHide(Client, selectedElement, setTransparency, number);
+          handleHide(spacetimeDB.Client, selectedElement, setTransparency, number);
         }}
       >
         {transparency > 0 ? "Hide" : "Show"}
@@ -336,7 +336,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       <StyledMenuItem
         onClick={() => {
-          handleLocked(Client, selectedElement, handleClose);
+          handleLocked(spacetimeDB.Client, selectedElement, handleClose);
         }}
       >
         {locked === "true" ? "Locked" : "Lock"}
@@ -349,7 +349,7 @@ export const ElementContextMenu = (props: IProps) => {
         <div>
           {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" && (
             <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-              Image: {Client.db.elementData.id.find(element.element.value.imageElementData.value)?.name || ""}
+              Image: {spacetimeDB.Client.db.elementData.id.find(element.element.value.imageElementData.value)?.name || ""}
             </Paper>
           )}
 
@@ -396,7 +396,7 @@ export const ElementContextMenu = (props: IProps) => {
       ) : (
         <StyledDeleteMenuItem
           onClick={() => {
-            handleDelete(Client, selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
+            handleDelete(spacetimeDB.Client, selectedElement, props.setSelected, props.setSelectoTargets, handleClose);
           }}
         >
           Delete

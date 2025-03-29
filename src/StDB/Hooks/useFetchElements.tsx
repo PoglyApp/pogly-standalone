@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { initData } from "../../Store/Features/ElementDataSlice";
 import { initElements } from "../../Store/Features/ElementsSlice";
 import { useAppDispatch } from "../../Store/Features/store";
@@ -8,8 +8,8 @@ import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 import { initCanvasElements } from "../../Store/Features/CanvasElementSlice";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Elements, Layouts } from "../../module_bindings";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { ElementData, Elements, Layouts } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 const useFetchElement = (
   layout: Layouts | undefined,
@@ -17,7 +17,7 @@ const useFetchElement = (
   setCanvasInitialized: Function
 ) => {
   const dispatch = useAppDispatch();
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [fetchedLayout, setFetchedLayout] = useState<Layouts>();
@@ -33,12 +33,13 @@ const useFetchElement = (
     // Fetch ElementData
     if (!refetch) {
       DebugLogger("Fetching element data");
-      const datas = Array.from(Client.db.elementData.iter());
+      const datas: ElementData[] = Array.from(spacetimeDB.Client.db.elementData.iter());
       dispatch(initData(datas));
     }
 
     // Fetch Elements
-    const fetchedElements = Array.from(Client.db.elements.iter()).filter((e: Elements) => e.layoutId === layout.id);
+    const cacheElements: Elements[] = Array.from(spacetimeDB.Client.db.elements.iter());
+    const fetchedElements = cacheElements.filter((e: Elements) => e.layoutId === layout.id);
 
     // This is here to fix a weird bug with SpacetimeDB Typescript SDK that only happens with Firefox where the SpacetimeDB cache doesn't update properly
     // When Clockwork Labs gets around to fix the issue, you can remove this and change line 38 back to "fetchedElements" -> "elements"
@@ -60,7 +61,7 @@ const useFetchElement = (
 
     setFetchedLayout(layout);
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch, Client]);
+  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch, spacetimeDB.Client]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

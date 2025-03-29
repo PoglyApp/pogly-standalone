@@ -1,7 +1,7 @@
 import { useAppSelector } from "../Store/Features/store";
 import { useOverlayElementsEvents } from "../StDB/Hooks/useOverlayElementsEvents";
 import { useOverlayElementDataEvents } from "../StDB/Hooks/useOverlayElementDataEvents";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useFetchElement from "../StDB/Hooks/useFetchElements";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { Loading } from "../Components/General/Loading";
@@ -11,7 +11,7 @@ import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { Layouts } from "../module_bindings";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const Overlay = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -19,7 +19,7 @@ export const Overlay = () => {
     overlayElementEventsInitialized: false,
     overlayGuestEventsInitialized: false,
   });
-  const { Client, Disconnected } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
 
@@ -39,23 +39,23 @@ export const Overlay = () => {
     const layoutParam = urlParams.get("layout");
     const transparent = urlParams.get("transparent");
 
-    Client.reducers.clearRefreshOverlayRequests();
+    spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
 
     if (layoutParam) {
       DebugLogger("Getting layout by name");
-      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.name === layoutParam));
+      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.name === layoutParam));
     } else {
       DebugLogger("Getting layout by active ID");
-      setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
+      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
     }
 
     if (transparent != null) {
       document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
       document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
     }
-  }, [Client]);
+  }, [spacetimeDB.Client]);
 
-  if (userDisconnected || Disconnected) {
+  if (userDisconnected || spacetimeDB.Disconnected) {
     DebugLogger("Overlay is disconnected");
     localStorage.removeItem("stdbToken");
     window.location.reload();

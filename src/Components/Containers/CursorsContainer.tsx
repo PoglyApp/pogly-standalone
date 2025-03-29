@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
 import { CursorComponent } from "../General/CursorComponent";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { Config, Guests } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const CursorsContainer = () => {
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
 
@@ -18,7 +18,7 @@ export const CursorsContainer = () => {
       {guests
         .filter(
           (guest: Guests) =>
-            guest.address.toHexString() !== Identity.address.toHexString() &&
+            guest.address.toHexString() !== spacetimeDB.Identity.address.toHexString() &&
             guest.nickname !== "" &&
             layoutContext.activeLayout.id === guest.selectedLayoutId
         )

@@ -2,7 +2,8 @@ import Selecto from "react-selecto";
 import Moveable from "react-moveable";
 import { toast } from "react-toastify";
 import { Elements } from "../../module_bindings";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { useContext } from "react";
 
 interface IProp {
   moveableRef: React.RefObject<Moveable>;
@@ -14,7 +15,7 @@ interface IProp {
 }
 
 export const SelectoComponent = (props: IProp) => {
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   return (
     <Selecto
@@ -64,7 +65,7 @@ export const SelectoComponent = (props: IProp) => {
 
         if (e.selected.length === 0) {
           props.setSelected(undefined);
-          Client.reducers.updateGuestSelectedElement(0);
+          spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
         }
 
         if (e.selected.length === 1) {
@@ -78,7 +79,7 @@ export const SelectoComponent = (props: IProp) => {
           });
 
           if (document.getElementById(selectedElement[0].id.toString())?.getAttribute("data-locked") !== "true")
-            Client.reducers.updateGuestSelectedElement(selectedElement[0].id);
+            spacetimeDB.Client.reducers.updateGuestSelectedElement(selectedElement[0].id);
         }
 
         if (anyLockedElements > 0) {

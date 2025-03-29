@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const navigate = useNavigate();
 
   const { connectionConfig, setConnectionConfig } = useContext(ConfigContext);
   const { spacetimeDB, setSpacetimeDB } = useContext(SpacetimeContext);
@@ -71,6 +72,7 @@ export const Login = () => {
       ElementData: [],
       Guests: [],
     });
+    DebugLogger("Successfully set Spacetime context");
   }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime]);
 
   useEffect(() => {
@@ -264,7 +266,7 @@ export const Login = () => {
     );
   }
 
-  //navigate("/canvas");
+  navigate("/canvas", { replace: true });
 
-  return <h1>Login</h1>;
+  return <></>;
 };

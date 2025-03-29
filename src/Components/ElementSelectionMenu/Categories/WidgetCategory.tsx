@@ -11,7 +11,7 @@ import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementData, ElementStruct, PermissionLevel } from "../../../module_bindings";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 interface IProps {
   elementData: ElementData[];
@@ -23,7 +23,7 @@ interface IProps {
 export const WidgetCategory = React.memo((props: IProps) => {
   const { setModals } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   // Memoize the filtered elements (prevents recalculation on every render)
   const filteredElementData = useMemo(() => {
@@ -41,7 +41,7 @@ export const WidgetCategory = React.memo((props: IProps) => {
     (elementData: ElementData) => {
       DebugLogger("Adding widget to canvas");
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.WidgetElement({
           elementDataId: elementData.id,
           width: elementData.dataWidth,
@@ -51,7 +51,7 @@ export const WidgetCategory = React.memo((props: IProps) => {
         layoutContext.activeLayout
       );
     },
-    [layoutContext.activeLayout, Client]
+    [layoutContext.activeLayout, spacetimeDB.Client]
   );
 
   return (

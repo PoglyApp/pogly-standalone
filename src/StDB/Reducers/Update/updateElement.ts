@@ -1,4 +1,3 @@
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import { DbConnection, ElementStruct } from "../../../module_bindings";
 import {
   GetCoordsFromTransform,

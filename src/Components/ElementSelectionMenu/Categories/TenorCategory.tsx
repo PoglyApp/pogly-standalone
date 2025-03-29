@@ -10,11 +10,11 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementStruct, ImageElementData } from "../../../module_bindings";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const TenorCategory = () => {
   const layoutContext = useContext(LayoutContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [tenorEmotes, setTenorEmotes] = useState<any>();
   const [searchEmotes, setSearchEmotes] = useState<string>("");
@@ -40,7 +40,7 @@ export const TenorCategory = () => {
     image.src = blob;
     image.onload = function () {
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,

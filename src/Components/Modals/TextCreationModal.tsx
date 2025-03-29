@@ -35,7 +35,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ElementStruct, TextElement } from "../../module_bindings";
 
 interface IProps {
@@ -53,7 +53,7 @@ const hightlightWithLineNumbers = (input: string, language: any, languageString:
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [text, setText] = useState<string>("");
 
@@ -90,7 +90,7 @@ export const TextCreationModal = (props: IProps) => {
     DebugLogger("Initializing text creation modal");
     if (!props.editElementId) return setShowModal(true);
 
-    const textElement = Client.db.elements.id.find(props.editElementId);
+    const textElement = spacetimeDB.Client.db.elements.id.find(props.editElementId);
     if (!textElement) return;
 
     const textStruct: TextElement = textElement.element.value as TextElement;
@@ -140,7 +140,7 @@ export const TextCreationModal = (props: IProps) => {
     }
 
     setShowModal(true);
-  }, [props.editElementId, Client]);
+  }, [props.editElementId, spacetimeDB.Client]);
 
   useEffect(() => {
     setError("");
@@ -159,7 +159,7 @@ export const TextCreationModal = (props: IProps) => {
     setError("");
 
     if (props.editElementId) {
-      Client.reducers.updateTextElementText(props.editElementId, newText);
+      spacetimeDB.Client.reducers.updateTextElementText(props.editElementId, newText);
     }
   };
 
@@ -326,10 +326,10 @@ export const TextCreationModal = (props: IProps) => {
 
     if (!props.editElementId) {
       DebugLogger("Inserting new text");
-      insertElement(Client, textElement, layoutContext.activeLayout);
+      insertElement(spacetimeDB.Client, textElement, layoutContext.activeLayout);
     } else {
       DebugLogger("Updating old text");
-      updateTextElement(Client, props.editElementId, textElement);
+      updateTextElement(spacetimeDB.Client, props.editElementId, textElement);
     }
 
     if (close) handleOnClose();

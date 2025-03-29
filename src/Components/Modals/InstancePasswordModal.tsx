@@ -4,11 +4,11 @@ import { Alert, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/m
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const InstancePasswordModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [password, setPassword] = useState<string>("");
@@ -16,7 +16,7 @@ export const InstancePasswordModal = () => {
 
   const handleSetPassword = () => {
     DebugLogger("Setting instance password");
-    Client.reducers.updateAuthenticationKey(password);
+    spacetimeDB.Client.reducers.updateAuthenticationKey(password);
     closeModal("instancePassword_modal", modals, setModals);
   };
 

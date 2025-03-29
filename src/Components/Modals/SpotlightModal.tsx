@@ -14,7 +14,7 @@ import SevenTVWrap from "../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData, ElementStruct, ImageElementData } from "../../module_bindings";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmoteType[] | undefined;
@@ -23,7 +23,7 @@ interface IProps {
 
 export const SpotlightModal = (props: IProps) => {
   const layoutContext = useContext(LayoutContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -60,7 +60,7 @@ export const SpotlightModal = (props: IProps) => {
     DebugLogger("Adding ElementData to canvas");
 
     insertElement(
-      Client,
+      spacetimeDB.Client,
       ElementStruct.ImageElement({
         imageElementData: ImageElementData.ElementDataId(elementData.id),
         width: elementData.dataWidth || 128,
@@ -80,7 +80,7 @@ export const SpotlightModal = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
@@ -101,7 +101,7 @@ export const SpotlightModal = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,

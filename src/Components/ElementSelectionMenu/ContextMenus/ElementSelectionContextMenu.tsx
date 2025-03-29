@@ -5,7 +5,7 @@ import { handleDeleteElementData } from "../../../Utility/ContextMenuMethods";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import { ElementData, PermissionLevel } from "../../../module_bindings";
 
@@ -16,11 +16,11 @@ interface IProps {
 
 export const ElementSelectionContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
-  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -74,7 +74,7 @@ export const ElementSelectionContextMenu = (props: IProps) => {
       ) : (
         <StyledDeleteMenuItem
           onClick={() => {
-            handleDeleteElementData(Client, selectedElementData, handleClose);
+            handleDeleteElementData(spacetimeDB.Client, selectedElementData, handleClose);
           }}
         >
           Delete

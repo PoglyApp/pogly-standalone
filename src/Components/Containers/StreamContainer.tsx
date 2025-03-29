@@ -1,27 +1,27 @@
 import { useState, useEffect, useContext, memo, useRef } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Config } from "../../module_bindings";
 import styled from "styled-components";
 
 const StreamContainer = () => {
   const config: Config = useContext(ConfigContext);
-  const { Runtime } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
 
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !Runtime) return;
+    if (!streamOverrides || !spacetimeDB.Runtime) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
 
     if (!currentOverride) return;
 
     setStreamOverride(currentOverride.override);
-  }, [Runtime]);
+  }, [spacetimeDB.Runtime]);
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");

@@ -33,7 +33,7 @@ import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { InstancePasswordModal } from "./InstancePasswordModal";
 import { SettingsTabPanel } from "../Settings/SettingsTabPanel";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -43,10 +43,10 @@ import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
 
 export const SettingsModal = () => {
   const config: Config = useContext(ConfigContext);
-  const { Runtime, Identity, Client } = useSpacetimeContext();
-  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
-  const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://pogly.spacetimedb.com";
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -76,9 +76,9 @@ export const SettingsModal = () => {
     settings.compressPaste != null ? settings.compressPaste : true
   );
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
+  let overlayURL = window.location.origin + "/overlay?module=" + spacetimeDB.Runtime?.module;
 
-  if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
+  if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + spacetimeDB.Runtime?.domain;
 
   const [streamOverride, setStreamOverride] = useState<string>("");
 
@@ -99,7 +99,7 @@ export const SettingsModal = () => {
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
-    Client.reducers.updateGuestNickname(nicknameInput);
+    spacetimeDB.Client.reducers.updateGuestNickname(nicknameInput);
 
     if (permission && permission.tag === "Owner") {
       const doUpdate =
@@ -109,7 +109,7 @@ export const SettingsModal = () => {
         auth !== config.authentication ||
         strictMode !== config.strictMode;
 
-      if (doUpdate) Client.reducers.updateConfig(platform, streamName, updateHz, auth, strictMode);
+      if (doUpdate) spacetimeDB.Client.reducers.updateConfig(platform, streamName, updateHz, auth, strictMode);
     }
 
     let newSettings = settings;
@@ -122,26 +122,26 @@ export const SettingsModal = () => {
 
     const streamOverrides = localStorage.getItem("streamOverride");
 
-    if (streamOverrides && Runtime) {
+    if (streamOverrides && spacetimeDB.Runtime) {
       let oldList = JSON.parse(streamOverrides);
-      let oldOverride = oldList.find((obj: any) => obj.module === Runtime.module);
+      let oldOverride = oldList.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
 
       if (!oldOverride && !streamOverride) return;
 
       if (oldOverride) {
         if (!streamOverride) {
-          oldList = oldList.filter((obj: any) => obj.module !== Runtime.module);
+          oldList = oldList.filter((obj: any) => obj.module !== spacetimeDB.Runtime.module);
         } else {
           oldOverride.override = streamOverride;
         }
       } else {
-        oldList.push({ module: Runtime.module, override: streamOverride });
+        oldList.push({ module: spacetimeDB.Runtime.module, override: streamOverride });
       }
 
       localStorage.setItem("streamOverride", JSON.stringify(oldList));
     } else {
-      if (streamOverride && Runtime) {
-        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime.module, override: streamOverride }]));
+      if (streamOverride && spacetimeDB.Runtime) {
+        localStorage.setItem("streamOverride", JSON.stringify([{ module: spacetimeDB.Runtime.module, override: streamOverride }]));
       }
     }
 
@@ -159,15 +159,15 @@ export const SettingsModal = () => {
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
 
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !Runtime) return;
+    if (!streamOverrides || !spacetimeDB.Runtime) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
 
     if (!currentOverride) return;
 
     setStreamOverride(currentOverride.override);
-  }, [settings, setSettings, Runtime]);
+  }, [settings, setSettings, spacetimeDB.Runtime]);
 
   function clearConnectionSettings() {
     localStorage.removeItem("stdbConnectDomain");
@@ -547,7 +547,7 @@ export const SettingsModal = () => {
                   "&:hover": { borderColor: "#b23927" },
                   marginTop: "10px",
                 }}
-                onClick={() => Client.reducers.deleteAllElements()}
+                onClick={() => spacetimeDB.Client.reducers.deleteAllElements()}
               >
                 Delete all elements
               </Button>
@@ -562,8 +562,8 @@ export const SettingsModal = () => {
                   marginTop: "10px",
                 }}
                 onClick={() => {
-                  Client.reducers.deleteAllElements();
-                  Client.reducers.deleteAllElementData();
+                  spacetimeDB.Client.reducers.deleteAllElements();
+                  spacetimeDB.Client.reducers.deleteAllElementData();
                 }}
               >
                 Delete all element data
@@ -578,7 +578,7 @@ export const SettingsModal = () => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => Client.reducers.refreshOverlay()}
+                onClick={() => spacetimeDB.Client.reducers.refreshOverlay()}
               >
                 Force refresh canvas
               </Button>
@@ -592,7 +592,7 @@ export const SettingsModal = () => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => Client.reducers.refreshOverlayClearStorage()}
+                onClick={() => spacetimeDB.Client.reducers.refreshOverlayClearStorage()}
               >
                 Force hard refresh canvas
               </Button>

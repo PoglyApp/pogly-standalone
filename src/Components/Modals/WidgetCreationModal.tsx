@@ -25,7 +25,7 @@ import "prismjs/themes/prism-solarizedlight.css";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ElementDataType } from "../../Types/General/ElementDataType";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { WidgetVariableTable } from "../General/WidgetVariableTable";
 import { updateElementData } from "../../StDB/Reducers/Update/updateElementData";
@@ -55,7 +55,7 @@ interface IProps {
 }
 
 export const WidgetCreationModal = (props: IProps) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [widgetName, setWidgetName] = useState<string>("");
@@ -78,8 +78,8 @@ export const WidgetCreationModal = (props: IProps) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
-    StrictMode: Client.db.config.version.find(0)!.strictMode,
-    Permission: Client.db.permissions.identity.find(Identity.identity)?.permissionLevel,
+    StrictMode: spacetimeDB.Client.db.config.version.find(0)!.strictMode,
+    Permission: spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel,
   };
 
   const loadByElementDataID = useCallback(() => {
@@ -87,7 +87,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
     try {
       DebugLogger("Loading widget by element data ID");
-      const elementData = Client.db.elementData.id.find(props.editElementDataId);
+      const elementData = spacetimeDB.Client.db.elementData.id.find(props.editElementDataId);
       if (!elementData) return;
 
       const jsonObject = JSON.parse(elementData.data);
@@ -106,20 +106,20 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT DATA ID", error);
     }
-  }, [props, Client]);
+  }, [props, spacetimeDB.Client]);
 
   const loadByElementID = useCallback(() => {
     if (!props.editElementId) return;
     try {
       DebugLogger("Loading widget by element ID");
 
-      const element = Client.db.elements.id.find(props.editElementId);
+      const element = spacetimeDB.Client.db.elements.id.find(props.editElementId);
       if (!element) return;
       const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
       let widgetData: any = null;
 
-      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(Client, widgetStruct.elementDataId);
+      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(spacetimeDB.Client, widgetStruct.elementDataId);
       else widgetData = JSON.parse(widgetStruct.rawData);
 
       setWidgetName(widgetData.widgetName || "");
@@ -136,7 +136,7 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT ID", error);
     }
-  }, [props, Client]);
+  }, [props, spacetimeDB.Client]);
 
   const loadByWidgetString = (widgetString: string) => {
     try {
@@ -171,7 +171,7 @@ export const WidgetCreationModal = (props: IProps) => {
     try {
       DebugLogger("Saving widget");
       if (props.editElementId) {
-        const element = Client.db.elements.id.find(props.editElementId);
+        const element = spacetimeDB.Client.db.elements.id.find(props.editElementId);
         if (!element) return;
         const widgetStruct: ElementStruct = element.element as ElementStruct;
 
@@ -188,7 +188,7 @@ export const WidgetCreationModal = (props: IProps) => {
 
         (widgetStruct.value as WidgetElement).rawData = widgetJson;
 
-        updateElementStruct(Client, props.editElementId, widgetStruct);
+        updateElementStruct(spacetimeDB.Client, props.editElementId, widgetStruct);
 
         return handleOnClose();
       }
@@ -201,13 +201,13 @@ export const WidgetCreationModal = (props: IProps) => {
         Data: widgetJson,
         DataWidth: widgetWidth,
         DataHeight: widgetHeight,
-        CreatedBy: Identity.nickname,
+        CreatedBy: spacetimeDB.Identity.nickname,
       };
 
       if (!props.editElementDataId) {
-        insertElementData(Client, newElementData);
+        insertElementData(spacetimeDB.Client, newElementData);
       } else {
-        updateElementData(Client, props.editElementDataId, newElementData);
+        updateElementData(spacetimeDB.Client, props.editElementDataId, newElementData);
       }
 
       handleOnClose();

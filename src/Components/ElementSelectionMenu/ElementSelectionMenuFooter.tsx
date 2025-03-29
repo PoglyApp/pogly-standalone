@@ -10,12 +10,12 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { ChangelogModal } from "../Modals/ChangelogModal";
 import { ChangelogType } from "../../Types/General/ChangelogType";
 import { GetLatestChangelogVersion, useChangeLog } from "../../Hooks/useChangeLog";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 
 export const ElementSelectionMenuFooter = () => {
   const { setModals } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [changelog, setChangelog] = useState<ChangelogType | undefined>(undefined);
   const [latestChangelogVersion, setLatestChangelogVersion] = useState<string>("");
@@ -48,7 +48,7 @@ export const ElementSelectionMenuFooter = () => {
     localStorage.removeItem("stdbConnectDomain");
     localStorage.removeItem("stdbConnectModule");
     localStorage.removeItem("stdbConnectModuleAuthKey");
-    Client.disconnect();
+    spacetimeDB.Client.disconnect();
     window.location.reload();
   };
 

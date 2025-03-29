@@ -19,7 +19,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   download: boolean;
@@ -27,7 +27,7 @@ interface IProps {
 
 export const BackupModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const config = useContext(ConfigContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -71,22 +71,22 @@ export const BackupModal = (props: IProps) => {
   const handleUpload = () => {
     if(!deleteOnUpload) {
       DebugLogger("Uploading backup data");
-      UploadBackupFromFile(Client, file);
+      UploadBackupFromFile(spacetimeDB.Client, file);
       closeModal("backup_modal", modals, setModals);
     } else {
       DebugLogger("Uploading backup data - clearing existing data");
-      Client.reducers.deleteAllElements();
-      Client.reducers.deleteAllElementData();
-      Client.reducers.deleteAllLayouts(false);
-      Client.reducers.deleteAllFolders(false);
-      UploadBackupFromFile(Client, file);
+      spacetimeDB.Client.reducers.deleteAllElements();
+      spacetimeDB.Client.reducers.deleteAllElementData();
+      spacetimeDB.Client.reducers.deleteAllLayouts(false);
+      spacetimeDB.Client.reducers.deleteAllFolders(false);
+      UploadBackupFromFile(spacetimeDB.Client, file);
       closeModal("backup_modal", modals, setModals);
     }
   };
 
   const handleDownload = () => {
     DebugLogger("Handling download data");
-    DownloadElementData(Client, downData, downElement, downLayout, config, modals, setModals, closeModal);
+    DownloadElementData(spacetimeDB.Client, downData, downElement, downLayout, config, modals, setModals, closeModal);
   };
 
   if (isOverlay) return <></>;

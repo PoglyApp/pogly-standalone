@@ -14,7 +14,7 @@ import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { convertBinaryToDataURI } from "../../../Utility/ImageConversion";
 import { ElementData, ElementStruct, ImageElementData, PermissionLevel } from "../../../module_bindings";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 interface IProps {
   elementData: ElementData[];
@@ -27,7 +27,7 @@ interface IProps {
 
 export const ImageCategory = React.memo((props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const layoutContext = useContext(LayoutContext);
   const [searchimage, setSearchImage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(!props.isSearch);
@@ -41,7 +41,7 @@ export const ImageCategory = React.memo((props: IProps) => {
     (elementData: ElementData) => {
       DebugLogger("Adding element to canvas");
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.ElementDataId(elementData.id),
           width: elementData.dataWidth,
@@ -54,7 +54,7 @@ export const ImageCategory = React.memo((props: IProps) => {
         closeModal("spotlight_modal", modals, setModals);
       }
     },
-    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals, Client]
+    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals, spacetimeDB.Client]
   );
 
   const filteredElements = useMemo(() => {

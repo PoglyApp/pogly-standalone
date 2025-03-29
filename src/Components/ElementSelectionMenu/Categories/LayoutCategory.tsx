@@ -13,26 +13,26 @@ import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import { Layouts, PermissionLevel } from "../../../module_bindings";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
   const layoutContext = useContext(LayoutContext);
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
 
   const changeLayout = (layout: Layouts) => {
-    Client.reducers.updateGuestSelectedLayout(layout.id);
+    spacetimeDB.Client.reducers.updateGuestSelectedLayout(layout.id);
     layoutContext.setActiveLayout(layout);
   };
 

@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import handleElementBorder from "../../Utility/HandleElementBorder";
 import { useAppSelector } from "../../Store/Features/store";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
@@ -14,7 +14,7 @@ interface IProp {
 export const Image = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [imageData, setImageData] = useState<string>("");
@@ -24,7 +24,7 @@ export const Image = (props: IProp) => {
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(Client, Identity.address, props.elements.id.toString());
+    handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, props.elements.id.toString());
     DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
@@ -40,12 +40,12 @@ export const Image = (props: IProp) => {
     }
   }, [
     elementData,
-    Identity.identity,
+    spacetimeDB.Identity.identity,
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
-    Identity.address,
-    Client
+    spacetimeDB.Identity.address,
+    spacetimeDB.Client
   ]);
 
   const renderDisplay = () => {

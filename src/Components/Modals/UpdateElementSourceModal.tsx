@@ -5,7 +5,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { Elements, ElementStruct, ImageElement, ImageElementData } from "../../module_bindings";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   selectedElement: Elements;
@@ -13,7 +13,7 @@ interface IProps {
 
 export const UpdateElementSourceModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [element, setElement] = useState<Elements>();
@@ -23,17 +23,17 @@ export const UpdateElementSourceModal = (props: IProps) => {
     if (!props.selectedElement) return;
     if (props.selectedElement.element.tag !== "ImageElement") return;
 
-    const oldElement: Elements = Client.db.elements.id.find(props.selectedElement.id)!;
+    const oldElement: Elements = spacetimeDB.Client.db.elements.id.find(props.selectedElement.id)!;
     setElement(oldElement);
 
     const imageElement = oldElement.element.value as ImageElement;
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
-      setSource(Client.db.elementData.id.find(imageElement.imageElementData.value)!.data);
+      setSource(spacetimeDB.Client.db.elementData.id.find(imageElement.imageElementData.value)!.data);
     } else {
       setSource(imageElement.imageElementData.value);
     }
-  }, [props.selectedElement, Client]);
+  }, [props.selectedElement, spacetimeDB.Client]);
 
   const handleSave = () => {
     const newImageElementData: ImageElementData = { tag: "RawData", value: source };
@@ -45,7 +45,7 @@ export const UpdateElementSourceModal = (props: IProps) => {
       height: imageElement.height,
     });
 
-    updateElementStruct(Client, props.selectedElement.id, newImageElement);
+    updateElementStruct(spacetimeDB.Client, props.selectedElement.id, newImageElement);
 
     handleOnClose();
   };

@@ -4,7 +4,6 @@ import { getTransformValues } from "./GetTransformValues";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import { DebugLogger } from "./DebugLogger";
 import { DbConnection, ElementData, Elements, ElementStruct, ImageElementData, WidgetElement } from "../module_bindings";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 
 interface TransformObject {
   transformFunction: string;

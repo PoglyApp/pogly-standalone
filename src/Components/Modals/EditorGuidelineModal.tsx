@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -20,8 +20,8 @@ export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Identity, Client } = useSpacetimeContext();
-  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
   const [guidelineText, setGuidelineText] = useState<string>(config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
@@ -37,7 +37,7 @@ export const EditorGuidelineModal = (props: IProp) => {
   const saveGuidelines = () => {
     if (permission && permission.tag !== "Owner") return;
     DebugLogger("Saved editor guidelines");
-    Client.reducers.updateEditorGuidelines(guidelineText);
+    spacetimeDB.Client.reducers.updateEditorGuidelines(guidelineText);
     closeModal("guideline_modal", modals, setModals);
   };
 

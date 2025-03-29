@@ -1,8 +1,9 @@
 import { Menu, MenuItem, Paper } from "@mui/material";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import styled from "styled-components";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { Guests, PermissionLevel } from "../../../module_bindings";
+import { useContext } from "react";
 
 interface IProps {
   contextMenu: any;
@@ -10,13 +11,13 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const { Identity, Client } = useSpacetimeContext();
-  const identityPermission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const identityPermission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
   let selectedGuestPermission: PermissionLevel | undefined;
   if (selectedGuest !== null && selectedGuest.identity)
-    selectedGuestPermission = Client.db.permissions.identity.find(selectedGuest.identity)?.permissionLevel;
+    selectedGuestPermission = spacetimeDB.Client.db.permissions.identity.find(selectedGuest.identity)?.permissionLevel;
 
   const handleClose = () => {
     DebugLogger("Handling close context");
@@ -49,14 +50,14 @@ export const GuestListContextMenu = (props: IProps) => {
           {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
         </Paper>
 
-        {!selectedGuest.identity.isEqual(Identity.identity) &&
+        {!selectedGuest.identity.isEqual(spacetimeDB.Identity.identity) &&
         identityPermission &&
         identityPermission.tag === "Owner" ? (
           <>
             {selectedGuestPermission?.tag === "Moderator" ? (
               <StyledMenuItemOrange
                 onClick={() => {
-                  Client.reducers.clearIdentityPermission(selectedGuest.identity);
+                  spacetimeDB.Client.reducers.clearIdentityPermission(selectedGuest.identity);
                   handleClose();
                 }}
                 sx={{ color: "#008205" }}
@@ -66,7 +67,7 @@ export const GuestListContextMenu = (props: IProps) => {
             ) : (
               <StyledMenuItemGreen
                 onClick={() => {
-                  Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
+                  spacetimeDB.Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
                   handleClose();
                 }}
               >
@@ -75,7 +76,7 @@ export const GuestListContextMenu = (props: IProps) => {
             )}
             <StyledMenuItemRed
               onClick={() => {
-                Client.reducers.kickGuest(selectedGuest.address);
+                spacetimeDB.Client.reducers.kickGuest(selectedGuest.address);
                 handleClose();
               }}
             >
@@ -86,11 +87,11 @@ export const GuestListContextMenu = (props: IProps) => {
           <></>
         )}
 
-        {selectedGuest.identity.isEqual(Identity.identity) ? (
+        {selectedGuest.identity.isEqual(spacetimeDB.Identity.identity) ? (
           <>
             <StyledMenuItemRed
               onClick={() => {
-                Client.reducers.kickSelf();
+                spacetimeDB.Client.reducers.kickSelf();
                 handleClose();
               }}
             >

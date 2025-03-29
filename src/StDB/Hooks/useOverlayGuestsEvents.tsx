@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Guests } from "../../module_bindings";
 
 export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -15,14 +15,14 @@ export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType,
 
     DebugLogger("Initializing overlay guest events");
 
-    Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
-      if (isOverlay && guest.address.toHexString() === Identity.address.toHexString()) {
+    spacetimeDB.Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
+      if (isOverlay && guest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) {
         setDisconnected(true);
       }
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayGuestEventsInitialized: true }));
-  }, [canvasInitialized.overlayGuestEventsInitialized, Identity.identity, Identity.address, isOverlay, setCanvasInitialized, Client]);
+  }, [canvasInitialized.overlayGuestEventsInitialized, spacetimeDB.dentity.identity, spacetimeDB.Identity.address, isOverlay, setCanvasInitialized, spacetimeDB.Client]);
 
   return disconnected;
 };

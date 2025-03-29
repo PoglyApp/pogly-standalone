@@ -6,7 +6,7 @@ import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
 import { useContext, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutCategory } from "./Categories/LayoutCategory";
@@ -24,7 +24,7 @@ interface IProps {
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const config: Config = useContext(ConfigContext);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
@@ -38,10 +38,10 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode = useMemo(() => Client.db.config.version.find(0)!.strictMode, [Client]);
+  const strictMode = useMemo(() => spacetimeDB.Client.db.config.version.find(0)!.strictMode, [spacetimeDB.Client]);
   const permissionLevel = useMemo(
-    () => Client.db.permissions.identity.find(Identity.identity)?.permissionLevel,
-    [Identity.identity, Client]
+    () => spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel,
+    [spacetimeDB.Identity.identity, spacetimeDB.Client]
   );
 
   const memoizedStrictSettings = useMemo(

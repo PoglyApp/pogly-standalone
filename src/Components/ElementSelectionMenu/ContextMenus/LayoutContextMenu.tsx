@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { PermissionLevel } from "../../../module_bindings";
@@ -17,16 +17,16 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [showExamine, setShowExamine] = useState(false);
 
-  const strictMode: boolean = Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const handleSetActive = () => {
     DebugLogger("Changing active layout");
-    Client.reducers.setLayoutActive(props.contextMenu.layout.id);
+    spacetimeDB.Client.reducers.setLayoutActive(props.contextMenu.layout.id);
     handleClose();
   };
 
@@ -40,7 +40,7 @@ export const LayoutContextMenu = (props: IProps) => {
 
   const cloneLayout = () => {
     DebugLogger("Cloning layout");
-    Client.reducers.duplicateLayout(props.contextMenu.layout.id);
+    spacetimeDB.Client.reducers.duplicateLayout(props.contextMenu.layout.id);
     handleClose();
   };
 

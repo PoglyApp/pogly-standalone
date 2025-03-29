@@ -11,7 +11,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
@@ -20,7 +19,7 @@ import styled from "styled-components";
 import { toast } from "react-toastify";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { Layouts } from "../../module_bindings";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   layout: Layouts;
@@ -28,7 +27,7 @@ interface IProp {
 
 export const LayoutDeletionConfirmationModal = (props: IProp) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -38,7 +37,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
   const [layouts, setLayouts] = useState<Layouts[]>();
 
   useEffect(() => {
-    const fetchedLayouts = Array.from(Client.db.layouts.iter());
+    const fetchedLayouts: Layouts[] = Array.from(spacetimeDB.Client.db.layouts.iter());
     DebugLogger("Fetching layouts for deletion");
 
     setLayouts(() =>
@@ -46,11 +45,12 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
         return a.id - b.id;
       })
     );
-  }, [Client]);
+  }, [spacetimeDB.Client]);
 
   const handleDeleteLayout = () => {
     DebugLogger("Deleting layout");
-    const doesLayoutStillExist = Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.id === preserveTo);
+    const tempLayouts: Layouts[] = Array.from(spacetimeDB.Client.db.layouts.iter());
+    const doesLayoutStillExist = tempLayouts.find((l: Layouts) => l.id === preserveTo);
 
     if (!doesLayoutStillExist) {
       DebugLogger("Layout no longer exists");
@@ -66,7 +66,7 @@ export const LayoutDeletionConfirmationModal = (props: IProp) => {
       });
     }
 
-    Client.reducers.deleteLayout(props.layout.id, preserveElements, preserveTo);
+    spacetimeDB.Client.reducers.deleteLayout(props.layout.id, preserveElements, preserveTo);
     handleOnClose();
   };
 

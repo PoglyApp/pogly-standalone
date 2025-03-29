@@ -14,7 +14,7 @@ import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementStruct, ImageElementData } from "../../../module_bindings";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmote[] | undefined;
@@ -23,7 +23,7 @@ interface IProps {
 
 export const ChannelEmoteCategory = (props: IProps) => {
   const layoutContext = useContext(LayoutContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
@@ -76,7 +76,7 @@ export const ChannelEmoteCategory = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
@@ -95,7 +95,7 @@ export const ChannelEmoteCategory = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
-        Client,
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,

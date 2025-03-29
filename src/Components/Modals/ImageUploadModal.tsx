@@ -16,7 +16,7 @@ import {
 import { StyledInput } from "../StyledComponents/StyledInput";
 import styled from "styled-components";
 import WarningIcon from "@mui/icons-material/Warning";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { CompressImage } from "../../Utility/CompressImage";
 import { SettingsContext } from "../../Contexts/SettingsContext";
@@ -28,7 +28,7 @@ interface IProps {
 }
 
 export const ImageUploadModal = (props: IProps) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -125,13 +125,13 @@ export const ImageUploadModal = (props: IProps) => {
       DataType: DataType.ImageElement as DataType,
       Data: usedFile,
       DataFileSize: usedFile.size / 1024, //convert to KB's
-      CreatedBy: Identity.nickname,
+      CreatedBy: spacetimeDB.Identity.nickname,
     };
 
     const imageSkeleton = document.getElementById("imageSkeleton");
     if (imageSkeleton) imageSkeleton.style.display = "block";
 
-    insertElementData(Client, newElementData);
+    insertElementData(spacetimeDB.Client, newElementData);
     handleOnClose();
   };
 

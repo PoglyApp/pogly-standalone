@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, FormGroup, Button, DialogActions, A
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   layoutId?: number;
@@ -11,7 +11,7 @@ interface IProps {
 
 export const LayoutCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layoutName, setLayoutName] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -35,13 +35,13 @@ export const LayoutCreationModal = (props: IProps) => {
 
   const saveLayout = () => {
     DebugLogger("Saving layout");
-    Client.reducers.addLayout(layoutName, false);
+    spacetimeDB.Client.reducers.addLayout(layoutName, false);
     handleOnClose();
   };
 
   const updateLayout = () => {
     DebugLogger("Updating layout");
-    Client.reducers.updateLayoutName(props.layoutId!, layoutName);
+    spacetimeDB.Client.reducers.updateLayoutName(props.layoutId!, layoutName);
     handleOnClose();
   };
 

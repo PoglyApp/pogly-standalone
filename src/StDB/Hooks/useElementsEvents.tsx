@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
 import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
@@ -6,7 +6,7 @@ import { addCanvasElement, removeCanvasElement } from "../../Store/Features/Canv
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Selecto from "react-selecto";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
@@ -15,7 +15,6 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 import { ElementData, Elements, EventContext, ImageElement, ImageElementData, Layouts, Reducer, ReducerEventContext, TextElement, WidgetElement } from "../../module_bindings";
-import { Event, ReducerEvent } from "@clockworklabs/spacetimedb-sdk";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -26,7 +25,7 @@ export const useElementsEvents = (
   setCanvasInitialized: Function,
   layout: Layouts | undefined
 ) => {
-  const { Identity, Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const dispatch = useAppDispatch();
 
@@ -48,7 +47,7 @@ export const useElementsEvents = (
 
     DebugLogger("Initializing element events");
 
-    Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+    spacetimeDB.Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
       if (!ctx.event) return;
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
@@ -59,7 +58,7 @@ export const useElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
+    spacetimeDB.Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -188,7 +187,7 @@ export const useElementsEvents = (
 
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
-            const htmlTag = WidgetCodeCompiler(Client,
+            const htmlTag = WidgetCodeCompiler(spacetimeDB.Client,
               newWidgetElement.width,
               newWidgetElement.height,
               undefined,
@@ -204,7 +203,7 @@ export const useElementsEvents = (
 
       // ===== MOVEABLE OBJECT RELATED =====
       if(ctx.event.tag === "Reducer") {
-        if(ctx.event.value.callerConnectionId?.toHexString() === Identity.address.toHexString() || !component) return;
+        if(ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Identity.address.toHexString() || !component) return;
       }
 
       const offsetElement = OffsetElementForCanvas(newElement);
@@ -228,7 +227,7 @@ export const useElementsEvents = (
       }
     });
 
-    Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
+    spacetimeDB.Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 
@@ -241,14 +240,14 @@ export const useElementsEvents = (
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementEventsInitialized: true }));
   }, [
     canvasInitialized.elementEventsInitialized,
-    Identity.identity,
-    Identity.address,
+    spacetimeDB.Identity.identity,
+    spacetimeDB.Identity.address,
     selectoRef,
     setCanvasInitialized,
     setSelected,
     setSelectoTargets,
     layout,
     dispatch,
-    Client
+    spacetimeDB.Client
   ]);
 };

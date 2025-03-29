@@ -30,7 +30,7 @@ import { UserInputHandler } from "../Utility/UserInputHandler";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { Config, Elements, Layouts } from "../module_bindings";
 
@@ -45,10 +45,10 @@ export const Canvas = () => {
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const config: Config = useContext(ConfigContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Identity, Client, Disconnected } = useSpacetimeContext();
-  const permission = Client.db.permissions.identity.find(Identity.identity)?.permissionLevel;
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -79,7 +79,7 @@ export const Canvas = () => {
 
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
 
-  useFetchElement(layoutContext.activeLayout, canvasInitialized, setCanvasInitialized);
+  useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
 
   useElementDataEvents(canvasInitialized, setCanvasInitialized);
   useElementsEvents(
@@ -89,7 +89,7 @@ export const Canvas = () => {
     setSelectoTargets,
     canvasInitialized,
     setCanvasInitialized,
-    layoutContext.activeLayout
+    activeLayout
   );
 
   const userDisconnected = useGuestsEvents(canvasInitialized, setCanvasInitialized, transformRef);
@@ -102,8 +102,8 @@ export const Canvas = () => {
 
   useHotkeys(
     UserInputHandler(
-      Client,
-      layoutContext.activeLayout,
+      spacetimeDB.Client,
+      activeLayout,
       selected,
       selectoTargets,
       settings.compressPaste,
@@ -112,9 +112,9 @@ export const Canvas = () => {
   );
 
   useEffect(() => {
-    if (!layoutContext.activeLayout) {
+    if (!activeLayout) {
       DebugLogger("Setting active layout");
-      //layoutContext.setActiveLayout(Array.from(Client.db.layouts.iter()).find((l: Layouts) => l.active === true));
+      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
     }
 
     DebugLogger("Layout context updated");
@@ -122,8 +122,8 @@ export const Canvas = () => {
     setSelected(undefined);
     setSelectoTargets(() => []);
 
-    Client.reducers.updateGuestSelectedElement(0);
-  }, [layoutContext, Client]);
+    spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
+  }, [activeLayout, setActiveLayout, spacetimeDB.Client]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -137,12 +137,12 @@ export const Canvas = () => {
     const x = (event.clientX - streamRect.left) / transformRef.current.instance.transformState.scale;
     const y = (event.clientY - streamRect.top) / transformRef.current.instance.transformState.scale;
 
-    Client.reducers.updateGuestPosition(x, y);
+    spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (userDisconnected || Disconnected) {
+  if (userDisconnected || spacetimeDB.Disconnected) {
     DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
@@ -175,7 +175,7 @@ export const Canvas = () => {
 
   return (
     <div className="mouseContainer" onMouseMove={onMouseMove}>
-      {Object.values(canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
+      {Object.values(canvasInitialized).every((init) => init === true) && activeLayout ? (
         <TransformWrapper
           ref={transformRef}
           limitToBounds={false}
