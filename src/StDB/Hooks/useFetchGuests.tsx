@@ -15,12 +15,14 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
 
     DebugLogger("Fetching guests");
 
-    const guests: Guests[] = Array.from(spacetimeDB.Client.db.guests.iter());
+    const guests: any[] = Array.from(spacetimeDB.Client.db.guests.iter());
 
-    //const guest = guests.findIndex((g) => g.address.toHexString() === spacetimeDB.Identity.address.toHexString());
-    //guests[guest].nickname = spacetimeDB.Identity.nickname;
+    const updatedGuests = guests.map((g: any) => g.address.toHexString() === spacetimeDB.Identity.address.toHexString()
+      ? { ...g, nickname: spacetimeDB.Identity.nickname}
+      : g
+    );
 
-    dispatch(initGuests(guests));
+    dispatch(initGuests(updatedGuests));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestFetchInitialized: true }));
   }, [spacetimeDB.Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch, spacetimeDB.Client]);
