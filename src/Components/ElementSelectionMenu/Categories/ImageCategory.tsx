@@ -28,7 +28,7 @@ interface IProps {
 export const ImageCategory = React.memo((props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const [searchimage, setSearchImage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(!props.isSearch);
 
@@ -47,14 +47,14 @@ export const ImageCategory = React.memo((props: IProps) => {
           width: elementData.dataWidth,
           height: elementData.dataHeight,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
 
       if (props.isSearch) {
         closeModal("spotlight_modal", modals, setModals);
       }
     },
-    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals, spacetimeDB.Client]
+    [activeLayout, closeModal, modals, props.isSearch, setModals, spacetimeDB.Client]
   );
 
   const filteredElements = useMemo(() => {

@@ -8,7 +8,6 @@ import { useContext, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
 import { useAppSelector } from "../../Store/Features/store";
@@ -25,7 +24,6 @@ interface IProps {
 
 export const ElementSelectionMenu = (props: IProps) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const config: Config = useContext(ConfigContext);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
   const memoizedData = useMemo(() => elementData, [elementData]);
@@ -90,7 +88,7 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {config.streamingPlatform === "twitch" && (
+          {spacetimeDB.Config.streamingPlatform === "twitch" && (
             <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
           )}
 

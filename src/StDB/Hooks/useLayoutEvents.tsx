@@ -6,16 +6,16 @@ import { Layouts, EventContext } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useLayoutEvents = (setLayouts: Function) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
-  const activeLayout = useRef<Layouts>(layoutContext.activeLayout);
+  const theActiveLayout = useRef<Layouts>(activeLayout);
 
   useEffect(() => {
     DebugLogger("Updating layout refs");
-    activeLayout.current = layoutContext.activeLayout;
-  }, [layoutContext]);
+    theActiveLayout.current = activeLayout;
+  }, [theActiveLayout]);
 
   useEffect(() => {
     if (eventsInitialized) return;
@@ -61,9 +61,9 @@ export const useLayoutEvents = (setLayouts: Function) => {
 
       if (layout.id !== activeLayout.current.id) return;
 
-      layoutContext.setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
+      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
     });
 
     setEventsInitialized(true);
-  }, [eventsInitialized, setLayouts, layoutContext, spacetimeDB.Client]);
+  }, [eventsInitialized, setLayouts, activeLayout, setActiveLayout, spacetimeDB.Client]);
 };

@@ -1,12 +1,9 @@
-import { useState, useEffect, useContext, memo, useRef } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { Config } from "../../module_bindings";
 import styled from "styled-components";
 
 const StreamContainer = () => {
-  const config: Config = useContext(ConfigContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
@@ -61,38 +58,38 @@ const StreamContainer = () => {
         </a>
       </StreamWarning>
 
-      {config.streamingPlatform === "twitch" && !streamOverride && (
+      {spacetimeDB.Config.streamingPlatform === "twitch" && !streamOverride && (
         <TwitchPlayer
           style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
           height="100%"
           width="100%"
           id="stream"
-          channel={config.streamName}
+          channel={spacetimeDB.Config.streamName}
           autoplay
           muted
           onReady={streamOnReady}
         />
       )}
 
-      {config.streamingPlatform === "youtube" && !streamOverride && (
+      {spacetimeDB.Config.streamingPlatform === "youtube" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
-          src={"https://www.youtube.com/embed/live_stream?channel=" + config.streamName + "&autoplay=1&mute=1"}
+          src={"https://www.youtube.com/embed/live_stream?channel=" + spacetimeDB.Config.streamName + "&autoplay=1&mute=1"}
           allowFullScreen
           title="YoutubeStream"
         />
       )}
 
-      {config.streamingPlatform === "kick" && !streamOverride && (
+      {spacetimeDB.Config.streamingPlatform === "kick" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
-          src={"https://player.kick.com/" + config.streamName + "?autoplay=true&muted=true"}
+          src={"https://player.kick.com/" + spacetimeDB.Config.streamName + "?autoplay=true&muted=true"}
           allowFullScreen
           title="KickStream"
         />

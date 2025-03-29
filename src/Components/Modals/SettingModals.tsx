@@ -31,7 +31,6 @@ import ContentPaste from "@mui/icons-material/ContentPaste";
 import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { InstancePasswordModal } from "./InstancePasswordModal";
@@ -42,7 +41,6 @@ import { Config } from "../../module_bindings";
 import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
 
 export const SettingsModal = () => {
-  const config: Config = useContext(ConfigContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
   const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
@@ -88,11 +86,11 @@ export const SettingsModal = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   // OWNER
-  const [platform, setPlatform] = useState<string>(config.streamingPlatform);
-  const [streamName, setStreamName] = useState<string>(config.streamName);
-  const [updateHz, setUpdateHz] = useState<number>(config.updateHz);
-  const [auth, setAuth] = useState<boolean>(config.authentication);
-  const [strictMode, setStrictMode] = useState<boolean>(config.strictMode);
+  const [platform, setPlatform] = useState<string>(spacetimeDB.Config.streamingPlatform);
+  const [streamName, setStreamName] = useState<string>(spacetimeDB.Config.streamName);
+  const [updateHz, setUpdateHz] = useState<number>(spacetimeDB.Config.updateHz);
+  const [auth, setAuth] = useState<boolean>(spacetimeDB.Config.authentication);
+  const [strictMode, setStrictMode] = useState<boolean>(spacetimeDB.Config.strictMode);
 
   useGetVersionNumber(setVersionNumber);
 
@@ -103,11 +101,11 @@ export const SettingsModal = () => {
 
     if (permission && permission.tag === "Owner") {
       const doUpdate =
-        platform !== config.streamingPlatform ||
-        streamName !== config.streamName ||
-        updateHz !== config.updateHz ||
-        auth !== config.authentication ||
-        strictMode !== config.strictMode;
+        platform !== spacetimeDB.Config.streamingPlatform ||
+        streamName !== spacetimeDB.Config.streamName ||
+        updateHz !== spacetimeDB.Config.updateHz ||
+        auth !== spacetimeDB.Config.authentication ||
+        strictMode !== spacetimeDB.Config.strictMode;
 
       if (doUpdate) spacetimeDB.Client.reducers.updateConfig(platform, streamName, updateHz, auth, strictMode);
     }
@@ -319,7 +317,7 @@ export const SettingsModal = () => {
                 />
               </div>
 
-              {config.streamingPlatform === "twitch" && (
+              {spacetimeDB.Config.streamingPlatform === "twitch" && (
                 <FormControl fullWidth sx={{ color: "#ffffffa6 !important", marginTop: "15px" }}>
                   <InputLabel id="qualityselector" sx={{ color: "#ffffffa6", ":focus": { color: "red !important" } }}>
                     Stream quality

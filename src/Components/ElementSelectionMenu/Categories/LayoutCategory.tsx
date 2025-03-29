@@ -18,7 +18,7 @@ import { Layouts, PermissionLevel } from "../../../module_bindings";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
@@ -33,7 +33,7 @@ export const LayoutCategory = () => {
 
   const changeLayout = (layout: Layouts) => {
     spacetimeDB.Client.reducers.updateGuestSelectedLayout(layout.id);
-    layoutContext.setActiveLayout(layout);
+    setActiveLayout(layout);
   };
 
   const showLayoutCreationModal = () => {
@@ -53,7 +53,7 @@ export const LayoutCategory = () => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutName>Layouts ({layoutContext.activeLayout.name})</LayoutName>
+          <LayoutName>Layouts ({activeLayout.name})</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -110,7 +110,7 @@ export const LayoutCategory = () => {
                     textTransform: "initial",
                     justifyContent: "left",
                     width: "100%",
-                    border: layoutContext.activeLayout.id === layout.id ? "solid 2px #022440" : "solid 2px #000C17",
+                    border: activeLayout.id === layout.id ? "solid 2px #022440" : "solid 2px #000C17",
                   }}
                   onClick={() => {
                     changeLayout(layout);

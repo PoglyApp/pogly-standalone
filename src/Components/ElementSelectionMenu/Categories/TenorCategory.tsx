@@ -13,7 +13,7 @@ import { ElementStruct, ImageElementData } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const TenorCategory = () => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [tenorEmotes, setTenorEmotes] = useState<any>();
@@ -46,7 +46,7 @@ export const TenorCategory = () => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };

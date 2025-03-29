@@ -52,7 +52,7 @@ const hightlightWithLineNumbers = (input: string, language: any, languageString:
 
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [text, setText] = useState<string>("");
@@ -326,7 +326,7 @@ export const TextCreationModal = (props: IProps) => {
 
     if (!props.editElementId) {
       DebugLogger("Inserting new text");
-      insertElement(spacetimeDB.Client, textElement, layoutContext.activeLayout);
+      insertElement(spacetimeDB.Client, textElement, activeLayout);
     } else {
       DebugLogger("Updating old text");
       updateTextElement(spacetimeDB.Client, props.editElementId, textElement);

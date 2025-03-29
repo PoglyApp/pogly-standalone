@@ -22,7 +22,7 @@ interface IProps {
 }
 
 export const ChannelEmoteCategory = (props: IProps) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
@@ -82,7 +82,7 @@ export const ChannelEmoteCategory = (props: IProps) => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };
@@ -101,7 +101,7 @@ export const ChannelEmoteCategory = (props: IProps) => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };

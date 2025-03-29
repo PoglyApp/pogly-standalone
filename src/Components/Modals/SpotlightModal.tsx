@@ -22,7 +22,7 @@ interface IProps {
 }
 
 export const SpotlightModal = (props: IProps) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -66,7 +66,7 @@ export const SpotlightModal = (props: IProps) => {
         width: elementData.dataWidth || 128,
         height: elementData.dataHeight || 128,
       }),
-      layoutContext.activeLayout
+      activeLayout
     );
 
     handleOnClose();
@@ -86,7 +86,7 @@ export const SpotlightModal = (props: IProps) => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
 
@@ -107,7 +107,7 @@ export const SpotlightModal = (props: IProps) => {
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
 

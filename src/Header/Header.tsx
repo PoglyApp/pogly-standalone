@@ -1,7 +1,7 @@
 import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
 import { SettingsModal } from "../Components/Modals/SettingModals";
 import SecurityIcon from "@mui/icons-material/Security";
@@ -15,9 +15,31 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { LayoutContext } from "../Contexts/LayoutContext";
 
 export const Header = () => {
-  const isCanvas: Boolean = window.location.href.includes("/canvas");
+  const location = useLocation();
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const { activeLayout } = useContext(LayoutContext);
+  const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
+
+  useEffect(() => {
+    if (
+      location.pathname !== '/login' && 
+      location.pathname !== '/' && 
+      (!spacetimeDB || !activeLayout)
+    ) {
+      setIsRedirecting(true);
+      window.location.href = "/";
+    }
+  }, [location, spacetimeDB, activeLayout, navigate]);
+
+  if (isRedirecting) {
+    return null;
+  }
 
   const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
 
@@ -36,7 +58,7 @@ export const Header = () => {
     setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
   };
 
-  if (!isCanvas) {
+  if (location.pathname !== "/canvas") {
     return (
       <main>
         <Outlet />

@@ -17,7 +17,6 @@ import styled from "styled-components";
 import { UploadBackupFromFile } from "../../Utility/UploadElementData";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
@@ -28,7 +27,6 @@ interface IProps {
 export const BackupModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const config = useContext(ConfigContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [file, setFile] = useState<any>(null);
@@ -86,7 +84,7 @@ export const BackupModal = (props: IProps) => {
 
   const handleDownload = () => {
     DebugLogger("Handling download data");
-    DownloadElementData(spacetimeDB.Client, downData, downElement, downLayout, config, modals, setModals, closeModal);
+    DownloadElementData(spacetimeDB.Client, downData, downElement, downLayout, spacetimeDB.Config, modals, setModals, closeModal);
   };
 
   if (isOverlay) return <></>;

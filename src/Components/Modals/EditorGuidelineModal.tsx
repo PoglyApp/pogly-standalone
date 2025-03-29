@@ -5,12 +5,10 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import Markdown from "react-markdown";
 import remark from "remark-gfm";
 import styled from "styled-components";
-import { Config } from "../../module_bindings";
 
 interface IProp {
   setAcceptedGuidelines?: Function;
@@ -18,11 +16,10 @@ interface IProp {
 
 export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config: Config = useContext(ConfigContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
   const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
-  const [guidelineText, setGuidelineText] = useState<string>(config.editorGuidelines.toString());
+  const [guidelineText, setGuidelineText] = useState<string>(spacetimeDB.Config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
   const initGuidelineAccept = () => {

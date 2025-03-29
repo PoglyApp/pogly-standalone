@@ -1,11 +1,10 @@
 import { useContext, useEffect } from "react";
 import SevenTVWrap from "../Utility/SevenTVWrap";
-import { ConfigContext } from "../Contexts/ConfigContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import BetterTVWrap from "../Utility/BetterTVWrap";
 import SevenTVEmoteType from "../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../Types/BetterTVTypes/BetterTVEmoteType";
-import { Config } from "../module_bindings";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const useChannelEmotes = (
   setSevenTVEmotes: Function,
@@ -13,7 +12,7 @@ export const useChannelEmotes = (
   channelEmotesInitialized: boolean,
   setChannelEmotesInitialized: Function
 ) => {
-  const config: Config = useContext(ConfigContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   useEffect(() => {
     if (channelEmotesInitialized) return;
@@ -22,7 +21,7 @@ export const useChannelEmotes = (
 
     (async () => {
       // 7TV
-      const sevenTVUserID = await SevenTVWrap.SearchForUser(config.streamName);
+      const sevenTVUserID = await SevenTVWrap.SearchForUser(spacetimeDB.Config.streamName);
       if (!sevenTVUserID) {
         console.log("Could not find 7TV user ID.");
         return setChannelEmotesInitialized(true);
@@ -72,5 +71,5 @@ export const useChannelEmotes = (
       setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
-  }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
+  }, [channelEmotesInitialized, spacetimeDB.Config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
 };

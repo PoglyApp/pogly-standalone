@@ -1,11 +1,10 @@
 import "./Login.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { ChooseInstanceModal } from "../../Components/Modals/ChooseInstanceModal";
 import useStDB from "../../StDB/useStDB";
 import { jwtDecode } from "jwt-decode";
-import { Guests } from "../../module_bindings";
+import { Guests, Layouts } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 import { Loading } from "../../Components/General/Loading";
@@ -14,12 +13,15 @@ import { SetNicknameModal } from "../../Components/Modals/SetNicknameModal";
 import { SetSubscriptions } from "../../Utility/SetSubscriptions";
 import { StartHeartbeat } from "../../Utility/PingHeartbeat";
 import { useNavigate } from "react-router-dom";
+import { LayoutContext } from "../../Contexts/LayoutContext";
+import { ConfigContext } from "../../Contexts/ConfigContext";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const navigate = useNavigate();
 
   const { connectionConfig, setConnectionConfig } = useContext(ConfigContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB, setSpacetimeDB } = useContext(SpacetimeContext);
 
   // STDB
@@ -68,6 +70,7 @@ export const Login = () => {
       Client: spacetime.Client,
       Identity: guestWithNickname,
       Runtime: spacetime.Runtime,
+      Config: spacetime.InstanceConfig,
       Elements: [],
       ElementData: [],
       Guests: [],
@@ -264,6 +267,13 @@ export const Login = () => {
         setInstanceConfigured={setInstanceConfigured}
       />
     );
+  }
+
+  // Step 9) Set active layout
+  if (!activeLayout) {
+    DebugLogger("Setting initial activeLayout");
+    setActiveLayout((Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
+    return <Loading text="Loading Layouts" />
   }
 
   navigate("/canvas", { replace: true });

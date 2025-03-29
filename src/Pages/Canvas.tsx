@@ -20,7 +20,6 @@ import { ElementContextMenu } from "../Components/Elements/ContextMenus/ElementC
 import { HandleElementContextMenu } from "../Utility/HandleContextMenu";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
-import { ConfigContext } from "../Contexts/ConfigContext";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
@@ -33,6 +32,7 @@ import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { Config, Elements, Layouts } from "../module_bindings";
+import { useNavigate } from "react-router-dom";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -43,11 +43,14 @@ export const Canvas = () => {
     guestEventsInitialized: false,
   });
 
+  const navigate = useNavigate();
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config: Config = useContext(ConfigContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
+
+  if(!spacetimeDB || !activeLayout) navigate("/", { replace: true});
+
   const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
@@ -139,7 +142,7 @@ export const Canvas = () => {
 
     spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
-    waitUntil = Date.now() + 1000 / config.updateHz;
+    waitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
   };
 
   if (userDisconnected || spacetimeDB.Disconnected) {

@@ -4,7 +4,6 @@ import Selecto from "react-selecto";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { SettingsContext } from "../../Contexts/SettingsContext";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GetCoordsFromTransform } from "../../Utility/ConvertCoordinates";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { Config } from "../../module_bindings";
@@ -20,7 +19,6 @@ interface IProp {
 
 export const MoveableComponent = (props: IProp) => {
   const { settings } = useContext(SettingsContext);
-  const config: Config = useContext(ConfigContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const debugText = document.getElementById("debug-text" + props.selected?.Elements.id);
@@ -103,7 +101,7 @@ export const MoveableComponent = (props: IProp) => {
       event.target.style.transform
     );
 
-    transformWaitUntil = Date.now() + 1000 / config.updateHz;
+    transformWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
   };
 
   let transformMultiWaitUntil = 0;
@@ -116,7 +114,7 @@ export const MoveableComponent = (props: IProp) => {
       updateElementTransform(spacetimeDB.Client, parseInt(ev.target.id), ev.target.style.transform);
     });
 
-    transformMultiWaitUntil = Date.now() + 1000 / config.updateHz;
+    transformMultiWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
   };
 
   const onResizeStop = (event: any) => {
@@ -168,7 +166,7 @@ export const MoveableComponent = (props: IProp) => {
 
     updateElementTransform(spacetimeDB.Client, event.target.id, event.target.style.transform);
 
-    resizeWaitUntil = Date.now() + 1000 / config.updateHz;
+    resizeWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
   };
 
   const onClip = (event: any) => {

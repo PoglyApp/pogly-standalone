@@ -22,7 +22,7 @@ interface IProps {
 
 export const WidgetCategory = React.memo((props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   // Memoize the filtered elements (prevents recalculation on every render)
@@ -48,10 +48,10 @@ export const WidgetCategory = React.memo((props: IProps) => {
           height: elementData.dataHeight,
           rawData: "",
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     },
-    [layoutContext.activeLayout, spacetimeDB.Client]
+    [activeLayout, spacetimeDB.Client]
   );
 
   return (

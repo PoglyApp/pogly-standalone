@@ -2,16 +2,15 @@ import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
 import styled from "styled-components";
 import { Avatar, Menu } from "@mui/material";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Config, Guests } from "../../module_bindings";
+import { Guests } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const GuestListContainer = () => {
-  const config: Config = useContext(ConfigContext);
-
   const guestStore = useAppSelector((state: any) => state.guests.guests);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [displayedGuests, setDisplayedGuests] = useState<Guests[]>([]);
   const [hiddenGuests, setHiddenGuests] = useState<Guests[]>([]);
@@ -55,7 +54,7 @@ export const GuestListContainer = () => {
     <>
       <Container id="GuestList">
         {displayedGuests.map((guest: Guests) => {
-          if ((config.authentication && guest.authenticated) || !config.authentication) {
+          if ((spacetimeDB.Config.authentication && guest.authenticated) || !spacetimeDB.Config.authentication) {
             //Authentication Enabled - Guest Authenticated
             if (guest.nickname !== "") {
               return (
@@ -103,7 +102,7 @@ export const GuestListContainer = () => {
               }}
             >
               {hiddenGuests.map((guest: Guests) => {
-                if ((config.authentication && guest.authenticated) || !config.authentication) {
+                if ((spacetimeDB.Config.authentication && guest.authenticated) || !spacetimeDB.Config.authentication) {
                   //Authentication Enabled - Guest Authenticated
                   if (guest.nickname !== "") {
                     return (
