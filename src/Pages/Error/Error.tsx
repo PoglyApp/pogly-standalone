@@ -1,7 +1,9 @@
 import "./Error.css";
-import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useLocation, useRouteError } from "react-router-dom";
 
 export const Error: React.FC = () => {
+  const location = useLocation();
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const error: any = useRouteError();
 
   function errorMessage(error: any): string {
@@ -20,6 +22,8 @@ export const Error: React.FC = () => {
     }
   }
 
+  if (isOverlay) return <></>;
+
   return (
     <>
       <div className="card">
@@ -31,6 +35,7 @@ export const Error: React.FC = () => {
                 <code>{errorMessage(error)}</code>
               </pre>
               <p>
+                {location.pathname}<br />
                 Report this in our{" "}
                 <a className="glow" href="https://discord.gg/pogly">
                   Discord

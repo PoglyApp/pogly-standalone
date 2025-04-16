@@ -12,7 +12,7 @@ import { InitialSetupModal } from "../../Components/Modals/InitialSetupModal";
 import { SetNicknameModal } from "../../Components/Modals/SetNicknameModal";
 import { SetSubscriptions } from "../../Utility/SetSubscriptions";
 import { StartHeartbeat } from "../../Utility/PingHeartbeat";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 
@@ -32,12 +32,20 @@ export const Login = () => {
   const [stdbSubscriptions, setStdbSubscriptions] = useState<boolean>(false);
 
   const stdbAuthenticatedRef = useRef<boolean>(false);
-
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
-
   const [nickname, setNickname] = useState<string | null>(null);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setInstanceConfigured);
+
+  const location = useLocation();
+  const from = location.state?.from?.pathname;
+
+  useEffect(() => {
+    if (spacetimeDB && from) {
+      navigate(from, { replace: true });
+    }
+  }, [spacetimeDB]);
+
 
   useEffect(() => {
     if (

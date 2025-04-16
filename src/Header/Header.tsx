@@ -15,38 +15,27 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
-import { SpacetimeContext } from "../Contexts/SpacetimeContext";
-import { LayoutContext } from "../Contexts/LayoutContext";
 
 export const Header = () => {
   const location = useLocation();
-  const { spacetimeDB } = useContext(SpacetimeContext);
-  const { activeLayout } = useContext(LayoutContext);
   const navigate = useNavigate();
+  const { setModals } = useContext(ModalContext);
+
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
+  const [isDroppingSelectionMenu, setIsDroppingSelectionMenu] = useState(false);
+  const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
+  const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
 
   useEffect(() => {
     if (
-      location.pathname !== '/login' && 
-      location.pathname !== '/' && 
-      (!spacetimeDB || !activeLayout)
+      location.pathname !== "/login" &&
+      location.pathname !== "/" &&
+      !location.pathname.startsWith("/canvas")
     ) {
       setIsRedirecting(true);
       window.location.href = "/";
     }
-  }, [location, spacetimeDB, activeLayout, navigate]);
-
-  if (isRedirecting) {
-    return null;
-  }
-
-  const [isDroppingSelectionMenu, setisDroppingSelectionMenu] = useState<boolean>(false);
-
-  const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
-  const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
-
-  const { setModals } = useContext(ModalContext);
+  }, [location, navigate]);
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
@@ -58,87 +47,92 @@ export const Header = () => {
     setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
   };
 
-  if (location.pathname !== "/canvas") {
-    return (
+  return isRedirecting ? null : (
+    location.pathname !== "/canvas" ? (
       <main>
         <Outlet />
       </main>
-    );
-  }
-
-  return (
-    <>
-      <StyledBox>
-        <AppBar position="static">
-          <Toolbar disableGutters>
-            <Typography
-              variant="h6"
-              sx={{
-                fontFamily: "monospace",
-                fontWeight: 700,
-                color: "#ffffffa6",
-                minWidth: "218px",
-                textAlign: "center",
-              }}
-            >
-              <span style={{ color: "#ffffffd9" }}>Pogly</span> Standalone
-            </Typography>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={0}
+    ) : (
+      <>
+        <StyledBox>
+          <AppBar position="static">
+            <Toolbar disableGutters>
+              <Typography
+                variant="h6"
                 sx={{
-                  ".Mui-selected": { backgroundColor: "#001529 !important" },
-                  ".MuiTabs-indicator": { backgroundColor: "#001529 !important" },
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  color: "#ffffffa6",
+                  minWidth: "218px",
+                  textAlign: "center",
                 }}
               >
-                <StyledTab
-                  id="quickswap-button"
-                  aria-controls={quickSwapMenuOpen ? "quickswap-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={quickSwapMenuOpen ? "true" : undefined}
-                  icon={<SwapHorizIcon />}
-                  iconPosition="start"
-                  label="Swap module"
-                  onClick={(event: any) => setQuickSwapMenuAnchor(event.currentTarget)}
-                />
-                <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
-                <StyledGuidelines
-                  icon={<SecurityIcon />}
-                  iconPosition="start"
-                  label="Editor Guidelines"
-                  onClick={showEditorGuidelines}
-                />
-              </Tabs>
-            </Box>
+                <span style={{ color: "#ffffffd9" }}>Pogly</span> Standalone
+              </Typography>
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={0}
+                  sx={{
+                    ".Mui-selected": { backgroundColor: "#001529 !important" },
+                    ".MuiTabs-indicator": { backgroundColor: "#001529 !important" },
+                  }}
+                >
+                  <StyledTab
+                    id="quickswap-button"
+                    aria-controls={quickSwapMenuOpen ? "quickswap-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={quickSwapMenuOpen ? "true" : undefined}
+                    icon={<SwapHorizIcon />}
+                    iconPosition="start"
+                    label="Swap module"
+                    onClick={(event: any) => setQuickSwapMenuAnchor(event.currentTarget)}
+                  />
+                  <StyledTab
+                    icon={<SettingsIcon />}
+                    iconPosition="start"
+                    label="Settings"
+                    onClick={showSettingsMenu}
+                  />
+                  <StyledGuidelines
+                    icon={<SecurityIcon />}
+                    iconPosition="start"
+                    label="Editor Guidelines"
+                    onClick={showEditorGuidelines}
+                  />
+                </Tabs>
+              </Box>
 
-            <GuestListContainer />
-          </Toolbar>
-        </AppBar>
-        <Dropzone
-          onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
-          noClick={true}
-          onDragEnter={() => setisDroppingSelectionMenu(true)}
-          onDragLeave={() => setisDroppingSelectionMenu(false)}
-          onDropAccepted={() => setisDroppingSelectionMenu(false)}
-          onDropRejected={() => setisDroppingSelectionMenu(false)}
-        >
-          {({ getRootProps }) => (
-            <div {...getRootProps()}>
-              <ElementSelectionMenu isDropping={isDroppingSelectionMenu} />
-            </div>
-          )}
-        </Dropzone>
+              <GuestListContainer />
+            </Toolbar>
+          </AppBar>
 
-        <QuickSwapMenu
-          quickSwapMenuAnchor={quickSwapMenuAnchor}
-          quickSwapMenuOpen={quickSwapMenuOpen}
-          setQuickSwapMenuAnchor={setQuickSwapMenuAnchor}
-        />
-      </StyledBox>
-      <main>
-        <Outlet />
-      </main>
-    </>
+          <Dropzone
+            onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}
+            noClick={true}
+            onDragEnter={() => setIsDroppingSelectionMenu(true)}
+            onDragLeave={() => setIsDroppingSelectionMenu(false)}
+            onDropAccepted={() => setIsDroppingSelectionMenu(false)}
+            onDropRejected={() => setIsDroppingSelectionMenu(false)}
+          >
+            {({ getRootProps }) => (
+              <div {...getRootProps()}>
+                <ElementSelectionMenu isDropping={isDroppingSelectionMenu} />
+              </div>
+            )}
+          </Dropzone>
+
+          <QuickSwapMenu
+            quickSwapMenuAnchor={quickSwapMenuAnchor}
+            quickSwapMenuOpen={quickSwapMenuOpen}
+            setQuickSwapMenuAnchor={setQuickSwapMenuAnchor}
+          />
+        </StyledBox>
+
+        <main>
+          <Outlet />
+        </main>
+      </>
+    )
   );
 };
 

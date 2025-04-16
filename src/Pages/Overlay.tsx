@@ -11,6 +11,7 @@ import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { Layouts } from "../module_bindings";
+import { useNavigate } from "react-router-dom";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 export const Overlay = () => {
@@ -20,9 +21,7 @@ export const Overlay = () => {
     overlayGuestEventsInitialized: false,
   });
   const { spacetimeDB } = useContext(SpacetimeContext);
-
   const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
-
   const [activeLayout, setActiveLayout] = useState<Layouts>();
 
   useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
