@@ -17,7 +17,7 @@ import { ModalContext } from "./Contexts/ModalContext";
 import { NotFound } from "./Pages/NotFound";
 import { LayoutContext } from "./Contexts/LayoutContext";
 import { Error } from "./Pages/Error/Error";
-import { Login } from "./Pages/Login/Login";
+import { Login } from "./Pages/Login/LoginNEW";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import { Callback } from "./Pages/Callback/Callback";
 import { Layouts } from "./module_bindings";
@@ -27,7 +27,7 @@ export const App: React.FC = () => {
   const [modals, setModals] = useState<ReactNode[]>([]);
 
   const [spacetimeDB, setSpacetimeDB] = useState<SpacetimeContextType | undefined>(undefined);
-  const [activeLayout, setActiveLayout] = useState<Layouts | undefined>(undefined)
+  const [activeLayout, setActiveLayout] = useState<Layouts | undefined>(undefined);
 
   // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);

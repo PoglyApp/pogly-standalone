@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
-
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -19,27 +19,18 @@ export default defineConfig(({ mode }) => {
       basePlugin(),
       importPrefixPlugin(),
       htmlPlugin(mode),
-      
-      
-      
+      tailwindcss(),
     ],
   };
 });
 
 function setEnv(mode: string) {
-	Object.assign(
-		process.env,
-		loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]),
-	);
-	process.env.NODE_ENV ||= mode;
-	const { homepage } = JSON.parse(readFileSync("package.json", "utf-8"));
-	process.env.PUBLIC_URL ||= homepage
-		? `${
-				homepage.startsWith("http") || homepage.startsWith("/")
-					? homepage
-					: `/${homepage}`
-			}`.replace(/\/$/, "")
-		: "";
+  Object.assign(process.env, loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]));
+  process.env.NODE_ENV ||= mode;
+  const { homepage } = JSON.parse(readFileSync("package.json", "utf-8"));
+  process.env.PUBLIC_URL ||= homepage
+    ? `${homepage.startsWith("http") || homepage.startsWith("/") ? homepage : `/${homepage}`}`.replace(/\/$/, "")
+    : "";
 }
 
 // Expose `process.env` environment variables to your client code
@@ -52,10 +43,7 @@ function envPlugin(): Plugin {
       const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]);
       return {
         define: Object.fromEntries(
-          Object.entries(env).map(([key, value]) => [
-            `process.env.${key}`,
-            JSON.stringify(value),
-          ]),
+          Object.entries(env).map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
         ),
       };
     },
@@ -68,82 +56,80 @@ function envPlugin(): Plugin {
 // https://vitejs.dev/config/server-options.html#server-https
 // https://vitejs.dev/config/server-options.html#server-port
 function devServerPlugin(): Plugin {
-	return {
-		name: "dev-server-plugin",
-		config(_, { mode }) {
-			const { HOST, PORT, HTTPS, SSL_CRT_FILE, SSL_KEY_FILE } = loadEnv(
-				mode,
-				".",
-				["HOST", "PORT", "HTTPS", "SSL_CRT_FILE", "SSL_KEY_FILE"],
-			);
-			const https = HTTPS === "true";
-			return {
-				server: {
-					host: HOST || "0.0.0.0",
-					port: parseInt(PORT || "3000", 10),
-					open: true,
-					...(https &&
-						SSL_CRT_FILE &&
-						SSL_KEY_FILE && {
-							https: {
-								cert: readFileSync(resolve(SSL_CRT_FILE)),
-								key: readFileSync(resolve(SSL_KEY_FILE)),
-							},
-						}),
-				},
-			};
-		},
-	};
+  return {
+    name: "dev-server-plugin",
+    config(_, { mode }) {
+      const { HOST, PORT, HTTPS, SSL_CRT_FILE, SSL_KEY_FILE } = loadEnv(mode, ".", [
+        "HOST",
+        "PORT",
+        "HTTPS",
+        "SSL_CRT_FILE",
+        "SSL_KEY_FILE",
+      ]);
+      const https = HTTPS === "true";
+      return {
+        server: {
+          host: HOST || "0.0.0.0",
+          port: parseInt(PORT || "3000", 10),
+          open: true,
+          ...(https &&
+            SSL_CRT_FILE &&
+            SSL_KEY_FILE && {
+              https: {
+                cert: readFileSync(resolve(SSL_CRT_FILE)),
+                key: readFileSync(resolve(SSL_KEY_FILE)),
+              },
+            }),
+        },
+      };
+    },
+  };
 }
 
 // Migration guide: Follow the guide below
 // https://vitejs.dev/config/build-options.html#build-sourcemap
 function sourcemapPlugin(): Plugin {
-	return {
-		name: "sourcemap-plugin",
-		config(_, { mode }) {
-			const { GENERATE_SOURCEMAP } = loadEnv(mode, ".", [
-				"GENERATE_SOURCEMAP",
-			]);
-			return {
-				build: {
-					sourcemap: GENERATE_SOURCEMAP === "true",
-				},
-			};
-		},
-	};
+  return {
+    name: "sourcemap-plugin",
+    config(_, { mode }) {
+      const { GENERATE_SOURCEMAP } = loadEnv(mode, ".", ["GENERATE_SOURCEMAP"]);
+      return {
+        build: {
+          sourcemap: GENERATE_SOURCEMAP === "true",
+        },
+      };
+    },
+  };
 }
 
 // Migration guide: Follow the guide below
 // https://vitejs.dev/config/build-options.html#build-outdir
 function buildPathPlugin(): Plugin {
-	return {
-		name: "build-path-plugin",
-		config(_, { mode }) {
-			const { BUILD_PATH } = loadEnv(mode, ".", [
-				"BUILD_PATH",
-			]);
-			return {
-				build: {
-					outDir: BUILD_PATH || "build",
-				},
-			};
-		},
-	};
+  return {
+    name: "build-path-plugin",
+    config(_, { mode }) {
+      const { BUILD_PATH } = loadEnv(mode, ".", ["BUILD_PATH"]);
+      return {
+        build: {
+          outDir: BUILD_PATH || "build",
+        },
+      };
+    },
+  };
 }
 
 // Migration guide: Follow the guide below and remove homepage field in package.json
 // https://vitejs.dev/config/shared-options.html#base
 function basePlugin(): Plugin {
-	return {
-		name: "base-plugin",
-		config(_, { mode }) {
-			const { PUBLIC_URL } = loadEnv(mode, ".", ["PUBLIC_URL"]);
-			return {
-				base: PUBLIC_URL || "",
-			};
-		},
-	};
+  return {
+    name: "base-plugin",
+    config(_, { mode }) {
+      const { PUBLIC_URL } = loadEnv(mode, ".", ["PUBLIC_URL"]);
+      return {
+        base: PUBLIC_URL || "",
+      };
+    },
+  };
 }
 
 // To resolve modules from node_modules, you can prefix paths with ~
@@ -151,34 +137,31 @@ function basePlugin(): Plugin {
 // Migration guide: Follow the guide below
 // https://vitejs.dev/config/shared-options.html#resolve-alias
 function importPrefixPlugin(): Plugin {
-	return {
-		name: "import-prefix-plugin",
-		config() {
-			return {
-				resolve: {
-					alias: [{ find: /^~([^/])/, replacement: "$1" }],
-				},
-			};
-		},
-	};
+  return {
+    name: "import-prefix-plugin",
+    config() {
+      return {
+        resolve: {
+          alias: [{ find: /^~([^/])/, replacement: "$1" }],
+        },
+      };
+    },
+  };
 }
-
-
-
 
 // Replace %ENV_VARIABLES% in index.html
 // https://vitejs.dev/guide/api-plugin.html#transformindexhtml
 // Migration guide: Follow the guide below, you may need to rename your environment variable to a name that begins with VITE_ instead of REACT_APP_
 // https://vitejs.dev/guide/env-and-mode.html#html-env-replacement
 function htmlPlugin(mode: string): Plugin {
-	const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]);
-	return {
-		name: "html-plugin",
-		transformIndexHtml: {
-			order: "pre",
-			handler(html) {
-				return html.replace(/%(.*?)%/g, (match, p1) => env[p1] ?? match);
-			},
-		},
-	};
+  const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]);
+  return {
+    name: "html-plugin",
+    transformIndexHtml: {
+      order: "pre",
+      handler(html) {
+        return html.replace(/%(.*?)%/g, (match, p1) => env[p1] ?? match);
+      },
+    },
+  };
 }
