@@ -1,7 +1,6 @@
 import "./Login.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { ChooseInstanceModal } from "../../Components/Modals/ChooseInstanceModal";
 import useStDB from "../../StDB/useStDB";
 import { jwtDecode } from "jwt-decode";
 import { Guests, Layouts } from "../../module_bindings";
@@ -15,6 +14,7 @@ import { StartHeartbeat } from "../../Utility/PingHeartbeat";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
+import { ConnectionContainer } from "./Components/ConnectionContainer";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -45,7 +45,6 @@ export const Login = () => {
       navigate(from, { replace: true });
     }
   }, [spacetimeDB]);
-
 
   useEffect(() => {
     if (
@@ -94,7 +93,7 @@ export const Login = () => {
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
     DebugLogger("Connection config not configured");
-    return <ChooseInstanceModal setInstanceSettings={setConnectionConfig} />;
+    return <ConnectionContainer setInstanceSettings={setConnectionConfig} />;
   }
 
   // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
@@ -280,8 +279,10 @@ export const Login = () => {
   // Step 9) Set active layout
   if (!activeLayout) {
     DebugLogger("Setting initial activeLayout");
-    setActiveLayout((Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
-    return <Loading text="Loading Layouts" />
+    setActiveLayout(
+      (Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
+    );
+    return <Loading text="Loading Layouts" />;
   }
 
   navigate("/canvas", { replace: true });

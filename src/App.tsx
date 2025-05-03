@@ -17,7 +17,7 @@ import { ModalContext } from "./Contexts/ModalContext";
 import { NotFound } from "./Pages/NotFound";
 import { LayoutContext } from "./Contexts/LayoutContext";
 import { Error } from "./Pages/Error/Error";
-import { Login } from "./Pages/Login/LoginNEW";
+import { Login } from "./Pages/Login/Login";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import { Callback } from "./Pages/Callback/Callback";
 import { Layouts } from "./module_bindings";
