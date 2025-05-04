@@ -1,7 +1,7 @@
 import "../Login.css";
-import { ChevronDown, SaveIcon, UserRound } from "lucide-react";
+import { ChevronDown, SaveIcon, UserRound, PenLine } from "lucide-react";
 import styled from "styled-components";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { AuthStatusType } from "../../../Types/General/AuthStatusType";
@@ -10,9 +10,10 @@ import { Container } from "../../../Components/General/Container";
 
 interface IProp {
   setInstanceSettings: Function;
+  setNickname: Function;
 }
 
-export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
+export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp) => {
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://pogly.spacetimedb.com");
@@ -20,33 +21,43 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [subtitle, setSubtitle] = useState<string>("");
 
-  const twitchIdToken = localStorage.getItem("twitchIdToken");
+  const [guestNickname, setGuestNickname] = useState<string>("");
+  const nicknameFieldRef = useRef<HTMLInputElement>(null);
 
-  const [authStatus, setAuthStatus] = useState<AuthStatusType>(
-    twitchIdToken ? AuthStatusType.TwitchAuth : AuthStatusType.NotAuthenticated
-  );
+  const domainRef = useRef<HTMLSelectElement>(null);
+
+  const [authStatus, setAuthStatus] = useState<AuthStatusType>(AuthStatusType.NotAuthenticated);
+  const [twitchToken, setTwitchToken] = useState<string | null>();
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
-
-  const preferredUsername = useMemo(() => {
-    try {
-      if (!twitchIdToken) return null;
-      const decoded: any = jwtDecode(twitchIdToken);
-      return decoded.preferred_username ?? null;
-    } catch {
-      return null;
-    }
-  }, [twitchIdToken]);
 
   useEffect(() => {
     const modules = localStorage.getItem("poglyQuickSwap");
     if (modules && modules !== undefined) setQuickSwapModules(JSON.parse(modules));
+
+    const twitchIdToken = localStorage.getItem("twitchIdToken");
+
+    if (twitchIdToken) {
+      setTwitchToken(twitchIdToken);
+
+      const decodedToken: any = jwtDecode(twitchIdToken);
+      setGuestNickname(decodedToken.preferred_username);
+      setAuthStatus(AuthStatusType.TwitchAuth);
+      setSubtitle("Twitch");
+    } else {
+      const savedNickname: string | null = localStorage.getItem("nickname");
+
+      if (savedNickname) setGuestNickname(savedNickname);
+      else setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
+    }
   }, []);
 
   const handleConnect = () => {
     saveQuickSwap();
 
+    setNickname(guestNickname);
+
     setInstanceSettings({
-      token: twitchIdToken,
+      token: twitchToken,
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -109,9 +120,22 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
     const module: QuickSwapType | undefined = quickSwapModules.find((m: QuickSwapType) => m.module === value);
     if (!module) return console.log("ERROR: Could not find selected module from quickswap list.");
 
-    console.log(module);
     setModuleName(module.module);
     setAuthKey(module.auth);
+    setDomain(module.domain);
+
+    switch (module.domain) {
+      case "wss://pogly.spacetimedb.com":
+        domainRef.current!.value = "Cloud";
+        break;
+      case "ws://127.0.0.1:3000":
+        domainRef.current!.value = "Local";
+        break;
+      default:
+        domainRef.current!.value = "Custom";
+        setCustomDomain(true);
+        break;
+    }
   };
 
   const handleAuth = (type: AuthStatusType) => {
@@ -132,11 +156,18 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
     window.location.href = twitchAuthUrl;
   };
 
+  const handleUpdateNickname = (value: any) => {
+    const newNickname = value.target.value;
+
+    if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
+    setGuestNickname(newNickname);
+    localStorage.setItem("nickname", newNickname);
+  };
+
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bottom-30">
       <PoglyLogo />
 
-      {/* LOGIN BUTTON OVERLAY */}
       {authStatus === AuthStatusType.NotAuthenticated && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
           <StyledButton
@@ -176,11 +207,19 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
             }`}
           >
             <div className="flex flex-col gap-3">
-              {twitchIdToken && (
-                <div className="text-[20px] text-center bg-[#10121a] p-3 rounded-md">
-                  Logged in as <span className="text-[#9146FF]">{preferredUsername}</span>
-                </div>
-              )}
+              <div className="flex text-[20px] text-center bg-[#10121a] p-3 rounded-md justify-center">
+                Logged in as
+                <input
+                  ref={nicknameFieldRef}
+                  type="text"
+                  defaultValue={guestNickname}
+                  disabled={authStatus === AuthStatusType.TwitchAuth ? true : false}
+                  className={`${
+                    authStatus === AuthStatusType.TwitchAuth ? "text-[#9146FF]" : "text-[#7e97a5]"
+                  } w-[100px] ml-2`}
+                  onBlur={handleUpdateNickname}
+                />
+              </div>
 
               <div className="w-full">
                 <p className="text-sm text-[#aeb4d4] font-mono">Module name</p>
@@ -237,14 +276,16 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
                   <input
                     type="text"
                     placeholder="ws(s)://127.0.0.1"
+                    defaultValue={domain}
                     className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md shadow-inner placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                    onChange={(value: any) => setDomain(value.target.value)}
                   />
                 </div>
               )}
             </div>
 
             <div className="flex justify-end gap-2">
-              {twitchIdToken && (
+              {twitchToken && (
                 <StyledButton
                   className="absolute left-5 bg-[#6441a5]!"
                   onClick={() => {
@@ -258,7 +299,7 @@ export const ConnectionContainer = ({ setInstanceSettings }: IProp) => {
               )}
 
               <div className="w-30 relative">
-                <StyledSelect onChange={(value) => handleDomainChange(value)}>
+                <StyledSelect ref={domainRef} onChange={(value) => handleDomainChange(value)}>
                   <option value="Cloud">Cloud</option>
                   <option value="Local">Local</option>
                   <option value="Custom">Custom</option>

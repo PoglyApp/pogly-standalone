@@ -2,7 +2,6 @@ import "./Login.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import useStDB from "../../StDB/useStDB";
-import { jwtDecode } from "jwt-decode";
 import { Guests, Layouts } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
@@ -59,16 +58,11 @@ export const Login = () => {
 
     DebugLogger("Setting nickname and Spacetime context");
 
-    let nickname: string = localStorage.getItem("nickname") || "";
-
-    if (connectionConfig.token !== null) nickname = (jwtDecode(connectionConfig.token) as any).preferred_username;
-
     if (nickname) {
       spacetime.Client.reducers.updateGuestNickname(nickname);
 
       setNickname(nickname);
     }
-
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
@@ -82,6 +76,7 @@ export const Login = () => {
       ElementData: [],
       Guests: [],
     });
+
     DebugLogger("Successfully set Spacetime context");
   }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime]);
 
@@ -93,7 +88,7 @@ export const Login = () => {
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
     DebugLogger("Connection config not configured");
-    return <ConnectionContainer setInstanceSettings={setConnectionConfig} />;
+    return <ConnectionContainer setInstanceSettings={setConnectionConfig} setNickname={setNickname} />;
   }
 
   // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
@@ -255,12 +250,6 @@ export const Login = () => {
   if (!spacetimeDB) {
     DebugLogger("Waiting for SpacetimeDB context");
     return <Loading text="Loading Canvas" />;
-  }
-
-  // Step 7) Has nickname been set?
-  if (!nickname) {
-    DebugLogger("Nickname has not been set");
-    return <SetNicknameModal client={spacetime.Client} identity={spacetime.Identity} setNickname={setNickname} />;
   }
 
   // Step 8) Has the Pogly Instance been configured?
