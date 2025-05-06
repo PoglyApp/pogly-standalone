@@ -6,14 +6,13 @@ import { Guests, Layouts } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 import { Loading } from "../../Components/General/Loading";
-import { InitialSetupModal } from "../../Components/Modals/InitialSetupModal";
-import { SetNicknameModal } from "../../Components/Modals/SetNicknameModal";
 import { SetSubscriptions } from "../../Utility/SetSubscriptions";
 import { StartHeartbeat } from "../../Utility/PingHeartbeat";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ConnectionContainer } from "./Components/ConnectionContainer";
+import { ModuleOnboarding } from "./Components/ModuleOnboarding";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -33,6 +32,7 @@ export const Login = () => {
   const stdbAuthenticatedRef = useRef<boolean>(false);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
   const [nickname, setNickname] = useState<string | null>(null);
+  const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setInstanceConfigured);
 
@@ -88,7 +88,13 @@ export const Login = () => {
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {
     DebugLogger("Connection config not configured");
-    return <ConnectionContainer setInstanceSettings={setConnectionConfig} setNickname={setNickname} />;
+    return (
+      <ConnectionContainer
+        setInstanceSettings={setConnectionConfig}
+        setNickname={setNickname}
+        setLegacyLogin={setLegacyLogin}
+      />
+    );
   }
 
   // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
@@ -255,14 +261,7 @@ export const Login = () => {
   // Step 8) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     DebugLogger("Pogly Instance is not configured");
-    return (
-      <InitialSetupModal
-        client={spacetime.Client}
-        config={spacetime.InstanceConfig}
-        connectionConfig={connectionConfig}
-        setInstanceConfigured={setInstanceConfigured}
-      />
-    );
+    return <ModuleOnboarding legacyLogin={legacyLogin} />;
   }
 
   // Step 9) Set active layout

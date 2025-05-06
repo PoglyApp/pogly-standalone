@@ -1,5 +1,5 @@
 import "../Login.css";
-import { ChevronDown, SaveIcon, UserRound, PenLine } from "lucide-react";
+import { ChevronDown, SaveIcon, UserRound } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
@@ -11,9 +11,10 @@ import { Container } from "../../../Components/General/Container";
 interface IProp {
   setInstanceSettings: Function;
   setNickname: Function;
+  setLegacyLogin: Function;
 }
 
-export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp) => {
+export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://pogly.spacetimedb.com");
@@ -174,6 +175,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
             className="flex justify-self-center mb-3 w-[178px]"
             onClick={() => {
               setAuthStatus(AuthStatusType.LegacyAuth);
+              setLegacyLogin(true);
               setSubtitle("Legacy");
             }}
           >
