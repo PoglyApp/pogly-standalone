@@ -1,11 +1,16 @@
 import "../Login.css";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
+import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
+import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
+import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 
 interface IProps {
   legacyLogin: boolean;
+  connectionConfig: ConnectionConfigType;
+  spacetime: any;
 }
 
 const steps = [
@@ -16,11 +21,64 @@ const steps = [
   { label: "Finish", description: "" },
 ];
 
-export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
+export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: IProps) => {
+  // Just to display debug box of doom
+  const debug: boolean = false;
+
   const [step, setStep] = useState<number>(0);
-  const [usePassword, setUsePassword] = useState<boolean>(false);
 
   const [platform, setPlatform] = useState<string | null>();
+  const [channelName, setChannelName] = useState<string | null>(null);
+  const [usePassword, setUsePassword] = useState<boolean>(false);
+  const [useStrictMode, setUseStrictMode] = useState<boolean>(false);
+  const [password, setPassword] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+
+  const [overlayURL, setOverlayURL] = useState<string>("");
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
+  const [copyAuthButtonText, setAuthButtonText] = useState("Copy authentication token");
+
+  const [defaultElements, setDefaultElements] = useState<string>("");
+  const [initializing, setInitializing] = useState<boolean>(false);
+
+  const isPoglyInstance: Boolean = connectionConfig.domain === "wss://pogly.spacetimedb.com";
+
+  useGetDefaultElements(setDefaultElements);
+
+  useEffect(() => {
+    let baseUrl = window.location.origin + "/overlay?module=" + connectionConfig.module;
+    if (!isPoglyInstance) baseUrl = baseUrl + "&domain=" + connectionConfig.domain;
+
+    setOverlayURL(baseUrl);
+  }, []);
+
+  const handleChannelName = (value: string) => {
+    if (value === "") setChannelName(null);
+    else setChannelName(value);
+  };
+
+  const handlePassword = (value: string) => {
+    if (value === "") return setPassword(null);
+
+    const regex = /^[0-9a-zA-Z]+$/;
+    if (!regex.test(value)) return setPasswordError(true);
+    else setPasswordError(false);
+
+    setPassword(value);
+  };
+
+  const handleSave = () => {
+    spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
+
+    (async () => {
+      UploadElementDataFromString(spacetime.Client, defaultElements);
+      setInitializing(true);
+    })();
+
+    setTimeout(function () {
+      window.location.reload();
+    }, 3000);
+  };
 
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bottom-30">
@@ -161,21 +219,27 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
                   <input
                     type="text"
                     placeholder="Channel ID"
+                    defaultValue={channelName || ""}
                     className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md placeholder-gray-400  focus:outline-none focus:ring-2 focus:ring-[#2c2f3a] w-[300px]"
+                    onChange={(value) => handleChannelName(value.target.value)}
                   />
                 </div>
               ) : (
                 <input
                   type="text"
                   placeholder="Channel name"
+                  defaultValue={channelName || ""}
                   className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md placeholder-gray-400  focus:outline-none focus:ring-2 focus:ring-[#2c2f3a] w-[300px]"
+                  onChange={(value) => handleChannelName(value.target.value)}
                 />
               )}
             </div>
 
             <div className="mt-6 flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
-              <StyledButton onClick={() => setStep((s) => s + 1)}>Next</StyledButton>
+              <StyledButton disabled={!channelName ? true : false} onClick={() => setStep((s) => s + 1)}>
+                Next
+              </StyledButton>
             </div>
           </div>
         )}
@@ -194,12 +258,25 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
               <div className="mt-4">
                 <div className="grid">
                   <label className="select-none">
-                    <input type="checkbox" className="mr-2" onChange={() => setUsePassword((u) => !u)} />
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      defaultChecked={usePassword}
+                      onChange={() => {
+                        setUsePassword((u) => !u);
+                        setPassword(null);
+                      }}
+                    />
                     Password protection
                   </label>
 
                   <label className="select-none">
-                    <input type="checkbox" className="mr-2" />
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      defaultChecked={useStrictMode}
+                      onChange={() => setUseStrictMode((u) => !u)}
+                    />
                     Enable strict mode{" "}
                     <a
                       href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/strictMode.md"
@@ -219,7 +296,16 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
                       type="text"
                       placeholder="Module password"
                       className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md placeholder-gray-400  focus:outline-none focus:ring-2 focus:ring-[#2c2f3a] w-[300px]"
+                      defaultValue={password || ""}
+                      onChange={(value) => handlePassword(value.target.value)}
                     />
+                  </div>
+                )}
+
+                {passwordError && (
+                  <div className="flex bg-[#FF5F15] text-[#212121] border border-[#fa4f00] rounded-lg w-[520px] p-2 mt-5">
+                    <TriangleAlert className="mr-2" />
+                    <span>Module passwords do not support special characters at this time.</span>
                   </div>
                 )}
               </div>
@@ -227,7 +313,12 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
 
             <div className="mt-6 flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
-              <StyledButton onClick={() => setStep((s) => s + 1)}>Next</StyledButton>
+              <StyledButton
+                disabled={(usePassword && !password) || passwordError ? true : false}
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Next
+              </StyledButton>
             </div>
           </div>
         )}
@@ -244,14 +335,25 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
               </p>
 
               {legacyLogin && (
-                <div className="mt-10">
+                <div className="mt-6">
                   <p>
                     Since you're using legacy login, it is <b>your responsibility</b> to keep your authentication token
                     safe.
                     <br /> Use this button to copy your token to clipboard and save it somewhere on your computer!
                   </p>
-                  <StyledButton onClick={() => setStep((s) => s - 1)} className="ml-0! mt-2">
-                    Copy authentication token
+                  <StyledButton
+                    onClick={() => {
+                      navigator.clipboard.writeText(localStorage.getItem("stdbToken")!);
+
+                      setAuthButtonText("Copied!");
+
+                      setTimeout(() => {
+                        setAuthButtonText("Copy Auth Token");
+                      }, 1000);
+                    }}
+                    className="ml-0! mt-2"
+                  >
+                    {copyAuthButtonText}
                   </StyledButton>
                 </div>
               )}
@@ -269,19 +371,45 @@ export const ModuleOnboarding = ({ legacyLogin }: IProps) => {
                     (How to add Pogly to your OBS/StreamLabs)
                   </a>
                 </p>
-                <StyledButton onClick={() => setStep((s) => s - 1)} className="ml-0! mt-2">
-                  Copy overlay URL
+                <StyledButton
+                  onClick={() => {
+                    navigator.clipboard.writeText(overlayURL);
+
+                    setCopyOverlayButtonText("Copied!");
+
+                    setTimeout(() => {
+                      setCopyOverlayButtonText("Copy Overlay URL");
+                    }, 1000);
+                  }}
+                  className="ml-0! mt-2"
+                >
+                  {copyOverlayButtonText}
                 </StyledButton>
               </div>
             </div>
 
             <div className="mt-6 flex justify-between">
-              <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
-              <StyledButton onClick={() => setStep((s) => s + 1)}>Finish</StyledButton>
+              <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
+                Back
+              </StyledButton>
+              <StyledButton disabled={initializing} onClick={handleSave}>
+                Finish
+              </StyledButton>
             </div>
           </div>
         )}
       </div>
+
+      {debug && (
+        <div className="grid absolute mt-50 bg-[#1e212b] p-5 rounded-2xl top-220">
+          <h1 className="pb-5 text-2xl">Debug box of doom</h1>
+          <span>Platform: {platform}</span>
+          <span>Channel name: {channelName}</span>
+          <span>Password protection: {usePassword ? "true" : false}</span>
+          <span>Strict mode: {useStrictMode ? "true" : false}</span>
+          <span>Password: {password}</span>
+        </div>
+      )}
     </div>
   );
 };

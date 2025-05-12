@@ -261,7 +261,7 @@ export const Login = () => {
   // Step 8) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     DebugLogger("Pogly Instance is not configured");
-    return <ModuleOnboarding legacyLogin={legacyLogin} />;
+    return <ModuleOnboarding legacyLogin={legacyLogin} connectionConfig={connectionConfig} spacetime={spacetime} />;
   }
 
   // Step 9) Set active layout
