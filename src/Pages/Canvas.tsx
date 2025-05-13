@@ -49,7 +49,7 @@ export const Canvas = () => {
   const { settings } = useContext(SettingsContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
-  if(!spacetimeDB || !activeLayout) navigate("/", { replace: true});
+  if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
   const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
@@ -117,7 +117,9 @@ export const Canvas = () => {
   useEffect(() => {
     if (!activeLayout) {
       DebugLogger("Setting active layout");
-      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
+      setActiveLayout(
+        (Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
+      );
     }
 
     DebugLogger("Layout context updated");

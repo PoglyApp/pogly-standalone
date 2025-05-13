@@ -1,4 +1,3 @@
-import "../Login.css";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
@@ -83,7 +82,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bottom-30">
       <PoglyLogo />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[500px]">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px]">
         <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
@@ -133,7 +132,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </p>
             </div>
 
-            <StyledButton className="mt-6" onClick={() => setStep((s) => s + 1)}>
+            <StyledButton className="mt-18" onClick={() => setStep((s) => s + 1)}>
               Lets get started!
             </StyledButton>
           </div>
@@ -181,7 +180,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </StyledButton>
             </div>
 
-            <div className="mt-6 flex justify-between">
+            <div className="mt-18 flex justify-between">
               <StyledButton className="bg-gray-700 hover:bg-gray-600" onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>
@@ -201,7 +200,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </p>
               {platform === "youtube" ? (
                 <div>
-                  <div className="flex bg-[#FF5F15] text-[#212121] border border-[#fa4f00] rounded-lg w-[450px] p-2 mb-4">
+                  <div className="flex bg-[#FF5F15] text-[#212121] border border-[#fa4f00] rounded-lg w-[580px] p-2 mb-4">
                     <TriangleAlert className="mr-2" />
                     <span>
                       Use your Youtube account ID instead! Find your ID{" "}
@@ -235,7 +234,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               )}
             </div>
 
-            <div className="mt-6 flex justify-between">
+            <div className="mt-18 flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton disabled={!channelName ? true : false} onClick={() => setStep((s) => s + 1)}>
                 Next
@@ -311,7 +310,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="mt-6 flex justify-between">
+            <div className="mt-18 flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton
                 disabled={(usePassword && !password) || passwordError ? true : false}
@@ -335,11 +334,10 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </p>
 
               {legacyLogin && (
-                <div className="mt-6">
+                <div className="mt-8">
                   <p>
                     Since you're using legacy login, it is <b>your responsibility</b> to keep your authentication token
-                    safe.
-                    <br /> Use this button to copy your token to clipboard and save it somewhere on your computer!
+                    safe. Use this button to copy your token to clipboard and save it somewhere on your computer!
                   </p>
                   <StyledButton
                     onClick={() => {
@@ -358,7 +356,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                 </div>
               )}
 
-              <div className="mt-5">
+              <div className="mt-8">
                 <p>
                   To start using Pogly on your stream, you need to create a new browser source in your OBS/StreamLabs
                   and paste the Pogly overlay URL into it{" "}
@@ -366,8 +364,9 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                     href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/firstTimeSetup.md#obs--streamlabs-browser-source"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[10px] text-[#82a5ff]"
+                    className="text-[10px] text-[#82a5ff] Geist-light"
                   >
+                    <br />
                     (How to add Pogly to your OBS/StreamLabs)
                   </a>
                 </p>
@@ -388,7 +387,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="mt-6 flex justify-between">
+            <div className="mt-18 flex justify-between">
               <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>

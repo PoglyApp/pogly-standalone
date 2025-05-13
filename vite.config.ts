@@ -4,6 +4,7 @@ import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
+import Unfonts from "unplugin-fonts/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -20,6 +21,16 @@ export default defineConfig(({ mode }) => {
       importPrefixPlugin(),
       htmlPlugin(mode),
       tailwindcss(),
+      Unfonts({
+        custom: {
+          families: [
+            {
+              name: "Geist",
+              src: "./src/Assets/Fonts/*.woff2",
+            },
+          ],
+        },
+      }),
     ],
   };
 });

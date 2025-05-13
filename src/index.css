@@ -2,8 +2,6 @@
 @import "tailwindcss";
 
 body {
-  font-family: "Roboto", sans-serif !important;
-
   margin: 0;
   padding: 0;
 
@@ -17,8 +15,9 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
+
 html {
-  font-family: "Roboto", sans-serif !important;
+  font-family: Geist, serif;
 
   margin: 0;
   padding: 0;
@@ -129,6 +128,21 @@ h1 {
 
 .Mui-focused {
   color: #ffffffa6 !important;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.animate-float {
+  animation: float 1.5s ease-in-out infinite;
 }
 
 .grid-bg {

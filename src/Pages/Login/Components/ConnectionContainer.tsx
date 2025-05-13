@@ -1,4 +1,3 @@
-import "../Login.css";
 import { ChevronDown, SaveIcon, UserRound } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +6,7 @@ import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { AuthStatusType } from "../../../Types/General/AuthStatusType";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
+import HintBubble from "../../../Components/General/HintBubble";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -23,6 +23,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const [subtitle, setSubtitle] = useState<string>("");
 
   const [guestNickname, setGuestNickname] = useState<string>("");
+  const [hasCustomNickname, setHasCustomNickname] = useState<boolean>(false);
   const nicknameFieldRef = useRef<HTMLInputElement>(null);
 
   const domainRef = useRef<HTMLSelectElement>(null);
@@ -47,8 +48,12 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     } else {
       const savedNickname: string | null = localStorage.getItem("nickname");
 
-      if (savedNickname) setGuestNickname(savedNickname);
-      else setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
+      if (savedNickname) {
+        setGuestNickname(savedNickname);
+        setHasCustomNickname(true);
+      } else {
+        setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
+      }
     }
   }, []);
 
@@ -163,41 +168,42 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
     setGuestNickname(newNickname);
     localStorage.setItem("nickname", newNickname);
+    setHasCustomNickname(true);
   };
 
   return (
-    <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bottom-30">
+    <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyLogo />
 
       {authStatus === AuthStatusType.NotAuthenticated && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
           <StyledButton
-            className="flex justify-self-center mb-3 w-[178px]"
+            className="flex justify-self-center mb-3 w-[220px]"
             onClick={() => {
               setAuthStatus(AuthStatusType.LegacyAuth);
               setLegacyLogin(true);
-              setSubtitle("Legacy");
+              setSubtitle("legacy");
             }}
           >
             <UserRound className="mr-2" />
-            <span>Login as guest</span>
+            <span>login as guest</span>
           </StyledButton>
           <StyledButton
             className="flex justify-self-center bg-[#6441a5]! hover:bg-[#6441a5b2]!"
             onClick={() => {
               handleAuth(AuthStatusType.TwitchAuth);
-              setSubtitle("Twitch");
+              setSubtitle("twitch");
             }}
           >
             <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
-            <span>Login with Twitch</span>
+            <span>login with Twitch</span>
           </StyledButton>
         </div>
       )}
 
       <div className="flex justify-center z-10 mt-8">
         <Container
-          title={authStatus === AuthStatusType.NotAuthenticated ? "Login" : "Connect"}
+          title={authStatus === AuthStatusType.NotAuthenticated ? "login" : "connect"}
           subTitle={subtitle}
           className="relative w-[400px]"
         >
@@ -210,49 +216,63 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
           >
             <div className="flex flex-col gap-3">
               <div className="flex text-[20px] text-center bg-[#10121a] p-3 rounded-md justify-center">
-                Logged in as
-                <input
-                  ref={nicknameFieldRef}
-                  type="text"
-                  defaultValue={guestNickname}
-                  disabled={authStatus === AuthStatusType.TwitchAuth ? true : false}
-                  className={`${
-                    authStatus === AuthStatusType.TwitchAuth ? "text-[#9146FF]" : "text-[#7e97a5]"
-                  } w-[100px] ml-2`}
-                  onBlur={handleUpdateNickname}
-                />
+                logged in as
+                <HintBubble
+                  hint="change nickname"
+                  className={
+                    authStatus === AuthStatusType.TwitchAuth ||
+                    authStatus === AuthStatusType.NotAuthenticated ||
+                    hasCustomNickname
+                      ? "hidden"
+                      : ""
+                  }
+                >
+                  <input
+                    ref={nicknameFieldRef}
+                    type="text"
+                    defaultValue={guestNickname}
+                    disabled={authStatus === AuthStatusType.TwitchAuth ? true : false}
+                    className={`${
+                      authStatus === AuthStatusType.TwitchAuth ? "text-[#9146FF]" : "text-[#7e97a5]"
+                    } w-[100px] ml-2 ${
+                      authStatus === AuthStatusType.LegacyAuth &&
+                      !hasCustomNickname &&
+                      "border border-[#82a5ff] rounded-md"
+                    }`}
+                    onBlur={handleUpdateNickname}
+                  />
+                </HintBubble>
               </div>
 
               <div className="w-full">
-                <p className="text-sm text-[#aeb4d4] font-mono">Module name</p>
+                <p className="text-sm text-[#aeb4d4]">module name</p>
                 <input
                   type="text"
-                  placeholder="Module name"
+                  placeholder="module name"
                   value={moduleName}
-                  className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                  className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
                   onChange={(value: any) => setModuleName(value.target.value)}
                 />
               </div>
 
               <div className="w-full">
-                <p className="text-sm text-[#aeb4d4] font-mono flex">
-                  Authentication key{" "}
-                  <span className="text-xs text-[#aeb4d47a] font-mono pl-1 pt-0.5">(If required by module)</span>
+                <p className="text-sm text-[#aeb4d4] flex">
+                  module password <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">(if required by module)</span>
                 </p>
                 <input
                   type="password"
-                  placeholder="Authentication key"
+                  placeholder="password"
                   value={authKey}
-                  className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                  className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
                   onChange={(value: any) => setAuthKey(value.target.value)}
                 />
               </div>
 
               <div className="relative w-full">
-                <p className="text-sm text-[#aeb4d4] font-mono">Saved modules</p>
+                <p className="text-sm text-[#aeb4d4]">quick select</p>
                 <div className="w-87 flex">
                   <StyledSelect onChange={(value: any) => handleQuickSwapChange(value.target.value)}>
-                    <option value="select">Select</option>
+                    <option value="select">select</option>
                     {quickSwapModules.length > 0 ? (
                       quickSwapModules.map((module) => (
                         <option key={module.module} value={module.module}>
@@ -260,7 +280,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                         </option>
                       ))
                     ) : (
-                      <option value="default">None</option>
+                      <option value="default">none</option>
                     )}
                   </StyledSelect>
                   <div className="pointer-events-none absolute right-18 top-1/2 text-gray-400">
@@ -274,12 +294,12 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
               {customDomain && (
                 <div className="w-full">
-                  <p className="text-sm text-[#aeb4d4] font-mono">Custom domain</p>
+                  <p className="text-sm text-[#aeb4d4]">Custom domain</p>
                   <input
                     type="text"
                     placeholder="ws(s)://127.0.0.1"
                     defaultValue={domain}
-                    className="bg-[#10121a] text-[#e9eeff] font-mono p-3 rounded-md shadow-inner placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                    className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md shadow-inner placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
                     onChange={(value: any) => setDomain(value.target.value)}
                   />
                 </div>
@@ -296,22 +316,22 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                     window.location.reload();
                   }}
                 >
-                  Logout
+                  logout
                 </StyledButton>
               )}
 
               <div className="w-30 relative">
                 <StyledSelect ref={domainRef} onChange={(value) => handleDomainChange(value)}>
-                  <option value="Cloud">Cloud</option>
-                  <option value="Local">Local</option>
-                  <option value="Custom">Custom</option>
+                  <option value="Cloud">cloud</option>
+                  <option value="Local">local</option>
+                  <option value="Custom">custom</option>
                 </StyledSelect>
                 <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <ChevronDown />
                 </div>
               </div>
 
-              <StyledButton onClick={handleConnect}>Connect</StyledButton>
+              <StyledButton onClick={handleConnect}>connect</StyledButton>
             </div>
           </div>
         </Container>
