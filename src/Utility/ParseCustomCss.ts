@@ -8,3 +8,9 @@ export const parseCustomCss = (customCss: string) => {
     return acc;
   }, {});
 };
+
+export const removedCssProperties = (oldCss: Object, newCss: Object) => {
+  const removedProperties = Object.keys(oldCss).filter((key) => !(key in newCss));
+
+  return removedProperties.length > 0 ? removedProperties : null;
+};

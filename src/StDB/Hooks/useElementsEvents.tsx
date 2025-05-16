@@ -13,8 +13,19 @@ import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
-import { parseCustomCss } from "../../Utility/ParseCustomCss";
-import { ElementData, Elements, EventContext, ImageElement, ImageElementData, Layouts, Reducer, ReducerEventContext, TextElement, WidgetElement } from "../../module_bindings";
+import { parseCustomCss, removedCssProperties } from "../../Utility/ParseCustomCss";
+import {
+  ElementData,
+  Elements,
+  EventContext,
+  ImageElement,
+  ImageElementData,
+  Layouts,
+  Reducer,
+  ReducerEventContext,
+  TextElement,
+  WidgetElement,
+} from "../../module_bindings";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -146,14 +157,25 @@ export const useElementsEvents = (
 
           // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
-            const css = JSON.parse(newTextElement.css);
-            const customCss = parseCustomCss(css.custom);
+            const newCss = JSON.parse(newTextElement.css);
+            const newCustomCss = parseCustomCss(newCss.custom);
 
-            component.style.textShadow = css.shadow;
-            component.style.webkitTextStroke = css.outline;
+            const oldCss = JSON.parse(oldTextElement.css);
+            const oldCustomCss = parseCustomCss(oldCss.custom);
 
-            Object.keys(customCss).forEach((styleKey: any) => {
-              component.style[styleKey] = customCss[styleKey];
+            component.style.textShadow = newCss.shadow;
+            component.style.webkitTextStroke = newCss.outline;
+
+            Object.keys(newCustomCss).forEach((styleKey: any) => {
+              component.style[styleKey] = newCustomCss[styleKey];
+            });
+
+            const removedProperties = removedCssProperties(oldCustomCss, newCustomCss);
+
+            if (!removedProperties) return;
+
+            removedProperties.forEach((property: any) => {
+              component.style[property] = "";
             });
           }
 
@@ -187,7 +209,8 @@ export const useElementsEvents = (
 
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
-            const htmlTag = WidgetCodeCompiler(spacetimeDB.Client,
+            const htmlTag = WidgetCodeCompiler(
+              spacetimeDB.Client,
               newWidgetElement.width,
               newWidgetElement.height,
               undefined,
@@ -202,8 +225,12 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if(ctx.event.tag === "Reducer") {
-        if(ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Identity.address.toHexString() || !component) return;
+      if (ctx.event.tag === "Reducer") {
+        if (
+          ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Identity.address.toHexString() ||
+          !component
+        )
+          return;
       }
 
       const offsetElement = OffsetElementForCanvas(newElement);
@@ -248,6 +275,6 @@ export const useElementsEvents = (
     setSelectoTargets,
     layout,
     dispatch,
-    spacetimeDB.Client
+    spacetimeDB.Client,
   ]);
 };

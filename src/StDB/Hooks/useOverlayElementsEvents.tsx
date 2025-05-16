@@ -9,9 +9,17 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
-import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { parseCustomCss, removedCssProperties } from "../../Utility/ParseCustomCss";
 import { marked } from "marked";
-import { Elements, EventContext, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../module_bindings";
+import {
+  Elements,
+  EventContext,
+  ImageElement,
+  ImageElementData,
+  Layouts,
+  TextElement,
+  WidgetElement,
+} from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useOverlayElementsEvents = (
@@ -117,19 +125,30 @@ export const useOverlayElementsEvents = (
 
           // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
-            const css = JSON.parse(newTextElement.css);
-            const customCss = parseCustomCss(css.custom);
+            const newCss = JSON.parse(newTextElement.css);
+            const newCustomCss = parseCustomCss(newCss.custom);
 
-            component.style.textShadow = css.shadow;
-            component.style.webkitTextStroke = css.outline;
+            const oldCss = JSON.parse(oldTextElement.css);
+            const oldCustomCss = parseCustomCss(oldCss.custom);
 
-            Object.keys(customCss).forEach((styleKey: any) => {
-              component.style[styleKey] = customCss[styleKey];
+            component.style.textShadow = newCss.shadow;
+            component.style.webkitTextStroke = newCss.outline;
+
+            Object.keys(newCustomCss).forEach((styleKey: any) => {
+              component.style[styleKey] = newCustomCss[styleKey];
+            });
+
+            const removedProperties = removedCssProperties(oldCustomCss, newCustomCss);
+
+            if (!removedProperties) return;
+
+            removedProperties.forEach((property: any) => {
+              component.style[property] = "";
             });
           }
           break;
 
-          case "ImageElement":
+        case "ImageElement":
           const oldImageElement: ImageElement = oldElement.element.value as ImageElement;
           const newImageElement: ImageElement = newElement.element.value as ImageElement;
 
@@ -140,7 +159,6 @@ export const useOverlayElementsEvents = (
             component.children[0].setAttribute("src", newImageData.value.toString());
           }
           break;
-
 
         case "WidgetElement":
           const oldWidgetElement: WidgetElement = oldElement.element.value as WidgetElement;
@@ -209,5 +227,12 @@ export const useOverlayElementsEvents = (
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [layout, canvasInitialized.overlayElementEventsInitialized, setCanvasInitialized, dispatch, isOverlay, spacetimeDB.Client]);
+  }, [
+    layout,
+    canvasInitialized.overlayElementEventsInitialized,
+    setCanvasInitialized,
+    dispatch,
+    isOverlay,
+    spacetimeDB.Client,
+  ]);
 };
