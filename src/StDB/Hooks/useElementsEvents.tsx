@@ -18,7 +18,7 @@ import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
-import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { parseCustomCss, removedCssProperties } from "../../Utility/ParseCustomCss";
 import ImageElement from "../../module_bindings/image_element";
 import ImageElementData from "../../module_bindings/image_element_data";
 
@@ -152,14 +152,25 @@ export const useElementsEvents = (
 
           // UPDATE CSS
           if (oldTextElement.css !== newTextElement.css) {
-            const css = JSON.parse(newTextElement.css);
-            const customCss = parseCustomCss(css.custom);
+            const newCss = JSON.parse(newTextElement.css);
+            const newCustomCss = parseCustomCss(newCss.custom);
 
-            component.style.textShadow = css.shadow;
-            component.style.webkitTextStroke = css.outline;
+            const oldCss = JSON.parse(oldTextElement.css);
+            const oldCustomCss = parseCustomCss(oldCss.custom);
 
-            Object.keys(customCss).forEach((styleKey: any) => {
-              component.style[styleKey] = customCss[styleKey];
+            component.style.textShadow = newCss.shadow;
+            component.style.webkitTextStroke = newCss.outline;
+
+            Object.keys(newCustomCss).forEach((styleKey: any) => {
+              component.style[styleKey] = newCustomCss[styleKey];
+            });
+
+            const removedProperties = removedCssProperties(oldCustomCss, newCustomCss);
+
+            if (!removedProperties) return;
+
+            removedProperties.forEach((property: any) => {
+              component.style[property] = "";
             });
           }
 
