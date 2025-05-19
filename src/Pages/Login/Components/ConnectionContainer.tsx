@@ -15,6 +15,8 @@ interface IProp {
 }
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
+  const urlParams = new URLSearchParams(window.location.search);
+
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://pogly.spacetimedb.com");
@@ -54,6 +56,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       } else {
         setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
       }
+    }
+
+    const domain = urlParams.get("domain");
+
+    if (domain) {
+      setCustomDomain(true);
+      setDomain(domain);
+      domainRef.current!.value = "Custom";
     }
   }, []);
 
