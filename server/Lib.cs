@@ -127,7 +127,6 @@ static partial class Module
                 newHeartbeat.Tick = ctx.Timestamp.ToStd().Second;
 
                 ctx.Db.Heartbeat.Id.Update(newHeartbeat);
-                Log.Info("Heartbeat Updated!");
             }
             else
             {
