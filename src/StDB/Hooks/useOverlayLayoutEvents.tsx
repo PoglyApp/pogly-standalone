@@ -1,10 +1,12 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Layouts } from "../../module_bindings";
-import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
-export const useOverlayLayoutEvents = (activeLayout: Layouts | undefined, setActiveLayout: Function) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+export const useOverlayLayoutEvents = (
+  spacetimeDB: any,
+  activeLayout: Layouts | undefined,
+  setActiveLayout: Function
+  ) => {
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
   const activeLayoutRef = useRef<Layouts | undefined>(activeLayout);
 

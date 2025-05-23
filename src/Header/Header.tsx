@@ -33,7 +33,7 @@ export const Header = () => {
   useEffect(() => {}, []);
 
   useEffect(() => {
-    if (location.pathname !== "/login" && location.pathname !== "/" && !location.pathname.startsWith("/canvas")) {
+    if (location.pathname !== "/login" && location.pathname !== "/" && !location.pathname.startsWith("/canvas") && !location.pathname.startsWith("/overlay")) {
       setIsRedirecting(true);
       window.location.href = "/";
     }

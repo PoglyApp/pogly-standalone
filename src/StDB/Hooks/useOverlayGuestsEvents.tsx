@@ -4,8 +4,11 @@ import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Guests } from "../../module_bindings";
 
-export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+export const useOverlayGuestsEvents = (
+    spacetimeDB: any,
+    canvasInitialized: CanvasInitializedType,
+    setCanvasInitialized: Function
+  ) => {
   const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -22,7 +25,7 @@ export const useOverlayGuestsEvents = (canvasInitialized: CanvasInitializedType,
     });
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayGuestEventsInitialized: true }));
-  }, [canvasInitialized.overlayGuestEventsInitialized, spacetimeDB.dentity.identity, spacetimeDB.Identity.address, isOverlay, setCanvasInitialized, spacetimeDB.Client]);
+  }, [canvasInitialized.overlayGuestEventsInitialized, spacetimeDB.Identity.identity, spacetimeDB.Identity.address, isOverlay, setCanvasInitialized, spacetimeDB.Client]);
 
   return disconnected;
 };

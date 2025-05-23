@@ -23,12 +23,12 @@ import {
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useOverlayElementsEvents = (
+  spacetimeDB: any,
   layout: Layouts | undefined,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function
 ) => {
   const dispatch = useAppDispatch();
-  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const activeLayout = useRef<Layouts>();
   const isOverlay: Boolean = window.location.href.includes("/overlay");

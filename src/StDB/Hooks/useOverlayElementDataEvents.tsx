@@ -8,11 +8,11 @@ import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ElementData, EventContext } from "../../module_bindings";
 
 export const useOverlayElementDataEvents = (
+  spacetimeDB: any,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function
 ) => {
   const dispatch = useAppDispatch();
-  const { spacetimeDB } = useContext(SpacetimeContext);
 
   useEffect(() => {
     DebugLogger("Initializing overlay element data events");
