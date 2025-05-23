@@ -38,32 +38,39 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const modules = localStorage.getItem("poglyQuickSwap");
     if (modules && modules !== undefined) setQuickSwapModules(JSON.parse(modules));
 
-    const twitchIdToken = localStorage.getItem("twitchIdToken");
-
-    if (twitchIdToken) {
-      setTwitchToken(twitchIdToken);
-
-      const decodedToken: any = jwtDecode(twitchIdToken);
-      setGuestNickname(decodedToken.preferred_username);
-      setAuthStatus(AuthStatusType.TwitchAuth);
-      setSubtitle("Twitch");
-    } else {
-      const savedNickname: string | null = localStorage.getItem("nickname");
-
-      if (savedNickname) {
-        setGuestNickname(savedNickname);
-        setHasCustomNickname(true);
-      } else {
-        setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
-      }
-    }
-
     const domain = urlParams.get("domain");
 
     if (domain) {
       setCustomDomain(true);
       setDomain(domain);
       domainRef.current!.value = "Custom";
+    }
+
+    const twitchIdToken = localStorage.getItem("twitchIdToken");
+
+    if (twitchIdToken) {
+      const decodedToken: any = jwtDecode(twitchIdToken);
+      const currentTime = Date.now() / 1000;
+
+      if (decodedToken.exp < currentTime) {
+        console.warn("Twitch ID token has expired. Forcing user to relog...");
+        return;
+      }
+
+      setTwitchToken(twitchIdToken);
+      setGuestNickname(decodedToken.preferred_username);
+      setAuthStatus(AuthStatusType.TwitchAuth);
+      setSubtitle("Twitch");
+      return;
+    }
+
+    const savedNickname: string | null = localStorage.getItem("nickname");
+
+    if (savedNickname) {
+      setGuestNickname(savedNickname);
+      setHasCustomNickname(true);
+    } else {
+      setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
     }
   }, []);
 
@@ -159,7 +166,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setAuthStatus(type);
 
     const CLIENT_ID = "2zrg60xlectlfv7pycwlt4acoabs1p"; // twitch oauth here!
-    const REDIRECT_URI = "http://localhost:3006/callback";
+    const REDIRECT_URI = `${window.location.origin}/callback`;
     const SCOPES = "openid";
 
     const twitchAuthUrl =
@@ -225,7 +232,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             }`}
           >
             <div className="flex flex-col gap-3">
-              <div className="flex text-[20px] text-center bg-[#10121a] p-3 rounded-md justify-center">
+              <div className="flex text-center bg-[#10121a] p-3 rounded-md justify-center">
                 logged in as
                 <HintBubble
                   hint="change nickname"
@@ -244,7 +251,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                     disabled={authStatus === AuthStatusType.TwitchAuth ? true : false}
                     className={`${
                       authStatus === AuthStatusType.TwitchAuth ? "text-[#9146FF]" : "text-[#7e97a5]"
-                    } w-[100px] ml-2 ${
+                    } ml-2 truncate bg-transparent outline-none w-auto max-w-[200px] ${
                       authStatus === AuthStatusType.LegacyAuth &&
                       !hasCustomNickname &&
                       "border border-[#82a5ff] rounded-md"
