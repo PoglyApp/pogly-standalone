@@ -96,7 +96,9 @@ export class SevenTVWrapper {
 
     if (!userObj) return null;
 
-    return userObj.connections.filter(x => x.platform.toLowerCase().includes("twitch"))[0].emote_set_id;
+    return userObj.connections.filter(
+      (x) => x.platform.toLowerCase().includes("twitch") || x.platform.toLowerCase().includes("kick")
+    )[0].emote_set_id;
   }
 
   public async GetEmoteSetEmotes(emoteSetId: string): Promise<Emote[]> {
