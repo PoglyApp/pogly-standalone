@@ -76,7 +76,7 @@ export const GuestListContainer = () => {
                     {(showPedro && (
                       <img src="./assets/pedro.gif" style={{ width: "32px", height: "32px" }} alt="pedro" />
                     )) ||
-                      guest.nickname[0]}
+                      "g"}
                   </Avatar>
                 </div>
               );

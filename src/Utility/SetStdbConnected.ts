@@ -5,7 +5,7 @@ export const SetStdbConnected = (
   client: DbConnection,
   fetchedConfig: Config,
   setStdbConnected: Function,
-  setStdbAuthenticated: Function
+  setStdbAuthenticated?: Function | undefined
 ) => {
   DebugLogger("Setting SpacetimeDB connected");
   // NO AUTHENTICATION
@@ -14,6 +14,8 @@ export const SetStdbConnected = (
 
     setStdbConnected(true);
   });
+
+  if (!setStdbAuthenticated) return;
 
   // AUTHENTICATION
   client.db.guests.onUpdate((_ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {

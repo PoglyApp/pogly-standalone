@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Identity, ConnectionId, SubscriptionEventContextInterface} from "@clockworklabs/spacetimedb-sdk";
+import { Identity, ConnectionId, SubscriptionEventContextInterface } from "@clockworklabs/spacetimedb-sdk";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
 import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
 import { DebugLogger } from "../Utility/DebugLogger";
@@ -9,8 +9,8 @@ import { SetStdbConnected } from "../Utility/SetStdbConnected";
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
   setStdbConnected: Function,
-  setStdbAuthenticated: Function,
-  setInstanceConfigured: Function
+  setInstanceConfigured?: Function,
+  setStdbAuthenticated?: Function
 ) => {
   const [identity, setIdentity] = useState<Identity>();
   const [config, setConfig] = useState<Config>();
@@ -35,10 +35,11 @@ const useStDB = (
       try {
         setIdentity(identity);
         setClient(DbCtx);
-        if(!isOverlay) localStorage.setItem("stdbToken", token);
+        if (!isOverlay) localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
-        client.subscriptionBuilder()
+        client
+          .subscriptionBuilder()
           .onApplied(onSubscriptionsApplied)
           .subscribe([
             "SELECT * FROM Heartbeat",
@@ -49,19 +50,19 @@ const useStDB = (
       } catch (error) {
         console.log("SpacetimeDB connection failed!", error);
       }
-    }
-    
+    };
+
     const onDisconnect = (ErrCtx: ErrorContext, error: Error | undefined) => {
       setDisconnected(true);
       StopHeartbeat();
       console.log("Disconnected!", ErrCtx.event?.message, error);
-    }
+    };
 
     const onConnectError = (ErrCtx: ErrorContext, error: Error | null) => {
       setError(true);
       StopHeartbeat();
       console.log("Error with SpacetimeDB: ", ErrCtx.event?.message, error);
-    }
+    };
 
     const client = DbConnection.builder()
       .withUri(stdbDomain)
@@ -71,26 +72,27 @@ const useStDB = (
       .onConnectError(onConnectError)
       .onDisconnect(onDisconnect)
       .build();
-      
-    const onSubscriptionsApplied = (ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>) => {
+
+    const onSubscriptionsApplied = (
+      ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>
+    ) => {
       try {
         const fetchedConfig = ctx.db.config.version.find(0);
-        
-        if(!fetchedConfig) {
+
+        if (!fetchedConfig) {
           setError(true);
           return;
         }
-  
-        if(fetchedConfig.configInit) setInstanceConfigured(true);
-  
+
+        if (fetchedConfig.configInit && setInstanceConfigured) setInstanceConfigured(true);
+
         setConfig(fetchedConfig);
-  
+
         SetStdbConnected(client, fetchedConfig, setStdbConnected, setStdbAuthenticated);
       } catch {
         console.log("initialStateSync failed:", error);
       }
-    }
-
+    };
   }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbAuthenticated, error]);
 
   return {

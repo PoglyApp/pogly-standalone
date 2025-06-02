@@ -33,7 +33,7 @@ export const Login = () => {
   const [nickname, setNickname] = useState<string | null>(null);
   const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
-  const spacetime = useStDB(connectionConfig, setStdbConnected, setStdbAuthenticated, setInstanceConfigured);
+  const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
 
   const location = useLocation();
   const from = location.state?.from?.pathname;
@@ -243,7 +243,7 @@ export const Login = () => {
     DebugLogger("Starting Client->Server heartbeat!");
     StartHeartbeat(spacetime.Client);
     DebugLogger("Redoing subscriptions");
-    SetSubscriptions(spacetime.Client, setStdbInitialized, setStdbSubscriptions);
+    SetSubscriptions(spacetime.Client, setStdbSubscriptions, setStdbInitialized);
   }
 
   // Step 6) Is SpacetimeDB fully initialized?

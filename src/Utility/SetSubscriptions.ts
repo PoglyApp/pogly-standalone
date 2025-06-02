@@ -4,8 +4,8 @@ import { SubscriptionEventContextInterface } from "@clockworklabs/spacetimedb-sd
 
 export const SetSubscriptions = (
   client: DbConnection,
-  setStdbInitialized: Function,
-  setStdbSubscriptions: Function
+  setStdbSubscriptions: Function,
+  setStdbInitialized?: Function
 ) => {
   DebugLogger("Subscribing to tables");
 
@@ -24,5 +24,5 @@ export const SetSubscriptions = (
       "SELECT * FROM Layouts",
     ]);
 
-  setStdbInitialized(true);
+  if (setStdbInitialized) setStdbInitialized(true);
 };

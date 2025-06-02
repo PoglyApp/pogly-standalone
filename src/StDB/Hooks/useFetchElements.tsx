@@ -61,7 +61,15 @@ const useFetchElement = (
 
     setFetchedLayout(layout);
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementsFetchInitialized: true }));
-  }, [layout, canvasInitialized.elementsFetchInitialized, isOverlay, fetchedLayout, setCanvasInitialized, dispatch, spacetimeDB.Client]);
+  }, [
+    layout,
+    canvasInitialized.elementsFetchInitialized,
+    isOverlay,
+    fetchedLayout,
+    setCanvasInitialized,
+    dispatch,
+    spacetimeDB.Client,
+  ]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

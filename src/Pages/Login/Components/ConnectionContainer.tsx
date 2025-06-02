@@ -79,6 +79,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
     setNickname(guestNickname);
 
+    localStorage.setItem("stdbConnectDomain", domain);
+    localStorage.setItem("stdbConnectModule", moduleName);
+    localStorage.setItem("stdbConnectModuleAuthKey", authKey);
+
     setInstanceSettings({
       token: twitchToken,
       domain: domain,
@@ -92,12 +96,15 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     if (!moduleName) return;
 
     const qSwap = localStorage.getItem("poglyQuickSwap");
-    let modules: QuickSwapType[] = [];
 
     if (!qSwap) {
-      modules.push({ domain: domain, module: moduleName, nickname: null, auth: authKey });
-      localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+      localStorage.setItem(
+        "poglyQuickSwap",
+        JSON.stringify([{ domain: domain, module: moduleName, nickname: null, auth: authKey }])
+      );
     } else {
+      let modules: QuickSwapType[] = [];
+
       try {
         if (qSwap) modules = JSON.parse(qSwap);
       } catch (error) {
@@ -107,7 +114,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: null, auth: authKey };
 
       if (modules) {
-        if (modules.some((x) => x.module === moduleName)) return;
+        modules = modules.filter((x) => x.module !== moduleName);
+
         modules.push(newConnection);
         localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
       } else {
