@@ -34,7 +34,7 @@ export const useChannelEmotes = (
         return setChannelEmotesInitialized(true);
       }
 
-      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID);
+      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID, config.streamingPlatform);
       if (!emoteSetID) {
         console.log("Could not find 7TV emote set ID.");
         return setChannelEmotesInitialized(true);
@@ -53,7 +53,7 @@ export const useChannelEmotes = (
       }
 
       const allSevenTvEmotes = [...sevenTvEmotes, ...globalSevenTvEmotes].filter(
-        (e: SevenTVEmoteType, index, arr: SevenTVEmoteType[]) => index === arr.findIndex(x => x.id === e.id)
+        (e: SevenTVEmoteType, index, arr: SevenTVEmoteType[]) => index === arr.findIndex((x) => x.id === e.id)
       );
 
       // BTTV
@@ -62,7 +62,7 @@ export const useChannelEmotes = (
 
         if (bttvUser) {
           const bttvEmotes = [...bttvUser.channelEmotes, ...bttvUser.sharedEmotes].filter(
-            (e: BetterTVEmoteType, index, arr: BetterTVEmoteType[]) => index === arr.findIndex(x => x.id === e.id)
+            (e: BetterTVEmoteType, index, arr: BetterTVEmoteType[]) => index === arr.findIndex((x) => x.id === e.id)
           );
 
           setBTTVEmotes(bttvEmotes);
