@@ -92,9 +92,7 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {config.streamingPlatform === "twitch" && (
-            <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
-          )}
+          <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
 
           <TenorCategory />
         </CategoryContainer>
