@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
 import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
+import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 
 interface IProps {
   legacyLogin: boolean;
@@ -69,6 +70,19 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const handleSave = () => {
     spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
 
+    if (usePassword) {
+      const quickSwap = localStorage.getItem("poglyQuickSwap");
+
+      if (quickSwap && quickSwap.length > 0) {
+        const modules: QuickSwapType[] = JSON.parse(quickSwap);
+
+        const savedModule = modules.findIndex((module: QuickSwapType) => module.module === connectionConfig.module);
+        modules[savedModule] = { ...modules[savedModule], auth: password! };
+
+        localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+      }
+    }
+
     (async () => {
       UploadElementDataFromString(spacetime.Client, defaultElements);
       setInitializing(true);
@@ -80,9 +94,9 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   };
 
   return (
-    <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bottom-30">
+    <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bg-[#10121a]">
       <PoglyLogo />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px]">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30">
         <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
