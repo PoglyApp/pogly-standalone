@@ -21,6 +21,7 @@ import { Login } from "./Pages/Login/Login";
 import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
 import { Callback } from "./Pages/Callback/Callback";
 import { Layouts } from "./module_bindings";
+import ModalRenderer from "./Components/Modals/ModalRenderer";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -61,11 +62,9 @@ export const App: React.FC = () => {
         <SettingsContext.Provider value={{ settings, setSettings }}>
           <LayoutContext.Provider value={{ activeLayout, setActiveLayout }}>
             <ModalContext.Provider value={{ modals, setModals, closeModal }}>
-              {modals.map((modal) => {
-                return modal;
-              })}
               <RouterProvider router={router} />
               <ToastContainer />
+              <ModalRenderer />
             </ModalContext.Provider>
           </LayoutContext.Provider>
         </SettingsContext.Provider>

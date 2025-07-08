@@ -31,7 +31,7 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Config, Elements, Layouts } from "../module_bindings";
+import { Config, Elements, Layouts, PermissionLevel } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
 
 export const Canvas = () => {
@@ -51,7 +51,7 @@ export const Canvas = () => {
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
-  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const [permission, setPermission] = useState<PermissionLevel>();
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -113,6 +113,12 @@ export const Canvas = () => {
       transformRef.current
     )
   );
+
+  useEffect(() => {
+    if (permission) return;
+
+    setPermission(spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel);
+  }, []);
 
   useEffect(() => {
     if (!activeLayout) {
@@ -243,7 +249,11 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer />
+                <StreamContainer
+                  moduleName={spacetimeDB.Runtime.module}
+                  platform={spacetimeDB.Config.streamingPlatform}
+                  streamName={spacetimeDB.Config.streamName}
+                />
               </div>
             </Container>
 

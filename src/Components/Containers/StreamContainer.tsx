@@ -1,24 +1,27 @@
-import { useState, useEffect, useContext, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
-import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import styled from "styled-components";
 
-const StreamContainer = () => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+interface IProps {
+  moduleName: string;
+  platform: string;
+  streamName: string;
+}
 
+const StreamContainer = ({ moduleName, platform, streamName }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
 
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !spacetimeDB.Runtime) return;
+    if (!streamOverrides) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === moduleName);
 
     if (!currentOverride) return;
 
     setStreamOverride(currentOverride.override);
-  }, [spacetimeDB.Runtime]);
+  }, []);
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
@@ -58,38 +61,38 @@ const StreamContainer = () => {
         </a>
       </StreamWarning>
 
-      {spacetimeDB.Config.streamingPlatform === "twitch" && !streamOverride && (
+      {platform === "twitch" && !streamOverride && (
         <TwitchPlayer
           style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
           height="100%"
           width="100%"
           id="stream"
-          channel={spacetimeDB.Config.streamName}
+          channel={streamName}
           autoplay
           muted
           onReady={streamOnReady}
         />
       )}
 
-      {spacetimeDB.Config.streamingPlatform === "youtube" && !streamOverride && (
+      {platform === "youtube" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
-          src={"https://www.youtube.com/embed/live_stream?channel=" + spacetimeDB.Config.streamName + "&autoplay=1&mute=1"}
+          src={"https://www.youtube.com/embed/live_stream?channel=" + streamName + "&autoplay=1&mute=1"}
           allowFullScreen
           title="YoutubeStream"
         />
       )}
 
-      {spacetimeDB.Config.streamingPlatform === "kick" && !streamOverride && (
+      {platform === "kick" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
-          src={"https://player.kick.com/" + spacetimeDB.Config.streamName + "?autoplay=true&muted=true"}
+          src={"https://player.kick.com/" + streamName + "?autoplay=true&muted=true"}
           allowFullScreen
           title="KickStream"
         />
@@ -125,4 +128,4 @@ const StreamWarning = styled.div`
   display: none;
 `;
 
-export default memo(StreamContainer, (prevProps, nextProps) => true);
+export default memo(StreamContainer);

@@ -139,7 +139,10 @@ export const SettingsModal = () => {
       localStorage.setItem("streamOverride", JSON.stringify(oldList));
     } else {
       if (streamOverride && spacetimeDB.Runtime) {
-        localStorage.setItem("streamOverride", JSON.stringify([{ module: spacetimeDB.Runtime.module, override: streamOverride }]));
+        localStorage.setItem(
+          "streamOverride",
+          JSON.stringify([{ module: spacetimeDB.Runtime.module, override: streamOverride }])
+        );
       }
     }
 

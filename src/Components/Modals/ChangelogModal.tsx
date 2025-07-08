@@ -90,9 +90,9 @@ export const ChangelogModal = (props: IProps) => {
                   }}
                 >
                   <List dense={true} disablePadding={true}>
-                    {e.log.map((log) => {
+                    {e.log.map((log, index) => {
                       return (
-                        <ListItem divider={true} key={log.title}>
+                        <ListItem divider={true} key={log.title !== "" ? log.title : e.version + "_" + "bugs" + index}>
                           <ListItemText
                             primaryTypographyProps={{ sx: { color: "#ffffffa6", fontWeight: "bold" } }}
                             secondaryTypographyProps={{ sx: { color: "#ffffffa6" } }}
