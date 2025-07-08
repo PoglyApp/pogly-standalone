@@ -211,6 +211,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
               setAuthStatus(AuthStatusType.LegacyAuth);
               setLegacyLogin(true);
               setSubtitle("legacy");
+              localStorage.removeItem("twitchAccessToken");
+              localStorage.removeItem("twitchIdToken");
             }}
           >
             <UserRound className="mr-2" />
