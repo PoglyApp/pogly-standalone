@@ -12,7 +12,7 @@ export const PoglyLogo: React.FC = () => {
         className="text-xs font-semibold py-0.2 px-1.5 rounded-md"
         style={{ backgroundColor: "#82a5ff", color: "#10121a", marginBottom: "3px" }}
       >
-        v0.2.2
+        v{process.env.REACT_APP_VERSION}
       </span>
     </div>
   );

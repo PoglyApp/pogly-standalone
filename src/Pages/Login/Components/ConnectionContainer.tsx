@@ -22,6 +22,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const [domain, setDomain] = useState<string>("wss://pogly.spacetimedb.com");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
+  const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
   const [subtitle, setSubtitle] = useState<string>("");
 
   const [guestNickname, setGuestNickname] = useState<string>("");
@@ -93,35 +94,35 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   };
 
   const saveQuickSwap = () => {
-    if (!moduleName) return;
+    const quickSwap = localStorage.getItem("poglyQuickSwap");
+    const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: guestNickname, auth: authKey };
 
-    const qSwap = localStorage.getItem("poglyQuickSwap");
+    // If pre-existing swap list exists and is not empty
+    if (quickSwap && quickSwap.length > 0) {
+      const modules: QuickSwapType[] = JSON.parse(quickSwap);
 
-    if (!qSwap) {
-      localStorage.setItem(
-        "poglyQuickSwap",
-        JSON.stringify([{ domain: domain, module: moduleName, nickname: null, auth: authKey }])
-      );
-    } else {
-      let modules: QuickSwapType[] = [];
+      // Delete quickswap option
+      if (!moduleName) {
+        const filteredModules = modules.filter((module: QuickSwapType) => module.module !== quickSwapSelected?.module);
+        setQuickSwapModules(filteredModules);
+        setQuickSwapSelected(null);
 
-      try {
-        if (qSwap) modules = JSON.parse(qSwap);
-      } catch (error) {
-        //do nothing
+        return localStorage.setItem("poglyQuickSwap", JSON.stringify(filteredModules));
       }
 
-      const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: null, auth: authKey };
+      const isModuleAlreadySaved = modules.findIndex((module: QuickSwapType) => module.module === moduleName);
 
-      if (modules) {
-        modules = modules.filter((x) => x.module !== moduleName);
-
-        modules.push(newConnection);
-        localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+      if (isModuleAlreadySaved != -1) {
+        modules[isModuleAlreadySaved] = newConnection;
       } else {
-        let swapArray: QuickSwapType[] = [newConnection];
-        localStorage.setItem("poglyQuickSwap", JSON.stringify(swapArray));
+        modules.push(newConnection);
       }
+
+      localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+      setQuickSwapModules(modules);
+    } else {
+      localStorage.setItem("poglyQuickSwap", JSON.stringify([newConnection]));
+      setQuickSwapModules([newConnection]);
     }
   };
 
@@ -145,6 +146,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     if (value === "select") {
       setModuleName("");
       setAuthKey("");
+      setQuickSwapSelected(null);
       return;
     }
 
@@ -154,6 +156,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setModuleName(module.module);
     setAuthKey(module.auth);
     setDomain(module.domain);
+    setQuickSwapSelected(module);
 
     switch (module.domain) {
       case "wss://pogly.spacetimedb.com":
@@ -296,22 +299,21 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
               <div className="relative w-full">
                 <p className="text-sm text-[#aeb4d4]">quick select</p>
                 <div className="w-87 flex">
-                  <StyledSelect onChange={(value: any) => handleQuickSwapChange(value.target.value)}>
-                    <option value="select">select</option>
-                    {quickSwapModules.length > 0 ? (
-                      quickSwapModules.map((module) => (
-                        <option key={module.module} value={module.module}>
-                          {module.module}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="default">none</option>
-                    )}
+                  <StyledSelect
+                    onChange={(value: any) => handleQuickSwapChange(value.target.value)}
+                    disabled={quickSwapModules.length === 0}
+                  >
+                    <option value="select">{quickSwapModules.length === 0 ? "no connections saved" : "select"}</option>
+                    {quickSwapModules.map((module) => (
+                      <option key={module.module} value={module.module}>
+                        {module.module}
+                      </option>
+                    ))}
                   </StyledSelect>
                   <div className="pointer-events-none absolute right-18 top-1/2 text-gray-400">
                     <ChevronDown />
                   </div>
-                  <StyledButton disabled={!moduleName} onClick={saveQuickSwap}>
+                  <StyledButton disabled={!moduleName && !quickSwapSelected} onClick={saveQuickSwap}>
                     <SaveIcon />
                   </StyledButton>
                 </div>
@@ -387,6 +389,12 @@ const StyledSelect = styled.select`
   & > option {
     background-color: #10121a;
   }
+
+  &:disabled {
+    background-color: #10121a80;
+    color: #edf1ff21;
+    cursor: not-allowed;
+  }
 `;
 
 const StyledButton = styled.button`
@@ -405,12 +413,9 @@ const StyledButton = styled.button`
   }
 
   &:disabled {
+    background-color: #10121a80;
     color: #edf1ff21;
 
     cursor: not-allowed;
-
-    &:hover {
-      background-color: #10121a;
-    }
   }
 `;
