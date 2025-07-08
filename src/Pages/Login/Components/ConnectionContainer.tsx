@@ -60,6 +60,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
       setTwitchToken(twitchIdToken);
       setGuestNickname(decodedToken.preferred_username);
+      setNickname(decodedToken.preferred_username);
       setAuthStatus(AuthStatusType.TwitchAuth);
       setSubtitle("Twitch");
       return;
