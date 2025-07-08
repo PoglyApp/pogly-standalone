@@ -18,7 +18,7 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const { connectionConfig, setConnectionConfig } = useContext(ConfigContext);
-  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB, setSpacetimeDB } = useContext(SpacetimeContext);
 
   // STDB

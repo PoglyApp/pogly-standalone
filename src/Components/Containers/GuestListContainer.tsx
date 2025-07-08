@@ -21,6 +21,7 @@ export const GuestListContainer = () => {
   const open = Boolean(hidenGuestsAnchor);
 
   useEffect(() => {
+    console.log(guestStore);
     if (guestStore.length > 5) {
       const guestsArray = [...guestStore];
 
@@ -76,7 +77,9 @@ export const GuestListContainer = () => {
                     {(showPedro && (
                       <img src="./assets/pedro.gif" style={{ width: "32px", height: "32px" }} alt="pedro" />
                     )) ||
-                      "g"}
+                    guest.nickname
+                      ? guest.nickname[0]
+                      : "?"}
                   </Avatar>
                 </div>
               );
