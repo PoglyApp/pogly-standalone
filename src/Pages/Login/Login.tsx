@@ -62,6 +62,11 @@ export const Login = () => {
 
       setNickname(nickname);
     }
+
+    setActiveLayout(
+      (Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
+    );
+
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
@@ -261,15 +266,6 @@ export const Login = () => {
   if (!instanceConfigured) {
     DebugLogger("Pogly Instance is not configured");
     return <ModuleOnboarding legacyLogin={legacyLogin} connectionConfig={connectionConfig} spacetime={spacetime} />;
-  }
-
-  // Step 9) Set active layout
-  if (!activeLayout) {
-    DebugLogger("Setting initial activeLayout");
-    setActiveLayout(
-      (Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
-    );
-    return <Loading text="Loading Layouts" />;
   }
 
   navigate("/canvas", { replace: true });
