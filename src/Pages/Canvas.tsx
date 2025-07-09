@@ -185,7 +185,7 @@ export const Canvas = () => {
   }
 
   return (
-    <div className="mouseContainer" onMouseMove={onMouseMove}>
+    <div className="mouseContainer canvas-font" onMouseMove={onMouseMove}>
       {Object.values(canvasInitialized).every((init) => init === true) && activeLayout ? (
         <TransformWrapper
           ref={transformRef}

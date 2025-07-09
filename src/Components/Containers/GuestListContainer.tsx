@@ -21,7 +21,6 @@ export const GuestListContainer = () => {
   const open = Boolean(hidenGuestsAnchor);
 
   useEffect(() => {
-    console.log(guestStore);
     if (guestStore.length > 5) {
       const guestsArray = [...guestStore];
 

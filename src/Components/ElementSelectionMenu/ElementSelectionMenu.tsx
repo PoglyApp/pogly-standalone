@@ -52,7 +52,7 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   return (
     <>
-      <SelectionMenuContainer id="SelectionMenu">
+      <SelectionMenuContainer id="SelectionMenu" className="canvas-font">
         <CategoryContainer>
           <LayoutCategory />
 

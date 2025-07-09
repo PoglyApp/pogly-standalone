@@ -53,7 +53,7 @@ export const ElementSelectionMenuFooter = () => {
   };
 
   return (
-    <SelectionMenuFooterContainer>
+    <SelectionMenuFooterContainer className="canvas-font">
       <FooterLinkContainer>
         <UpdateIcon />
         <Button
