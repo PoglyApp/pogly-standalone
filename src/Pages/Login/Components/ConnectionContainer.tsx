@@ -1,4 +1,4 @@
-import { ChevronDown, SaveIcon, UserRound } from "lucide-react";
+import { ChevronDown, SaveIcon, UserRound, Trash } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
@@ -317,7 +317,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                     <ChevronDown />
                   </div>
                   <StyledButton disabled={!moduleName && !quickSwapSelected} onClick={saveQuickSwap}>
-                    <SaveIcon />
+                    {moduleName.length === 0 && quickSwapSelected ? <Trash /> : <SaveIcon />}
                   </StyledButton>
                 </div>
               </div>
