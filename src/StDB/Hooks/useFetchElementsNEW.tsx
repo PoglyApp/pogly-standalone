@@ -2,13 +2,10 @@ import { useEffect } from "react";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { DbConnection, ElementData, Elements, Layouts } from "../../module_bindings";
+import { CanvasElementType } from "../../Types/General/CanvasElementType";
+import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 
-const useFetchElement = (
-  Client: DbConnection | undefined,
-  subscriptionsApplied: boolean,
-  setElements: Function,
-  setElementData: Function
-) => {
+const useFetchElement = (Client: DbConnection | undefined, subscriptionsApplied: boolean, setElements: Function) => {
   const urlParams = new URLSearchParams(window.location.search);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -24,10 +21,17 @@ const useFetchElement = (
     const elements: Elements[] = (Client.db.elements.iter() as Elements[]).filter(
       (element: Elements) => element.layoutId === activeLayout.id
     );
-    const elementData: ElementData[] = Client.db.elementData.iter() as ElementData[];
 
-    setElements(elements);
-    setElementData(elementData);
+    const offsetElements = isOverlay ? elementOffsetForOverlay(elements) : elementOffsetForCanvas(elements);
+    const canvasElements: CanvasElementType[] = [];
+
+    offsetElements.forEach((element: Elements) => {
+      canvasElements.push(CreateElementComponent(element));
+    });
+
+    console.log(canvasElements);
+
+    setElements(canvasElements);
   }, [subscriptionsApplied]);
 };
 

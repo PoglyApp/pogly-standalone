@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import handleElementBorder from "../../Utility/HandleElementBorder";
-import { useAppSelector } from "../../Store/Features/store";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData, Elements, ImageElement } from "../../module_bindings";
+import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
 
 interface IProp {
   elements: Elements;
@@ -21,14 +21,16 @@ export const Image = (props: IProp) => {
   const [imageName, setImageName] = useState<string>("");
 
   const imageElement = props.elements.element.value as ImageElement;
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, props.elements.id.toString());
+    if (!isOverlay) {
+      handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, props.elements.id.toString());
+    }
+
     DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
-      const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
+      const eData: ElementData = getElementDataByID(spacetimeDB.Client, imageElement.imageElementData.value);
 
       if (!eData) return;
 
@@ -39,23 +41,21 @@ export const Image = (props: IProp) => {
       setImageName("RawData");
     }
   }, [
-    elementData,
     spacetimeDB.Identity.identity,
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
     spacetimeDB.Identity.address,
-    spacetimeDB.Client
+    spacetimeDB.Client,
   ]);
 
   const renderDisplay = () => {
-    if(InRenderBounds(props.elements)) {
+    if (InRenderBounds(props.elements)) {
       return "block";
-    }
-    else {
+    } else {
       return "none";
     }
-  }
+  };
 
   return (
     <div

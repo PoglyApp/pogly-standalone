@@ -12,6 +12,7 @@ import { LayoutContext } from "../../Contexts/LayoutContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ConnectionContainer } from "./Components/ConnectionContainer";
 import { ModuleOnboarding } from "./Components/ModuleOnboarding";
+import { getActiveLayout } from "../../StDB/SpacetimeDBUtils";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -63,9 +64,7 @@ export const Login = () => {
       setNickname(nickname);
     }
 
-    setActiveLayout(
-      (Array.from(spacetime.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
-    );
+    setActiveLayout(getActiveLayout(spacetime.Client));
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);

@@ -1,10 +1,8 @@
-import { useContext, useEffect, useRef } from "react";
-import { useAppDispatch } from "../../Store/Features/store";
+import { useEffect, useState } from "react";
 import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
-import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
@@ -12,6 +10,7 @@ import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { parseCustomCss, removedCssProperties } from "../../Utility/ParseCustomCss";
 import { marked } from "marked";
 import {
+  DbConnection,
   Elements,
   EventContext,
   ImageElement,
@@ -20,44 +19,32 @@ import {
   TextElement,
   WidgetElement,
 } from "../../module_bindings";
-import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { getActiveLayout } from "../SpacetimeDBUtils";
 
-export const useOverlayElementsEvents = (
-  spacetimeDB: any,
-  layout: Layouts | undefined,
-  canvasInitialized: CanvasInitializedType,
-  setCanvasInitialized: Function
-) => {
-  const dispatch = useAppDispatch();
-
-  const activeLayout = useRef<Layouts>();
-  const isOverlay: Boolean = window.location.href.includes("/overlay");
+export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbConnection | undefined) => {
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!layout) return;
-    DebugLogger("Updating overlay elements events refs");
-    activeLayout.current = layout;
-  }, [layout]);
-
-  useEffect(() => {
-    if (canvasInitialized.overlayElementEventsInitialized || !layout) return;
+    if (initialized || !spacetimeDB) return;
 
     DebugLogger("Initializing overlay element events");
 
-    spacetimeDB.Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+    spacetimeDB.db.elements.onInsert((ctx: EventContext, element: Elements) => {
       if (!ctx.event) return;
-      if (!activeLayout.current) return;
-      if (element.layoutId !== activeLayout.current.id) return;
 
-      const newElement: CanvasElementType | undefined = CreateElementComponent(element, isOverlay);
+      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
+      if (element.layoutId !== activeLayout.id) return;
 
-      dispatch(addElement(newElement.Elements));
-      dispatch(addCanvasElement(newElement));
+      const newElement: CanvasElementType | undefined = CreateElementComponent(element);
+
+      setElements((elements: CanvasElementType[]) => [...elements, newElement]);
     });
 
-    spacetimeDB.Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
-      if (!activeLayout.current) return;
-      if (newElement.layoutId !== activeLayout.current.id) return;
+    spacetimeDB.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
+      if (!ctx.event) return;
+
+      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
+      if (newElement.layoutId !== activeLayout.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -65,10 +52,9 @@ export const useOverlayElementsEvents = (
       if (oldElement.layoutId !== newElement.layoutId) {
         if (component) return;
 
-        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement, isOverlay);
+        const newCanvasElement: CanvasElementType | undefined = CreateElementComponent(newElement);
 
-        dispatch(addElement(newCanvasElement.Elements));
-        dispatch(addCanvasElement(newCanvasElement));
+        setElements((elements: CanvasElementType[]) => [...elements, newCanvasElement]);
       }
 
       if (!component) return;
@@ -177,7 +163,7 @@ export const useOverlayElementsEvents = (
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(
-              spacetimeDB.Client,
+              spacetimeDB,
               newWidgetElement.width,
               newWidgetElement.height,
               undefined,
@@ -217,22 +203,19 @@ export const useOverlayElementsEvents = (
       }
     });
 
-    spacetimeDB.Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
+    spacetimeDB.db.elements.onDelete((ctx: EventContext, element: Elements) => {
       if (!ctx.event) return;
-      if (!activeLayout.current) return;
-      if (element.layoutId !== activeLayout.current.id) return;
 
-      dispatch(removeCanvasElement(element));
-      dispatch(removeElement(element));
+      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
+      if (element.layoutId !== activeLayout.id) return;
+
+      setElements((elements: CanvasElementType[]) => {
+        const filteredElements = elements.filter((e: CanvasElementType) => e.Elements.id !== element.id);
+
+        return filteredElements;
+      });
     });
 
-    setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, overlayElementEventsInitialized: true }));
-  }, [
-    layout,
-    canvasInitialized.overlayElementEventsInitialized,
-    setCanvasInitialized,
-    dispatch,
-    isOverlay,
-    spacetimeDB.Client,
-  ]);
+    setInitialized(true);
+  }, [spacetimeDB]);
 };

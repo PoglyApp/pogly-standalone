@@ -8,10 +8,10 @@ export const SetStdbConnected = (
   setStdbAuthenticated?: Function | undefined
 ) => {
   DebugLogger("Setting SpacetimeDB connected");
+
   // NO AUTHENTICATION
   client.db.guests.onInsert((_ctx: EventContext, newGuest: Guests) => {
     if (newGuest.address.toHexString() !== client.connectionId.toHexString()) return;
-
     setStdbConnected(true);
   });
 
@@ -21,7 +21,6 @@ export const SetStdbConnected = (
   client.db.guests.onUpdate((_ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
     if (newGuest.address.toHexString() !== client.connectionId.toHexString()) return;
     if (oldGuest.authenticated === newGuest.authenticated) return;
-
     if (fetchedConfig.authentication && newGuest.authenticated) setStdbAuthenticated(true);
   });
 };

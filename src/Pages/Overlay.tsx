@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { CanvasElementType } from "../Types/General/CanvasElementType";
-import { Loading } from "../Components/General/Loading";
 import { DebugLogger } from "../Utility/DebugLogger";
-import { ElementData, Elements, Layouts } from "../module_bindings";
+import { ElementData, Elements } from "../module_bindings";
 import useStDB from "../StDB/useStDB";
 import { useGetConnectionConfig } from "../Hooks/useGetConnectionConfig";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
 import useFetchElement from "../StDB/Hooks/useFetchElementsNEW";
 import { SetSubscriptions } from "../Utility/SetSubscriptions";
+import { CanvasElementType } from "../Types/General/CanvasElementType";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
+import { useOverlayElementsEvents } from "../StDB/Hooks/useOverlayElementsEvents";
 
 export const Overlay = () => {
   const [stdbConnected, setStdbConnected] = useState<boolean>(false);
@@ -16,19 +18,15 @@ export const Overlay = () => {
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
 
   useGetConnectionConfig(setConnectionConfig);
+
   const spacetimeDB = useStDB(connectionConfig, setStdbConnected);
 
-  const [elements, setElements] = useState<Elements[]>([]);
-  const [elementData, setElementData] = useState<ElementData[]>([]);
+  const [elements, setElements] = useState<CanvasElementType[]>([]);
 
-  useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements, setElementData);
+  useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements);
 
-  // useOverlayFetchElement(spacetimeDB, activeLayout, canvasInitialized, setCanvasInitialized);
-  // useOverlayElementDataEvents(spacetimeDB, canvasInitialized, setCanvasInitialized);
-  // useOverlayElementsEvents(spacetimeDB, activeLayout, canvasInitialized, setCanvasInitialized);
-  // useOverlayLayoutEvents(spacetimeDB, activeLayout, setActiveLayout);
-  // setUserDisconnected(useOverlayGuestsEvents(spacetimeDB, canvasInitialized, setCanvasInitialized));
-  // useOverlayHeartbeatEvents(spacetimeDB, canvasInitialized);
+  useOverlayElementsEvents(setElements, spacetimeDB.Client);
+  //setUserDisconnected(useOverlayGuestsEvents(spacetimeDB));
 
   /*
       const urlParams = new URLSearchParams(window.location.search);
@@ -56,9 +54,8 @@ export const Overlay = () => {
   }, [spacetimeDB, spacetimeDB.Client]);
 
   useEffect(() => {
-    console.log("Elements", elements);
-    console.log("ElementData", elementData);
-  }, [elements, elementData]);
+    console.log(elements);
+  }, [elements]);
 
   if (userDisconnected || spacetimeDB.Disconnected) {
     DebugLogger("Overlay is disconnected");
@@ -66,21 +63,13 @@ export const Overlay = () => {
     window.location.reload();
   }
 
-  if (!stdbConnected) return <></>;
-
-  /*return (
-    <>
-      {canvasInitialized.elementsFetchInitialized ? (
-        <>
-          <div className="elementContent">
-            {canvasElements.map((element: CanvasElementType) => {
-              return <div key={element.Elements.id.toString()}>{element.Component}</div>;
-            })}
-          </div>
-        </>
-      ) : (
-        <Loading text="Loading..." />
-      )}
-    </>
-  );*/
+  return (
+    <SpacetimeContext.Provider value={{ spacetimeDB }}>
+      <div className="elementContent">
+        {elements.map((element: CanvasElementType) => {
+          return <div key={element.Elements.id.toString()}>{element.Component}</div>;
+        })}
+      </div>
+    </SpacetimeContext.Provider>
+  );
 };
