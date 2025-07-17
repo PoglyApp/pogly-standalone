@@ -77,7 +77,7 @@ export const Image = (props: IProp) => {
       }}
       data-locked={props.elements.locked}
     >
-      <img src={imageData} alt={imageName} draggable="false" width={"100%"} height={"100%"} />
+      <img src={imageData} alt={imageName} draggable="false" className="imageElement" />
       <p id={"debug-text" + props.elements.id} style={{ color: "white", display: "inline", fontSize: "6px" }}></p>
     </div>
   );

@@ -122,6 +122,11 @@ h1 {
   margin-block-end: unset;
 }
 
+.imageElement {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .MuiOutlinedInput-notchedOutline {
   border-color: #ffffffa6 !important;
 }
