@@ -10,6 +10,8 @@ import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { useOverlayElementsEvents } from "../StDB/Hooks/useOverlayElementsEvents";
+import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
+import { useOverlayHeartbeatEvents } from "../StDB/Hooks/useOverlayHeartbeatEvents";
 
 export const Overlay = () => {
   const [stdbConnected, setStdbConnected] = useState<boolean>(false);
@@ -22,46 +24,45 @@ export const Overlay = () => {
   const spacetimeDB = useStDB(connectionConfig, setStdbConnected);
 
   const [elements, setElements] = useState<CanvasElementType[]>([]);
+  const [refetchElements, setRefetchElements] = useState<boolean>(true);
 
-  useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements);
+  useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements, refetchElements, setRefetchElements);
 
   useOverlayElementsEvents(setElements, spacetimeDB.Client);
-  //setUserDisconnected(useOverlayGuestsEvents(spacetimeDB));
-
-  /*
-      const urlParams = new URLSearchParams(window.location.search);
-    const layoutParam = urlParams.get("layout");
-    const transparent = urlParams.get("transparent");
-
-    if (layoutParam) {
-      DebugLogger("Getting layout by name");
-      setActiveLayout(
-        (Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.name === layoutParam)
-      );
-    } else {
-      DebugLogger("Getting layout by active ID");
-      setActiveLayout(
-        (Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
-      );
-    }
-  */
+  useOverlayGuestsEvents(spacetimeDB, setUserDisconnected);
+  useOverlayLayoutEvents(spacetimeDB, setRefetchElements);
+  useOverlayHeartbeatEvents(spacetimeDB);
 
   useEffect(() => {
     if (!spacetimeDB || !spacetimeDB.Client) return;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const layoutParam = urlParams.get("layout");
+    const transparent = urlParams.get("transparent");
+    const nickname = urlParams.get("nickname");
+
     SetSubscriptions(spacetimeDB.Client, setSubscriptionsApplied);
     spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
+
+    spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
+
+    if (transparent != null) {
+      document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
+      document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    }
+
+    if (nickname != null) {
+      spacetimeDB.Client.reducers.updateGuestNickname(nickname);
+    }
   }, [spacetimeDB, spacetimeDB.Client]);
 
   useEffect(() => {
-    console.log(elements);
-  }, [elements]);
-
-  if (userDisconnected || spacetimeDB.Disconnected) {
-    DebugLogger("Overlay is disconnected");
-    localStorage.removeItem("stdbToken");
-    window.location.reload();
-  }
+    if (userDisconnected || spacetimeDB.Disconnected) {
+      DebugLogger("Overlay is disconnected");
+      localStorage.removeItem("stdbToken");
+      window.location.reload();
+    }
+  }, [userDisconnected]);
 
   return (
     <SpacetimeContext.Provider value={{ spacetimeDB }}>

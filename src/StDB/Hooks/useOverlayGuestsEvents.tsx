@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Guests } from "../../module_bindings";
 
-export const useOverlayGuestsEvents = (spacetimeDB: any) => {
+export const useOverlayGuestsEvents = (spacetimeDB: any, setDisconnected: Function) => {
   const [initialized, setInitialized] = useState<boolean>(false);
-  const [disconnected, setDisconnected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (initialized || !spacetimeDB) return;
-    DebugLogger("Initializing overlay guest events");
+    if (initialized || !spacetimeDB.Client) return;
 
     spacetimeDB.Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
       if (guest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) {
@@ -18,7 +14,5 @@ export const useOverlayGuestsEvents = (spacetimeDB: any) => {
     });
 
     setInitialized(true);
-  }, [spacetimeDB.Identity.identity, spacetimeDB.Identity.address, spacetimeDB.Client]);
-
-  return disconnected;
+  }, [spacetimeDB.Client]);
 };

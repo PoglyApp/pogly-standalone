@@ -1,13 +1,14 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Heartbeat } from "../../module_bindings";
 
-export const useOverlayHeartbeatEvents = (spacetimeDB: any, canvasInitialized: CanvasInitializedType) => {
+export const useOverlayHeartbeatEvents = (spacetimeDB: any) => {
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!spacetimeDB.Identity || canvasInitialized.elementEventsInitialized) return;
+    if (initialized || !spacetimeDB.Client) return;
 
     DebugLogger("Initializing heartbeat");
 
@@ -27,5 +28,7 @@ export const useOverlayHeartbeatEvents = (spacetimeDB: any, canvasInitialized: C
     spacetimeDB.Client.db.heartbeat.onUpdate((ctx: EventContext, oldElement: Heartbeat, newElement: Heartbeat) => {
       internalBeat = newElement.tick;
     });
-  }, [spacetimeDB.Identity, canvasInitialized.elementEventsInitialized, spacetimeDB.Client]);
+
+    setInitialized(true);
+  }, [spacetimeDB.Client]);
 };

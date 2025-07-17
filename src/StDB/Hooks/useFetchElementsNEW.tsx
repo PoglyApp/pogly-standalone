@@ -5,14 +5,20 @@ import { DbConnection, ElementData, Elements, Layouts } from "../../module_bindi
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 
-const useFetchElement = (Client: DbConnection | undefined, subscriptionsApplied: boolean, setElements: Function) => {
+const useFetchElement = (
+  Client: DbConnection | undefined,
+  subscriptionsApplied: boolean,
+  setElements: Function,
+  refetchElements: boolean,
+  setRefetchElements: Function
+) => {
   const urlParams = new URLSearchParams(window.location.search);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const layoutParam = urlParams.get("layout");
 
   useEffect(() => {
-    if (!Client || !subscriptionsApplied) return;
+    if (!Client || !subscriptionsApplied || !refetchElements) return;
 
     const activeLayout: Layouts = layoutParam ? getLayoutByName(Client, layoutParam)! : getLayoutByActivity(Client)!;
 
@@ -29,10 +35,10 @@ const useFetchElement = (Client: DbConnection | undefined, subscriptionsApplied:
       canvasElements.push(CreateElementComponent(element));
     });
 
-    console.log(canvasElements);
-
     setElements(canvasElements);
-  }, [subscriptionsApplied]);
+
+    if (refetchElements) setRefetchElements(false);
+  }, [subscriptionsApplied, refetchElements]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {
