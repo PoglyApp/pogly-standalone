@@ -159,7 +159,7 @@ export const WidgetVariableTable = (props: IProps) => {
   };
 
   return (
-    <TableWrapper>
+    <TableWrapper className="canvas-font" style={{ fontSize: "14px" }}>
       {rows.length > 0 ? (
         <StyledTable>
           <thead>
@@ -391,6 +391,7 @@ const StyledButton = styled.button`
   background-color: #3f80ea;
   color: white;
   cursor: pointer;
+  padding: 4px;
 
   &:hover {
     background-color: #4a90e2;

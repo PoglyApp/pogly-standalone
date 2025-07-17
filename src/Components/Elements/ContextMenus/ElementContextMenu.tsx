@@ -41,7 +41,9 @@ export const ElementContextMenu = (props: IProps) => {
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;
 
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(
+    spacetimeDB.Identity.identity
+  )?.permissionLevel;
 
   const [transformEdit, setTransformEdit] = useState("Scale");
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
@@ -58,12 +60,14 @@ export const ElementContextMenu = (props: IProps) => {
   if (selectedElement) element = spacetimeDB.Client.db.elements.id.find(selectedElement.id);
 
   useEffect(() => {
-    if (selectedElement) setTransparency(spacetimeDB.Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
+    if (selectedElement)
+      setTransparency(spacetimeDB.Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
     if (selectedElement?.element.tag !== "WidgetElement") return;
 
     DebugLogger("Setting widget data");
 
-    const widgetElement: WidgetElement = spacetimeDB.Client.db.elements.id.find(selectedElement.id)?.element.value as WidgetElement;
+    const widgetElement: WidgetElement = spacetimeDB.Client.db.elements.id.find(selectedElement.id)?.element
+      .value as WidgetElement;
 
     if (widgetElement.rawData === "") {
       const elementData = spacetimeDB.Client.db.elementData.id.find(widgetElement.elementDataId);
@@ -129,6 +133,7 @@ export const ElementContextMenu = (props: IProps) => {
       }
       transitionDuration={{ enter: 0, exit: 0 }}
       MenuListProps={{ onMouseLeave: handleClose }}
+      className="canvas-font"
     >
       {/* <StyledMenuItem
         sx={{
@@ -183,13 +188,17 @@ export const ElementContextMenu = (props: IProps) => {
             </MenuItem>
             <StyledMenuItem
               value={"Scale"}
-              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Scale, handleClose)}
+              onClick={() =>
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Scale, handleClose)
+              }
             >
               Scale
             </StyledMenuItem>
             <StyledMenuItem
               value={"Rotation"}
-              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Rotation, handleClose)}
+              onClick={() =>
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Rotation, handleClose)
+              }
             >
               Rotation
             </StyledMenuItem>
@@ -271,7 +280,9 @@ export const ElementContextMenu = (props: IProps) => {
                 value={transparency}
                 aria-label="Small"
                 valueLabelDisplay="on"
-                onChange={(event, number) => handleTransparency(spacetimeDB.Client, selectedElement, setTransparency, number)}
+                onChange={(event, number) =>
+                  handleTransparency(spacetimeDB.Client, selectedElement, setTransparency, number)
+                }
               />
             </StyledMenuItem>
           </StyledSelect>
@@ -349,7 +360,8 @@ export const ElementContextMenu = (props: IProps) => {
         <div>
           {element.element.tag === "ImageElement" && element.element.value.imageElementData.tag === "ElementDataId" && (
             <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-              Image: {spacetimeDB.Client.db.elementData.id.find(element.element.value.imageElementData.value)?.name || ""}
+              Image:{" "}
+              {spacetimeDB.Client.db.elementData.id.find(element.element.value.imageElementData.value)?.name || ""}
             </Paper>
           )}
 
@@ -372,7 +384,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       <Divider component="li" variant="fullWidth" sx={{ border: "solid 1px #001529e6" }} />
       {selectedElement.element.tag === "ImageElement" && (
-        <>
+        <div>
           {strictMode && !permissions ? (
             <Tooltip title="Strict mode is enabled and preventing you from updating the source. Ask the instance owner!">
               <StyledDisabledMenuItem>
@@ -383,7 +395,7 @@ export const ElementContextMenu = (props: IProps) => {
           ) : (
             <StyledMenuItem onClick={openUpdateSourceModal}>Update source</StyledMenuItem>
           )}
-        </>
+        </div>
       )}
 
       {strictMode && !permissions ? (
@@ -408,59 +420,59 @@ export const ElementContextMenu = (props: IProps) => {
 
 const StyledMenuItem = styled(MenuItem)`
   &:hover {
-    background-color: #001529;
+    background-color: #001529 !important;
   }
 
-  padding-left: 5px;
+  padding-left: 5px !important;
 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
 
-  padding-left: 5px;
+  padding-left: 5px !important;
 
   &:hover {
-    color: #960000;
+    color: #960000 !important;
   }
 `;
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
+  color: #681c1c !important;
 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
 
-  padding-left: 5px;
+  padding-left: 5px !important;
 
-  cursor: not-allowed;
+  cursor: not-allowed !important;
 `;
 
 const StyledDisabledMenuItem = styled(MenuItem)`
-  color: #ffffff75;
+  color: #ffffff75 !important;
 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
 
-  padding-left: 5px;
+  padding-left: 5px !important;
 
-  cursor: not-allowed;
+  cursor: not-allowed !important;
 `;
 
 const StyledSelect = styled(Select)`
-  color: #ffffffa6;
-  margin-left: 0px;
+  color: #ffffffa6 !important;
+  margin-left: 0px !important;
 
   &:after {
-    border-width: 0;
+    border-width: 0 !important;
   }
 
   &:before {
-    border-width: 0;
+    border-width: 0 !important;
   }
 `;

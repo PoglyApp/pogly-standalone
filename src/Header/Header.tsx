@@ -33,7 +33,12 @@ export const Header = () => {
   useEffect(() => {}, []);
 
   useEffect(() => {
-    if (location.pathname !== "/login" && location.pathname !== "/" && !location.pathname.startsWith("/canvas") && !location.pathname.startsWith("/overlay")) {
+    if (
+      location.pathname !== "/login" &&
+      location.pathname !== "/" &&
+      !location.pathname.startsWith("/canvas") &&
+      !location.pathname.startsWith("/overlay")
+    ) {
       setIsRedirecting(true);
       window.location.href = "/";
     }
@@ -57,7 +62,7 @@ export const Header = () => {
     </main>
   ) : (
     <>
-      <StyledBox>
+      <StyledBox className="canvas-font">
         <AppBar position="static">
           <Toolbar disableGutters>
             <Typography

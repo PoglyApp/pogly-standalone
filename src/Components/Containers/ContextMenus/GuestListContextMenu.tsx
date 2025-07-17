@@ -12,7 +12,9 @@ interface IProps {
 
 export const GuestListContextMenu = (props: IProps) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const identityPermission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const identityPermission = spacetimeDB.Client.db.permissions.identity.find(
+    spacetimeDB.Identity.identity
+  )?.permissionLevel;
 
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
   let selectedGuestPermission: PermissionLevel | undefined;
@@ -39,6 +41,7 @@ export const GuestListContextMenu = (props: IProps) => {
       transitionDuration={{ enter: 0, exit: 0 }}
       MenuListProps={{ onMouseLeave: handleClose }}
       sx={{ zIndex: 2000000 }}
+      className="canvas-font"
     >
       <div>
         <Paper variant="outlined" sx={{ fontWeight: "bold", color: "#ffffffa6", padding: "5px", margin: "5px" }}>
@@ -135,9 +138,10 @@ const StyledMenuItemOrange = styled(MenuItem)`
 const StyledMenuItemRed = styled(MenuItem)`
   &:hover {
     background-color: #001529;
+    color: #960000 !important;
   }
 
-  color: #800000;
+  color: #d82b2b !important;
 
   padding-left: 5px;
 

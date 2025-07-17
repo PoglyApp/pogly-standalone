@@ -20,7 +20,9 @@ export const ElementSelectionContextMenu = (props: IProps) => {
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(
+    spacetimeDB.Identity.identity
+  )?.permissionLevel;
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -96,7 +98,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
   margin-left: 5px;
   margin-right: 5px;
@@ -104,12 +106,12 @@ const StyledDeleteMenuItem = styled(MenuItem)`
   padding-left: 5px;
 
   &:hover {
-    color: #960000;
+    color: #960000 !important;
   }
 `;
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
+  color: #681c1c !important;
 
   margin-left: 5px;
   margin-right: 5px;

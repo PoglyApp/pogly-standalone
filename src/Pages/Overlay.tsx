@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { DebugLogger } from "../Utility/DebugLogger";
-import { ElementData, Elements } from "../module_bindings";
 import useStDB from "../StDB/useStDB";
 import { useGetConnectionConfig } from "../Hooks/useGetConnectionConfig";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";

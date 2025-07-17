@@ -22,7 +22,9 @@ export const LayoutContextMenu = (props: IProps) => {
   const [showExamine, setShowExamine] = useState(false);
 
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(
+    spacetimeDB.Identity.identity
+  )?.permissionLevel;
 
   const handleSetActive = () => {
     DebugLogger("Changing active layout");
@@ -167,7 +169,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
   margin-left: 5px;
   margin-right: 5px;
@@ -187,7 +189,7 @@ const StyledDisabledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
+  color: #681c1c !important;
 
   margin-left: 5px;
   margin-right: 5px;

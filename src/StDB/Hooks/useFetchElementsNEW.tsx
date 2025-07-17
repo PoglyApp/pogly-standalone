@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { DbConnection, ElementData, Elements, Layouts } from "../../module_bindings";
+import { DbConnection, Elements, Layouts } from "../../module_bindings";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 

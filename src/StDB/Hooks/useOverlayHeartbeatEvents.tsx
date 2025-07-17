@@ -1,6 +1,4 @@
-import { useContext, useEffect, useState } from "react";
-import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
+import { useEffect, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Heartbeat } from "../../module_bindings";
 

@@ -95,6 +95,7 @@ export const QuickSwapContextMenu = (props: IProps) => {
       }
       transitionDuration={{ enter: 0, exit: 0 }}
       MenuListProps={{ onMouseLeave: handleClose }}
+      className="canvas-font"
     >
       <StyledMenuItem onClick={openNicknameModal}>Edit nickname</StyledMenuItem>
       <StyledMenuItem onClick={clearNickname}>Clear nickname</StyledMenuItem>
@@ -115,27 +116,21 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
   margin-left: 5px;
   margin-right: 5px;
 
   padding-left: 5px;
+
+  &:hover {
+    background-color: #001529;
+    color: #960000 !important;
+  }
 `;
 
 const StyledDisabledMenuItem = styled(MenuItem)`
   color: #ffffff4e;
-
-  margin-left: 5px;
-  margin-right: 5px;
-
-  padding-left: 5px;
-
-  cursor: not-allowed;
-`;
-
-const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
 
   margin-left: 5px;
   margin-right: 5px;
