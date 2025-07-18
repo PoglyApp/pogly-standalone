@@ -72,5 +72,12 @@ export const useChannelEmotes = (
       setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
-  }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
+  }, [
+    channelEmotesInitialized,
+    config.streamName,
+    setSevenTVEmotes,
+    setBTTVEmotes,
+    setChannelEmotesInitialized,
+    config.streamingPlatform,
+  ]);
 };

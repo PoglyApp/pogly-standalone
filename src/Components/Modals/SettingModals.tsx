@@ -702,7 +702,13 @@ export const SettingsModal = (props: IProp) => {
                   sx={{ alignItems: "start" }}
                   control={
                     <Checkbox
-                      onChange={() => setAuth(!auth)}
+                      onChange={() => {
+                        if (!config.authentication) {
+                          showInstancePassword();
+                        }
+
+                        setAuth(!auth);
+                      }}
                       checked={auth}
                       sx={{
                         color: "#ffffffa6",
