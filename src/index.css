@@ -14,8 +14,6 @@ body {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
-
-  font-size: 16px;
 }
 
 html {
@@ -31,6 +29,8 @@ html {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+
+  font-size: 16px;
 }
 
 .canvas-font {
