@@ -28,7 +28,7 @@ const useStDB = (
     const isOverlay: Boolean = window.location.href.includes("/overlay");
 
     if (isOverlay && stdbDomain === "") {
-      stdbDomain = "wss://pogly.spacetimedb.com";
+      stdbDomain = "wss://maincloud.spacetimedb.com";
     }
 
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {

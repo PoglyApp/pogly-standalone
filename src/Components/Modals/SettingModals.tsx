@@ -44,7 +44,7 @@ export const SettingsModal = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
   const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
 
-  const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://maincloud.spacetimedb.com";
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);

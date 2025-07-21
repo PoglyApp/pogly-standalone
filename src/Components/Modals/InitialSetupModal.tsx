@@ -41,7 +41,7 @@ export const InitialSetupModal = (props: IProp) => {
   const [initializing, setInitializing] = useState<boolean>(false);
   const [defaultElements, setDefaultElements] = useState<string>("");
 
-  const isPoglyInstance: Boolean = props.connectionConfig.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = props.connectionConfig.domain === "wss://maincloud.spacetimedb.com";
 
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
   const [copyAuthButtonText, setAuthButtonText] = useState("Copy Auth Token");

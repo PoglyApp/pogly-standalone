@@ -45,7 +45,7 @@ export const ChooseInstanceModal = (props: IProp) => {
     setAuthStatus(type);
 
     const CLIENT_ID = "2zrg60xlectlfv7pycwlt4acoabs1p"; // twitch oauth here!
-    const REDIRECT_URI = "http://localhost:3006/callback";
+    const REDIRECT_URI = `${window.location.origin}/callback`;
     const SCOPES = "openid";
 
     const twitchAuthUrl =
@@ -64,7 +64,7 @@ export const ChooseInstanceModal = (props: IProp) => {
 
     switch (type) {
       case "Cloud":
-        domain = "wss://pogly.spacetimedb.com";
+        domain = "wss://maincloud.spacetimedb.com";
         break;
       case "Local":
         domain = "ws://127.0.0.1:3000";
@@ -122,7 +122,6 @@ export const ChooseInstanceModal = (props: IProp) => {
     }
   }, [twitchIdToken]);
 
-
   if (isOverlay || isRedirecting) {
     return <></>;
   }
@@ -176,10 +175,18 @@ export const ChooseInstanceModal = (props: IProp) => {
             </FormGroup>
           </DialogContent>
 
-          <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}>
+          <DialogActions
+            sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}
+          >
             <div style={{ position: "fixed" }}>
               <p
-                style={{ margin: "0", paddingLeft: "10px", paddingBottom: "10px", fontSize: "12px", color: "#ffffffa6" }}
+                style={{
+                  margin: "0",
+                  paddingLeft: "10px",
+                  paddingBottom: "10px",
+                  fontSize: "12px",
+                  color: "#ffffffa6",
+                }}
               >
                 Version: {process.env.REACT_APP_VERSION}
               </p>
@@ -189,13 +196,9 @@ export const ChooseInstanceModal = (props: IProp) => {
       ) : (
         <>
           <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6", width: "370px", textAlign: "center" }}>
-          {twitchIdToken
-            ? (
+            {twitchIdToken ? (
               <>
-                Welcome{" "}
-                <span style={{ color: "#9146FF" }}>
-                  {preferredUsername}
-                </span>
+                Welcome <span style={{ color: "#9146FF" }}>{preferredUsername}</span>
                 , Connect below.
                 <br />
                 <Button
@@ -217,7 +220,6 @@ export const ChooseInstanceModal = (props: IProp) => {
               "Connect below w/ Legacy Auth"
             )}
           </DialogTitle>
-          
 
           <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
             <FormGroup sx={{ gap: "20px" }}>
@@ -297,7 +299,9 @@ export const ChooseInstanceModal = (props: IProp) => {
             </FormGroup>
           </DialogContent>
 
-          <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}>
+          <DialogActions
+            sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "10px", display: "grid" }}
+          >
             <div style={{ position: "fixed" }}>
               <p style={{ margin: "0", paddingLeft: "10px", fontSize: "12px", color: "#ffffffa6" }}>
                 Version: {process.env.REACT_APP_VERSION}

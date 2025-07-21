@@ -41,7 +41,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const [defaultElements, setDefaultElements] = useState<string>("");
   const [initializing, setInitializing] = useState<boolean>(false);
 
-  const isPoglyInstance: Boolean = connectionConfig.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = connectionConfig.domain === "wss://maincloud.spacetimedb.com";
 
   useGetDefaultElements(setDefaultElements);
 

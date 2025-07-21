@@ -19,7 +19,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
-  const [domain, setDomain] = useState<string>("wss://pogly.spacetimedb.com");
+  const [domain, setDomain] = useState<string>("wss://maincloud.spacetimedb.com");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
@@ -130,7 +130,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const handleDomainChange = (value: any) => {
     switch (value.target.value) {
       case "Cloud":
-        setDomain("wss://pogly.spacetimedb.com");
+        setDomain("wss://maincloud.spacetimedb.com");
         setCustomDomain(false);
         break;
       case "Local":
@@ -160,7 +160,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setQuickSwapSelected(module);
 
     switch (module.domain) {
-      case "wss://pogly.spacetimedb.com":
+      case "wss://maincloud.spacetimedb.com":
         domainRef.current!.value = "Cloud";
         break;
       case "ws://127.0.0.1:3000":
@@ -301,7 +301,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
               <div className="relative w-full">
                 <p className="text-sm text-[#aeb4d4]">quick select</p>
-                <div className="w-87 flex">
+                <div className="flex">
                   <StyledSelect
                     onChange={(value: any) => handleQuickSwapChange(value.target.value)}
                     disabled={quickSwapModules.length === 0}
