@@ -15,6 +15,8 @@ interface IProp {
 
 export const Text = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const urlParams = new URLSearchParams(window.location.search);
+  const noMarkdown = urlParams.get("nomarkdown");
 
   const { setModals } = useContext(ModalContext);
 
@@ -78,7 +80,7 @@ export const Text = (props: IProp) => {
       }}
       onDoubleClick={showTextCreationModal}
     >
-      <Markdown remarkPlugins={[remark]}>{textElement.text}</Markdown>
+      {noMarkdown ? <p>{textElement.text}</p> : <Markdown remarkPlugins={[remark]}>{textElement.text}</Markdown>}
     </div>
   );
 };
