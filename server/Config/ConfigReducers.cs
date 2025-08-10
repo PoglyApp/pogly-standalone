@@ -85,7 +85,7 @@ public partial class Module
                 var newConfig = oldConfig.Value;
                 newConfig.StreamingPlatform = platform;
                 newConfig.StreamName = channel;
-                newConfig.OwnerIdentity = ctx.Sender;
+                newConfig.OwnerIdentity = guest.Identity;
                 newConfig.DebugMode = debug;
                 newConfig.UpdateHz = updateHz;
                 newConfig.EditorBorder = editorBorder;
