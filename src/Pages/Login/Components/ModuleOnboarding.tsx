@@ -70,14 +70,16 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const handleSave = () => {
     spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
 
-    if (usePassword) {
+    if (usePassword && password) {
+      localStorage.setItem("stdbConnectModuleAuthKey", password);
+
       const quickSwap = localStorage.getItem("poglyQuickSwap");
 
       if (quickSwap && quickSwap.length > 0) {
         const modules: QuickSwapType[] = JSON.parse(quickSwap);
 
         const savedModule = modules.findIndex((module: QuickSwapType) => module.module === connectionConfig.module);
-        modules[savedModule] = { ...modules[savedModule], auth: password! };
+        modules[savedModule] = { ...modules[savedModule], auth: password };
 
         localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
       }
