@@ -361,7 +361,9 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                 </div>
               </div>
 
-              <StyledButton onClick={handleConnect}>connect</StyledButton>
+              <StyledButton disabled={!moduleName} onClick={handleConnect}>
+                connect
+              </StyledButton>
             </div>
           </div>
         </Container>
