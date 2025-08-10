@@ -4,6 +4,7 @@ import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import SaveIcon from "@mui/icons-material/Save";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import Markdown from "react-markdown";
@@ -99,7 +100,7 @@ export const EditorGuidelineModal = (props: IProp) => {
         {permission && permission.tag === "Owner" && (
           <Button
             variant="outlined"
-            startIcon={<CancelIcon />}
+            startIcon={<SaveIcon />}
             sx={{
               color: "#ffffffa6",
               borderColor: "#ffffffa6",

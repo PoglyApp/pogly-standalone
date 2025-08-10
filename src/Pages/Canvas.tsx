@@ -179,7 +179,7 @@ export const Canvas = () => {
     );
   }
 
-  if (!acceptedGuidelines) {
+  if (!acceptedGuidelines && permission?.tag !== "Owner") {
     DebugLogger("Guest has not accepted guidelines");
     return <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} />;
   }
