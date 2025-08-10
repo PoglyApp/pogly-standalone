@@ -33,6 +33,7 @@ import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { Config, Elements, Layouts, PermissionLevel } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
+import { getGuestNickname } from "../StDB/SpacetimeDBUtils";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -134,6 +135,13 @@ export const Canvas = () => {
     setSelectoTargets(() => []);
 
     spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
+
+    const localGuest = getGuestNickname(spacetimeDB.Client, spacetimeDB.Identity.identity);
+
+    if (localGuest && localGuest.nickname === "") {
+      const nickname = localStorage.getItem("nickname") || "Unknown";
+      spacetimeDB.Client.reducers.updateGuestNickname(nickname);
+    }
   }, [activeLayout, setActiveLayout, spacetimeDB.Client]);
 
   // Limit how many times cursor event is updated

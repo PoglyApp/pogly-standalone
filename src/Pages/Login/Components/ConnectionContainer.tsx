@@ -63,6 +63,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       setNickname(decodedToken.preferred_username);
       setAuthStatus(AuthStatusType.TwitchAuth);
       setSubtitle("Twitch");
+
+      localStorage.setItem("nickname", decodedToken.preferred_username);
       return;
     }
 
@@ -81,6 +83,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
     setNickname(guestNickname);
 
+    localStorage.setItem("nickname", guestNickname);
     localStorage.setItem("stdbConnectDomain", domain);
     localStorage.setItem("stdbConnectModule", moduleName);
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);

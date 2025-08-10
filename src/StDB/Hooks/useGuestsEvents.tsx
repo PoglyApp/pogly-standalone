@@ -32,6 +32,14 @@ export const useGuestsEvents = (
     });
 
     spacetimeDB.Client.db.guests.onUpdate((ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
+      // Quick and dirty fix, all of this will be redone when getting rid of guest store
+      if (
+        newGuest.address.toHexString() === spacetimeDB.Identity.address.toHexString() &&
+        oldGuest.nickname !== newGuest.nickname
+      ) {
+        dispatch(updateGuest(newGuest));
+      }
+
       if (newGuest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
@@ -118,7 +126,7 @@ export const useGuestsEvents = (
     setCanvasInitialized,
     dispatch,
     spacetimeDB.Identity.selectedLayoutId,
-    spacetimeDB.Client
+    spacetimeDB.Client,
   ]);
 
   return disconnected;
