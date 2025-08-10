@@ -88,9 +88,7 @@ export const ElementSelectionMenu = (props: IProps) => {
             setContextMenu={setContextMenu}
           />
 
-          {spacetimeDB.Config.streamingPlatform === "twitch" && (
-            <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
-          )}
+          <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
 
           <TenorCategory />
         </CategoryContainer>
