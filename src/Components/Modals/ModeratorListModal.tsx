@@ -53,7 +53,7 @@ export const ModeratorListModal = () => {
                 return (
                   <Container key={"mod_" + mod.identity.toHexString().substring(0, 5)}>
                     <StyledDeleteIcon onClick={() => handleDeletePermission(mod.identity)} />
-                    <IdentitySpan>{mod.nickname === "" ? mod.nickname : "Unknown..."}</IdentitySpan>
+                    <IdentitySpan>{mod.nickname !== "" ? mod.nickname : "Unknown..."}</IdentitySpan>
                   </Container>
                 );
               })}
