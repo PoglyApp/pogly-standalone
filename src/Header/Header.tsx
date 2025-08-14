@@ -1,11 +1,12 @@
 import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
 import { SettingsModal } from "../Components/Modals/SettingModals";
 import SecurityIcon from "@mui/icons-material/Security";
 import SettingsIcon from "@mui/icons-material/Settings";
+import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import Toolbar from "@mui/material/Toolbar";
 import { ModalContext } from "../Contexts/ModalContext";
 import { DebugLogger } from "../Utility/DebugLogger";
@@ -16,13 +17,13 @@ import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/Element
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
 
 export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { setModals } = useContext(ModalContext);
-
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -30,7 +31,20 @@ export const Header = () => {
   const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
   const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
 
-  useEffect(() => {}, []);
+  const [showVerificationButton, setShowVerificationButton] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/overlay") || !spacetimeDB) return;
+
+    const heartBeat = spacetimeDB.Client.db.heartbeat.id.find(0);
+    const config = spacetimeDB.Client.db.config.version.find(0);
+
+    console.log("Heartbeat", heartBeat.serverIdentity.toHexString());
+    console.log("Config", config.ownerIdentity.toHexString());
+    console.log("Are they equal", config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString());
+
+    if (config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString()) setShowVerificationButton(true);
+  }, [spacetimeDB]);
 
   useEffect(() => {
     if (
@@ -52,6 +66,10 @@ export const Header = () => {
   const showEditorGuidelines = () => {
     DebugLogger("Opening editor guidelines modal");
     setModals((oldModals: any) => [...oldModals, <EditorGuidelineModal key="guideline_modal" />]);
+  };
+
+  const showVerifyOwnershipModal = () => {
+    setModals((oldModals: any) => [...oldModals, <VerifyOwnershipModal key="verifyownership_modal" />]);
   };
 
   if (location.pathname === "/canvas" && !spacetimeDB) return <Navigate to="/login" replace />;
@@ -102,6 +120,15 @@ export const Header = () => {
                   label="Editor Guidelines"
                   onClick={showEditorGuidelines}
                 />
+
+                {showVerificationButton && (
+                  <StyledNoOwner
+                    icon={<ReportGmailerrorredIcon />}
+                    iconPosition="start"
+                    label="Verify ownership!"
+                    onClick={showVerifyOwnershipModal}
+                  />
+                )}
               </Tabs>
             </Box>
 
@@ -157,6 +184,20 @@ const StyledGuidelines = styled(Tab)`
 
   &:hover {
     background-color: #020e1a !important;
+  }
+`;
+
+const StyledNoOwner = styled(Tab)`
+  text-transform: none !important;
+  color: red !important;
+
+  border: 1px solid red !important;
+  border-radius: 15px !important;
+
+  background-color: #ff00002b !important;
+
+  &:hover {
+    background-color: #ff000058 !important;
   }
 `;
 

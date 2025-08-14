@@ -54,6 +54,8 @@ import { AddLayoutWithId } from "./add_layout_with_id_reducer.ts";
 export { AddLayoutWithId };
 import { Authenticate } from "./authenticate_reducer.ts";
 export { Authenticate };
+import { ClaimOwnership } from "./claim_ownership_reducer.ts";
+export { ClaimOwnership };
 import { ClearIdentityPermission } from "./clear_identity_permission_reducer.ts";
 export { ClearIdentityPermission };
 import { ClearRefreshOverlayRequests } from "./clear_refresh_overlay_requests_reducer.ts";
@@ -224,6 +226,8 @@ import { LayoutsTableHandle } from "./layouts_table.ts";
 export { LayoutsTableHandle };
 import { OverlayCommandTableHandle } from "./overlay_command_table.ts";
 export { OverlayCommandTableHandle };
+import { OwnerRecoveryKeyTableHandle } from "./owner_recovery_key_table.ts";
+export { OwnerRecoveryKeyTableHandle };
 import { PermissionsTableHandle } from "./permissions_table.ts";
 export { PermissionsTableHandle };
 import { ZIndexTableHandle } from "./z_index_table.ts";
@@ -386,6 +390,15 @@ const REMOTE_MODULE = {
         colType: OverlayCommand.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
       },
     },
+    OwnerRecoveryKey: {
+      tableName: "OwnerRecoveryKey",
+      rowType: AuthenticationKey.getTypeScriptAlgebraicType(),
+      primaryKey: "version",
+      primaryKeyInfo: {
+        colName: "version",
+        colType: AuthenticationKey.getTypeScriptAlgebraicType().product.elements[0].algebraicType,
+      },
+    },
     Permissions: {
       tableName: "Permissions",
       rowType: Permissions.getTypeScriptAlgebraicType(),
@@ -445,6 +458,10 @@ const REMOTE_MODULE = {
     Authenticate: {
       reducerName: "Authenticate",
       argsType: Authenticate.getTypeScriptAlgebraicType(),
+    },
+    ClaimOwnership: {
+      reducerName: "ClaimOwnership",
+      argsType: ClaimOwnership.getTypeScriptAlgebraicType(),
     },
     ClearIdentityPermission: {
       reducerName: "ClearIdentityPermission",
@@ -778,6 +795,7 @@ export type Reducer = never
 | { name: "AddLayout", args: AddLayout }
 | { name: "AddLayoutWithId", args: AddLayoutWithId }
 | { name: "Authenticate", args: Authenticate }
+| { name: "ClaimOwnership", args: ClaimOwnership }
 | { name: "ClearIdentityPermission", args: ClearIdentityPermission }
 | { name: "ClearRefreshOverlayRequests", args: ClearRefreshOverlayRequests }
 | { name: "CompleteOverlayCommand", args: CompleteOverlayCommand }
@@ -1014,6 +1032,22 @@ export class RemoteReducers {
 
   removeOnAuthenticate(callback: (ctx: ReducerEventContext, key: string) => void) {
     this.connection.offReducer("Authenticate", callback);
+  }
+
+  claimOwnership(key: string) {
+    const __args = { key };
+    let __writer = new BinaryWriter(1024);
+    ClaimOwnership.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("ClaimOwnership", __argsBuffer, this.setCallReducerFlags.claimOwnershipFlags);
+  }
+
+  onClaimOwnership(callback: (ctx: ReducerEventContext, key: string) => void) {
+    this.connection.onReducer("ClaimOwnership", callback);
+  }
+
+  removeOnClaimOwnership(callback: (ctx: ReducerEventContext, key: string) => void) {
+    this.connection.offReducer("ClaimOwnership", callback);
   }
 
   clearIdentityPermission(identity: Identity) {
@@ -2189,6 +2223,11 @@ export class SetReducerFlags {
     this.authenticateFlags = flags;
   }
 
+  claimOwnershipFlags: CallReducerFlags = 'FullUpdate';
+  claimOwnership(flags: CallReducerFlags) {
+    this.claimOwnershipFlags = flags;
+  }
+
   clearIdentityPermissionFlags: CallReducerFlags = 'FullUpdate';
   clearIdentityPermission(flags: CallReducerFlags) {
     this.clearIdentityPermissionFlags = flags;
@@ -2591,6 +2630,10 @@ export class RemoteTables {
 
   get overlayCommand(): OverlayCommandTableHandle {
     return new OverlayCommandTableHandle(this.connection.clientCache.getOrCreateTable<OverlayCommand>(REMOTE_MODULE.tables.OverlayCommand));
+  }
+
+  get ownerRecoveryKey(): OwnerRecoveryKeyTableHandle {
+    return new OwnerRecoveryKeyTableHandle(this.connection.clientCache.getOrCreateTable<AuthenticationKey>(REMOTE_MODULE.tables.OwnerRecoveryKey));
   }
 
   get permissions(): PermissionsTableHandle {
