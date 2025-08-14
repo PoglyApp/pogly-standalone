@@ -147,6 +147,53 @@ public partial class Module
             Log.Exception($"{ctx.Sender} tried to initialize SetConfig - but we couldn't find the default Config!");
         }
     }
+
+    [Reducer]
+    public static void ClaimOwnership(ReducerContext ctx, string _key)
+    {
+        if (ctx.ConnectionId is null)
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} does not have an address!");
+
+        if (!GetGuest("ClaimOwnership", ctx, out var guest))
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} does not have Guest entry!");
+
+        if (string.IsNullOrEmpty(_key))
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} did not provide a Key!");
+        
+        var config = ctx.Db.Config.Version.Find(0) ?? throw new Exception($"Unable to Claim Ownership: Server cannot find Config!");
+        
+        if(config.OwnerIdentity != ctx.Identity) throw new Exception($"Unable to Claim Ownership: {ctx.Sender} tried to claim ownership after it's already been claimed!");
+
+        try
+        {
+            var key = ctx.Db.OwnerRecoveryKey.Version.Find(0);
+
+            if (key.HasValue)
+            {
+                if (_key != key.Value.Key) return;
+                
+                var newConfig = config;
+                newConfig.OwnerIdentity = guest.Identity;
+                ctx.Db.Config.Version.Update(newConfig);
+                
+                ctx.Db.Permissions.Insert(new Permissions
+                {
+                    Identity = newConfig.OwnerIdentity,
+                    Nickname = "",
+                    PermissionLevel = PermissionLevel.Owner
+                });
+            }
+            else
+            {
+                Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - couldn't find ownership recovery key!");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - there was an issue!");
+        }
+        
+    }
     
     [Reducer]
     public static void UpdateConfig(ReducerContext ctx, string platform, string channel, uint updateHz,
