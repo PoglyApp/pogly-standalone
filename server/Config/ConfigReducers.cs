@@ -178,7 +178,7 @@ public partial class Module
                 
                 ctx.Db.Permissions.Insert(new Permissions
                 {
-                    Identity = newConfig.OwnerIdentity,
+                    Identity = guest.Identity,
                     Nickname = "",
                     PermissionLevel = PermissionLevel.Owner
                 });
