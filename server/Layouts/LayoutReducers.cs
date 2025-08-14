@@ -173,7 +173,7 @@ public partial class Module
                 Id = id,
                 Name = name,
                 CreatedBy = createdBy,
-                Active = active
+                Active = false
             };
 
             ctx.Db.Layouts.Insert(newLayout);
