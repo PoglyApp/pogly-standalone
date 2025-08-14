@@ -66,7 +66,7 @@ const useStDB = (
 
     const client = DbConnection.builder()
       .withUri(stdbDomain)
-      .withModuleName(connectionConfig?.module || "")
+      .withModuleName(connectionConfig?.module.replace("_", "-") || "")
       .withToken(isOverlay ? "" : stdbToken)
       .onConnect(onConnect)
       .onConnectError(onConnectError)
