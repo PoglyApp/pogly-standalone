@@ -11,7 +11,7 @@ public partial class Module
             ctx.Db.Heartbeat.Insert(new Heartbeat
             {
                 Id = 0,
-                ServerIdentity = ctx.Sender,
+                ServerIdentity = ctx.Identity,
                 Tick = 0
             });
 
@@ -25,7 +25,7 @@ public partial class Module
             ctx.Db.Config.Insert(new Config
             {
                 Version = 0,
-                OwnerIdentity = ctx.Sender,
+                OwnerIdentity = ctx.Identity,
                 StreamingPlatform = "twitch",
                 StreamName = "bobross",
                 DebugMode = false,
