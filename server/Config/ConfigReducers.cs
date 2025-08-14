@@ -1,4 +1,6 @@
-﻿using SpacetimeDB;
+﻿using System.Text;
+using SpacetimeDB;
+using SpacetimeDB.Internal.TableHandles;
 
 public partial class Module
 {
@@ -33,6 +35,22 @@ public partial class Module
                 StrictMode = false,
                 EditorGuidelines = "Placeholder: Follow Twitch ToS :^)",
                 ConfigInit = false
+            });
+
+            int length = 12;
+            Random rng = new Random();
+            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var sb = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                int index = rng.Next(0, alphabet.Length);
+                sb.Append(alphabet[index]);
+            }
+
+            ctx.Db.OwnerRecoveryKey.Insert(new AuthenticationKey
+            {
+                Version = 0,
+                Key = sb.ToString()
             });
 
             ctx.Db.ZIndex.Insert(new ZIndex

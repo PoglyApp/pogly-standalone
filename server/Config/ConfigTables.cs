@@ -39,6 +39,7 @@ public partial class Module
     }
 
     [Table(Public = false, Name = "AuthenticationKey")]
+    [Table(Public = false, Name = "OwnerRecoveryKey")]
     public partial struct AuthenticationKey
     {
         [PrimaryKey]
