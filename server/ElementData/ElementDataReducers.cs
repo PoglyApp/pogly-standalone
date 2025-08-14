@@ -157,7 +157,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height, string createdBy)
+    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, string createdBy)
     {
         string func = "ImportElementDataArrayWithId";
         
@@ -171,7 +171,7 @@ public partial class Module
                 Name = name,
                 DataType = type,
                 Data = data,
-                ByteArray = null,
+                ByteArray = byteArray,
                 DataWidth = width,
                 DataHeight = height,
                 CreatedBy = createdBy
