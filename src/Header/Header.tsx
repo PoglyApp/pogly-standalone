@@ -39,10 +39,6 @@ export const Header = () => {
     const heartBeat = spacetimeDB.Client.db.heartbeat.id.find(0);
     const config = spacetimeDB.Client.db.config.version.find(0);
 
-    console.log("Heartbeat", heartBeat.serverIdentity.toHexString());
-    console.log("Config", config.ownerIdentity.toHexString());
-    console.log("Are they equal", config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString());
-
     if (config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString()) setShowVerificationButton(true);
   }, [spacetimeDB]);
 
