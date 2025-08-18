@@ -130,7 +130,13 @@ export const UserInputHandler = (
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element)
-          insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
+          insertElement(
+            Client,
+            element.element,
+            activeLayout,
+            element.transparency,
+            OffsetElementForCanvas(element).transform
+          );
       } catch {
         console.log("Pogly encountered an issue when attempting to Duplicate an element!");
       }
@@ -220,6 +226,7 @@ export const UserInputHandler = (
             DebugLogger("Inserting new text");
 
             insertElement(
+              Client,
               json.element as ElementStruct,
               activeLayout,
               json.transparency,
@@ -234,7 +241,7 @@ export const UserInputHandler = (
 
               image.onload = async function () {
                 insertElement(
-                  Client, 
+                  Client,
                   ElementStruct.ImageElement({
                     imageElementData: ImageElementData.RawData(text as string),
                     width: image.width,
