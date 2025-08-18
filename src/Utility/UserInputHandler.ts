@@ -10,6 +10,24 @@ import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { handleFlipElement } from "./ContextMenuMethods";
 import { DbConnection, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 
+let hobbesArmed = false;
+let hobbesTimer: number | null = null;
+const HOBBES_CHAIN_MS = 4000;
+
+const armHobbes = () => {
+  hobbesArmed = true;
+  if (hobbesTimer) clearTimeout(hobbesTimer);
+  hobbesTimer = window.setTimeout(() => (hobbesArmed = false), HOBBES_CHAIN_MS);
+};
+
+const disarmHobbes = () => {
+  hobbesArmed = false;
+  if (hobbesTimer) {
+    clearTimeout(hobbesTimer);
+    hobbesTimer = null;
+  }
+};
+
 export const UserInputHandler = (
   Client: DbConnection,
   activeLayout: Layouts,
@@ -814,6 +832,50 @@ export const UserInputHandler = (
       event.preventDefault();
 
       handleFlipElement(Client, true, selectedElement!.Elements);
+    },
+  });
+
+  userInputs.push({
+    name: "hobbes_part1",
+    keys: ["h", "o", "b"],
+    action: "keydown",
+    callback: (event: KeyboardEvent) => {
+      event.preventDefault();
+      armHobbes();
+    },
+  });
+
+  userInputs.push({
+    name: "hobbes_part2",
+    keys: ["b", "e", "s"],
+    action: "keydown",
+    callback: (event: KeyboardEvent) => {
+      if (!hobbesArmed) return;
+      event.preventDefault();
+      disarmHobbes();
+
+      insertElement(
+        Client,
+        ElementStruct.ImageElement({
+          imageElementData: ImageElementData.RawData(
+            "https://images.steamusercontent.com/ugc/436076195940631339/AF31CA667FA29E51E6D450FB58838C2B4F19C068/" as string
+          ),
+          width: 500,
+          height: 320,
+        }),
+        activeLayout
+      );
+
+      toast.success("In loving memory <3", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     },
   });
 
