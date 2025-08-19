@@ -24,6 +24,9 @@ const StreamContainer = ({ moduleName, platform, streamName }: IProps) => {
   }, []);
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
+    const streamContainer = document.getElementById("stream");
+    streamContainer!.style.pointerEvents = "none";
+
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
     const warningSetting = localStorage.getItem("contentWarning");
     if (warningSetting) return;
@@ -63,7 +66,7 @@ const StreamContainer = ({ moduleName, platform, streamName }: IProps) => {
 
       {platform === "twitch" && !streamOverride && (
         <TwitchPlayer
-          style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
+          style={{ zIndex: 0, height: "100%", width: "100%" }}
           height="100%"
           width="100%"
           id="stream"
