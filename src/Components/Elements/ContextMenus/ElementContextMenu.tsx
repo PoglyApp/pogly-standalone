@@ -372,6 +372,10 @@ export const ElementContextMenu = (props: IProps) => {
           <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
             Added by: {element.placedBy}
           </Paper>
+
+          <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            ID: {element.id}
+          </Paper>
         </div>
       )}
 
