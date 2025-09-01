@@ -176,22 +176,75 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     }
   };
 
-  const handleAuth = (type: AuthStatusType) => {
+  // const handleAuth = (type: AuthStatusType) => {
+  //   setIsRedirecting(true);
+  //   setAuthStatus(type);
+
+  //   const CLIENT_ID = "2zrg60xlectlfv7pycwlt4acoabs1p"; // twitch oauth here!
+  //   const REDIRECT_URI = `${window.location.origin}/callback`;
+  //   const SCOPES = "openid";
+
+  //   const twitchAuthUrl =
+  //     "https://id.twitch.tv/oauth2/authorize" +
+  //     `?client_id=${CLIENT_ID}` +
+  //     `&redirect_uri=${REDIRECT_URI}` +
+  //     `&response_type=token+id_token` +
+  //     `&scope=${encodeURIComponent(SCOPES)}`;
+
+  //   window.location.href = twitchAuthUrl;
+
+  //   window.location.href = twitchAuthUrl;
+  // };
+
+  // tiny helpers (inline)
+  function b64url(ab: ArrayBuffer) {
+    const bytes = new Uint8Array(ab);
+    let str = "";
+    for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+    return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+  function genVerifier(len = 64) {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+    const rnd = crypto.getRandomValues(new Uint8Array(len));
+    let v = "";
+    for (const n of rnd) v += chars[n % chars.length];
+    return v;
+  }
+  async function challengeFrom(verifier: string) {
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return b64url(digest);
+  }
+
+  const handleAuth = async (type: AuthStatusType) => {
     setIsRedirecting(true);
     setAuthStatus(type);
 
-    const CLIENT_ID = "2zrg60xlectlfv7pycwlt4acoabs1p"; // twitch oauth here!
+    const CLIENT_ID = "client_030t5fnI0zvgj3KScXWDp8";
     const REDIRECT_URI = `${window.location.origin}/callback`;
     const SCOPES = "openid";
+    const OIDC_BASE = "https://spacetimeauth.staging.spacetimedb.com/oidc";
 
-    const twitchAuthUrl =
-      "https://id.twitch.tv/oauth2/authorize" +
-      `?client_id=${CLIENT_ID}` +
-      `&redirect_uri=${REDIRECT_URI}` +
-      `&response_type=token+id_token` +
-      `&scope=${encodeURIComponent(SCOPES)}`;
+    const verifier = genVerifier();
+    const challenge = await challengeFrom(verifier);
+    const state = crypto.randomUUID();
 
-    window.location.href = twitchAuthUrl;
+    sessionStorage.setItem("pkce_verifier", verifier);
+    sessionStorage.setItem("oidc_state", state);
+    sessionStorage.setItem("auth_type", String(type));
+
+    const authorizeUrl =
+      `${OIDC_BASE}/auth` +
+      `?client_id=${encodeURIComponent(CLIENT_ID)}` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent(SCOPES)}` +
+      `&code_challenge=${encodeURIComponent(challenge)}` +
+      `&code_challenge_method=S256` +
+      `&state=${encodeURIComponent(state)}`;
+
+    console.log(authorizeUrl);
+    window.location.href = authorizeUrl;
   };
 
   const handleUpdateNickname = (value: any) => {
@@ -210,27 +263,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       {authStatus === AuthStatusType.NotAuthenticated && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
           <StyledButton
-            className="flex justify-self-center mb-3 w-[220px]"
-            onClick={() => {
-              setAuthStatus(AuthStatusType.LegacyAuth);
-              setLegacyLogin(true);
-              setSubtitle("legacy");
-              localStorage.removeItem("twitchAccessToken");
-              localStorage.removeItem("twitchIdToken");
-            }}
-          >
-            <UserRound className="mr-2" />
-            <span>login as guest</span>
-          </StyledButton>
-          <StyledButton
-            className="flex justify-self-center bg-[#6441a5]! hover:bg-[#6441a5b2]!"
+            className="flex justify-self-center bg-[#060606] border border-transparent text-white hover:border-[#82a5ff]"
             onClick={() => {
               handleAuth(AuthStatusType.TwitchAuth);
               setSubtitle("twitch");
             }}
           >
-            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
-            <span>login with Twitch</span>
+            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
+            <span>login with SpacetimeAuth</span>
           </StyledButton>
         </div>
       )}

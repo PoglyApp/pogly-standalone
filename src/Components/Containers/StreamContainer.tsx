@@ -110,6 +110,7 @@ const StreamContainer = ({ moduleName, platform, streamName }: IProps) => {
           src={streamOverride}
           allowFullScreen
           title="OverrideStream"
+          sandbox="allow-scripts allow-same-origin"
         />
       )}
     </>
