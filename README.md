@@ -68,6 +68,7 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/tubbo" rel="noreferrer" target="_blank" title="Tubbo"><img src="./images/streamers/tubbo.svg" /></a>
 <a href="https://www.twitch.tv/orophia" rel="noreferrer" target="_blank" title="orophia"><img src="./images/streamers/orophia.svg" /></a>
 <a href="https://www.twitch.tv/maya" rel="noreferrer" target="_blank" title="Maya"><img src="./images/streamers/maya.svg" /></a>
+<a href="https://www.twitch.tv/zoil" rel="noreferrer" target="_blank" title="Zoil"><img src="./images/streamers/zoil.svg" /></a>
 <a href="https://www.twitch.tv/alveussanctuary" rel="noreferrer" target="_blank" title="AlveusSanctuary"><img src="./images/streamers/alveussanctuary.svg" /></a>
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
