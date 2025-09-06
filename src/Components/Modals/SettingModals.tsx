@@ -28,6 +28,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import Fingerprint from "@mui/icons-material/Fingerprint";
 import ContentPaste from "@mui/icons-material/ContentPaste";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { BackupModal } from "./BackupModal";
 import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
@@ -46,6 +47,7 @@ import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer
 import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
 import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
 import { ModeratorListModal } from "./ModeratorListModal";
+import { LocalOverridesModal } from "./LocalOverridesModal";
 
 interface IProp {
   onlineVersion: string;
@@ -153,8 +155,6 @@ export const SettingsModal = (props: IProp) => {
 
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
-
-    closeModal("settings_modal", modals, setModals);
   };
 
   useEffect(() => {
@@ -202,6 +202,10 @@ export const SettingsModal = (props: IProp) => {
     setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
+  const showLocalOverridesModal = () => {
+    setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
+  };
+
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
 
@@ -222,6 +226,11 @@ export const SettingsModal = (props: IProp) => {
 
   const openInNewTab = (url: string) => {
     window.open(url, "_blank", "noreferrer");
+  };
+
+  const handleCloseModal = () => {
+    saveSettings();
+    closeModal("settings_modal", modals, setModals);
   };
 
   const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
@@ -479,17 +488,20 @@ export const SettingsModal = (props: IProp) => {
               >
                 Clear Connection Settings
               </Button>
-            </div>
 
-            <div style={{ marginTop: "15px" }}>
-              <StyledInput
-                focused={false}
-                label="Local stream container override"
-                color="#ffffffa6"
-                onChange={setStreamOverride}
-                defaultValue={streamOverride}
-                style={{ width: "100%" }}
-              />
+              <Button
+                variant="outlined"
+                startIcon={<PublishedWithChangesIcon />}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  marginTop: "10px",
+                }}
+                onClick={showLocalOverridesModal}
+              >
+                Local override settings
+              </Button>
             </div>
           </SettingsTabPanel>
           <SettingsTabPanel value={tabValue} index={2}>
@@ -771,7 +783,7 @@ export const SettingsModal = (props: IProp) => {
             borderColor: "#ffffffa6",
             "&:hover": { borderColor: "white" },
           }}
-          onClick={saveSettings}
+          onClick={handleCloseModal}
         >
           Save
         </Button>

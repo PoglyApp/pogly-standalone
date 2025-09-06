@@ -97,8 +97,9 @@ export class SevenTVWrapper {
     if (!userObj) return null;
 
     //try getting emotes from specified platform
-    if (userObj.connections.some(x => x.platform.toLocaleLowerCase() === platform)) 
-      return userObj.connections.filter((x) => x.platform.toLowerCase().includes(platform))[0].emote_set_id;
+    if (userObj.connections.some((x) => x.platform.toLocaleLowerCase() === platform.toLowerCase()))
+      return userObj.connections.filter((x) => x.platform.toLowerCase().includes(platform.toLowerCase()))[0]
+        .emote_set_id;
 
     //otherwise use default
     return userObj.connections[0].emote_set_id;
