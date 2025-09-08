@@ -4,7 +4,7 @@ import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import styled from "styled-components";
-import { Alert, IconButton } from "@mui/material";
+import { Alert, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 const StreamContainer = () => {
@@ -141,6 +141,23 @@ const StreamContainer = () => {
                   <br />
                   We apologize for the inconvenience and appreciate your understanding.
                 </ExplanationText>
+
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#ffffffa6",
+                    borderColor: "#ffffffa6",
+                    "&:hover": { borderColor: "white" },
+                    marginTop: "10px",
+                    marginRight: "10px",
+                    width: "fit-content",
+                    justifySelf: "center",
+                    display: "block",
+                  }}
+                  onClick={showExplanation}
+                >
+                  Close
+                </Button>
               </ExplanationContent>
             </ExplanationContainer>
           </div>
