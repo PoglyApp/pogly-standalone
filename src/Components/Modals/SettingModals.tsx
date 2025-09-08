@@ -128,51 +128,12 @@ export const SettingsModal = (props: IProp) => {
     newSettings.compressPaste = compressPaste;
     newSettings.urlAsDefault = urlAsDefault;
 
-    const streamOverrides = localStorage.getItem("streamOverride");
-
-    if (streamOverrides && Runtime) {
-      let oldList = JSON.parse(streamOverrides);
-      let oldOverride = oldList.find((obj: any) => obj.module === Runtime.module);
-
-      if (!oldOverride && !streamOverride) return;
-
-      if (oldOverride) {
-        if (!streamOverride) {
-          oldList = oldList.filter((obj: any) => obj.module !== Runtime.module);
-        } else {
-          oldOverride.override = streamOverride;
-        }
-      } else {
-        oldList.push({ module: Runtime.module, override: streamOverride });
-      }
-
-      localStorage.setItem("streamOverride", JSON.stringify(oldList));
-    } else {
-      if (streamOverride && Runtime) {
-        localStorage.setItem("streamOverride", JSON.stringify([{ module: Runtime.module, override: streamOverride }]));
-      }
-    }
-
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
   };
 
   useEffect(() => {
     setSettings(settings);
-
-    const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
-
-    setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
-
-    const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !Runtime) return;
-
-    const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
-
-    if (!currentOverride) return;
-
-    setStreamOverride(currentOverride.override);
   }, [settings, setSettings, Runtime]);
 
   function clearConnectionSettings() {
