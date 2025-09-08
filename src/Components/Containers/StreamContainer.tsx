@@ -3,6 +3,9 @@ import Config from "../../module_bindings/config";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import { ConfigContext } from "../../Contexts/ConfigContext";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import styled from "styled-components";
+import { Alert, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const StreamContainer = () => {
   const config: Config = useContext(ConfigContext);
@@ -44,6 +47,35 @@ const StreamContainer = () => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
   };
 
+  const streamOnLive = () => {
+    const ua = navigator.userAgent.toLowerCase();
+    const chrome = ua.includes("chrome") || ua.includes("crios");
+
+    if (!chrome) return;
+
+    document.getElementById("chromealert")?.style.removeProperty("display");
+    document.getElementById("stream")?.style.removeProperty("pointer-events");
+  };
+
+  const streamOnPlaying = () => {
+    closeAlert();
+  };
+
+  const closeAlert = () => {
+    document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+    document.getElementById("chromealert")?.remove();
+  };
+
+  const showExplanation = () => {
+    const explanation = document.getElementById("explanation");
+
+    if (explanation!.style.display !== "unset") {
+      explanation!.style.display = "unset";
+    } else {
+      explanation!.style.display = "none";
+    }
+  };
+
   const checkEmbeddingAllowed = async (url: string): Promise<boolean> => {
     try {
       const response = await fetch(url, { method: "HEAD" });
@@ -68,16 +100,51 @@ const StreamContainer = () => {
   return (
     <>
       {config.streamingPlatform === "twitch" && !streamOverride && (
-        <TwitchPlayer
-          style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
-          height="100%"
-          width="100%"
-          id="stream"
-          channel={config.streamName}
-          autoplay
-          muted
-          onReady={streamOnReady}
-        />
+        <>
+          <StyledAlert severity="warning" id="chromealert" style={{ display: "none" }}>
+            Unable to autoplay stream. Please click play on the stream preview manually.
+            <AlertButton onClick={showExplanation}>(Why am I seeing this?)</AlertButton>
+            <IconButton sx={{ padding: "0px", marginLeft: "auto" }} onClick={closeAlert}>
+              <CloseIcon sx={{ color: "#ffffffd9", fontSize: "36px", marginTop: "10px" }} />
+            </IconButton>
+          </StyledAlert>
+
+          <div style={{ width: "100%", height: "100%", display: "flex" }}>
+            <TwitchPlayer
+              style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
+              height="100%"
+              width="100%"
+              id="stream"
+              channel={config.streamName}
+              autoplay
+              muted
+              onReady={streamOnReady}
+              onOnline={streamOnLive}
+              onPlaying={streamOnPlaying}
+            />
+
+            <ExplanationContainer id="explanation">
+              <ExplanationContent>
+                <ExplanationTitle>Stream preview changes for Chrome users</ExplanationTitle>
+                <ExplanationText>
+                  You may have noticed that the stream preview no longer autoplays. This change comes from Twitch, which
+                  recently introduced stricter visibility rules for embedding streams in order to combat viewbotting.
+                  <br />
+                  <br />
+                  Because of the way Pogly uses the embed, it's unfortunately not possible for us to fully comply with
+                  these new requirements and Twitch does not currently offer a whitelist or workaround.
+                  <br />
+                  <br />
+                  For now, if you'd like to watch the stream from the editor, you'll need to press play manually. We'll
+                  continue exploring options to meet the visibility rules and restore autoplay if possible.
+                  <br />
+                  <br />
+                  We apologize for the inconvenience and appreciate your understanding.
+                </ExplanationText>
+              </ExplanationContent>
+            </ExplanationContainer>
+          </div>
+        </>
       )}
 
       {config.streamingPlatform === "youtube" && !streamOverride && (
@@ -128,3 +195,92 @@ const StreamContainer = () => {
 };
 
 export default memo(StreamContainer, (prevProps, nextProps) => true);
+
+const StyledAlert = styled(Alert)`
+  position: absolute;
+
+  font-size: 24px;
+  background-color: #c27707 !important;
+  color: #ffffffd9 !important;
+
+  border-style: solid;
+  border-color: #a76707;
+  border-radius: 0px !important;
+
+  padding: 0 8px 12px 8px;
+  height: 40px;
+
+  top: -52px;
+  overflow-y: hidden;
+
+  & > .MuiAlert-icon {
+    color: #ffb13d;
+    font-size: 36px;
+  }
+
+  & > .MuiAlert-message {
+    display: flex;
+    width: 100% !important;
+
+    overflow-y: hidden;
+  }
+
+  left: 0;
+  right: 0;
+`;
+
+const AlertButton = styled.a`
+  text-decoration: inherit;
+
+  font-size: 16px;
+  color: #fdd79c;
+
+  margin-left: 10px;
+  margin-top: 5px;
+
+  &:hover {
+    color: #ffb13d;
+    cursor: pointer;
+  }
+`;
+
+const ExplanationContainer = styled.div`
+  display: none;
+
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+  align-content: center;
+  justify-content: center;
+
+  backdrop-filter: blur(10px);
+`;
+
+const ExplanationContent = styled.div`
+  background-color: #001529;
+  border-radius: 10px;
+
+  width: 800px;
+  height: fit-content;
+
+  padding: 30px;
+
+  justify-self: center;
+  align-self: center;
+
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.12), 0 4px 4px rgba(0, 0, 0, 0.12),
+    0 8px 8px rgba(0, 0, 0, 0.12), 0 16px 16px rgba(0, 0, 0, 0.12);
+`;
+
+const ExplanationTitle = styled.div`
+  color: white;
+
+  text-align: center;
+  font-size: 40px;
+`;
+
+const ExplanationText = styled.p`
+  color: #ffffffa6;
+  font-size: 30px;
+`;
