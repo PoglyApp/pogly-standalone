@@ -16,29 +16,6 @@ interface IProp {
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
   const auth = useAuth();
-  const autoLoginRan = useRef(false);
-
-  useEffect(() => {
-    if (window.location.pathname === "/callback") return;
-    if (sessionStorage.getItem("skipAutoLogin") === "1") return;
-
-    if (auth.isLoading) return;
-
-    if (!auth.isAuthenticated && !auth.activeNavigator && !autoLoginRan.current) {
-      autoLoginRan.current = true;
-      auth.signinRedirect().catch(err => {
-        console.error("[OIDC] signinRedirect failed:", err);
-        autoLoginRan.current = false;
-      });
-    }
-  }, [auth.isLoading, auth.isAuthenticated, auth.activeNavigator]);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("skipAutoLogin") === "1") {
-      sessionStorage.removeItem("skipAutoLogin");
-    }
-  }, []);
-
   const urlParams = new URLSearchParams(window.location.search);
 
   const [moduleName, setModuleName] = useState<string>("");
