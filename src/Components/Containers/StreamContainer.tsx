@@ -14,6 +14,9 @@ const StreamContainer = () => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
 
+  const ua = navigator.userAgent.toLowerCase();
+  const chrome = ua.includes("chrome") || ua.includes("crios");
+
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
     if (!streamOverrides || !Runtime) return;
@@ -48,9 +51,6 @@ const StreamContainer = () => {
   };
 
   const streamOnLive = () => {
-    const ua = navigator.userAgent.toLowerCase();
-    const chrome = ua.includes("chrome") || ua.includes("crios");
-
     if (!chrome) return;
 
     document.getElementById("chromealert")?.style.removeProperty("display");
@@ -101,13 +101,15 @@ const StreamContainer = () => {
     <>
       {config.streamingPlatform === "twitch" && !streamOverride && (
         <>
-          <StyledAlert severity="warning" id="chromealert" style={{ display: "none" }}>
-            Unable to autoplay stream. Please click play on the stream preview manually.
-            <AlertButton onClick={showExplanation}>(Why am I seeing this?)</AlertButton>
-            <IconButton sx={{ padding: "0px", marginLeft: "auto" }} onClick={closeAlert}>
-              <CloseIcon sx={{ color: "#ffffffd9", fontSize: "36px", marginTop: "10px" }} />
-            </IconButton>
-          </StyledAlert>
+          {chrome && (
+            <StyledAlert severity="warning" id="chromealert" style={{ display: "none" }}>
+              Unable to autoplay stream. Please click play on the stream preview manually.
+              <AlertButton onClick={showExplanation}>(Why am I seeing this?)</AlertButton>
+              <IconButton sx={{ padding: "0px", marginLeft: "auto" }} onClick={closeAlert}>
+                <CloseIcon sx={{ color: "#ffffffd9", fontSize: "36px", marginTop: "10px" }} />
+              </IconButton>
+            </StyledAlert>
+          )}
 
           <div style={{ width: "100%", height: "100%", display: "flex" }}>
             <TwitchPlayer
@@ -123,43 +125,46 @@ const StreamContainer = () => {
               onPlaying={streamOnPlaying}
             />
 
-            <ExplanationContainer id="explanation">
-              <ExplanationContent>
-                <ExplanationTitle>Stream preview changes for Chrome users</ExplanationTitle>
-                <ExplanationText>
-                  You may have noticed that the stream preview no longer autoplays. This change comes from Twitch, which
-                  recently introduced stricter visibility rules for embedding streams in order to combat viewbotting.
-                  <br />
-                  <br />
-                  Because of the way Pogly uses the embed, it's unfortunately not possible for us to fully comply with
-                  these new requirements and Twitch does not currently offer a whitelist or workaround.
-                  <br />
-                  <br />
-                  For now, if you'd like to watch the stream from the editor, you'll need to press play manually. We'll
-                  continue exploring options to meet the visibility rules and restore autoplay if possible.
-                  <br />
-                  <br />
-                  We apologize for the inconvenience and appreciate your understanding.
-                </ExplanationText>
+            {chrome && (
+              <ExplanationContainer id="explanation">
+                <ExplanationContent>
+                  <ExplanationTitle>Stream preview changes for Chrome users</ExplanationTitle>
+                  <ExplanationText>
+                    You may have noticed that the stream preview no longer autoplays. This change comes from Twitch,
+                    which recently introduced stricter visibility rules for embedding streams in order to combat
+                    viewbotting.
+                    <br />
+                    <br />
+                    Because of the way Pogly uses the embed, it's unfortunately not possible for us to fully comply with
+                    these new requirements and Twitch does not currently offer a whitelist or workaround.
+                    <br />
+                    <br />
+                    For now, if you'd like to watch the stream from the editor, you'll need to press play manually.
+                    We'll continue exploring options to meet the visibility rules and restore autoplay if possible.
+                    <br />
+                    <br />
+                    We apologize for the inconvenience and appreciate your understanding.
+                  </ExplanationText>
 
-                <Button
-                  variant="outlined"
-                  sx={{
-                    color: "#ffffffa6",
-                    borderColor: "#ffffffa6",
-                    "&:hover": { borderColor: "white" },
-                    marginTop: "10px",
-                    marginRight: "10px",
-                    width: "fit-content",
-                    justifySelf: "center",
-                    display: "block",
-                  }}
-                  onClick={showExplanation}
-                >
-                  Close
-                </Button>
-              </ExplanationContent>
-            </ExplanationContainer>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: "#ffffffa6",
+                      borderColor: "#ffffffa6",
+                      "&:hover": { borderColor: "white" },
+                      marginTop: "10px",
+                      marginRight: "10px",
+                      width: "fit-content",
+                      justifySelf: "center",
+                      display: "block",
+                    }}
+                    onClick={showExplanation}
+                  >
+                    Close
+                  </Button>
+                </ExplanationContent>
+              </ExplanationContainer>
+            )}
           </div>
         </>
       )}
