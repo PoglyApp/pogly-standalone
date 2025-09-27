@@ -8,13 +8,13 @@ public partial class Module
     {
         string func = "UpdateGuest";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try
         {
-            var oldGuest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var oldGuest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
 
             if (oldGuest.HasValue)
             {
@@ -30,12 +30,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered an error updating [{nickname},{selectedElementId}], requested by {ctx.CallerIdentity}. Couldn't find existing Guest!");
+                Log.Error($"[{func}] Encountered an error updating [{nickname},{selectedElementId}], requested by {ctx.Sender}. Couldn't find existing Guest!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered an error updating [{nickname},{selectedElementId}], requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered an error updating [{nickname},{selectedElementId}], requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -44,12 +44,12 @@ public partial class Module
     {
         string func = "UpdateGuestNickname";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         
         try
         {
-            var oldGuest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var oldGuest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
 
             if (oldGuest.HasValue)
             {
@@ -62,12 +62,22 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered an error updating [{nickname}], requested by {ctx.CallerIdentity}. Couldn't find existing Guest!");
+                Log.Error($"[{func}] Encountered an error updating [{nickname}], requested by {ctx.Sender}. Couldn't find existing Guest!");
+            }
+            
+            var permissions = ctx.Db.Permissions.Identity.Find(ctx.Identity);
+
+            if (permissions.HasValue && permissions.Value.PermissionLevel == PermissionLevel.Moderator)
+            {
+                var updatedPermissions = permissions.Value;
+                updatedPermissions.Nickname = nickname;
+
+                ctx.Db.Permissions.Identity.Update(updatedPermissions);
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered an error updating [{nickname}], requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered an error updating [{nickname}], requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -76,7 +86,7 @@ public partial class Module
     {
         string func = "UpdateGuestSelectedElement";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -84,7 +94,7 @@ public partial class Module
         
         try
         {
-            var oldGuest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var oldGuest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
 
             if (oldGuest.HasValue)
             {
@@ -97,12 +107,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered error updating [{selectedElementId}], requested by {ctx.CallerIdentity}. Couldn't find existing Guest!");
+                Log.Error($"[{func}] Encountered error updating [{selectedElementId}], requested by {ctx.Sender}. Couldn't find existing Guest!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating [{selectedElementId}], requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating [{selectedElementId}], requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -111,13 +121,13 @@ public partial class Module
     {
         string func = "UpdateGuestSelectedLayout";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
         try
         {
-            var oldGuest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var oldGuest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
 
             if (oldGuest.HasValue)
             {
@@ -130,12 +140,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.CallerIdentity}. Couldn't find existing Guest!");
+                Log.Error($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.Sender}. Couldn't find existing Guest!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating [{selectedLayoutId}], requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -144,13 +154,13 @@ public partial class Module
     {
         string func = "UpdateGuestPosition";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
 
         try
         {
-            var oldGuest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var oldGuest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
 
             if (oldGuest.HasValue)
             {
@@ -164,21 +174,21 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered error updating position, requested by {ctx.CallerIdentity}. Couldn't find existing Guest!");
+                Log.Error($"[{func}] Encountered error updating position, requested by {ctx.Sender}. Couldn't find existing Guest!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating position, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating position, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
     [Reducer]
-    public static void KickGuest(ReducerContext ctx, Address address)
+    public static void KickGuest(ReducerContext ctx, ConnectionId address)
     {
         string func = "KickGuest";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -190,7 +200,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error kicking Guest, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error kicking Guest, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -199,19 +209,19 @@ public partial class Module
     {
         string func = "KickSelf";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
 
         try
         {
-            foreach (var s in ctx.Db.Guests.Iter().Where(i => i.Identity == ctx.CallerIdentity))
+            foreach (var s in ctx.Db.Guests.Iter().Where(i => i.Identity == ctx.Sender))
             {
                 ctx.Db.Guests.Address.Delete(s.Address);
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error kicking Self, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error kicking Self, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -220,7 +230,7 @@ public partial class Module
     {
         string func = "SetIdentityPermission";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -228,11 +238,14 @@ public partial class Module
         try
         {
             var perm = ctx.Db.Permissions.Identity.Find(identity);
+            var targetGuest = ctx.Db.Guests.Identity.Filter(identity).First();
+            
             if (perm is null)
             {
                 ctx.Db.Permissions.Insert(new Permissions
                 {
                     Identity = identity,
+                    Nickname = targetGuest.Nickname,
                     PermissionLevel = permissionLevel
                 });
             } 
@@ -240,12 +253,13 @@ public partial class Module
             {
                 var newPerm = perm.Value;
                 newPerm.PermissionLevel = permissionLevel;
+                newPerm.Nickname = targetGuest.Nickname;
                 ctx.Db.Permissions.Identity.Update(newPerm);
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating permission, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating permission, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -294,7 +308,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error importing permission, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error importing permission, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -329,7 +343,7 @@ public partial class Module
     {
         string func = "ClearIdentityPermission";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -344,7 +358,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error deleting permission, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error deleting permission, requested by {ctx.Sender}. " + e.Message);
         }
     }
 }

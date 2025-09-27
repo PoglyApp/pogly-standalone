@@ -7,7 +7,7 @@ public partial class Module
     {
         string func = "AddFolder";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -38,7 +38,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new Folder, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new Folder, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -47,7 +47,7 @@ public partial class Module
     {
         string func = "UpdateFolderName";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -71,13 +71,13 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.CallerIdentity}! Couldn't find existing Folder!");
+                Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.Sender}! Couldn't find existing Folder!");
             }
             
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating folderId {folderId} name, with name {name}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -86,7 +86,7 @@ public partial class Module
     {
         string func = "UpdateFolderIcon";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -110,12 +110,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.CallerIdentity}! Couldn't find existing Folder!");
+                Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.Sender}! Couldn't find existing Folder!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating folderId {folderId} icon, with icon {icon}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -124,7 +124,7 @@ public partial class Module
     {
         string func = "DeleteFolder";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -156,7 +156,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting folderId {folderId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting folderId {folderId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -165,7 +165,7 @@ public partial class Module
     {
         string func = "DeleteAllFolders";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -200,7 +200,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting all folders, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting all folders, requested by {ctx.Sender}! " + e.Message);
         }
     }
 }

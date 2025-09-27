@@ -2,14 +2,10 @@ import { UserContext } from "@/contexts/UserContext";
 import { useContext } from "react";
 import { TwitchPlayerNonInteractive } from "react-twitch-embed";
 
-
 export const StreamContainer = () => {
-  const userCtx = useContext(UserContext)!;
+  return <></>;
 
-  const streamingPlatform = userCtx.Client.db.config.version.find(0)?.streamingPlatform;
-  const streamName = userCtx.Client.db.config.version.find(0)?.streamName;
-
-  return (
+  /*return (
     <>
       {streamingPlatform === "twitch" && (
         <TwitchPlayerNonInteractive
@@ -45,5 +41,5 @@ export const StreamContainer = () => {
         />
       )}
     </>
-  );
+  );*/
 };

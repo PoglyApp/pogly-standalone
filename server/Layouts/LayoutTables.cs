@@ -3,7 +3,6 @@
 public partial class Module
 {
     [Table(Public = true, Name = "Layouts")]
-    [Index(Name = "ActiveLayout", BTree = ["Active"])]
     public partial struct Layouts
     {
         [PrimaryKey]
@@ -13,6 +12,7 @@ public partial class Module
         public string Name;
         public string CreatedBy;
 
+        [SpacetimeDB.Index.BTree(Name = "ActiveLayout")]
         public bool Active;
     }
 }

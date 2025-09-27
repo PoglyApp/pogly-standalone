@@ -5,9 +5,9 @@ public partial class Module
     
     private static bool GetGuest(string reducerContext, ReducerContext ctx, out Guests guest)
     {
-        if (ctx.CallerAddress.HasValue)
+        if (ctx.ConnectionId.HasValue)
         {
-            var g = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            var g = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
             
             if (g is null)
             {
@@ -41,7 +41,7 @@ public partial class Module
 
     private static bool GetPermission(string reducerContext, ReducerContext ctx, out Permissions permissions)
     {
-        var p = ctx.Db.Permissions.Identity.Find(ctx.CallerIdentity);
+        var p = ctx.Db.Permissions.Identity.Find(ctx.Sender);
         
         if (p is null)
         {

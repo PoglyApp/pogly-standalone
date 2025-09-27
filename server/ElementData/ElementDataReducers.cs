@@ -7,7 +7,7 @@ public partial class Module
     {
         const string func = "AddElementData";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -39,7 +39,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -48,7 +48,7 @@ public partial class Module
     {
         string func = "AddElementDataWithId";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -74,7 +74,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -83,7 +83,7 @@ public partial class Module
     {
         string func = "AddElementDataArray";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -116,7 +116,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -125,7 +125,7 @@ public partial class Module
     {
         string func = "AddElementDataArrayWithId";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -152,12 +152,12 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
     [Reducer]
-    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height, string createdBy)
+    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, string createdBy)
     {
         string func = "ImportElementDataArrayWithId";
         
@@ -171,7 +171,7 @@ public partial class Module
                 Name = name,
                 DataType = type,
                 Data = data,
-                ByteArray = null,
+                ByteArray = byteArray,
                 DataWidth = width,
                 DataHeight = height,
                 CreatedBy = createdBy
@@ -180,7 +180,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error adding element data with name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -189,7 +189,7 @@ public partial class Module
     {
         string func = "UpdateElementData";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -215,12 +215,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element data with id {dataId}, requested by {ctx.CallerIdentity}. Couldn't find existing ElementData!");
+                Log.Error($"[{func}] Error updating element data with id {dataId}, requested by {ctx.Sender}. Couldn't find existing ElementData!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element data with id {dataId}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error updating element data with id {dataId}, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -229,7 +229,7 @@ public partial class Module
     {
         string func = "UpdateElementDataSize";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
 
@@ -249,12 +249,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element data size with id {dataId}, requested by {ctx.CallerIdentity}. Couldn't find existing ElementData!");
+                Log.Error($"[{func}] Error updating element data size with id {dataId}, requested by {ctx.Sender}. Couldn't find existing ElementData!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element data size with id {dataId}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error updating element data size with id {dataId}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -263,7 +263,7 @@ public partial class Module
     {
         string func = "UpdateElementDataName";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -282,12 +282,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.CallerIdentity}. Couldn't find existing ElementData!");
+                Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. Couldn't find existing ElementData!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. " + e.Message);
         }
     }
     
@@ -296,7 +296,7 @@ public partial class Module
     {
         string func = "UpdateElementDataData";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -319,12 +319,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.CallerIdentity}. Couldn't find existing ElementData!");
+                Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. Couldn't find existing ElementData!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -333,7 +333,7 @@ public partial class Module
     {
         string func = "DeleteElementDataById";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -369,12 +369,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error deleting element data by id {id}, requested by {ctx.CallerIdentity}. Couldn't find existing ElementData!");
+                Log.Error($"[{func}] Error deleting element data by id {id}, requested by {ctx.Sender}. Couldn't find existing ElementData!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting element data by id {id}, requested by {ctx.CallerIdentity} " + e.Message);
+            Log.Error($"[{func}] Error deleting element data by id {id}, requested by {ctx.Sender} " + e.Message);
         }
     }
     
@@ -383,7 +383,7 @@ public partial class Module
     {
         string func = "DeleteElementDataByName";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -417,7 +417,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting element data by name {name}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error deleting element data by name {name}, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -426,7 +426,7 @@ public partial class Module
     {
         string func = "DeleteAllElementData";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -461,7 +461,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting all element data, requested by {ctx.CallerIdentity} " + e.Message);
+            Log.Error($"[{func}] Error deleting all element data, requested by {ctx.Sender} " + e.Message);
         }
     }
 }

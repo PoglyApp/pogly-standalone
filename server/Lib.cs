@@ -13,7 +13,7 @@ static partial class Module
         string func = "UpdateThing";
     
         //Basic sanity checks
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
     
@@ -58,7 +58,7 @@ static partial class Module
     [Reducer(ReducerKind.ClientConnected)]
     public static void GuestConnected(ReducerContext ctx)
     {
-        Log.Info($"[GuestConnected] New guest connected {ctx.CallerIdentity} at {ctx.CallerAddress!.Value}!");
+        Log.Info($"[GuestConnected] New guest connected {ctx.Sender} at {ctx.ConnectionId}!");
     }
 
     [Reducer]
@@ -66,15 +66,15 @@ static partial class Module
     {
         try
         {
-            if (ctx.CallerAddress is null) throw new Exception("Guest with Null Address tried to Connect!");
+            if (ctx.ConnectionId is null) throw new Exception("Guest with Null Address tried to Connect!");
             
             var random = new Random();
             var color = $"#{random.Next(0x1000000):X6}";
 
             var guest = ctx.Db.Guests.Insert(new Guests
             {
-                Address = ctx.CallerAddress.Value,
-                Identity = ctx.CallerIdentity,
+                Address = ctx.ConnectionId.Value,
+                Identity = ctx.Sender,
                 Nickname = "",
                 Color = color,
                 SelectedElementId = 0,
@@ -84,12 +84,12 @@ static partial class Module
                 Authenticated = !ctx.Db.Config.Version.Find(0)!.Value.Authentication
             });
             
-            Log.Info($"[Connect] New guest {ctx.CallerIdentity} inserted into Guest table!");
+            Log.Info($"[Connect] New guest {ctx.Sender} inserted into Guest table!");
             LogAudit(ctx,"GuestConnected",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log.Info($"[GuestConnected] Error during connection with client {ctx.CallerIdentity}! " + e.Message);
+            Log.Info($"[GuestConnected] Error during connection with client {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -98,19 +98,19 @@ static partial class Module
     {
         try
         {
-            if (ctx.CallerAddress is null) throw new Exception($"Address missing for disconnecting Guest");
-            var guest = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+            if (ctx.ConnectionId is null) throw new Exception($"Address missing for disconnecting Guest");
+            var guest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
             if (guest is null)
                 throw new Exception("Identity did not have Guest entry");
 
             ctx.Db.Guests.Address.Delete(guest.Value.Address);
             
-            Log.Info($"[GuestDisconnected] Guest {ctx.CallerIdentity} at {ctx.CallerAddress.Value} has disconnected.");
+            Log.Info($"[GuestDisconnected] Guest {ctx.Sender} at {ctx.ConnectionId.Value} has disconnected.");
             LogAudit(ctx,"GuestDisconnected",GetChangeStructFromGuest(guest.Value),GetEmptyStruct(), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
         catch (Exception e)
         {
-            Log.Error($"[GuestDisconnected] Error during disconnection with client {ctx.CallerIdentity}- they may not have been deleted from guests properly! " + e.Message);
+            Log.Error($"[GuestDisconnected] Error during disconnection with client {ctx.Sender}- they may not have been deleted from guests properly! " + e.Message);
         }
     }
     
@@ -124,10 +124,9 @@ static partial class Module
             if (heartbeat is not null)
             {
                 var newHeartbeat = heartbeat.Value;
-                newHeartbeat.Tick = ctx.Timestamp.Second;
+                newHeartbeat.Tick = ctx.Timestamp.ToStd().Second;
 
                 ctx.Db.Heartbeat.Id.Update(newHeartbeat);
-                Log.Info("Heartbeat Updated!");
             }
             else
             {
@@ -138,5 +137,65 @@ static partial class Module
         {
             Log.Error("Encountered error with heartbeat: " + e.Message);
         }
+    }
+    
+    //dirty workaround until OverlayCommand is implemented
+    [Reducer]
+    public static void RefreshOverlay(ReducerContext ctx)
+    {
+        try
+        {
+            ctx.Db.Heartbeat.Insert(new Heartbeat
+            {
+                Id = (uint) ctx.Timestamp.ToStd().ToUnixTimeSeconds(),
+                ServerIdentity = ctx.Sender,
+                Tick = 1337
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error forcing an overlay Refresh: " + e.Message);
+        }
+    }
+    
+    [Reducer]
+    public static void RefreshOverlayClearStorage(ReducerContext ctx)
+    {
+        try
+        {
+            ctx.Db.Heartbeat.Insert(new Heartbeat
+            {
+                Id = (uint) ctx.Timestamp.ToStd().ToUnixTimeSeconds(),
+                ServerIdentity = ctx.Sender,
+                Tick = 69420
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error forcing an overlay Refresh: " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void ClearRefreshOverlayRequests(ReducerContext ctx)
+    {
+        try
+        {
+            foreach (var request in ctx.Db.Heartbeat.Iter())
+            {
+                if (request.Tick == 1337) ctx.Db.Heartbeat.Delete(request);
+                if (request.Tick == 69420) ctx.Db.Heartbeat.Delete(request);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error("Encountered an error clearing overlay requests: " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void PingHeartbeat(ReducerContext ctx)
+    {
+        //do nothing
     }
 }

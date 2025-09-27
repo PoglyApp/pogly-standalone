@@ -14,7 +14,11 @@ public partial class Module
     }
 
     [Table(Public = false, Scheduled = "KeepAlive", Name = "KeepAliveWorker")]
-    public partial struct KeepAliveWorker { }
+    public partial struct KeepAliveWorker
+    {
+        [PrimaryKey] [AutoInc] public ulong Id;
+        public ScheduleAt ScheduledAt;
+    }
     
     [Table(Public = true, Name = "Config")]
     public partial struct Config
@@ -35,6 +39,7 @@ public partial class Module
     }
 
     [Table(Public = false, Name = "AuthenticationKey")]
+    [Table(Public = false, Name = "OwnerRecoveryKey")]
     public partial struct AuthenticationKey
     {
         [PrimaryKey]

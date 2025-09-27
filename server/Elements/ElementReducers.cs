@@ -11,7 +11,7 @@ public partial class Module
         
         try
         {
-            if (ctx.CallerAddress is null) return;
+            if (ctx.ConnectionId is null) return;
             if (!GetGuest(func, ctx, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
@@ -54,7 +54,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new element, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -66,7 +66,7 @@ public partial class Module
         
         try
         {
-            if (ctx.CallerAddress is null) return;
+            if (ctx.ConnectionId is null) return;
             if (!GetGuest(func, ctx, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
 
@@ -109,7 +109,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new element, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -140,7 +140,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new element, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new element, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -150,7 +150,7 @@ public partial class Module
     {
         string func = "UpdateElement";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -188,12 +188,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element with id {elementId}, requested by {ctx.CallerIdentity}! Can't find existing Element!");
+                Log.Error($"[{func}] Error updating element with id {elementId}, requested by {ctx.Sender}! Can't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating element with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -202,7 +202,7 @@ public partial class Module
     {
         string func = "UpdateElementStruct";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -235,12 +235,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element struct with id {elementId}, requested by {ctx.CallerIdentity}! Can't find existing Element!");
+                Log.Error($"[{func}] Error updating element struct with id {elementId}, requested by {ctx.Sender}! Can't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element struct with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating element struct with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -251,7 +251,7 @@ public partial class Module
     {
         string func = "UpdateTextElementText";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -277,12 +277,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateTextElementText with id {elementId} and text {text}, requested by {ctx.CallerIdentity}! Can't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateTextElementText with id {elementId} and text {text}, requested by {ctx.Sender}! Can't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateTextElementText with id {elementId} and text {text}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateTextElementText with id {elementId} and text {text}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -291,7 +291,7 @@ public partial class Module
     {
         string func = "UpdateTextElementSize";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -314,12 +314,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateTextElementSize with id {elementId} and size {size.ToString()}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateTextElementSize with id {elementId} and size {size.ToString()}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateTextElementSize with id {elementId} and size {size.ToString()}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateTextElementSize with id {elementId} and size {size.ToString()}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -328,7 +328,7 @@ public partial class Module
     {
         string func = "UpdateTextElementColor";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -351,12 +351,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateTextElementColor with id {elementId} and color {color}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateTextElementColor with id {elementId} and color {color}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateTextElementColor with id {elementId} and color {color}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateTextElementColor with id {elementId} and color {color}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -365,7 +365,7 @@ public partial class Module
     {
         string func = "UpdateTextElementFont";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -388,12 +388,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateTextElementFont with id {elementId} and font {font}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -402,7 +402,7 @@ public partial class Module
     {
         string func = "UpdateTextElementShadow";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -425,12 +425,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateTextElementShadow with id {elementId} and font {css}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -440,7 +440,7 @@ public partial class Module
     {
         string func = "UpdateImageElementDataStruct";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -467,12 +467,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateImageElementDataStruct with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element");
+                Log.Error($"[{func}] Error updating UpdateImageElementDataStruct with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateImageElementDataStruct with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateImageElementDataStruct with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -481,7 +481,7 @@ public partial class Module
     {
         string func = "UpdateImageElementSize";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -505,12 +505,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateImageElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateImageElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateImageElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateImageElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -519,7 +519,7 @@ public partial class Module
     {
         string func = "UpdateImageElementWidth";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -542,12 +542,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateImageElementWidth with id {elementId} with width {width}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateImageElementWidth with id {elementId} with width {width}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateImageElementWidth with id {elementId} with width {width}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateImageElementWidth with id {elementId} with width {width}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -556,7 +556,7 @@ public partial class Module
     {
         string func = "UpdateImageElementHeight";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -579,12 +579,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateImageElementHeight with id {elementId} with height {height}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateImageElementHeight with id {elementId} with height {height}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateImageElementHeight with id {elementId} with height {height}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateImageElementHeight with id {elementId} with height {height}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -593,7 +593,7 @@ public partial class Module
     {
         string func = "UpdateWidgetElementDataId";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -616,12 +616,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateWidgetElementDataId with id {elementId} with dataId {elementDataId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateWidgetElementDataId with id {elementId} with dataId {elementDataId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateWidgetElementDataId with id {elementId} with dataId {elementDataId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateWidgetElementDataId with id {elementId} with dataId {elementDataId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -630,7 +630,7 @@ public partial class Module
     {
         string func = "UpdateWidgetElementSize";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -654,12 +654,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateWidgetElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateWidgetElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateWidgetElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateWidgetElementSize with id {elementId} with width {width} / height {height}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -668,7 +668,7 @@ public partial class Module
     {
         string func = "UpdateWidgetElementWidth";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -691,12 +691,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateWidgetElementWidth with id {elementId} with width {width}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateWidgetElementWidth with id {elementId} with width {width}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateWidgetElementWidth with id {elementId} with width {width}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateWidgetElementWidth with id {elementId} with width {width}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -705,7 +705,7 @@ public partial class Module
     {
         string func = "UpdateWidgetElementHeight";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -729,12 +729,12 @@ public partial class Module
             else
             {
                 Log.Error(
-                    $"[{func}] Error updating UpdateWidgetElementHeight with id {elementId} with height {height}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                    $"[{func}] Error updating UpdateWidgetElementHeight with id {elementId} with height {height}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateWidgetElementHeight with id {elementId} with height {height}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateWidgetElementHeight with id {elementId} with height {height}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -743,7 +743,7 @@ public partial class Module
     {
         string func = "UpdateWidgetElementRawData";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -770,12 +770,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating UpdateWidgetElementRawData with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating UpdateWidgetElementRawData with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating UpdateWidgetElementRawData with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating UpdateWidgetElementRawData with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -786,7 +786,7 @@ public partial class Module
     {
         string func = "UpdateElementTransparency";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -806,12 +806,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element transparency with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating element transparency with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element transparency with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating element transparency with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -820,7 +820,7 @@ public partial class Module
     {
         string func = "UpdateElementTransform";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -840,12 +840,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating element transform with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating element transform with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating element transform with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating element transform with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -854,7 +854,7 @@ public partial class Module
     {
         string func = "UpdateElementClip";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -874,12 +874,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements clipping with id {elementId}, requested by {ctx.CallerIdentity}! Can't find existing Element!");
+                Log.Error($"[{func}] Error updating elements clipping with id {elementId}, requested by {ctx.Sender}! Can't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating elements clipping with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating elements clipping with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -888,7 +888,7 @@ public partial class Module
     {
         string func = "UpdateElementLocked";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -908,12 +908,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements locked with id {elementId}, requested by {ctx.CallerIdentity}! Can't find existing Element!");
+                Log.Error($"[{func}] Error updating elements locked with id {elementId}, requested by {ctx.Sender}! Can't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating elements locked with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating elements locked with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -922,7 +922,7 @@ public partial class Module
     {
         string func = "UpdateElementLayout";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -948,12 +948,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements layout with id {elementId} and layoutId {layoutId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating elements layout with id {elementId} and layoutId {layoutId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch(Exception e)
         {
-            Log.Error($"[{func}] Error updating elements layout with id {elementId} and layoutId {layoutId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating elements layout with id {elementId} and layoutId {layoutId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -962,7 +962,7 @@ public partial class Module
     {
         string func = "UpdateElementFolder";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -988,12 +988,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch(Exception e)
         {
-            Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -1002,7 +1002,7 @@ public partial class Module
         if (elementId == 0) return;
         string func = "UpdateElementZIndex";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -1040,12 +1040,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -1054,7 +1054,7 @@ public partial class Module
     {
         string func = "DeleteElement";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -1074,12 +1074,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error deleting element with id {elementId}, requested by {ctx.CallerIdentity}! Couldn't find existing Element!");
+                Log.Error($"[{func}] Error deleting element with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting element with id {elementId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting element with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -1088,7 +1088,7 @@ public partial class Module
     {
         string func = "DeleteAllElements";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -1106,7 +1106,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting all elements, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting all elements, requested by {ctx.Sender}! " + e.Message);
         }
     }
 }

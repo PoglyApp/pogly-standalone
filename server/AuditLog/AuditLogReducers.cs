@@ -7,7 +7,7 @@ public partial class Module
     {
         string func = "SendMessage";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
@@ -17,7 +17,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error sending message {chatMessage}, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Error sending message {chatMessage}, requested by {ctx.Sender}. " + e.Message);
         }
     }
 }

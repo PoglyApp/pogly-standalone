@@ -7,7 +7,7 @@ public partial class Module
     {
         string func = "AddLayout";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -38,7 +38,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -47,7 +47,7 @@ public partial class Module
     {
         string func = "AddLayoutWithId";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -73,7 +73,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -82,7 +82,7 @@ public partial class Module
     {
         string func = "DuplicateLayout";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -150,12 +150,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error duplicating Layout, requested by {ctx.CallerIdentity}! Couldn't find existing Layout!");
+                Log.Error($"[{func}] Error duplicating Layout, requested by {ctx.Sender}! Couldn't find existing Layout!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error duplicating Layout, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error duplicating Layout, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -173,14 +173,14 @@ public partial class Module
                 Id = id,
                 Name = name,
                 CreatedBy = createdBy,
-                Active = active
+                Active = false
             };
 
             ctx.Db.Layouts.Insert(newLayout);
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error adding new Layout, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -189,7 +189,7 @@ public partial class Module
     {
         string func = "UpdateLayoutName";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -213,12 +213,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error Updating layoutId {layoutId} name, with name {name}, requested by {ctx.CallerIdentity}! Couldn't find existing Layout!");
+                Log.Error($"[{func}] Error Updating layoutId {layoutId} name, with name {name}, requested by {ctx.Sender}! Couldn't find existing Layout!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error Updating layoutId {layoutId} name, with name {name}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error Updating layoutId {layoutId} name, with name {name}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -227,7 +227,7 @@ public partial class Module
     {
         string func = "SetLayoutActive";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -250,7 +250,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error setting active layoutId {layoutId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error setting active layoutId {layoutId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 
@@ -259,7 +259,7 @@ public partial class Module
     {
         string func = "DeleteLayout";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -310,12 +310,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Error deleting layoutId {layoutId}, requested by {ctx.CallerIdentity}! Couldn't find existing Layout!");
+                Log.Error($"[{func}] Error deleting layoutId {layoutId}, requested by {ctx.Sender}! Couldn't find existing Layout!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting layoutId {layoutId}, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting layoutId {layoutId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     
@@ -324,7 +324,7 @@ public partial class Module
     {
         string func = "DeleteAllLayouts";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -371,7 +371,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Error deleting all layouts, requested by {ctx.CallerIdentity}! " + e.Message);
+            Log.Error($"[{func}] Error deleting all layouts, requested by {ctx.Sender}! " + e.Message);
         }
     }
 }

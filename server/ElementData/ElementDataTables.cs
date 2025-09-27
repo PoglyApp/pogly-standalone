@@ -3,13 +3,13 @@
 public partial class Module
 {
     [Table(Public = true, Name = "ElementData")]
-    [Index(Name = "Name", BTree = ["Name"])]
     public partial struct ElementData
     {
         [PrimaryKey]
         [AutoInc]
         public uint Id;
 
+        [SpacetimeDB.Index.BTree(Name = "Name")]
         public string Name;
         public DataType DataType;
         public string Data;

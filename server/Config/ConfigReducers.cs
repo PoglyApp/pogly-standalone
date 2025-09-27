@@ -1,4 +1,6 @@
-﻿using SpacetimeDB;
+﻿using System.Text;
+using SpacetimeDB;
+using SpacetimeDB.Internal.TableHandles;
 
 public partial class Module
 {
@@ -9,21 +11,21 @@ public partial class Module
             ctx.Db.Heartbeat.Insert(new Heartbeat
             {
                 Id = 0,
-                ServerIdentity = ctx.CallerIdentity,
+                ServerIdentity = ctx.Identity,
                 Tick = 0
             });
 
 
             ctx.Db.KeepAliveWorker.Insert(new KeepAliveWorker
             {
-                ScheduledId = 0,
+                Id = 0,
                 ScheduledAt = TimeSpan.FromSeconds(5)
             });
 
             ctx.Db.Config.Insert(new Config
             {
                 Version = 0,
-                OwnerIdentity = ctx.CallerIdentity,
+                OwnerIdentity = ctx.Identity,
                 StreamingPlatform = "twitch",
                 StreamName = "bobross",
                 DebugMode = false,
@@ -33,6 +35,22 @@ public partial class Module
                 StrictMode = false,
                 EditorGuidelines = "Placeholder: Follow Twitch ToS :^)",
                 ConfigInit = false
+            });
+
+            int length = 12;
+            Random rng = new Random();
+            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var sb = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                int index = rng.Next(0, alphabet.Length);
+                sb.Append(alphabet[index]);
+            }
+
+            ctx.Db.OwnerRecoveryKey.Insert(new AuthenticationKey
+            {
+                Version = 0,
+                Key = sb.ToString()
             });
 
             ctx.Db.ZIndex.Insert(new ZIndex
@@ -64,7 +82,7 @@ public partial class Module
     {
         string func = "SetConfig";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         
         var oldConfig = ctx.Db.Config.Version.Find(0);
@@ -73,12 +91,12 @@ public partial class Module
         {
             if (oldConfig.Value.ConfigInit)
             {
-                Log.Exception($"{ctx.CallerIdentity} tried to initialize Config- but Config is already initialized!");
-                throw new Exception($"{ctx.CallerIdentity} tried to initialize Config- but Config is already initialized!");
+                Log.Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
+                throw new Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
             }
             
             if (authentication && string.IsNullOrEmpty(authKey))
-                throw new Exception($"Unable to {func}: {ctx.CallerIdentity} has authentication enabled but did not provide a Key!");
+                throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
 
             try
             {
@@ -98,6 +116,7 @@ public partial class Module
                     ctx.Db.Permissions.Insert(new Permissions
                     {
                         Identity = newConfig.OwnerIdentity,
+                        Nickname = "",
                         PermissionLevel = PermissionLevel.Owner
                     });
                 }
@@ -125,8 +144,55 @@ public partial class Module
         }
         else
         {
-            Log.Exception($"{ctx.CallerIdentity} tried to initialize SetConfig - but we couldn't find the default Config!");
+            Log.Exception($"{ctx.Sender} tried to initialize SetConfig - but we couldn't find the default Config!");
         }
+    }
+
+    [Reducer]
+    public static void ClaimOwnership(ReducerContext ctx, string _key)
+    {
+        if (ctx.ConnectionId is null)
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} does not have an address!");
+
+        if (!GetGuest("ClaimOwnership", ctx, out var guest))
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} does not have Guest entry!");
+
+        if (string.IsNullOrEmpty(_key))
+            throw new Exception($"Unable to Claim Ownership: {ctx.Sender} did not provide a Key!");
+        
+        var config = ctx.Db.Config.Version.Find(0) ?? throw new Exception($"Unable to Claim Ownership: Server cannot find Config!");
+        
+        if(config.OwnerIdentity != ctx.Identity) throw new Exception($"Unable to Claim Ownership: {ctx.Sender} tried to claim ownership after it's already been claimed!");
+
+        try
+        {
+            var key = ctx.Db.OwnerRecoveryKey.Version.Find(0);
+
+            if (key.HasValue)
+            {
+                if (_key != key.Value.Key) return;
+                
+                var newConfig = config;
+                newConfig.OwnerIdentity = guest.Identity;
+                ctx.Db.Config.Version.Update(newConfig);
+                
+                ctx.Db.Permissions.Insert(new Permissions
+                {
+                    Identity = guest.Identity,
+                    Nickname = "",
+                    PermissionLevel = PermissionLevel.Owner
+                });
+            }
+            else
+            {
+                Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - couldn't find ownership recovery key!");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - there was an issue!");
+        }
+        
     }
     
     [Reducer]
@@ -135,7 +201,7 @@ public partial class Module
     {
         string func = "UpdateConfig";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -179,8 +245,8 @@ public partial class Module
         {
             if (config.Value.ConfigInit)
             {
-                Log.Exception($"{ctx.CallerIdentity} tried to import Config- but Config is already initialized!");
-                throw new Exception($"{ctx.CallerIdentity} tried to import Config- but Config is already initialized!");
+                Log.Exception($"{ctx.Sender} tried to import Config- but Config is already initialized!");
+                throw new Exception($"{ctx.Sender} tried to import Config- but Config is already initialized!");
             }
             
             try
@@ -227,7 +293,7 @@ public partial class Module
         }
         else
         {
-            Log.Exception($"{ctx.CallerIdentity} tried to initialize ImportConfig - but we couldn't find the default Config!");
+            Log.Exception($"{ctx.Sender} tried to initialize ImportConfig - but we couldn't find the default Config!");
         }
     }
 
@@ -236,7 +302,7 @@ public partial class Module
     {
         string func = "UpdateAuthenticationKey";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -258,7 +324,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating Authentication Key, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating Authentication Key, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
@@ -267,7 +333,7 @@ public partial class Module
     {
         string func = "UpdateEditorGuidelines";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (!IsGuestOwner(func, ctx)) return;
@@ -290,19 +356,19 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered error updating EditorGuidelines, requested by {ctx.CallerIdentity}. " + e.Message);
+            Log.Error($"[{func}] Encountered error updating EditorGuidelines, requested by {ctx.Sender}. " + e.Message);
         }
     }
 
     [Reducer]
     public static void Authenticate(ReducerContext ctx, string _key)
     {
-        if (ctx.CallerAddress is null) throw new Exception($"Unable to Authenticate: {ctx.CallerIdentity} does not have an address!");
+        if (ctx.ConnectionId is null) throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have an address!");
         if (!GetGuest("Authenticate", ctx, out var guest))
-            throw new Exception($"Unable to Authenticate: {ctx.CallerIdentity} does not have Guest entry!");
+            throw new Exception($"Unable to Authenticate: {ctx.Sender} does not have Guest entry!");
         
         if (string.IsNullOrEmpty(_key))
-            throw new Exception($"Unable to Authenticate: {ctx.CallerIdentity} did not provide a Key!");
+            throw new Exception($"Unable to Authenticate: {ctx.Sender} did not provide a Key!");
 
         try
         {
@@ -311,7 +377,7 @@ public partial class Module
             if (key.HasValue)
             {
                 if (_key != key.Value.Key) return;
-                var g = ctx.Db.Guests.Address.Find(ctx.CallerAddress.Value);
+                var g = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
                 if (g is null) throw new Exception("Guest is null!");
                 var newGuest = g.Value;
                 newGuest.Authenticated = true;
@@ -319,7 +385,7 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[Authenticate] {ctx.CallerIdentity} tried to authenticate - couldn't find AuthenticationKey 0!");
+                Log.Error($"[Authenticate] {ctx.Sender} tried to authenticate - couldn't find AuthenticationKey 0!");
             }
         }
         catch (Exception e)

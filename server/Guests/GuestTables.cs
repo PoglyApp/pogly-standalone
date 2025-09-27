@@ -6,8 +6,9 @@ public partial class Module
     public partial struct Guests
     {
         [PrimaryKey]
-        public Address Address;
+        public ConnectionId Address;
         
+        [SpacetimeDB.Index.BTree(Name = "Identity")]
         public Identity Identity;
 
         public string Nickname;
@@ -27,6 +28,7 @@ public partial class Module
         [PrimaryKey]
         public Identity Identity;
 
+        public string Nickname;
         public PermissionLevel PermissionLevel;
     }
 }

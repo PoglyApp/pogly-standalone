@@ -1,7 +1,7 @@
 {
   "name": "pogly-standalone",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -9,13 +9,13 @@
     "gen bindings": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ./server"
   },
   "dependencies": {
-    "@clockworklabs/spacetimedb-sdk": "^1.0.0-rc1.0",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "i": "^0.3.7",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.456.0",
     "npm": "^10.9.0",
     "react": "^18.3.1",
@@ -23,6 +23,7 @@
     "react-router-dom": "^6.28.0",
     "react-twitch-embed": "^3.0.2",
     "react-zoom-pan-pinch": "^3.6.1",
+    "spacetimedb": "^1.4.0",
     "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",

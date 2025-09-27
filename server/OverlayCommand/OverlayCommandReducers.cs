@@ -7,7 +7,7 @@ public partial class Module
     {
         string func = "IssueOverlayCommand";
 
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
@@ -18,14 +18,14 @@ public partial class Module
             ctx.Db.OverlayCommand.Insert(new OverlayCommand
             {
                 Command = command,
-                IssuedBy = ctx.CallerIdentity,
-                Timestamp = ctx.Timestamp.ToUnixTimeSeconds(),
+                IssuedBy = ctx.Sender,
+                Timestamp = ctx.Timestamp.ToStd().ToUnixTimeSeconds(),
                 Completed = false
             });
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered an error issuing command ({command}) requested by {ctx.CallerIdentity}: " + e.Message);
+            Log.Error($"[{func}] Encountered an error issuing command ({command}) requested by {ctx.Sender}: " + e.Message);
         }
     }
 
@@ -34,7 +34,7 @@ public partial class Module
     {
         string func = "CompleteOverlayCommand";
         
-        if (ctx.CallerAddress is null) return;
+        if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
 
         try
@@ -48,12 +48,12 @@ public partial class Module
             }
             else
             {
-                Log.Error($"[{func}] Encountered an error completing command ({command}) requested by {ctx.CallerIdentity} - couldn't find commandId!");
+                Log.Error($"[{func}] Encountered an error completing command ({command}) requested by {ctx.Sender} - couldn't find commandId!");
             }
         }
         catch (Exception e)
         {
-            Log.Error($"[{func}] Encountered an error completing command with Id#({commandId}) requested by {ctx.CallerIdentity}: " + e.Message);
+            Log.Error($"[{func}] Encountered an error completing command with Id#({commandId}) requested by {ctx.Sender}: " + e.Message);
         }
     }
 }
