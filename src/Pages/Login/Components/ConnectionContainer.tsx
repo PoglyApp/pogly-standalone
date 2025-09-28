@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
-import { AuthStatusType } from "../../../Types/General/AuthStatusType";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
 import HintBubble from "../../../Components/General/HintBubble";
+import { useAuth } from "react-oidc-context";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -15,6 +15,7 @@ interface IProp {
 }
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
+  const auth = useAuth();
   const urlParams = new URLSearchParams(window.location.search);
 
   const [moduleName, setModuleName] = useState<string>("");
@@ -31,8 +32,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   const domainRef = useRef<HTMLSelectElement>(null);
 
-  const [authStatus, setAuthStatus] = useState<AuthStatusType>(AuthStatusType.NotAuthenticated);
-  const [twitchToken, setTwitchToken] = useState<string | null>();
+  const [idToken, setIdToken] = useState<string | undefined>(auth.user?.id_token);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
   useEffect(() => {
@@ -47,22 +47,22 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       domainRef.current!.value = "Custom";
     }
 
-    const twitchIdToken = localStorage.getItem("twitchIdToken");
+    const storedIdToken = localStorage.getItem("StdbIdToken");
 
-    if (twitchIdToken) {
-      const decodedToken: any = jwtDecode(twitchIdToken);
+    if (storedIdToken) {
+      const decodedToken: any = jwtDecode(storedIdToken);
       const currentTime = Date.now() / 1000;
 
       if (decodedToken.exp < currentTime) {
-        console.warn("Twitch ID token has expired. Forcing user to relog...");
+        console.warn("ID token has expired. Forcing user to relog...");
         return;
       }
 
-      setTwitchToken(twitchIdToken);
+      setIdToken(storedIdToken);
       setGuestNickname(decodedToken.preferred_username);
       setNickname(decodedToken.preferred_username);
-      setAuthStatus(AuthStatusType.TwitchAuth);
-      setSubtitle("Twitch");
+      setHasCustomNickname(true);
+      setSubtitle("SpacetimeAuth");
 
       localStorage.setItem("nickname", decodedToken.preferred_username);
       return;
@@ -78,10 +78,32 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     }
   }, []);
 
+useEffect(() => {
+  if (auth.isAuthenticated && auth.user) {
+    if (auth.user.id_token) localStorage.setItem("StdbIdToken", auth.user.id_token);
+
+    const preferred =
+      (auth.user.profile as any)?.preferred_username ||
+      auth.user.profile?.name ||
+      auth.user.profile?.sub;
+
+    if (preferred) {
+      setGuestNickname(preferred);
+      setNickname(preferred);
+      setSubtitle("SpacetimeAuth");
+      localStorage.setItem("nickname", preferred);
+      setHasCustomNickname(true);
+    }
+
+    setIdToken(auth.user.id_token);
+  }
+}, [auth.isAuthenticated, auth.user]);
+
   const handleConnect = () => {
     saveQuickSwap();
 
     setNickname(guestNickname);
+    setHasCustomNickname(true);
 
     localStorage.setItem("nickname", guestNickname);
     localStorage.setItem("stdbConnectDomain", domain);
@@ -89,7 +111,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
     setInstanceSettings({
-      token: twitchToken,
+      token: idToken,
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -176,24 +198,6 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     }
   };
 
-  const handleAuth = (type: AuthStatusType) => {
-    setIsRedirecting(true);
-    setAuthStatus(type);
-
-    const CLIENT_ID = "2zrg60xlectlfv7pycwlt4acoabs1p"; // twitch oauth here!
-    const REDIRECT_URI = `${window.location.origin}/callback`;
-    const SCOPES = "openid";
-
-    const twitchAuthUrl =
-      "https://id.twitch.tv/oauth2/authorize" +
-      `?client_id=${CLIENT_ID}` +
-      `&redirect_uri=${REDIRECT_URI}` +
-      `&response_type=token+id_token` +
-      `&scope=${encodeURIComponent(SCOPES)}`;
-
-    window.location.href = twitchAuthUrl;
-  };
-
   const handleUpdateNickname = (value: any) => {
     const newNickname = value.target.value;
 
@@ -207,43 +211,30 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyLogo />
 
-      {authStatus === AuthStatusType.NotAuthenticated && (
+      {!auth.isLoading && !auth.isAuthenticated && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
           <StyledButton
-            className="flex justify-self-center mb-3 w-[220px]"
+            className="flex justify-self-center bg-[#060606] border border-transparent text-white hover:border-[#82a5ff]"
             onClick={() => {
-              setAuthStatus(AuthStatusType.LegacyAuth);
-              setLegacyLogin(true);
-              setSubtitle("legacy");
-              localStorage.removeItem("twitchAccessToken");
-              localStorage.removeItem("twitchIdToken");
+              auth.signinRedirect();
+              setSubtitle("SpacetimeAuth");
             }}
           >
-            <UserRound className="mr-2" />
-            <span>login as guest</span>
-          </StyledButton>
-          <StyledButton
-            className="flex justify-self-center bg-[#6441a5]! hover:bg-[#6441a5b2]!"
-            onClick={() => {
-              handleAuth(AuthStatusType.TwitchAuth);
-              setSubtitle("twitch");
-            }}
-          >
-            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
-            <span>login with Twitch</span>
+            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
+            <span>login with SpacetimeAuth</span>
           </StyledButton>
         </div>
       )}
 
       <div className="flex justify-center z-10 mt-8">
         <Container
-          title={authStatus === AuthStatusType.NotAuthenticated ? "login" : "connect"}
+          title={!auth.isAuthenticated ? "login" : "connect"}
           subTitle={subtitle}
           className="relative w-[400px]"
         >
           <div
             className={`flex flex-col justify-between h-full px-6 pt-8 pb-4 transition-all duration-300 ${
-              authStatus === AuthStatusType.NotAuthenticated || isRedirecting
+              !auth.isAuthenticated || isRedirecting
                 ? "blur-sm pointer-events-none select-none"
                 : ""
             }`}
@@ -254,8 +245,6 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                 <HintBubble
                   hint="change nickname"
                   className={
-                    authStatus === AuthStatusType.TwitchAuth ||
-                    authStatus === AuthStatusType.NotAuthenticated ||
                     hasCustomNickname
                       ? "hidden"
                       : ""
@@ -265,14 +254,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                     ref={nicknameFieldRef}
                     type="text"
                     defaultValue={guestNickname}
-                    disabled={authStatus === AuthStatusType.TwitchAuth ? true : false}
+                    disabled={auth.isAuthenticated ? true : false}
                     className={`${
-                      authStatus === AuthStatusType.TwitchAuth ? "text-[#9146FF]" : "text-[#7e97a5]"
-                    } ml-2 truncate bg-transparent outline-none w-auto max-w-[200px] ${
-                      authStatus === AuthStatusType.LegacyAuth &&
-                      !hasCustomNickname &&
-                      "border border-[#82a5ff] rounded-md"
-                    }`}
+                      auth.isAuthenticated ? "text-[#9146FF]" : "text-[#7e97a5]"
+                    } ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
                     onBlur={handleUpdateNickname}
                   />
                 </HintBubble>
@@ -340,13 +325,13 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             </div>
 
             <div className="flex justify-end gap-2">
-              {twitchToken && (
+              {idToken && (
                 <StyledButton
                   className="absolute left-5 bg-[#6441a5]!"
                   onClick={() => {
-                    localStorage.removeItem("twitchIdToken");
-                    localStorage.removeItem("twitchAccessToken");
-                    window.location.reload();
+                    localStorage.removeItem("StdbIdToken");
+                    localStorage.removeItem("nickname");
+                    auth.signoutRedirect();
                   }}
                 >
                   logout

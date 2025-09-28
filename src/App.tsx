@@ -45,14 +45,17 @@ export const App: React.FC = () => {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<Header />} errorElement={<Error />}>
-        <Route index element={<Navigate to="/login" replace />} />
-        <Route path="login" element={<Login />} />
-        <Route path="callback" element={<Callback />} />
-        <Route path="canvas" element={<Canvas />} />
-        <Route path="overlay" element={<Overlay />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+      <>
+        <Route path="/callback" element={<Callback />} />
+        
+        <Route path="/" element={<Header />} errorElement={<Error />}>
+          <Route index element={<Navigate to="/login" replace />} />
+          <Route path="login" element={<Login />} />
+          <Route path="canvas" element={<Canvas />} />
+          <Route path="overlay" element={<Overlay />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </>
     )
   );
 

@@ -1,20 +1,12 @@
-import { useEffect } from "react";
-
+import { useAuth } from "react-oidc-context";
+import { Navigate, useLocation } from "react-router-dom";
 
 export const Callback = () => {
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get("access_token");
-    const idToken = hashParams.get("id_token");
+  const auth = useAuth();
 
-    if (accessToken && idToken) {
-      localStorage.setItem("twitchAccessToken", accessToken);
-      localStorage.setItem("twitchIdToken", idToken);
-      window.location.href = "/";
-    } else {
-      console.error("No access token found in URL");
-    }
-  }, []);
+  if (auth.isLoading) return <p>Finishing login…</p>;
+  if (auth.error)     return <p>Login failed: {String(auth.error)}</p>;
+  if (auth.isAuthenticated) return <Navigate to="/login" replace />;
 
-  return (<p>Processing login...</p>);
-}
+  return <p>Processing…</p>;
+};
