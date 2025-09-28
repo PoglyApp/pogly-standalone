@@ -6,13 +6,13 @@ export const Error: React.FC = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const error: any = useRouteError();
 
-  function errorMessage(e: any): string {
+  function errorMessage(error: any): string {
     if (isRouteErrorResponse(error)) {
       return `${error.status} ${error.statusText}
 
-            ${e.error?.message}
-            
-            ${e.error?.stack}`;
+            ${error.error?.message}
+
+            ${error.error?.stack}`;
     } else if (typeof error === "string") {
       return error;
     } else {
@@ -35,8 +35,7 @@ export const Error: React.FC = () => {
                 <code>{errorMessage(error)}</code>
               </pre>
               <p>
-                {location.pathname}
-                <br />
+                {location.pathname}<br />
                 Report this in our{" "}
                 <a className="glow" href="https://discord.gg/pogly">
                   Discord

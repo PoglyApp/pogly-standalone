@@ -1,40 +1,31 @@
-import styled from "styled-components";
+import { ChangeEventHandler } from "react";
 
 interface IProps {
-  defaultValue?: string;
-  placeholder?: string;
-  label?: any;
-  style?: any;
-  className?: string;
+  placeholder: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  value?: string;
+  title?: string;
+  subTitle?: string;
+  password?: boolean;
+  disabled?: boolean;
 }
 
-export const TextInput = ({ defaultValue, placeholder, label, style, className }: IProps) => {
+export const TextInput = ({ placeholder, onChange, value, title, subTitle, password, disabled }: IProps) => {
   return (
-    <div>
-      {label && (
-        <label className="pr-2" style={{ color: "#edf1ff" }}>
-          {label}
-        </label>
+    <div className="w-full">
+      {title && (
+        <p className="text-sm text-[#aeb4d4]">
+          {title} {subTitle && <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">{subTitle}</span>}
+        </p>
       )}
-
-      <StyledInput
-        className={ className }
-        style={{
-          ...style,
-        }}
-        defaultValue={defaultValue}
+      <input
+        type={password ? "password" : "text"}
         placeholder={placeholder}
+        value={value ? value : ""}
+        className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+        onChange={onChange}
+        disabled={disabled}
       />
     </div>
   );
 };
-
-const StyledInput = styled.input`
-  background-color: #10121a;
-  color: #edf1ff;
-  padding-left: 8px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  border-width: 2px;
-  border-color: transparent;
-`;

@@ -1,4 +1,4 @@
-import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import { Identity } from "spacetimedb";
 import { ConnectionConfigType } from "../ConfigTypes/ConnectionConfigType";
 import { DbConnection, Guests } from "../../module_bindings";
 

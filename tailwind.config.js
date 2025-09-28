@@ -8,10 +8,10 @@ export default {
         geist: ["Geist", "sans-serif"],
       },
       fontSize: {
-        sm: ['14px', '20px'],
-        base: ['16px', '24px'],
-        lg: ['20px', '28px'],
-        xl: ['24px', '32px'],
+        sm: ["14px", "20px"],
+        base: ["16px", "24px"],
+        lg: ["20px", "28px"],
+        xl: ["24px", "32px"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -62,11 +62,11 @@ export default {
       },
     },
     screens: {
-      'sm': '0px',   // 720p
-      'md': '1920px',   // 1080p
-      'lg': '2560px',   // 1440p
-      'xl': '3840px',   // 4k
-      '2xl': '7680px',  // 8k
+      sm: "0px", // 720p
+      md: "1920px", // 1080p
+      lg: "2560px", // 1440p
+      xl: "3840px", // 4k
+      "2xl": "7680px", // 8k
     }, //Custom screen breakpoints
   },
   plugins: [require("tailwindcss-animate")],

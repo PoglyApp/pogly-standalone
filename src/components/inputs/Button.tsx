@@ -1,55 +1,39 @@
+import { MouseEventHandler, PropsWithChildren } from "react";
 import styled from "styled-components";
-import { Tooltip } from "../general/Tooltip";
 
 interface IProps {
-  tooltip?: string;
-  onclick: Function;
-  icon?: any;
-  text?: string;
-  border?: boolean;
-  fontSize?: string;
-  fontColor?: string;
-  style?: any;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
   className?: string;
 }
 
-export const Button = ({ tooltip, onclick, icon, text, border, fontSize, fontColor, style, className }: IProps) => {
-  
-  if(!tooltip) return (
-    <div className={className} style={{ color: "#7e828c", ...style }} onClick={() => onclick()}>
-        <StyledButton
-          className={ (border ? " highlight" : "")}
-          style={{
-            fontSize: fontSize,
-            color: fontColor,
-          }}
-        >
-          {icon} {text}
-        </StyledButton>
-      </div>
-  );
-  
+export const Button = ({ onClick, disabled, className, children }: PropsWithChildren<IProps>) => {
   return (
-    <Tooltip text={tooltip}>
-      <div className={className} style={{ color: "#7e828c", ...style }} onClick={() => onclick()}>
-        <StyledButton
-          className={ (border ? " highlight" : "")}
-          style={{
-            fontSize: fontSize,
-            color: fontColor,
-          }}
-        >
-          {icon} {text}
-        </StyledButton>
-      </div>
-    </Tooltip>
+    <StyledButton className={className} disabled={disabled} onClick={onClick}>
+      {children}
+    </StyledButton>
   );
 };
 
 const StyledButton = styled.button`
-  height: 100%;
-  border-style: solid;
-  border-radius: 10px;
-  border-width: 2px;
-  border-color: transparent;
+  background-color: #10121a;
+  color: #edf1ff;
+
+  padding: 10px 15px 10px 15px;
+  border-radius: 7px;
+
+  margin-left: 5px;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: #10121a80;
+  }
+
+  &:disabled {
+    background-color: #10121a80;
+    color: #edf1ff21;
+
+    cursor: not-allowed;
+  }
 `;

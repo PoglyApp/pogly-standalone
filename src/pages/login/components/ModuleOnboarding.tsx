@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
-import { PoglyLogo } from "../../../Components/General/PoglyLogo";
+import { PoglyTitle } from "./PoglyTitle";
+import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
+import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
+import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
-import { ConnectionConfigType } from "@/types/ConfigTypes/ConnectionConfigType";
-import { useGetDefaultElements } from "@/hooks/useGetDefaultElements";
-import { UploadElementDataFromString } from "@/utility/UploadElementData";
 
 interface IProps {
   legacyLogin: boolean;
@@ -97,7 +97,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
 
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bg-[#10121a]">
-      <PoglyLogo />
+      <PoglyTitle />
       <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30">
         <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">

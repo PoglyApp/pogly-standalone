@@ -3,6 +3,7 @@ import { DbConnection } from "../module_bindings";
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
 export const StartHeartbeat = (Client: DbConnection) => {
+
   if (heartbeatInterval) {
     //console.warn("Heartbeat already running.");
     return;
@@ -10,13 +11,14 @@ export const StartHeartbeat = (Client: DbConnection) => {
 
   heartbeatInterval = setInterval(() => {
     try {
+      Client.reducers.pingHeartbeat(); 
       //console.log("ping");
     } catch (error) {
       console.error("Failed to send heartbeat ping:", error);
-      StopHeartbeat();
+      StopHeartbeat(); 
     }
   }, 5000); // 5 seconds
-};
+}
 
 export const StopHeartbeat = () => {
   if (heartbeatInterval) {
@@ -24,4 +26,4 @@ export const StopHeartbeat = () => {
     heartbeatInterval = null;
     //console.log("Heartbeat stopped");
   }
-};
+}

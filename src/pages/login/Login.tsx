@@ -1,21 +1,18 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import useStDB from "../../spacetimedb/useStDB";
+import useStDB from "../../StDB/useStDB";
 import { Guests } from "../../module_bindings";
-import { SpacetimeContext } from "../../contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SetSubscriptions } from "../../Utility/SetSubscriptions";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SetSubscriptions } from "@/utility/SetSubscriptions";
-import { LayoutContext } from "@/contexts/LayoutContext";
-import { getActiveLayout } from "@/spacetimedb/SpacetimeDBUtils";
-import { ConnectionContainer } from "./components/ConnectionContainer";
-import { ModuleOnboarding } from "./components/ModuleOnboarding";
-import { ConfigContext } from "@/contexts/ConfigContext";
+import { ConfigContext } from "../../Contexts/ConfigContext";
+import { ConnectionContainer } from "./Components/ConnectionContainer";
+import { ModuleOnboarding } from "./Components/ModuleOnboarding";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const navigate = useNavigate();
 
   const { connectionConfig, setConnectionConfig } = useContext(ConfigContext);
-  const { setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB, setSpacetimeDB } = useContext(SpacetimeContext);
 
   // STDB
@@ -58,8 +55,6 @@ export const Login = () => {
       setNickname(nickname);
     }
 
-    setActiveLayout(getActiveLayout(spacetime.Client));
-
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
     const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
@@ -93,7 +88,6 @@ export const Login = () => {
   // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
   if (!spacetime.Client) {
     if (spacetime.Error) {
-      return <>Client error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -104,14 +98,14 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>SpacetimeDB Client error</>;
     }
-    return <>Loading SpacetimeDB</>;
     //return <Loading text="Loading SpacetimeDB" />;
+    return <>Loading SpacetimeDB</>;
   }
 
   if (!spacetime.Identity) {
     if (spacetime.Error) {
-      return <>SpacetimeDB Identity error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -121,14 +115,14 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>SpacetimeDB Identity error</>;
     }
-    return <>Retrieving identity</>;
     //return <Loading text="Retreiving Identity" />;
+    return <>Retreiving identity</>;
   }
 
   if (!spacetime.Client.connectionId) {
     if (spacetime.Error) {
-      return <>SpacetimeDB address error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -138,14 +132,14 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>SpacetimeDB Address error</>;
     }
-    return <>Retrieving address</>;
     //return <Loading text="Retreiving Address" />;
+    return <>Retreiving address</>;
   }
 
   if (!spacetime.InstanceConfig) {
     if (spacetime.Error) {
-      return <>Configuration error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -155,15 +149,15 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>Configuration error</>;
     }
-    return <>Loading configuration</>;
     //return <Loading text="Loading Configuration" />;
+    return <>Loading configuration</>;
   }
 
   // Step 3) Are we connected to SpacetimeDB?
   if (!stdbConnected) {
     if (spacetime.Error) {
-      return <>Instance error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -173,12 +167,12 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>Pogly Instance error</>;
     }
 
     const alreadyLogged = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
 
     if (!isOverlay && alreadyLogged) {
-      return <>Multiple connections error</>;
       /*return (
         <ErrorRefreshModal
           type="button"
@@ -191,18 +185,18 @@ export const Login = () => {
           client={spacetime.Client}
         />
       );*/
+      return <>Multi connection error</>;
     }
 
     spacetime.Client.reducers.connect();
 
-    return <>Connecting to instance</>;
     //return <Loading text="Connecting to Instance" />;
+    return <>Connecting to Instance</>;
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
   if (!isOverlay && spacetime.InstanceConfig.authentication) {
     if (stdbAuthTimeout) {
-      return <>Authentication required</>;
       /*return (
         <ErrorRefreshModal
           type="timer"
@@ -213,6 +207,7 @@ export const Login = () => {
           clearSettings={true}
         />
       );*/
+      return <>Authentication error</>;
     }
 
     let timeout = null;
@@ -224,8 +219,8 @@ export const Login = () => {
         setStdbAuthTimeout(!stdbAuthenticatedRef.current);
       }, 2500);
 
-      return <>Authenticating</>;
       //return <Loading text="Authenticating..." />;
+      return <>Authenticating...</>;
     }
 
     if (timeout) clearTimeout(timeout);
@@ -238,13 +233,13 @@ export const Login = () => {
 
   // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbSubscriptions) {
-    return <>Loading data</>;
     //return <Loading text="Loading data..." />;
+    return <>Loading data</>;
   }
 
   if (!spacetimeDB) {
-    return <>Loading canvas</>;
     //return <Loading text="Loading Canvas" />;
+    return <>Loading canvas</>;
   }
 
   // Step 8) Has the Pogly Instance been configured?

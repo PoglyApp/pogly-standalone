@@ -1,61 +1,57 @@
-import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
-import { Editor } from "./editor/Editor";
-import { Canvas } from "./pages/Canvas";
-import { Overlay } from "./pages/Overlay";
-import { NotFound } from "./pages/404";
+import "react-toastify/dist/ReactToastify.css";
+
+import { createBrowserRouter, Route, createRoutesFromElements, RouterProvider, Navigate } from "react-router-dom";
 import { useState } from "react";
-import { useGetConnectionConfig } from "./hooks/useGetConnectionConfig.tsx";
-import { ConnectionConfigType } from "./types/ConfigTypes/ConnectionConfigType.ts";
-import { Login } from "./pages/login/Login.tsx";
-import { Callback } from "./pages/callback/Callback.tsx";
-import { Error } from "./pages/error/Error.tsx";
-import { ConfigContext } from "./contexts/ConfigContext.ts";
-import { SpacetimeContextType } from "./types/General/SpacetimeContextType.ts";
-import Layouts from "./module_bindings/layouts_type.ts";
-import { SpacetimeContext } from "./contexts/SpacetimeContext.ts";
-import { LayoutContext } from "./contexts/LayoutContext.ts";
+
+import { useGetConnectionConfig } from "./Hooks/useGetConnectionConfig";
+import { ConnectionConfigType } from "./Types/ConfigTypes/ConnectionConfigType";
+import { ToastContainer } from "react-toastify";
+import { SpacetimeContext } from "./Contexts/SpacetimeContext";
+import { ConfigContext } from "./Contexts/ConfigContext";
+import { SettingsContext } from "./Contexts/SettingsContext";
+import { Error } from "./Pages/Error/Error";
+import { Login } from "./Pages/Login/Login";
+import { SpacetimeContextType } from "./Types/General/SpacetimeContextType";
+import { Callback } from "./Pages/Callback/Callback";
+import { Canvas } from "./Pages/Canvas/Canvas";
 
 export const App: React.FC = () => {
   const [spacetimeDB, setSpacetimeDB] = useState<SpacetimeContextType | undefined>(undefined);
-  const [activeLayout, setActiveLayout] = useState<Layouts | undefined>(undefined);
 
+  // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
+  const [settings, setSettings] = useState<any>(
+    JSON.parse(localStorage.getItem("settings")!) || {
+      debug: false,
+      cursorName: true,
+      compressUpload: true,
+      compressPaste: true,
+    }
+  );
 
   useGetConnectionConfig(setConnectionConfig);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
-        {/* Auth routes (no Editor layout) */}
-        <Route path="/login" element={<Login />} />
         <Route path="/callback" element={<Callback />} />
 
-        {/* Editor layout and its children */}
-        <Route path="/" element={<Editor />} errorElement={<Error />}>
-          <Route index element={<Navigate to="/login" replace />} />
+        <Route path="/" errorElement={<Error />}>
+          <Route index element={<Navigate to="/canvas" replace />} />
+          <Route path="login" element={<Login />} />
           <Route path="canvas" element={<Canvas />} />
-          <Route path="overlay" element={<Overlay />} />
-          <Route path="*" element={<NotFound />} />
         </Route>
       </>
-    ),
-    {
-      future: {
-        v7_fetcherPersist: true,
-        v7_normalizeFormMethod: true,
-        v7_partialHydration: true,
-        v7_relativeSplatPath: true,
-        v7_skipActionErrorRevalidation: true,
-      },
-    }
+    )
   );
 
   return (
     <SpacetimeContext.Provider value={{ spacetimeDB, setSpacetimeDB }}>
       <ConfigContext.Provider value={{ connectionConfig, setConnectionConfig }}>
-        <LayoutContext.Provider value={{ activeLayout, setActiveLayout }}>
-          <RouterProvider future={{ v7_startTransition: true }} router={router} />
-        </LayoutContext.Provider>
+        <SettingsContext.Provider value={{ settings, setSettings }}>
+          <RouterProvider router={router} />
+          <ToastContainer />
+        </SettingsContext.Provider>
       </ConfigContext.Provider>
     </SpacetimeContext.Provider>
   );

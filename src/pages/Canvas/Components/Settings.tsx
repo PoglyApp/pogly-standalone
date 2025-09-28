@@ -1,0 +1,25 @@
+import styled from "styled-components";
+import SettingsIcon from "@/Assets/Icons/SettingsIcon.svg";
+
+export const Settings = () => {
+  return (
+    <Button className="mr-10">
+      <img src={SettingsIcon} alt="settings" />
+    </Button>
+  );
+};
+
+const Button = styled.button`
+  cursor: pointer;
+
+  width: 40px;
+  height: 40px;
+
+  border: solid 1px transparent;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #82a5ff4d;
+    border: solid 1px #82a5ff;
+  }
+`;
