@@ -1,16 +1,16 @@
 import styled from "styled-components";
-import ImageIcon from "@/Assets/Icons/ImageIcon.svg";
+import ImageIcon from "@/Assets/Icons/ImagePickIcon.svg";
 
 export const ElementPicker = () => {
   return (
-    <div className="w-fit h-[64px] p-[13px] bg-[#1E212B] rounded-lg">
-      <div className="flex gap-2.5">
+    <div className="w-fit p-[13px] bg-[#1E212B] rounded-lg">
+      <div className="flex gap-2.5 h-fit">
         <Button>
           <ButtonIcon src={ImageIcon} alt="Images" />
         </Button>
 
         <Button className="w-[32px] h-[32px]">
-          <span className="text-3xl">T</span>
+          <span className="text-3xl h-fit text-[#717b97]">T</span>
         </Button>
       </div>
     </div>

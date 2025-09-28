@@ -8,18 +8,20 @@ import { LayersContainer } from "./Components/LayersContainter";
 import { Footer } from "./Components/Footer";
 import { ElementPicker } from "./Components/ElementPicker";
 import { Settings } from "./Components/Settings";
+import { Details } from "./Components/Details";
 
 export const Canvas = () => {
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
   return (
     <div className="w-full h-full absolute">
-      <div className="absolute z-1000">
+      <div className="editor-overlay absolute z-1000 w-full h-full">
         <PoglyTitle />
         <LayoutsContainer />
         <LayersContainer />
+        <Details />
 
-        <div className="flex fixed w-full bottom-0  mb-[18px] justify-between">
+        <div className="editor-overlay flex fixed w-full bottom-0 mb-8 justify-between">
           <Footer />
           <ElementPicker />
           <Settings />

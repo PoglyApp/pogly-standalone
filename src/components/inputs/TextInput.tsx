@@ -6,13 +6,23 @@ interface IProps {
   value?: string;
   title?: string;
   subTitle?: string;
+  titleOnLeft?: boolean;
   password?: boolean;
   disabled?: boolean;
 }
 
-export const TextInput = ({ placeholder, onChange, value, title, subTitle, password, disabled }: IProps) => {
+export const TextInput = ({
+  placeholder,
+  onChange,
+  value,
+  title,
+  subTitle,
+  titleOnLeft,
+  password,
+  disabled,
+}: IProps) => {
   return (
-    <div className="w-full">
+    <div className={"w-full" + titleOnLeft ? " flex items-center gap-2" : ""}>
       {title && (
         <p className="text-sm text-[#aeb4d4]">
           {title} {subTitle && <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">{subTitle}</span>}

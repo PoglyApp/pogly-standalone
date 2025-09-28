@@ -25,3 +25,11 @@ body {
   height: 100%;
   position: absolute;
 }
+
+.editor-overlay {
+  pointer-events: none !important;
+
+  & > * {
+    pointer-events: auto;
+  }
+}

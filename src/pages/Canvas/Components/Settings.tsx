@@ -3,7 +3,7 @@ import SettingsIcon from "@/Assets/Icons/SettingsIcon.svg";
 
 export const Settings = () => {
   return (
-    <Button className="mr-10">
+    <Button className="mr-10 self-center">
       <img src={SettingsIcon} alt="settings" />
     </Button>
   );
