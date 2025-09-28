@@ -26,37 +26,18 @@ import {
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
 } from "spacetimedb";
+import { TextElement as TextElementType } from "./text_element_type";
+// Mark import as potentially unused
+declare type __keep_TextElementType = TextElementType;
+import { ImageElement as ImageElementType } from "./image_element_type";
+// Mark import as potentially unused
+declare type __keep_ImageElementType = ImageElementType;
+import { WidgetElement as WidgetElementType } from "./widget_element_type";
+// Mark import as potentially unused
+declare type __keep_WidgetElementType = WidgetElementType;
 
-export type UpdateTextElementSize = {
-  elementId: number,
-  size: number,
-};
-/**
- * An object for generated helper functions.
- */
-export const UpdateTextElementSize = {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "elementId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "size", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
-  },
 
-  serialize(writer: __BinaryWriter, value: UpdateTextElementSize): void {
-    __AlgebraicTypeValue.serializeValue(writer, UpdateTextElementSize.getTypeScriptAlgebraicType(), value);
-  },
-
-  deserialize(reader: __BinaryReader): UpdateTextElementSize {
-    return __AlgebraicTypeValue.deserializeValue(reader, UpdateTextElementSize.getTypeScriptAlgebraicType());
-  },
-
-}
-
-export default UpdateTextElementSize;
+export type TextElement = { tag: "TextElement", value: TextElementType };
+export type ImageElement = { tag: "ImageElement", value: ImageElementType };
+export type WidgetElement = { tag: "WidgetElement", value: WidgetElementType };
 

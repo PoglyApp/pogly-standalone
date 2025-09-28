@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@clockworklabs/spacetimedb-sdk": "^1.2.2",
+    "spacetimedb": "^1.4.0",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@reduxjs/toolkit": "^2.0.1",
