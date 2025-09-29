@@ -12,7 +12,7 @@ const oidcConfig = {
   authority: "https://spacetimeauth.staging.spacetimedb.com/oidc",
   client_id: "client_0319cWpFKkEcwmVeoN44hS",
   redirect_uri: `${window.location.origin}/callback`,
-  scope: "openid",
+  scope: "openid profile",
   response_type: "code",
   automaticSilentRenew: false,
   loadUserInfo: false,
