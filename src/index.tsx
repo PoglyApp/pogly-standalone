@@ -10,18 +10,18 @@ const oidcConfig = {
   authority: "https://spacetimeauth.staging.spacetimedb.com/oidc",
   client_id: "client_0319cWpFKkEcwmVeoN44hS",
   redirect_uri: `${window.location.origin}/callback`,
-  scope: "openid",
+  scope: "openid profile",
   response_type: "code",
   automaticSilentRenew: false,
-  loadUserInfo: true,
-  metadata: {
+  loadUserInfo: false,
+    metadata: {
     issuer: "https://spacetimeauth.staging.spacetimedb.com/oidc",
     authorization_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/auth",
-    token_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/token",
-    jwks_uri: "https://spacetimeauth.staging.spacetimedb.com/oidc/jwks",
-    end_session_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/session/end",
+    token_endpoint:         "https://spacetimeauth.staging.spacetimedb.com/oidc/token",
+    jwks_uri:               "https://spacetimeauth.staging.spacetimedb.com/oidc/jwks",
+    end_session_endpoint:   "https://spacetimeauth.staging.spacetimedb.com/oidc/session/end",
     pushed_authorization_request_endpoing: "https://spacetimeauth.staging.spacetimedb.com/oidc/request",
-    userinfo_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/me",
+    userinfo_endpoint:      "https://spacetimeauth.staging.spacetimedb.com/oidc/me"
   },
 };
 
