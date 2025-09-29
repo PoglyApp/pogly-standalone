@@ -58,16 +58,13 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
         return;
       }
 
-      console.log(decodedToken.login_method);
+      const loginMethod: string = String(decodedToken.login_method);
 
       setIdToken(storedIdToken);
       setGuestNickname(decodedToken.preferred_username);
       setNickname(decodedToken.preferred_username);
       setHasCustomNickname(true);
-      setSubtitle(
-        String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) ||
-          "SpacetimeAuth"
-      );
+      setSubtitle(loginMethod || "SpacetimeAuth");
 
       localStorage.setItem("nickname", decodedToken.preferred_username);
       return;
