@@ -37,7 +37,7 @@ export const App: React.FC = () => {
         <Route path="/callback" element={<Callback />} />
 
         <Route path="/" errorElement={<Error />}>
-          <Route index element={<Navigate to="/canvas" replace />} />
+          <Route index element={<Navigate to="/login" replace />} />
           <Route path="login" element={<Login />} />
           <Route path="canvas" element={<Canvas />} />
         </Route>

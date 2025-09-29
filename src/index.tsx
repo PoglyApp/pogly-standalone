@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from "react-oidc-context";
 
 const oidcConfig = {
   authority: "https://spacetimeauth.staging.spacetimedb.com/oidc",
-  client_id: "client_030t5fnI0zvgj3KScXWDp8",
+  client_id: "client_0319cWpFKkEcwmVeoN44hS",
   redirect_uri: `${window.location.origin}/callback`,
   scope: "openid",
   response_type: "code",

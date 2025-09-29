@@ -65,7 +65,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       setGuestNickname(decodedToken.preferred_username);
       setNickname(decodedToken.preferred_username);
       setHasCustomNickname(true);
-      setSubtitle("SpacetimeAuth");
+      setSubtitle(
+        String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) ||
+          "SpacetimeAuth"
+      );
 
       localStorage.setItem("nickname", decodedToken.preferred_username);
       return;
@@ -83,15 +86,22 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      if (auth.user.id_token) localStorage.setItem("StdbIdToken", auth.user.id_token);
+      if (!auth.user.id_token) return;
+
+      localStorage.setItem("StdbIdToken", auth.user.id_token);
 
       const preferred =
         (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
 
+      const decodedToken: any = jwtDecode(auth.user.id_token);
+
       if (preferred) {
         setGuestNickname(preferred);
         setNickname(preferred);
-        setSubtitle("SpacetimeAuth");
+        setSubtitle(
+          String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) ||
+            "SpacetimeAuth"
+        );
         localStorage.setItem("nickname", preferred);
         setHasCustomNickname(true);
       }
