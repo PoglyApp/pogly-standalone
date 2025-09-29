@@ -58,11 +58,13 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
         return;
       }
 
+      const loginMethod: string = String(decodedToken.login_method);
+
       setIdToken(storedIdToken);
       setGuestNickname(decodedToken.preferred_username);
       setNickname(decodedToken.preferred_username);
       setHasCustomNickname(true);
-      setSubtitle(String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) || "SpacetimeAuth");
+      setSubtitle(loginMethod || "SpacetimeAuth");
 
       localStorage.setItem("nickname", decodedToken.preferred_username);
       return;
@@ -78,30 +80,29 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     }
   }, []);
 
-useEffect(() => {
-  if (auth.isAuthenticated && auth.user) {
-    if (!auth.user.id_token) return;
-    
-    localStorage.setItem("StdbIdToken", auth.user.id_token);
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user) {
+      if (!auth.user.id_token) return;
 
-    const preferred =
-      (auth.user.profile as any)?.preferred_username ||
-      auth.user.profile?.name ||
-      auth.user.profile?.sub;
+      localStorage.setItem("StdbIdToken", auth.user.id_token);
 
-    const decodedToken: any = jwtDecode(auth.user.id_token);
+      const preferred =
+        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
 
-    if (preferred) {
-      setGuestNickname(preferred);
-      setNickname(preferred);
-      setSubtitle(String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) || "SpacetimeAuth");
-      localStorage.setItem("nickname", preferred);
-      setHasCustomNickname(true);
+      const decodedToken: any = jwtDecode(auth.user.id_token);
+      const loginMethod: string = String(decodedToken.login_method);
+
+      if (preferred) {
+        setGuestNickname(preferred);
+        setNickname(preferred);
+        setSubtitle(loginMethod || "SpacetimeAuth");
+        localStorage.setItem("nickname", preferred);
+        setHasCustomNickname(true);
+      }
+
+      setIdToken(auth.user.id_token);
     }
-
-    setIdToken(auth.user.id_token);
-  }
-}, [auth.isAuthenticated, auth.user]);
+  }, [auth.isAuthenticated, auth.user]);
 
   const handleConnect = () => {
     saveQuickSwap();
@@ -238,22 +239,13 @@ useEffect(() => {
         >
           <div
             className={`flex flex-col justify-between h-full px-6 pt-8 pb-4 transition-all duration-300 ${
-              !auth.isAuthenticated || isRedirecting
-                ? "blur-sm pointer-events-none select-none"
-                : ""
+              !auth.isAuthenticated || isRedirecting ? "blur-sm pointer-events-none select-none" : ""
             }`}
           >
             <div className="flex flex-col gap-3">
               <div className="flex text-center bg-[#10121a] p-3 rounded-md justify-center">
                 logged in as
-                <HintBubble
-                  hint="change nickname"
-                  className={
-                    hasCustomNickname
-                      ? "hidden"
-                      : ""
-                  }
-                >
+                <HintBubble hint="change nickname" className={hasCustomNickname ? "hidden" : ""}>
                   <input
                     ref={nicknameFieldRef}
                     type="text"
