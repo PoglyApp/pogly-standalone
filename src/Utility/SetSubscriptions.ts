@@ -1,6 +1,6 @@
 import { DebugLogger } from "./DebugLogger";
 import { DbConnection, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
-import { SubscriptionEventContextInterface } from "@clockworklabs/spacetimedb-sdk";
+import { SubscriptionEventContextInterface } from "spacetimedb";
 
 export const SetSubscriptions = (
   client: DbConnection,

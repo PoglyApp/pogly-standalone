@@ -27,36 +27,6 @@ import {
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
 } from "spacetimedb";
 
-export type UpdateTextElementSize = {
-  elementId: number,
-  size: number,
-};
-/**
- * An object for generated helper functions.
- */
-export const UpdateTextElementSize = {
-  /**
-  * A function which returns this type represented as an AlgebraicType.
-  * This function is derived from the AlgebraicType used to generate this type.
-  */
-  getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "elementId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "size", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
-  },
-
-  serialize(writer: __BinaryWriter, value: UpdateTextElementSize): void {
-    __AlgebraicTypeValue.serializeValue(writer, UpdateTextElementSize.getTypeScriptAlgebraicType(), value);
-  },
-
-  deserialize(reader: __BinaryReader): UpdateTextElementSize {
-    return __AlgebraicTypeValue.deserializeValue(reader, UpdateTextElementSize.getTypeScriptAlgebraicType());
-  },
-
-}
-
-export default UpdateTextElementSize;
+export type Refresh = { tag: "Refresh" };
+export type HardRefresh = { tag: "HardRefresh" };
 

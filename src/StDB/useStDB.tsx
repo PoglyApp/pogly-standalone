@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Identity, ConnectionId, SubscriptionEventContextInterface } from "@clockworklabs/spacetimedb-sdk";
+import { Identity, ConnectionId, SubscriptionEventContextInterface } from "spacetimedb";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
 import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
 import { DebugLogger } from "../Utility/DebugLogger";

@@ -4,7 +4,7 @@ import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import { Identity } from "spacetimedb";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Permissions } from "../../module_bindings";
 

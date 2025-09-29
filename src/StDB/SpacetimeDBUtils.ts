@@ -1,4 +1,4 @@
-import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import { Identity } from "spacetimedb";
 import { DbConnection, ElementData, Guests, Layouts } from "../module_bindings";
 
 export const getElementDataByID = (Client: DbConnection, elementDataID: number) => {
