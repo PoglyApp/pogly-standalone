@@ -26,10 +26,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
-import Fingerprint from "@mui/icons-material/Fingerprint";
 import ContentPaste from "@mui/icons-material/ContentPaste";
 import { BackupModal } from "./BackupModal";
-import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
@@ -176,10 +174,6 @@ export const SettingsModal = () => {
     localStorage.removeItem("stdbConnectModuleAuthKey");
     closeModal("settings_modal", modals, setModals);
   }
-
-  const showAuthToken = () => {
-    setModals((oldModals: any) => [...oldModals, <AuthTokenModal key="authToken_modal" />]);
-  };
 
   const showInstancePassword = () => {
     setModals((oldModals: any) => [...oldModals, <InstancePasswordModal key="instancePassword_modal" />]);
@@ -445,20 +439,6 @@ export const SettingsModal = () => {
                 }}
               >
                 {copyOverlayButtonText}
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<Fingerprint />}
-                sx={{
-                  color: "#ffa700",
-                  borderColor: "#ffa700",
-                  "&:hover": { borderColor: "#db8f00" },
-                  marginTop: "10px",
-                }}
-                onClick={showAuthToken}
-              >
-                Update Auth Token
               </Button>
 
               <Button
