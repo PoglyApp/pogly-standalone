@@ -5,6 +5,7 @@ import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetRe
 import { DebugLogger } from "../Utility/DebugLogger";
 import { StopHeartbeat } from "../Utility/PingHeartbeat";
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
+import { useAuth } from "react-oidc-context";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -12,6 +13,7 @@ const useStDB = (
   setInstanceConfigured?: Function,
   setStdbAuthenticated?: Function
 ) => {
+  const auth = useAuth();
   const [identity, setIdentity] = useState<Identity>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
@@ -22,7 +24,7 @@ const useStDB = (
     if (!connectionConfig) return;
     DebugLogger("Initializing SpacetimeDB");
 
-    const stdbToken = localStorage.getItem("twitchIdToken") || localStorage.getItem("stdbToken") || "";
+    const stdbToken = auth.user?.id_token || "";
     let stdbDomain = connectionConfig?.domain || "";
 
     const isOverlay: Boolean = window.location.href.includes("/overlay");
