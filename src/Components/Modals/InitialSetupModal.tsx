@@ -19,6 +19,7 @@ import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { Config, DbConnection } from "../../module_bindings";
+import { useAuth } from "react-oidc-context";
 
 interface IProp {
   client: DbConnection;
@@ -28,6 +29,7 @@ interface IProp {
 }
 
 export const InitialSetupModal = (props: IProp) => {
+  const auth = useAuth();
   const [platform, setPlatform] = useState<string>(props.config.streamingPlatform);
   const [channel, setChannel] = useState<string>(props.config.streamName);
   const [debug, setDebug] = useState<boolean>(props.config.debugMode);
@@ -224,21 +226,6 @@ export const InitialSetupModal = (props: IProp) => {
             }
             label="Strict Mode"
           />
-
-          <Button
-            variant="outlined"
-            title="This is your token to prove that you are the owner of this Pogly instance. Keep this saved somewhere in case your local cache gets cleared!"
-            onClick={() => {
-              navigator.clipboard.writeText(localStorage.getItem("stdbToken")!);
-              setAuthButtonText("Copied!");
-
-              setTimeout(() => {
-                setAuthButtonText("Copy Auth Token");
-              }, 1000);
-            }}
-          >
-            {copyAuthButtonText}
-          </Button>
 
           <Button
             variant="outlined"

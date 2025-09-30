@@ -349,7 +349,8 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                 configuration from the settings.
               </p>
 
-              {legacyLogin && (
+              {/* NEED TO FIGURE OUT HOW TO HANDLE LEGACY/ANONYMOUS SPACETIMEAUTH LOGINS */}
+              {/* {legacyLogin && (
                 <div className="mt-8">
                   <p>
                     Since you're using legacy login, it is <b>your responsibility</b> to keep your authentication token
@@ -370,7 +371,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                     {copyAuthButtonText}
                   </StyledButton>
                 </div>
-              )}
+              )} */}
 
               <div className="mt-8">
                 <p>
