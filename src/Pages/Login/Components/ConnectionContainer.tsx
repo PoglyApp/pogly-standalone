@@ -1,12 +1,12 @@
 import { ChevronDown, SaveIcon, UserRound, Trash } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
 import HintBubble from "../../../Components/General/HintBubble";
 import { useAuth } from "react-oidc-context";
+import { useNavigate } from "react-router-dom";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -16,7 +16,6 @@ interface IProp {
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
   const auth = useAuth();
-  const urlParams = new URLSearchParams(window.location.search);
 
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
@@ -29,80 +28,45 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const [guestNickname, setGuestNickname] = useState<string>("");
   const [hasCustomNickname, setHasCustomNickname] = useState<boolean>(false);
   const nicknameFieldRef = useRef<HTMLInputElement>(null);
-
   const domainRef = useRef<HTMLSelectElement>(null);
 
-  const [idToken, setIdToken] = useState<string | undefined>(auth.user?.id_token);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
   useEffect(() => {
     const modules = localStorage.getItem("poglyQuickSwap");
-    if (modules && modules !== undefined) setQuickSwapModules(JSON.parse(modules));
+    if (modules) setQuickSwapModules(JSON.parse(modules));
 
+    const urlParams = new URLSearchParams(window.location.search);
     const domain = urlParams.get("domain");
-
     if (domain) {
       setCustomDomain(true);
       setDomain(domain);
-      domainRef.current!.value = "Custom";
-    }
-
-    const storedIdToken = localStorage.getItem("StdbIdToken");
-
-    if (storedIdToken) {
-      const decodedToken: any = jwtDecode(storedIdToken);
-      const currentTime = Date.now() / 1000;
-
-      if (decodedToken.exp < currentTime) {
-        console.warn("ID token has expired. Forcing user to relog...");
-        return;
-      }
-
-      const loginMethod: string = String(decodedToken.login_method);
-
-      setIdToken(storedIdToken);
-      setGuestNickname(decodedToken.preferred_username);
-      setNickname(decodedToken.preferred_username);
-      setHasCustomNickname(true);
-      setSubtitle(loginMethod || "SpacetimeAuth");
-
-      localStorage.setItem("nickname", decodedToken.preferred_username);
-      return;
+      if(domainRef.current) domainRef.current.value = "Custom";
     }
 
     const savedNickname: string | null = localStorage.getItem("nickname");
 
-    if (savedNickname) {
-      setGuestNickname(savedNickname);
-      setHasCustomNickname(true);
-    } else {
-      setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
-    }
+    setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
   }, []);
 
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      if (!auth.user.id_token) return;
+      const preferred = 
+        (auth.user.profile as any)?.preferred_username || 
+        auth.user.profile?.name || 
+        auth.user.profile?.sub ||
+        "";
 
-      localStorage.setItem("StdbIdToken", auth.user.id_token);
-
-      const preferred =
-        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
-
-      const decodedToken: any = jwtDecode(auth.user.id_token);
-      const loginMethod: string = String(decodedToken.login_method);
+      const loginMethod = (auth.user?.profile as any)?.login_method;
 
       if (preferred) {
         setGuestNickname(preferred);
         setNickname(preferred);
         setSubtitle(loginMethod || "SpacetimeAuth");
-        localStorage.setItem("nickname", preferred);
         setHasCustomNickname(true);
       }
-
-      setIdToken(auth.user.id_token);
     }
-  }, [auth.isAuthenticated, auth.user]);
+  }, [auth.isAuthenticated, auth.user, setNickname]);
 
   const handleConnect = () => {
     saveQuickSwap();
@@ -110,13 +74,12 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setNickname(guestNickname);
     setHasCustomNickname(true);
 
-    localStorage.setItem("nickname", guestNickname);
     localStorage.setItem("stdbConnectDomain", domain);
     localStorage.setItem("stdbConnectModule", moduleName);
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
     setInstanceSettings({
-      token: idToken,
+      token: auth.user?.id_token ?? undefined,
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -128,22 +91,19 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const quickSwap = localStorage.getItem("poglyQuickSwap");
     const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: guestNickname, auth: authKey };
 
-    // If pre-existing swap list exists and is not empty
     if (quickSwap && quickSwap.length > 0) {
       const modules: QuickSwapType[] = JSON.parse(quickSwap);
 
-      // Delete quickswap option
       if (!moduleName) {
         const filteredModules = modules.filter((module: QuickSwapType) => module.module !== quickSwapSelected?.module);
         setQuickSwapModules(filteredModules);
         setQuickSwapSelected(null);
-
         return localStorage.setItem("poglyQuickSwap", JSON.stringify(filteredModules));
       }
 
       const isModuleAlreadySaved = modules.findIndex((module: QuickSwapType) => module.module === moduleName);
 
-      if (isModuleAlreadySaved != -1) {
+      if (isModuleAlreadySaved !== -1) {
         modules[isModuleAlreadySaved] = newConnection;
       } else {
         modules.push(newConnection);
@@ -189,15 +149,17 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setDomain(module.domain);
     setQuickSwapSelected(module);
 
+    if(!domainRef.current) return;
+
     switch (module.domain) {
       case "wss://maincloud.spacetimedb.com":
-        domainRef.current!.value = "Cloud";
+        domainRef.current.value = "Cloud";
         break;
       case "ws://127.0.0.1:3000":
-        domainRef.current!.value = "Local";
+        domainRef.current.value = "Local";
         break;
       default:
-        domainRef.current!.value = "Custom";
+        domainRef.current.value = "Custom";
         setCustomDomain(true);
         break;
     }
@@ -208,7 +170,6 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
     setGuestNickname(newNickname);
-    localStorage.setItem("nickname", newNickname);
     setHasCustomNickname(true);
   };
 
@@ -321,14 +282,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             </div>
 
             <div className="flex justify-end gap-2">
-              {idToken && (
+              {auth.isAuthenticated && (
                 <StyledButton
                   className="absolute left-5 bg-[#6441a5]!"
-                  onClick={() => {
-                    localStorage.removeItem("StdbIdToken");
-                    localStorage.removeItem("nickname");
-                    auth.signoutRedirect();
-                  }}
+                  onClick={() => auth.signoutRedirect()}
                 >
                   logout
                 </StyledButton>

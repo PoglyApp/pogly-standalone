@@ -35,7 +35,6 @@ const useStDB = (
       try {
         setIdentity(identity);
         setClient(DbCtx);
-        if (!isOverlay) localStorage.setItem("stdbToken", token);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
         client
