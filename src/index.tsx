@@ -21,6 +21,7 @@ const oidcConfig = {
 
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   automaticSilentRenew: true,
+  includeIdTokenInSilentRenew: true,
   silent_redirect_uri: `${origin}/silent-oidc-renew.html`,
 
   loadUserInfo: false,
