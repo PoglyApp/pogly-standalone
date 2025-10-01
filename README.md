@@ -66,6 +66,7 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/EMIRU" rel="noreferrer" target="_blank" title="Emiru"><img src="./images/streamers/emiru.svg" /></a>
 <a href="https://www.twitch.tv/npmlol" rel="noreferrer" target="_blank" title="Npmlol"><img src="./images/streamers/npmlol.svg" /></a>
 <a href="https://www.twitch.tv/tubbo" rel="noreferrer" target="_blank" title="Tubbo"><img src="./images/streamers/tubbo.svg" /></a>
+<a href="https://www.twitch.tv/jasontheween" rel="noreferrer" target="_blank" title="jasontheween"><img src="./images/streamers/jasontheween.svg" /></a>
 <a href="https://www.twitch.tv/orophia" rel="noreferrer" target="_blank" title="orophia"><img src="./images/streamers/orophia.svg" /></a>
 <a href="https://www.twitch.tv/maya" rel="noreferrer" target="_blank" title="Maya"><img src="./images/streamers/maya.svg" /></a>
 <a href="https://www.twitch.tv/zoil" rel="noreferrer" target="_blank" title="Zoil"><img src="./images/streamers/zoil.svg" /></a>
