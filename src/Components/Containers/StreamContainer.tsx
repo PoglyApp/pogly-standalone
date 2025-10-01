@@ -53,8 +53,12 @@ const StreamContainer = () => {
   const streamOnLive = () => {
     if (!chrome) return;
 
-    document.getElementById("chromealert")?.style.removeProperty("display");
-    document.getElementById("stream")?.style.removeProperty("pointer-events");
+    try {
+      document.getElementById("chromealert")?.style.removeProperty("display");
+      document.getElementById("stream")?.style.removeProperty("pointer-events");
+    } catch (error) {
+      console.log("[ERROR] Failed to remove properties from stream container", error);
+    }
   };
 
   const streamOnPlaying = () => {
@@ -62,17 +66,26 @@ const StreamContainer = () => {
   };
 
   const closeAlert = () => {
-    document.getElementById("stream")?.style.setProperty("pointer-events", "none");
-    document.getElementById("chromealert")?.remove();
+    try {
+      document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+      document.getElementById("chromealert")?.remove();
+    } catch (error) {
+      console.log("[ERROR] Failed to close alert", error);
+    }
   };
 
   const showExplanation = () => {
     const explanation = document.getElementById("explanation");
+    if (!explanation) return console.log("Explanation somehow missing?");
 
-    if (explanation!.style.display !== "unset") {
-      explanation!.style.display = "unset";
-    } else {
-      explanation!.style.display = "none";
+    try {
+      if (explanation.style.display !== "unset") {
+        explanation.style.display = "unset";
+      } else {
+        explanation.style.display = "none";
+      }
+    } catch (error) {
+      console.log("[ERROR] Failed to show explanation", error);
     }
   };
 
