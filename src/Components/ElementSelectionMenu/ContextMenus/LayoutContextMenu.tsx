@@ -69,6 +69,15 @@ export const LayoutContextMenu = (props: IProps) => {
     ]);
   };
 
+  const copyLayoutOverlayURL = (layoutName: string) => {
+    let overlayURL = window.location.origin + "/overlay?module=" + spacetimeDB.Runtime?.module;
+    const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://pogly.spacetimedb.com";
+
+    if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + spacetimeDB.Runtime?.domain;
+
+    navigator.clipboard.writeText(overlayURL + `&layout=${layoutName}`);
+  };
+
   const handleClose = () => {
     DebugLogger("Handling close context menu");
     props.setContextMenu(null);
@@ -124,6 +133,9 @@ export const LayoutContextMenu = (props: IProps) => {
         <StyledMenuItem onClick={cloneLayout}>Clone</StyledMenuItem>
       )}
 
+      <StyledMenuItem onClick={() => copyLayoutOverlayURL(props.contextMenu.layout.name)}>
+        Layout overlay URL
+      </StyledMenuItem>
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
       {showExamine && (
