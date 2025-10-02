@@ -21,7 +21,7 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
+  const { Identity, Runtime } = useSpacetimeContext();
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -69,6 +69,15 @@ export const LayoutContextMenu = (props: IProps) => {
       ...oldModals,
       <LayoutDeletionConfirmationModal key="layoutDeletionConfirmationModal_modal" layout={props.contextMenu.layout} />,
     ]);
+  };
+
+  const copyLayoutOverlayURL = (layoutName: string) => {
+    let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
+    const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
+
+    if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
+
+    navigator.clipboard.writeText(overlayURL + `&layout=${layoutName}`);
   };
 
   const handleClose = () => {
@@ -126,6 +135,9 @@ export const LayoutContextMenu = (props: IProps) => {
         <StyledMenuItem onClick={cloneLayout}>Clone</StyledMenuItem>
       )}
 
+      <StyledMenuItem onClick={() => copyLayoutOverlayURL(props.contextMenu.layout.name)}>
+        Layout overlay URL
+      </StyledMenuItem>
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
       {showExamine && (

@@ -5,7 +5,7 @@ import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import Layouts from "../../../module_bindings/layouts";
 import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";
@@ -26,7 +26,6 @@ export const LayoutCategory = () => {
   const { Identity } = useSpacetimeContext();
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
-
   const [contextMenu, setContextMenu] = useState<any>(null);
 
   const strictMode: boolean = Config.findByVersion(0)!.strictMode;
@@ -121,11 +120,13 @@ export const LayoutCategory = () => {
                   }}
                 >
                   {layout.name}
-                  <CheckIcon
-                    id={layout.id + "_layout_icon"}
-                    sx={{ color: "green", marginLeft: "3px", display: `${layout.active ? "unset" : "none"}` }}
-                    titleAccess="Active Layout"
-                  />
+                  {layoutContext.activeLayout.id === layout.id && (
+                    <CheckIcon
+                      id={layout.id + "_layout_icon"}
+                      sx={{ color: "green", marginLeft: "3px" }}
+                      titleAccess="Active Layout"
+                    />
+                  )}
                 </Button>
               </div>
             );
