@@ -120,13 +120,11 @@ export const LayoutCategory = () => {
                   }}
                 >
                   {layout.name}
-                  {layoutContext.activeLayout.id === layout.id && (
-                    <CheckIcon
-                      id={layout.id + "_layout_icon"}
-                      sx={{ color: "green", marginLeft: "3px" }}
-                      titleAccess="Active Layout"
-                    />
-                  )}
+                  <CheckIcon
+                    id={layout.id + "_layout_icon"}
+                    sx={{ color: "green", marginLeft: "3px", display: `${layout.active ? "unset" : "none"}` }}
+                    titleAccess="Active Layout"
+                  />
                 </Button>
               </div>
             );
