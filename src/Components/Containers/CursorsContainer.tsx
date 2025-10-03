@@ -24,8 +24,9 @@ export const CursorsContainer = () => {
             layoutContext.activeLayout.id === guest.selectedLayoutId
         )
         .map((guest: Guests) => {
-          if (config.authentication && !guest.authenticated) return <></>;
-          return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
+          if (config.authentication && !guest.authenticated) {
+            return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
+          }
         })}
     </>
   );
