@@ -2,14 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
 import Guests from "../../module_bindings/guests";
 import { CursorComponent } from "../General/CursorComponent";
-import Config from "../../module_bindings/config";
 import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 
 export const CursorsContainer = () => {
   const { Identity } = useSpacetimeContext();
-  const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
 
   const [visibleCursors, setVisibleCursors] = useState<Guests[]>([]);
