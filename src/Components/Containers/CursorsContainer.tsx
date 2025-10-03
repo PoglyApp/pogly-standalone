@@ -12,21 +12,26 @@ export const CursorsContainer = () => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
 
+  const [visibleCursors, setVisibleCursors] = useState<Guests[]>([]);
+
   const guests = useAppSelector((state: any) => state.guests.guests);
+
+  useEffect(() => {
+    setVisibleCursors(() => {
+      return guests.filter(
+        (guest: Guests) =>
+          guest.address.toHexString() !== Identity.address.toHexString() &&
+          guest.nickname !== "" &&
+          layoutContext.activeLayout.id === guest.selectedLayoutId
+      );
+    });
+  }, [layoutContext.activeLayout, guests]);
 
   return (
     <>
-      {guests
-        .filter(
-          (guest: Guests) =>
-            guest.address.toHexString() !== Identity.address.toHexString() &&
-            guest.nickname !== "" &&
-            layoutContext.activeLayout.id === guest.selectedLayoutId
-        )
-        .map((guest: Guests) => {
-          if (config.authentication && !guest.authenticated) {
-            return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
-          }
+      {visibleCursors &&
+        visibleCursors.map((guest: Guests) => {
+          return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
         })}
     </>
   );
