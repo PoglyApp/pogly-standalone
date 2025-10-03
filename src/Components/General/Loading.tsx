@@ -1,39 +1,93 @@
-import { CircularProgress, Typography } from "@mui/material";
 import styled from "styled-components";
+import { CircularProgress, Typography, Button } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useEffect, useState } from "react";
 
 interface IProps {
   text: string;
+  loadingStuckText?: boolean;
 }
 
 export const Loading = (props: IProps) => {
-  const isOverlay: Boolean = window.location.href.includes("/overlay");
-  
-  if(isOverlay) return (<></>);
-  
+  const [showLoadingStuck, setShowLoadingStuck] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoadingStuck(true);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const clearConnection = () => {
+    localStorage.removeItem("stdbConnectDomain");
+    localStorage.removeItem("stdbConnectModule");
+    localStorage.removeItem("stdbConnectModuleAuthKey");
+
+    window.location.reload();
+  };
+
   return (
-    <Container>
-      <Typography variant="h5" component="h1" color="white" paddingBottom={3}>
-        {props.text}
-      </Typography>
-      <svg width={0} height={0}>
-        <defs>
-          <linearGradient id="my_gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#00c8af" />
-            <stop offset="100%" stopColor="#9146ff" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <CircularProgress  sx={{ 'svg circle': {stroke: 'url(#my_gradient)' } }}/>
-    </Container>
+    <LoadingContainer>
+      <div style={{ position: "absolute", top: "45%" }}>
+        <Typography variant="h5" component="h1" color="white" paddingBottom={3}>
+          {props.text}
+        </Typography>
+        <svg width={0} height={0}>
+          <defs>
+            <linearGradient id="my_gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#00c8af" />
+              <stop offset="100%" stopColor="#9146ff" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <CircularProgress sx={{ "svg circle": { stroke: "url(#my_gradient)" } }} />
+      </div>
+
+      {showLoadingStuck && (
+        <LoadingStuckContainer>
+          {props.loadingStuckText && (
+            <Typography variant="subtitle1" component="span" color="white" paddingBottom={3}>
+              Loading seems to be taking longer than usual.
+              <br />
+              Please logout and verify your module, authentication key and domain.
+            </Typography>
+          )}
+          <Button
+            variant="text"
+            sx={{
+              color: "#ff0000c8",
+              textTransform: "initial",
+              padding: "0",
+              width: "fit-content",
+              justifySelf: "center",
+            }}
+            onClick={clearConnection}
+          >
+            <LogoutIcon sx={{ color: "#ff0000c8", marginRight: "5px" }} />
+            Log Out
+          </Button>
+        </LoadingStuckContainer>
+      )}
+    </LoadingContainer>
   );
 };
+const LoadingContainer = styled.div`
+  display: grid;
 
-const Container = styled.div`
+  width: 100vw;
+  height: 100vh;
+
   text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translateX(-50%) translateY(-50%);
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+
+  justify-items: center;
+  align-content: center;
+`;
+
+const LoadingStuckContainer = styled.div`
+  display: grid;
+
+  width: 600px;
+  height: fit-content;
+
+  margin-top: 300px;
 `;

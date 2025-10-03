@@ -33,7 +33,9 @@ export const Login = () => {
 
   const stdbAuthenticatedRef = useRef<boolean>(false);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
-  const [nickname, setNickname] = useState<string | null>((auth.user?.profile as any)?.preferred_username || auth.user?.profile?.name || auth.user?.profile?.sub || "");
+  const [nickname, setNickname] = useState<string | null>(
+    (auth.user?.profile as any)?.preferred_username || auth.user?.profile?.name || auth.user?.profile?.sub || ""
+  );
   const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
@@ -117,7 +119,7 @@ export const Login = () => {
         />
       );
     }
-    return <Loading text="Loading SpacetimeDB" />;
+    return <Loading text="Loading SpacetimeDB" loadingStuckText={true} />;
   }
 
   if (!spacetime.Identity) {
@@ -134,7 +136,7 @@ export const Login = () => {
         />
       );
     }
-    return <Loading text="Retreiving Identity" />;
+    return <Loading text="Retreiving Identity" loadingStuckText={true} />;
   }
 
   if (!spacetime.Client.connectionId) {
@@ -151,7 +153,7 @@ export const Login = () => {
         />
       );
     }
-    return <Loading text="Retreiving Address" />;
+    return <Loading text="Retreiving Address" loadingStuckText={true} />;
   }
 
   if (!spacetime.InstanceConfig) {
@@ -168,7 +170,7 @@ export const Login = () => {
         />
       );
     }
-    return <Loading text="Loading Configuration" />;
+    return <Loading text="Loading Configuration" loadingStuckText={true} />;
   }
 
   // Step 3) Are we connected to SpacetimeDB?
@@ -207,7 +209,7 @@ export const Login = () => {
 
     spacetime.Client.reducers.connect();
 
-    return <Loading text="Connecting to Instance" />;
+    return <Loading text="Connecting to Instance" loadingStuckText={true} />;
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
