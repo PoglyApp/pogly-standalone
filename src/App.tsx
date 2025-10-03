@@ -187,7 +187,7 @@ export const App: React.FC = () => {
         />
       );
     }
-    return <Loading text="Loading SpacetimeDB" />;
+    return <Loading text="Loading SpacetimeDB" loadingStuckText={true} />;
   }
 
   if (!spacetime.Identity) {
@@ -204,7 +204,7 @@ export const App: React.FC = () => {
         />
       );
     }
-    return <Loading text="Retreiving Identity" />;
+    return <Loading text="Retreiving Identity" loadingStuckText={true} />;
   }
 
   if (!spacetime.Address) {
@@ -221,7 +221,7 @@ export const App: React.FC = () => {
         />
       );
     }
-    return <Loading text="Retreiving Address" />;
+    return <Loading text="Retreiving Address" loadingStuckText={true} />;
   }
 
   if (!spacetime.InstanceConfig) {
@@ -238,7 +238,7 @@ export const App: React.FC = () => {
         />
       );
     }
-    return <Loading text="Loading Configuration" />;
+    return <Loading text="Loading Configuration" loadingStuckText={true} />;
   }
 
   // Step 3) Are we connected to SpacetimeDB?
@@ -276,7 +276,7 @@ export const App: React.FC = () => {
 
     ConnectReducer.call();
 
-    return <Loading text="Connecting to Instance" />;
+    return <Loading text="Connecting to Instance" loadingStuckText={true} />;
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
