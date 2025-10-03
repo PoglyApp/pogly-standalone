@@ -22,14 +22,14 @@ export const CursorsContainer = () => {
           layoutContext.activeLayout.id === guest.selectedLayoutId
       );
     });
-  }, [layoutContext.activeLayout, guests]);
+  }, [layoutContext.activeLayout, guests, Identity.address]);
 
   return (
-    <>
+    <div>
       {visibleCursors &&
         visibleCursors.map((guest: Guests) => {
-          return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
+          return <CursorComponent key={guest.identity.toHexString()} guest={guest} />;
         })}
-    </>
+    </div>
   );
 };
