@@ -33,6 +33,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const [useStrictMode, setUseStrictMode] = useState<boolean>(false);
   const [password, setPassword] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<boolean>(false);
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [overlayURL, setOverlayURL] = useState<string>("");
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
@@ -94,6 +95,8 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       window.location.reload();
     }, 3000);
   };
+
+  if (isOverlay) return <></>;
 
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bg-[#10121a]">

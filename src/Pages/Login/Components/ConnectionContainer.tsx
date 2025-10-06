@@ -20,6 +20,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://maincloud.spacetimedb.com");
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
@@ -178,6 +179,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setGuestNickname(newNickname);
     setHasCustomNickname(true);
   };
+
+  if (isOverlay) return <></>;
 
   return (
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
