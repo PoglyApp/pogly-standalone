@@ -10,6 +10,7 @@ interface IProps {
 
 export const Loading = (props: IProps) => {
   const [showLoadingStuck, setShowLoadingStuck] = useState<boolean>(false);
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,6 +26,8 @@ export const Loading = (props: IProps) => {
 
     window.location.reload();
   };
+
+  if (isOverlay) return <></>;
 
   return (
     <LoadingContainer>
