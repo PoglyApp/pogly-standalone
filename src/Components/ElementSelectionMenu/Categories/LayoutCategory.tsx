@@ -5,7 +5,7 @@ import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import Layouts from "../../../module_bindings/layouts";
 import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { useLayoutEvents } from "../../../StDB/Hooks/useLayoutEvents";

@@ -70,6 +70,6 @@ export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) =
 
       break;
   }
-  
+
   return canvasElement;
 };

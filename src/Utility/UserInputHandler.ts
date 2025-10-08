@@ -7,7 +7,7 @@ import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import { GetCoordsFromTransform, GetTransformFromCoords } from "./ConvertCoordinates";
+import { GetCoordsFromTransform, GetMatrixFromElement, GetTransformFromCoords } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
@@ -133,8 +133,12 @@ export const UserInputHandler = (
         DebugLogger("Duplicating element");
         const element = Elements.findById(selectedElement.Elements.id);
 
-        if (element)
-          insertElement(element.element, activeLayout, element.transparency, OffsetElementForCanvas(element).transform);
+        if (element) {
+          const matrix = GetMatrixFromElement(element.transform) || undefined;
+          const transform = OffsetElementForCanvas(element).transform;
+
+          insertElement(element.element, activeLayout, element.transparency, transform, element.clip, matrix);
+        }
       } catch {
         console.log("Pogly encountered an issue when attempting to Duplicate an element!");
       }
@@ -222,12 +226,10 @@ export const UserInputHandler = (
 
             DebugLogger("Inserting new text");
 
-            insertElement(
-              json.element as ElementStruct,
-              activeLayout,
-              json.transparency,
-              OffsetElementForCanvas(json as Elements).transform
-            );
+            const matrix = GetMatrixFromElement(json.transform) || undefined;
+            const transform = OffsetElementForCanvas(json).transform;
+
+            insertElement(json.element as ElementStruct, activeLayout, json.transparency, transform, json.clip, matrix);
           } catch (error) {
             const isImageUrl = /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg|webp|avif))/i.test(text);
 

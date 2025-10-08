@@ -261,6 +261,7 @@ export const Canvas = (props: IProps) => {
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
             canvasElements={canvasElements}
+            transformSelect={transformSelect}
             setTransformSelect={setTransformSelect}
             setSelected={setSelected}
             setSelectoTargets={setSelectoTargets}

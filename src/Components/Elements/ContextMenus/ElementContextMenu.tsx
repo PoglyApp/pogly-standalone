@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Elements from "../../../module_bindings/elements";
 import { CanvasElementType } from "../../../Types/General/CanvasElementType";
 import LockIcon from "@mui/icons-material/Lock";
+import CheckIcon from "@mui/icons-material/Check";
 import {
   handleDelete,
   handleFlipElement,
@@ -34,6 +35,7 @@ interface IProps {
   contextMenu: any;
   setContextMenu: Function;
   canvasElements: CanvasElementType[];
+  transformSelect: any;
   setTransformSelect: Function;
   setSelected: Function;
   setSelectoTargets: Function;
@@ -164,10 +166,12 @@ export const ElementContextMenu = (props: IProps) => {
                 value={"Scale"}
                 onClick={() => {
                   if (!hasElementBeenWarped) props.setTransformSelect({ size: true, warp: false, clip: false });
+                  handleClose();
                 }}
                 style={hasElementBeenWarped ? { cursor: "not-allowed", color: "#364f68" } : {}}
               >
                 Scale
+                {props.transformSelect.size && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
                 {hasElementBeenWarped && (
                   <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingLeft: "5px" }} />
                 )}
@@ -178,17 +182,21 @@ export const ElementContextMenu = (props: IProps) => {
               value={"Clip"}
               onClick={() => {
                 props.setTransformSelect({ size: false, warp: false, clip: true });
+                handleClose();
               }}
             >
               Clip
+              {props.transformSelect.clip && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
             </StyledMenuItem>
             <StyledMenuItem
               value={"Wrap"}
               onClick={() => {
                 props.setTransformSelect({ size: false, warp: true, clip: false });
+                handleClose();
               }}
             >
-              Wrap
+              Warp
+              {props.transformSelect.warp && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
             </StyledMenuItem>
           </StyledSelect>
         </FormControl>
@@ -235,6 +243,18 @@ export const ElementContextMenu = (props: IProps) => {
               onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
             >
               Warp
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"All"}
+              onClick={() => {
+                handleResetTransform(selectedElement, TransformType.Scale, () => {});
+                handleResetTransform(selectedElement, TransformType.Rotation, () => {});
+                handleResetTransform(selectedElement, TransformType.Clip, () => {});
+                handleResetTransform(selectedElement, TransformType.Warp, () => {});
+                handleClose();
+              }}
+            >
+              All
             </StyledMenuItem>
           </StyledSelect>
         </FormControl>
