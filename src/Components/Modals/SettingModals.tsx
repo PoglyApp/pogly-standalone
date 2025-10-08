@@ -559,7 +559,7 @@ export const SettingsModal = (props: IProp) => {
                 }}
                 onClick={() => RefreshOverlayReducer.call()}
               >
-                Force refresh canvas
+                Force refresh overlay
               </Button>
 
               <Button
@@ -573,7 +573,7 @@ export const SettingsModal = (props: IProp) => {
                 }}
                 onClick={() => RefreshOverlayClearStorageReducer.call()}
               >
-                Force hard refresh canvas
+                Force hard refresh overlay
               </Button>
             </div>
           </SettingsTabPanel>
