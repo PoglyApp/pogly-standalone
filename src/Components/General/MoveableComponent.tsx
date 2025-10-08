@@ -4,12 +4,11 @@ import Selecto from "react-selecto";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
 import Config from "../../module_bindings/config";
-import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
-import { GetCoordsFromTransform } from "../../Utility/ConvertCoordinates";
 import UpdateWidgetElementSizeReducer from "../../module_bindings/update_widget_element_size_reducer";
 import UpdateImageElementSizeReducer from "../../module_bindings/update_image_element_size_reducer";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import UpdateElementClipReducer from "../../module_bindings/update_element_clip_reducer";
 
 interface IProp {
   transformSelect: any;
@@ -20,14 +19,10 @@ interface IProp {
 }
 
 export const MoveableComponent = (props: IProp) => {
-  const { settings } = useContext(SettingsContext);
   const config: Config = useContext(ConfigContext);
 
-  const debugText = document.getElementById("debug-text" + props.selected?.Elements.id);
-  const stream = document.getElementById("stream")?.getBoundingClientRect();
-
   const [isShiftPressed, setIsShiftPressed] = useState(false);
-  //const [isResize, setIsResize] = useState(false);
+  const [hasElementBeenWarped, sethasElementBeenWarped] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
@@ -55,16 +50,11 @@ export const MoveableComponent = (props: IProp) => {
   }, []);
 
   useEffect(() => {
-    if (!debugText) return;
-
-    if (!settings.debug) {
-      DebugLogger("Hide debug text");
-      debugText.style.display = "none";
-    } else {
-      DebugLogger("Show debug text");
-      debugText.style.display = "Inline";
-    }
-  }, [settings.debug, debugText]);
+    if (!props.selected) return;
+    const hasMatrix =
+      document.getElementById(props.selected.Elements.id.toString())?.style.transform.includes("matrix") || false;
+    sethasElementBeenWarped(hasMatrix);
+  }, [props.selected]);
 
   const onTransformStop = (event: any) => {
     if (!event.isDrag || !props.selected) return;
@@ -81,26 +71,7 @@ export const MoveableComponent = (props: IProp) => {
 
     if (Date.now() < transformWaitUntil) return;
 
-    if (settings.debug && debugText) {
-      if (!stream) return;
-      const bounds = event.target.getBoundingClientRect();
-
-      const insideStream =
-        bounds.right >= stream.left &&
-        bounds.left <= stream.right &&
-        bounds.bottom >= stream.top &&
-        bounds.top <= stream.bottom;
-
-      const coords = GetCoordsFromTransform(event.target.style.transform);
-
-      debugText.innerHTML = `Pos: ${coords.x},${coords.y}<br />Vis: ${insideStream}`;
-    }
-
-    updateElementTransform(
-      //props.selected.Elements.id,
-      event.target.id,
-      event.target.style.transform
-    );
+    updateElementTransform(event.target.id, event.target.style.transform);
 
     transformWaitUntil = Date.now() + 1000 / config.updateHz;
   };
@@ -130,12 +101,10 @@ export const MoveableComponent = (props: IProp) => {
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-
         UpdateImageElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
 
       case "WidgetElement":
-
         UpdateWidgetElementSizeReducer.call(event.target.id, event.lastEvent.width, event.lastEvent.height);
         break;
     }
@@ -155,12 +124,10 @@ export const MoveableComponent = (props: IProp) => {
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-
         UpdateImageElementSizeReducer.call(event.target.id, event.width, event.height);
         break;
 
       case "WidgetElement":
-
         UpdateWidgetElementSizeReducer.call(event.target.id, event.width, event.height);
         break;
     }
@@ -172,12 +139,7 @@ export const MoveableComponent = (props: IProp) => {
 
   const onClip = (event: any) => {
     if (!props.selected) return;
-    //updateElementClip(props.selected.Elements.id, event.style.clipPath);
-  };
-
-  const onClipStop = (event: any) => {
-    if (!event.isDrag || !props.selected) return;
-    //updateElementClip(props.selected.Elements.id, event.lastEvent.style.clipPath);
+    UpdateElementClipReducer.call(event.target.id, event.clipStyle);
   };
 
   return (
@@ -195,11 +157,15 @@ export const MoveableComponent = (props: IProp) => {
       // snappable={isShiftPressed && !isResize}
       // snapGridWidth={10}
       // snapGridHeight={10}
-      resizable={true && props.transformSelect.size && props.selected?.Elements.element.tag !== "TextElement"}
-      // warpable={true && props.transformSelect.warp}
-      // clippable={true && props.transformSelect.clip}
-      warpable={false}
-      clippable={false}
+      resizable={
+        true &&
+        props.transformSelect.size &&
+        props.selected?.Elements.element.tag !== "TextElement" &&
+        !hasElementBeenWarped
+      }
+      warpable={true && props.transformSelect.warp}
+      clippable={true && props.transformSelect.clip}
+      clipTargetBounds
       throttleResize={1}
       throttleDrag={1}
       throttleRotate={1}
@@ -251,7 +217,6 @@ export const MoveableComponent = (props: IProp) => {
         event.target.style.clipPath = event.clipStyle;
         onClip(event);
       }}
-      onClipEnd={(event) => onClipStop(event)}
     />
   );
 };

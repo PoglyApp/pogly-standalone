@@ -1,4 +1,4 @@
-import { Divider, FormControl, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
+import { Divider, FormControl, InputLabel, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import Elements from "../../../module_bindings/elements";
@@ -48,7 +48,7 @@ export const ElementContextMenu = (props: IProps) => {
   const strictMode: boolean = Config.findByVersion(0)!.strictMode;
   const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
-  const [transformEdit, setTransformEdit] = useState("Scale");
+  const [showTransformEditMenuItem, setShowTransformEditMenuItem] = useState(true);
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
   const [showResetTransformMenuItem, setShowResetTransformMenuItem] = useState(true);
   const [showTransparencyMenuItem, setShowTransparencyMenuItem] = useState(true);
@@ -61,6 +61,8 @@ export const ElementContextMenu = (props: IProps) => {
 
   let element: Elements | undefined;
   if (selectedElement) element = Elements.findById(selectedElement.id);
+
+  const hasElementBeenWarped = element?.transform.includes("matrix");
 
   useEffect(() => {
     if (selectedElement) setTransparency(Elements.findById(selectedElement.id)!.transparency.valueOf());
@@ -135,38 +137,62 @@ export const ElementContextMenu = (props: IProps) => {
       transitionDuration={{ enter: 0, exit: 0 }}
       MenuListProps={{ onMouseLeave: handleClose }}
     >
-      {/* <StyledMenuItem
-        sx={{
-          paddingLeft: "0px",
-          paddingRight: "0px",
-          paddingTop: "15px",
-        }}
-      >
+      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
-          <InputLabel sx={{ color: "#ffffffa6", "&.Mui-focused": { color: "#ffffffa6" } }}>Edit Transform</InputLabel>
           <StyledSelect
-            label="Edit transform"
-            value={transformEdit !== "" ? transformEdit : "Scale"}
-            onChange={(event: any) => setTransformEdit(event.target.value)}
-            variant={"outlined"}
+            value={"Edit transform"}
+            variant={"standard"}
             sx={{
-              ".MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
+              ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
               ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+              marginRight: "5px !important",
+              marginTop: "0px !important",
             }}
+            onOpen={(prev) => setShowTransformEditMenuItem(false)}
+            onClose={(prev) => setShowTransformEditMenuItem(true)}
           >
-            <MenuItem value={"Scale"} onClick={() => handleEditTransform(TransformType.Scale, props.setTransformSelect)}>
-              Scale
+            <MenuItem value={"Edit transform"} style={{ display: showTransformEditMenuItem ? "block" : "none" }}>
+              Edit
             </MenuItem>
-            <MenuItem value={"Warp"} onClick={() => handleEditTransform(TransformType.Warp, props.setTransformSelect)}>
-              Warp
-            </MenuItem>
-            <MenuItem value={"Clip"} onClick={() => handleEditTransform(TransformType.Clip, props.setTransformSelect)}>
+            <Tooltip
+              title="Scale cannot be modified if the element has been warped. Reset warp to scale the element."
+              disableHoverListener={!hasElementBeenWarped}
+              placement="top"
+            >
+              <StyledMenuItem
+                value={"Scale"}
+                onClick={() => {
+                  if (!hasElementBeenWarped) props.setTransformSelect({ size: true, warp: false, clip: false });
+                }}
+                style={hasElementBeenWarped ? { cursor: "not-allowed", color: "#364f68" } : {}}
+              >
+                Scale
+                {hasElementBeenWarped && (
+                  <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingLeft: "5px" }} />
+                )}
+              </StyledMenuItem>
+            </Tooltip>
+
+            <StyledMenuItem
+              value={"Clip"}
+              onClick={() => {
+                props.setTransformSelect({ size: false, warp: false, clip: true });
+              }}
+            >
               Clip
-            </MenuItem>
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"Wrap"}
+              onClick={() => {
+                props.setTransformSelect({ size: false, warp: true, clip: false });
+              }}
+            >
+              Wrap
+            </StyledMenuItem>
           </StyledSelect>
         </FormControl>
-      </StyledMenuItem> */}
+      </StyledMenuItem>
 
       <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
@@ -198,18 +224,18 @@ export const ElementContextMenu = (props: IProps) => {
             >
               Rotation
             </StyledMenuItem>
-            {/* <StyledMenuItem
-              value={"Warp"}
-              onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
-            >
-              Warp
-            </StyledMenuItem>
             <StyledMenuItem
               value={"Clip"}
               onClick={() => handleResetTransform(selectedElement, TransformType.Clip, handleClose)}
             >
               Clip
-            </StyledMenuItem> */}
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"Warp"}
+              onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
+            >
+              Warp
+            </StyledMenuItem>
           </StyledSelect>
         </FormControl>
       </StyledMenuItem>
@@ -381,7 +407,7 @@ export const ElementContextMenu = (props: IProps) => {
 
       <Divider component="li" variant="fullWidth" sx={{ border: "solid 1px #001529e6" }} />
       {selectedElement.element.tag === "ImageElement" && (
-        <>
+        <div>
           {strictMode && !permissions ? (
             <Tooltip title="Strict mode is enabled and preventing you from updating the source. Ask the instance owner!">
               <StyledDisabledMenuItem>
@@ -392,7 +418,7 @@ export const ElementContextMenu = (props: IProps) => {
           ) : (
             <StyledMenuItem onClick={openUpdateSourceModal}>Update source</StyledMenuItem>
           )}
-        </>
+        </div>
       )}
 
       {strictMode && !permissions ? (

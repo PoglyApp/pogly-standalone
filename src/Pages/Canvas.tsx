@@ -94,7 +94,9 @@ export const Canvas = (props: IProps) => {
     setSelectoTargets,
     props.canvasInitialized,
     props.setCanvasInitialized,
-    layoutContext.activeLayout
+    layoutContext.activeLayout,
+    transformSelect,
+    setTransformSelect
   );
 
   const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);

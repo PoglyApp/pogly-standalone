@@ -15,6 +15,7 @@ import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import UpdateWidgetElementRawDataReducer from "../module_bindings/update_widget_element_raw_data_reducer";
 import UpdateWidgetElementDataIdReducer from "../module_bindings/update_widget_element_data_id_reducer";
 import { DebugLogger } from "./DebugLogger";
+import UpdateElementClipReducer from "../module_bindings/update_element_clip_reducer";
 
 interface TransformObject {
   transformFunction: string;
@@ -196,24 +197,14 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
       break;
 
     case TransformType.Warp:
-      // const oldTransform_Warp = getTransformValues(element.style.transform);
-
-      // const updatedTransform_Warp = oldTransform_Warp.flatMap((obj) =>
-      //   obj.transformFunction !== "matrix3d" ? obj : null
-      // );
-
-      // const transformString_Warp = updatedTransform_Warp
-      //   .map((obj) => (obj ? `${obj.transformFunction}(${obj.transformValue})` : null))
-      //   .join(" ");
-
-      // updateElementTransform(elements.id, transformString_Warp);
-
-      // element.style.transform = transformString_Warp;
+      const newTransform = element.style.transform.replace(/matrix3d?\([^)]*\)\s*/g, "").trim();
+      updateElementTransform(elements.id, newTransform);
+      element.style.transform = newTransform;
       break;
 
     case TransformType.Clip:
-      // updateElementClip(elements.id, "");
-      // element.style.clipPath = "";
+      UpdateElementClipReducer.call(elements.id, "");
+      element.style.removeProperty("clip-path");
       break;
   }
 

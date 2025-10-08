@@ -3,7 +3,15 @@ import { DebugLogger } from "./DebugLogger";
 
 export const GetCoordsFromTransform = (
   transform: string
-): { x: number; y: number; rotation: number; rotationAfterX: boolean; rotationAfterY: boolean; scaleX: number | null; scaleY?: number | null } => {
+): {
+  x: number;
+  y: number;
+  rotation: number;
+  rotationAfterX: boolean;
+  rotationAfterY: boolean;
+  scaleX: number | null;
+  scaleY?: number | null;
+} => {
   DebugLogger("Getting coordinates from transform");
   const translate = transform.substring(transform.indexOf("translate(") + 10, transform.indexOf(")"));
   const newX = parseFloat(translate.substring(0, translate.indexOf("px, ")));
@@ -23,7 +31,6 @@ export const GetCoordsFromTransform = (
   const scaleXRegex = transform.match(/scaleX\((-?[1-9.])\)/);
   const scaleYRegex = transform.match(/scaleY\((-?[1-9.])\)/);
 
-  
   let rotationAfterX = false;
   let rotationAfterY = false;
   let scaleX: number | null = null;
@@ -34,13 +41,13 @@ export const GetCoordsFromTransform = (
   if (scaleXRegex) {
     scaleX = parseFloat(scaleXRegex[1]);
     scaleXPosition = transform.indexOf("scaleX");
-    if(rotationPosition > scaleXPosition) rotationAfterX = true;
+    if (rotationPosition > scaleXPosition) rotationAfterX = true;
   }
 
   if (scaleYRegex) {
     scaleY = parseFloat(scaleYRegex[1]);
     scaleYPosition = transform.indexOf("scaleY");
-    if(rotationPosition > scaleYPosition) rotationAfterY = true;
+    if (rotationPosition > scaleYPosition) rotationAfterY = true;
   }
 
   return {
@@ -50,7 +57,7 @@ export const GetCoordsFromTransform = (
     rotationAfterX: rotationAfterX,
     rotationAfterY: rotationAfterY,
     scaleX: scaleX,
-    scaleY: scaleY
+    scaleY: scaleY,
   };
 };
 
@@ -74,10 +81,10 @@ export const GetTransformFromCoords = (
 
   let scaleRot = "";
 
-  if(!rotationAfterX && !rotationAfterY) scaleRot = rotate + scaleXString + scaleYString;
-  if(rotationAfterX && !rotationAfterY) scaleRot = scaleXString + rotate + scaleYString;
-  if(!rotationAfterX && rotationAfterY) scaleRot = scaleYString + rotate + scaleXString;
-  if(rotationAfterX && rotationAfterY) scaleRot = scaleXString + scaleYString + rotate;
+  if (!rotationAfterX && !rotationAfterY) scaleRot = rotate + scaleXString + scaleYString;
+  if (rotationAfterX && !rotationAfterY) scaleRot = scaleXString + rotate + scaleYString;
+  if (!rotationAfterX && rotationAfterY) scaleRot = scaleYString + rotate + scaleXString;
+  if (rotationAfterX && rotationAfterY) scaleRot = scaleXString + scaleYString + rotate;
 
   return `translate(${x}px, ${y}px)` + scaleRot;
 };
@@ -88,7 +95,7 @@ export const InRenderBounds = (element: Elements) => {
   let height = 0;
   let isText = false;
 
-  switch(element.element.tag) {
+  switch (element.element.tag) {
     case "TextElement":
       isText = true;
       break;
@@ -102,11 +109,15 @@ export const InRenderBounds = (element: Elements) => {
       break;
   }
 
-  const visible = isText ? true : 
-    coords.x + width >= 0 &&
-    coords.x <= 1920 &&
-    coords.y + height >= 0 &&
-    coords.y <= 1080;
-    
+  const visible = isText
+    ? true
+    : coords.x + width >= 0 && coords.x <= 1920 && coords.y + height >= 0 && coords.y <= 1080;
+
   return visible;
-}
+};
+
+export const GetMatrixFromElement = (transform: string) => {
+  const match = transform.match(/matrix3d?\([^)]*\)/);
+
+  return match ? match[0] : null;
+};

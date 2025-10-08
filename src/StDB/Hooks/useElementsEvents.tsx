@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Elements from "../../module_bindings/elements";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
@@ -29,7 +29,9 @@ export const useElementsEvents = (
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function,
-  layout: Layouts | undefined
+  layout: Layouts | undefined,
+  transformEditType: any,
+  setTransformEditType: Function
 ) => {
   const { Identity } = useSpacetimeContext();
 
@@ -221,6 +223,10 @@ export const useElementsEvents = (
       // ===== MOVEABLE OBJECT RELATED =====
       if (reducerEvent?.callerAddress?.toHexString() === Identity.address.toHexString() || !component) return;
 
+      if (newElement.transform.includes("matrix") && transformEditType.scale) {
+        setTransformEditType({ scale: false, warp: false, clip: false });
+      }
+
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
 
@@ -237,8 +243,7 @@ export const useElementsEvents = (
 
       // UPDATE CLIP
       if (oldElement.clip !== newElement.clip) {
-        component.style.clipPath = newElement.clip;
-        component.style.setProperty("transform", newElement.transform);
+        component.style.setProperty("clip-path", newElement.clip);
       }
     });
 
@@ -263,6 +268,8 @@ export const useElementsEvents = (
     setSelected,
     setSelectoTargets,
     layout,
+    transformEditType.scale,
+    setTransformEditType,
     dispatch,
   ]);
 };
