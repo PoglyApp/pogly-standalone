@@ -202,12 +202,11 @@ export const useOverlayElementsEvents = (
           component.style.width = newImageElement.width + "px";
           component.style.height = newImageElement.height + "px";
         }
+      }
 
-        // UPDATE CLIP
-        if (oldElement.clip !== newElement.clip) {
-          component.style.clipPath = newElement.clip;
-          component.style.setProperty("transform", newElement.transform);
-        }
+      // UPDATE CLIP
+      if (oldElement.clip !== newElement.clip) {
+        component.style.setProperty("clip-path", newElement.clip);
       }
     });
 

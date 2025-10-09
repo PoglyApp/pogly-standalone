@@ -76,6 +76,7 @@ export const Text = (props: IProp) => {
         textShadow: textShadow,
         WebkitTextStroke: textOutline,
         whiteSpace: "nowrap",
+        clipPath: props.elements.clip,
         ...customCss,
       }}
       onDoubleClick={showTextCreationModal}
