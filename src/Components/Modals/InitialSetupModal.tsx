@@ -20,6 +20,8 @@ import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigTy
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import Elements from "../../module_bindings/elements";
+import ElementData from "../../module_bindings/element_data";
 
 interface IProp {
   config: Config;
@@ -97,7 +99,12 @@ export const InitialSetupModal = (props: IProp) => {
     );
 
     (async () => {
-      UploadElementDataFromString(defaultElements);
+      const elementData: ElementData = ElementData.filterById(1).next().value;
+
+      if (!elementData) {
+        UploadElementDataFromString(defaultElements);
+      }
+
       setInitializing(true);
     })();
 
