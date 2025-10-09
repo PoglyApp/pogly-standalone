@@ -20,6 +20,7 @@ import BetterTVEmote from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import SevenTVEmote from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
 import { SpotlightModal } from "../Modals/SpotlightModal";
+import { SketchCategory } from "./Categories/sketchCategory";
 
 interface IProps {
   isDropping: boolean;
@@ -95,6 +96,8 @@ export const ElementSelectionMenu = (props: IProps) => {
           <ChannelEmoteCategory sevenTVEmotes={sevenTVEmotes} betterTVEmotes={betterTVEmotes} />
 
           <TenorCategory />
+
+          <SketchCategory />
         </CategoryContainer>
 
         <ElementSelectionMenuFooter />

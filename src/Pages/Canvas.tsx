@@ -38,7 +38,8 @@ import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
 import Permissions from "../module_bindings/permissions";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { ModalContext } from "../Contexts/ModalContext";
+import { ReactSketchCanvas } from "react-sketch-canvas";
+import { SketchContext } from "../Contexts/SketchContext";
 
 interface IProps {
   setActivePage: Function;
@@ -52,12 +53,15 @@ export const Canvas = (props: IProps) => {
   const config: Config = useContext(ConfigContext);
   const layoutContext = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
+  const { sketchConfig } = useContext(SketchContext);
+
   const { Identity } = useSpacetimeContext();
   const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
+  const sketchCanvasRef = useRef<any>(null);
 
   const [selectoTargets, setSelectoTargets] = useState<Array<SVGElement | HTMLElement>>([]);
   const [selected, setSelected] = useState<SelectedType | undefined>(undefined);
@@ -131,6 +135,12 @@ export const Canvas = (props: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.setActivePage]);
 
+  useEffect(() => {
+    if (sketchConfig.drawing) {
+      transformRef.current?.centerView(1);
+    }
+  }, [sketchConfig.drawing]);
+
   // Limit how many times cursor event is updated
   let waitUntil = 0;
 
@@ -146,6 +156,12 @@ export const Canvas = (props: IProps) => {
     UpdateGuestPositionReducer.call(x, y);
 
     waitUntil = Date.now() + 1000 / config.updateHz;
+  };
+
+  const onStroke = async (event: any) => {
+    console.log(event);
+    //const sketch = await sketchCanvasRef.current.exportSvg();
+    //console.log(sketch);
   };
 
   if (disconnected || props.disconnected) {
@@ -200,6 +216,7 @@ export const Canvas = (props: IProps) => {
           smooth={true}
           wheel={{
             step: 0.1,
+            wheelDisabled: sketchConfig.drawing,
           }}
         >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
@@ -244,7 +261,18 @@ export const Canvas = (props: IProps) => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer />
+                <div style={{ display: "flex" }}>
+                  <StreamContainer />
+                  <ReactSketchCanvas
+                    id="sketchCanvas"
+                    ref={sketchCanvasRef}
+                    strokeWidth={sketchConfig.drawing ? sketchConfig.strokeWidth : 0}
+                    strokeColor={sketchConfig.strokeColor}
+                    backgroundImage="transparent"
+                    onStroke={onStroke}
+                    style={{ position: "absolute" }}
+                  />
+                </div>
               </div>
             </Container>
 

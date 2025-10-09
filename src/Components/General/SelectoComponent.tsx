@@ -25,7 +25,8 @@ export const SelectoComponent = (props: IProp) => {
       ratio={0}
       onDragStart={(e) => {
         const selectionMenu = document.getElementById("SelectionMenu");
-        if (selectionMenu?.contains(e.inputEvent.target)) e.stop();
+        const sketchCanvas = document.getElementById("sketchCanvas");
+        if (selectionMenu?.contains(e.inputEvent.target) || sketchCanvas?.contains(e.inputEvent.target)) e.stop();
 
         const moveable = props.moveableRef.current;
         const target = e.inputEvent.target;

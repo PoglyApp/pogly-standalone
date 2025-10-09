@@ -124,7 +124,7 @@ const StreamContainer = () => {
             </StyledAlert>
           )}
 
-          <div style={{ width: "100%", height: "100%", display: "flex" }}>
+          <div style={{ width: "100%", height: "100%", display: "flex", position: "absolute" }}>
             <TwitchPlayer
               style={{ zIndex: 0, pointerEvents: "none", height: "100%", width: "100%" }}
               height="100%"

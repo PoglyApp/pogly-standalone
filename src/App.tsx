@@ -34,6 +34,8 @@ import AuthenticateReducer from "./module_bindings/authenticate_reducer";
 import { DebugLogger } from "./Utility/DebugLogger";
 import { StartHeartbeat } from "./Utility/PingHeartbeat";
 import { Error } from "./Pages/Error";
+import { SketchConfigType } from "./Types/General/SketchConfigType";
+import { SketchContext } from "./Contexts/SketchContext";
 
 export const App: React.FC = () => {
   const { closeModal } = useContext(ModalContext);
@@ -71,6 +73,12 @@ export const App: React.FC = () => {
       compressPaste: true,
     }
   );
+  const [sketchConfig, setSketchConfig] = useState<SketchConfigType>({
+    drawing: false,
+    eraseMode: false,
+    strokeColor: "white",
+    strokeWidth: 4,
+  });
 
   // GENERAL
   const [nickname, setNickname] = useState<string | null>(null);
@@ -357,13 +365,15 @@ export const App: React.FC = () => {
       <ConfigContext.Provider value={spacetime.InstanceConfig}>
         <SettingsContext.Provider value={{ settings, setSettings }}>
           <LayoutContext.Provider value={{ activeLayout: activeLayout, setActiveLayout: setActiveLayout }}>
-            <ModalContext.Provider value={{ modals, setModals, closeModal }}>
-              {modals.map((modal) => {
-                return modal;
-              })}
-              <RouterProvider router={router} />
-              <ToastContainer />
-            </ModalContext.Provider>
+            <SketchContext.Provider value={{ sketchConfig: sketchConfig, setSketchConfig: setSketchConfig }}>
+              <ModalContext.Provider value={{ modals, setModals, closeModal }}>
+                {modals.map((modal) => {
+                  return modal;
+                })}
+                <RouterProvider router={router} />
+                <ToastContainer />
+              </ModalContext.Provider>
+            </SketchContext.Provider>
           </LayoutContext.Provider>
         </SettingsContext.Provider>
       </ConfigContext.Provider>
