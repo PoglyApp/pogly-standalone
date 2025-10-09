@@ -37,7 +37,6 @@ export const MoveableComponent = (props: IProp) => {
 
       if (event.key === "Control") {
         setIsControlPressed(true);
-        console.log("test");
       }
 
       if (event.key === "Alt") {
