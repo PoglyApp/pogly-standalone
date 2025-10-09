@@ -22,13 +22,26 @@ export const MoveableComponent = (props: IProp) => {
   const config: Config = useContext(ConfigContext);
 
   const [isShiftPressed, setIsShiftPressed] = useState(false);
+  const [isControlPressed, setIsControlPressed] = useState(false);
+  const [isAltPressed, setIsAltPressed] = useState(false);
   const [hasElementBeenWarped, sethasElementBeenWarped] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
+      if (event.repeat) return;
+
       if (event.key === "Shift") {
         DebugLogger("Shift is being pressed");
         setIsShiftPressed(true);
+      }
+
+      if (event.key === "Control") {
+        setIsControlPressed(true);
+        console.log("test");
+      }
+
+      if (event.key === "Alt") {
+        setIsAltPressed(true);
       }
     };
 
@@ -36,6 +49,14 @@ export const MoveableComponent = (props: IProp) => {
       if (event.key === "Shift") {
         DebugLogger("Shift is let go");
         setIsShiftPressed(false);
+      }
+
+      if (event.key === "Control") {
+        setIsControlPressed(false);
+      }
+
+      if (event.key === "Alt") {
+        setIsAltPressed(false);
       }
     };
 
@@ -161,10 +182,11 @@ export const MoveableComponent = (props: IProp) => {
         true &&
         props.transformSelect.size &&
         props.selected?.Elements.element.tag !== "TextElement" &&
-        !hasElementBeenWarped
+        !hasElementBeenWarped &&
+        !isControlPressed
       }
-      warpable={true && props.transformSelect.warp}
-      clippable={true && props.transformSelect.clip}
+      warpable={(true && props.transformSelect.warp) || isControlPressed}
+      clippable={(true && props.transformSelect.clip) || isAltPressed}
       clipTargetBounds
       throttleResize={1}
       throttleDrag={1}
