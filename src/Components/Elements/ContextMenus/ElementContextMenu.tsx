@@ -87,6 +87,9 @@ export const ElementContextMenu = (props: IProps) => {
       setWidgetVariables(() => (toggleVariables.length > 0 ? toggleVariables : null));
     } else {
       const widgetCodeJson = JSON.parse(widgetElement.rawData);
+
+      if (!widgetCodeJson.variables) return;
+
       const toggleVariables = widgetCodeJson.variables.filter(
         (variable: WidgetVariableType) => variable.variableType === 3
       );
