@@ -62,41 +62,29 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
         }
       }
 
-      let loginMethod = (auth.user?.profile as any)?.login_method;
-      loginMethod = loginMethod === "magic_link" ? "guest" : loginMethod;
-
-      let loginName = null;
+      const loginMethod = (auth.user?.profile as any)?.login_method;
 
       switch (loginMethod) {
         case "guest":
-          setIsGuestLogin(true);
-
-          const storedName = localStorage.getItem("nickname");
-          const hasNickname = storedName !== null;
-
-          if (hasNickname) {
-            loginName = storedName;
-            setHasCustomNickname(true);
-          } else {
-            loginName = "guest_" + Math.floor(Math.random() * 100) + 1;
-            setHasCustomNickname(false);
-          }
+          // Chippy said no to guest login :cute_smile_cat_meme:
           break;
 
         case "twitch":
           setLoginMethodThemeColor("#9146FF");
           break;
+
         case "kick":
           setLoginMethodThemeColor("#53fc18");
           break;
+
         case "google":
           setLoginMethodThemeColor("#FF0000");
           break;
       }
 
       setSubtitle(loginMethod);
-      setNickname(loginName || preferred);
-      setGuestNickname(loginName || preferred);
+      setNickname(preferred);
+      setGuestNickname(preferred);
     }
   }, [auth.isAuthenticated, auth.user, setNickname]);
 
@@ -201,7 +189,6 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const newNickname = value.target.value;
 
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
-    localStorage.setItem("nickname", newNickname);
     setGuestNickname(newNickname);
     setHasCustomNickname(true);
   };
