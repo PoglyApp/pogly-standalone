@@ -6,7 +6,6 @@ import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
 import HintBubble from "../../../Components/General/HintBubble";
 import { useAuth } from "react-oidc-context";
-import { useNavigate } from "react-router-dom";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -25,8 +24,11 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
   const [subtitle, setSubtitle] = useState<string>("");
 
+  const [isGuestLogin, setIsGuestLogin] = useState<boolean>(false);
   const [guestNickname, setGuestNickname] = useState<string>("");
   const [hasCustomNickname, setHasCustomNickname] = useState<boolean>(false);
+  const [loginMethodThemeColor, setLoginMethodThemeColor] = useState<string>("#7e97a5");
+
   const nicknameFieldRef = useRef<HTMLInputElement>(null);
   const domainRef = useRef<HTMLSelectElement>(null);
 
@@ -38,39 +40,62 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
     const urlParams = new URLSearchParams(window.location.search);
     const domain = urlParams.get("domain");
+
     if (domain) {
       setCustomDomain(true);
       setDomain(domain);
-      if(domainRef.current) domainRef.current.value = "Custom";
+      if (domainRef.current) domainRef.current.value = "Custom";
     }
-
-    setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
   }, []);
 
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      const preferred = 
-        (auth.user.profile as any)?.preferred_username || 
-        auth.user.profile?.name || 
-        auth.user.profile?.sub ||
-        "";
-
-      const loginMethod = (auth.user?.profile as any)?.login_method;
+      const preferred =
+        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub || "";
 
       if (auth.user.profile) {
         const currentTime = Date.now() / 1000;
-        if(auth.user.profile.exp < currentTime) {
+        if (auth.user.profile.exp < currentTime) {
           console.warn("ID token has expired...");
           return;
         }
       }
 
-      if (preferred) {
-        setGuestNickname(preferred);
-        setNickname(preferred);
-        setSubtitle(loginMethod || "SpacetimeAuth");
-        setHasCustomNickname(true);
+      let loginMethod = (auth.user?.profile as any)?.login_method;
+      loginMethod = loginMethod === "magic_link" ? "guest" : loginMethod;
+
+      let loginName = null;
+
+      switch (loginMethod) {
+        case "guest":
+          setIsGuestLogin(true);
+
+          const storedName = localStorage.getItem("nickname");
+          const hasNickname = storedName !== null;
+
+          if (hasNickname) {
+            loginName = storedName;
+            setHasCustomNickname(true);
+          } else {
+            loginName = "guest_" + Math.floor(Math.random() * 100) + 1;
+            setHasCustomNickname(false);
+          }
+          break;
+
+        case "twitch":
+          setLoginMethodThemeColor("#9146FF");
+          break;
+        case "kick":
+          setLoginMethodThemeColor("#53fc18");
+          break;
+        case "google":
+          setLoginMethodThemeColor("#FF0000");
+          break;
       }
+
+      setSubtitle(loginMethod);
+      setNickname(loginName || preferred);
+      setGuestNickname(loginName || preferred);
     }
   }, [auth.isAuthenticated, auth.user, setNickname]);
 
@@ -155,7 +180,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setDomain(module.domain);
     setQuickSwapSelected(module);
 
-    if(!domainRef.current) return;
+    if (!domainRef.current) return;
 
     switch (module.domain) {
       case "wss://maincloud.spacetimedb.com":
@@ -175,6 +200,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const newNickname = value.target.value;
 
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
+    localStorage.setItem("nickname", newNickname);
     setGuestNickname(newNickname);
     setHasCustomNickname(true);
   };
@@ -186,7 +212,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       {!auth.isLoading && !auth.isAuthenticated && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
           <StyledButton
-            className="flex justify-self-center bg-[#060606] border border-transparent text-white hover:border-[#82a5ff]"
+            className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
             onClick={() => {
               auth.signinRedirect();
               setSubtitle("SpacetimeAuth");
@@ -212,16 +238,19 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             <div className="flex flex-col gap-3">
               <div className="flex text-center bg-[#10121a] p-3 rounded-md justify-center">
                 logged in as
-                <HintBubble hint="change nickname" className={hasCustomNickname ? "hidden" : ""}>
+                <HintBubble
+                  hint="change nickname"
+                  className={!isGuestLogin || hasCustomNickname ? "hidden" : ""}
+                  style={{ left: "50px" }}
+                >
                   <input
                     ref={nicknameFieldRef}
                     type="text"
                     defaultValue={guestNickname}
-                    disabled={auth.isAuthenticated ? true : false}
-                    className={`${
-                      auth.isAuthenticated ? "text-[#9146FF]" : "text-[#7e97a5]"
-                    } ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
+                    disabled={!isGuestLogin}
+                    className={` ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
                     onBlur={handleUpdateNickname}
+                    style={{ color: loginMethodThemeColor }}
                   />
                 </HintBubble>
               </div>
@@ -290,8 +319,9 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             <div className="flex justify-end gap-2">
               {auth.isAuthenticated && (
                 <StyledButton
-                  className="absolute left-5 bg-[#6441a5]!"
+                  className="absolute left-5"
                   onClick={() => auth.signoutRedirect()}
+                  loginTheme={loginMethodThemeColor}
                 >
                   logout
                 </StyledButton>
@@ -349,9 +379,9 @@ const StyledSelect = styled.select`
   }
 `;
 
-const StyledButton = styled.button`
-  background-color: #10121a;
-  color: #edf1ff;
+const StyledButton = styled.button<{ loginTheme?: string }>`
+  background-color: ${(props) => (props.loginTheme ? props.loginTheme : "#10121a")};
+  color: ${(props) => (props.loginTheme ? "#10121a" : "#edf1ff")};
 
   padding: 10px 15px 10px 15px;
   border-radius: 7px;
@@ -361,7 +391,7 @@ const StyledButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #10121a80;
+    background-color: ${(props) => props.theme + "80"};
   }
 
   &:disabled {
