@@ -31,9 +31,9 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Config, Elements, Layouts, PermissionLevel } from "../module_bindings";
+import { Elements, Layouts, PermissionLevel } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
-import { getGuestNickname } from "../StDB/SpacetimeDBUtils";
+import { useAuth } from "react-oidc-context";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -45,6 +45,7 @@ export const Canvas = () => {
   });
 
   const navigate = useNavigate();
+
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
@@ -135,13 +136,6 @@ export const Canvas = () => {
     setSelectoTargets(() => []);
 
     spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
-
-    const localGuest = getGuestNickname(spacetimeDB.Client, spacetimeDB.Identity.identity);
-
-    if (localGuest && localGuest.nickname === "") {
-      const nickname = localStorage.getItem("nickname") || "Unknown";
-      spacetimeDB.Client.reducers.updateGuestNickname(nickname);
-    }
   }, [activeLayout, setActiveLayout, spacetimeDB.Client]);
 
   // Limit how many times cursor event is updated

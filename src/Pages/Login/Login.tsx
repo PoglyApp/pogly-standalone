@@ -62,16 +62,22 @@ export const Login = () => {
 
     DebugLogger("Setting nickname and Spacetime context");
 
-    if (nickname) {
-      spacetime.Client.reducers.updateGuestNickname(nickname);
-      setNickname(nickname);
+    let preferred = "";
+
+    if (auth.user) {
+      preferred = (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
+    } else {
+      preferred = nickname || "";
     }
+
+    spacetime.Client.reducers.updateGuestNickname(preferred);
+    setNickname(preferred);
 
     setActiveLayout(getActiveLayout(spacetime.Client));
 
     // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
-    const guestWithNickname: Guests = { ...guest, nickname: nickname } as Guests;
+    const guestWithNickname: Guests = { ...guest, nickname: preferred } as Guests;
 
     setSpacetimeDB({
       Client: spacetime.Client,

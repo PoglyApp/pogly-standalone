@@ -324,7 +324,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                 <StyledButton
                   className="absolute left-5"
                   onClick={() => auth.signoutRedirect()}
-                  loginTheme={loginMethodThemeColor}
+                  logintheme={loginMethodThemeColor}
                 >
                   logout
                 </StyledButton>
@@ -382,9 +382,9 @@ const StyledSelect = styled.select`
   }
 `;
 
-const StyledButton = styled.button<{ loginTheme?: string }>`
-  background-color: ${(props) => (props.loginTheme ? props.loginTheme : "#10121a")};
-  color: ${(props) => (props.loginTheme ? "#10121a" : "#edf1ff")};
+const StyledButton = styled.button<{ logintheme?: string }>`
+  background-color: ${(props) => (props.logintheme ? props.logintheme : "#10121a")};
+  color: ${(props) => (props.logintheme ? "#10121a" : "#edf1ff")};
 
   padding: 10px 15px 10px 15px;
   border-radius: 7px;
