@@ -20,7 +20,8 @@ export const UserInputHandler = (
   selectedElement: SelectedType | undefined,
   selectoElements: Array<SVGElement | HTMLElement>,
   compressPaste: boolean | undefined,
-  transformRef: ReactZoomPanPinchRef | null
+  transformRef: ReactZoomPanPinchRef | null,
+  setTransformSelect: Function
 ): any => {
   const userInputs = [];
 
@@ -811,6 +812,104 @@ export const UserInputHandler = (
       event.preventDefault();
 
       handleFlipElement(true, selectedElement!.Elements);
+    },
+  });
+
+  userInputs.push({
+    name: "enablewarp",
+    keys: "shift+w",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+
+      setTransformSelect({
+        size: false,
+        warp: true,
+        clip: false,
+      });
+
+      toast.info("Warp transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    },
+  });
+
+  userInputs.push({
+    name: "enableclip",
+    keys: "shift+c",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+
+      setTransformSelect({
+        size: false,
+        warp: false,
+        clip: true,
+      });
+
+      toast.info("Clip transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    },
+  });
+
+  userInputs.push({
+    name: "enablescale",
+    keys: "shift+s",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+
+      if (selectedElement) {
+        const element = Elements.findById(selectedElement.Elements.id);
+
+        if (element) {
+          const hasElementBeenWarped = element.transform.includes("matrix");
+          if (hasElementBeenWarped) {
+            return toast.error("Warped elements cannot be scaled.", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          }
+        }
+      }
+
+      setTransformSelect({
+        size: true,
+        warp: false,
+        clip: false,
+      });
+
+      toast.info("Scale transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     },
   });
 
