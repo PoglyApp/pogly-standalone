@@ -4,24 +4,35 @@ import { App } from "./App";
 import "./index.css";
 import "unfonts.css";
 
+import { Provider } from "react-redux";
 import { AuthProvider, useAuth } from "react-oidc-context";
+import { WebStorageStateStore } from "oidc-client-ts";
+
+//https://auth.spacetimedb.com/oidc/.well-known/openid-configuration
 
 const oidcConfig = {
-  authority: "https://spacetimeauth.staging.spacetimedb.com/oidc",
-  client_id: "client_0319cWpFKkEcwmVeoN44hS",
+  authority: "https://auth.spacetimedb.com/oidc",
+  client_id: "client_031BvnxblLKmMtctMbLllZ",
   redirect_uri: `${window.location.origin}/callback`,
-  scope: "openid",
+  post_logout_redirect_uri: `${window.location.origin}/`,
+  scope: "openid profile",
   response_type: "code",
-  automaticSilentRenew: false,
-  loadUserInfo: true,
+
+  userStore: new WebStorageStateStore({ store: window.localStorage }),
+  automaticSilentRenew: true,
+  includeIdTokenInSilentRenew: true,
+  silent_redirect_uri: `${origin}/silent-oidc-renew.html`,
+
+  loadUserInfo: false,
   metadata: {
-    issuer: "https://spacetimeauth.staging.spacetimedb.com/oidc",
-    authorization_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/auth",
-    token_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/token",
-    jwks_uri: "https://spacetimeauth.staging.spacetimedb.com/oidc/jwks",
-    end_session_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/session/end",
-    pushed_authorization_request_endpoing: "https://spacetimeauth.staging.spacetimedb.com/oidc/request",
-    userinfo_endpoint: "https://spacetimeauth.staging.spacetimedb.com/oidc/me",
+    issuer: "https://auth.spacetimedb.com/oidc",
+    authorization_endpoint: "https://auth.spacetimedb.com/oidc/auth",
+    token_endpoint: "https://auth.spacetimedb.com/oidc/token",
+    jwks_uri: "https://auth.spacetimedb.com/oidc/jwks",
+    end_session_endpoint: "https://auth.spacetimedb.com/oidc/session/end",
+    pushed_authorization_request_endpoing: "https://auth.spacetimedb.com/oidc/request",
+    userinfo_endpoint: "https://auth.spacetimedb.com/oidc/me",
+    introspection_endpoint: "https://auth.spacetimedb.com/oidc/token/introspection",
   },
 };
 

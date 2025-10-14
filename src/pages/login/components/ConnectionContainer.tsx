@@ -1,15 +1,11 @@
 import { ChevronDown, SaveIcon, Trash } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { PoglyTitle } from "./PoglyTitle";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
-import { useAuth } from "react-oidc-context";
 import HintBubble from "../../../Components/General/HintBubble";
-import { TextInput } from "../../../Components/Inputs/TextInput";
-import { Select } from "../../../Components/Inputs/Select";
-import { Button } from "../../../Components/Inputs/Button";
+import { useAuth } from "react-oidc-context";
+import { PoglyTitle } from "./PoglyTitle";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -19,96 +15,78 @@ interface IProp {
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
   const auth = useAuth();
-  const urlParams = new URLSearchParams(window.location.search);
 
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://maincloud.spacetimedb.com");
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
   const [subtitle, setSubtitle] = useState<string>("");
 
+  const [isGuestLogin, setIsGuestLogin] = useState<boolean>(false);
   const [guestNickname, setGuestNickname] = useState<string>("");
   const [hasCustomNickname, setHasCustomNickname] = useState<boolean>(false);
-  const nicknameFieldRef = useRef<HTMLInputElement>(null);
+  const [loginMethodThemeColor, setLoginMethodThemeColor] = useState<string>("#7e97a5");
 
+  const nicknameFieldRef = useRef<HTMLInputElement>(null);
   const domainRef = useRef<HTMLSelectElement>(null);
 
-  const [idToken, setIdToken] = useState<string | undefined>(auth.user?.id_token);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
   useEffect(() => {
     const modules = localStorage.getItem("poglyQuickSwap");
-    if (modules && modules !== undefined) setQuickSwapModules(JSON.parse(modules));
+    if (modules) setQuickSwapModules(JSON.parse(modules));
 
+    const urlParams = new URLSearchParams(window.location.search);
     const domain = urlParams.get("domain");
 
     if (domain) {
       setCustomDomain(true);
       setDomain(domain);
-      domainRef.current!.value = "Custom";
-    }
-
-    const storedIdToken = localStorage.getItem("StdbIdToken");
-
-    if (storedIdToken) {
-      const decodedToken: any = jwtDecode(storedIdToken);
-      const currentTime = Date.now() / 1000;
-
-      if (decodedToken.exp < currentTime) {
-        console.warn("ID token has expired. Forcing user to relog...");
-        return;
-      }
-
-      setIdToken(storedIdToken);
-      setGuestNickname(decodedToken.preferred_username);
-      setNickname(decodedToken.preferred_username);
-      setHasCustomNickname(true);
-      setSubtitle(
-        String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) ||
-          "SpacetimeAuth"
-      );
-
-      localStorage.setItem("nickname", decodedToken.preferred_username);
-      return;
-    }
-
-    const savedNickname: string | null = localStorage.getItem("nickname");
-
-    if (savedNickname) {
-      setGuestNickname(savedNickname);
-      setHasCustomNickname(true);
-    } else {
-      setGuestNickname("Guest_" + Math.floor(Math.random() * 100) + 1);
+      if (domainRef.current) domainRef.current.value = "Custom";
     }
   }, []);
 
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      if (!auth.user.id_token) return;
-
-      localStorage.setItem("StdbIdToken", auth.user.id_token);
-
       const preferred =
-        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
+        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub || "";
 
-      const decodedToken: any = jwtDecode(auth.user.id_token);
-
-      if (preferred) {
-        setGuestNickname(preferred);
-        setNickname(preferred);
-        setSubtitle(
-          String(decodedToken.login_method[0]).toUpperCase() + String(decodedToken.login_method).slice(1) ||
-            "SpacetimeAuth"
-        );
-        localStorage.setItem("nickname", preferred);
-        setHasCustomNickname(true);
+      if (auth.user.profile) {
+        const currentTime = Date.now() / 1000;
+        if (auth.user.profile.exp < currentTime) {
+          console.warn("ID token has expired...");
+          return;
+        }
       }
 
-      setIdToken(auth.user.id_token);
+      const loginMethod = (auth.user?.profile as any)?.login_method;
+
+      switch (loginMethod) {
+        case "guest":
+          // Chippy said no to guest login :cute_smile_cat_meme:
+          break;
+
+        case "twitch":
+          setLoginMethodThemeColor("#9146FF");
+          break;
+
+        case "kick":
+          setLoginMethodThemeColor("#53fc18");
+          break;
+
+        case "google":
+          setLoginMethodThemeColor("#FF0000");
+          break;
+      }
+
+      setSubtitle(loginMethod);
+      setNickname(preferred);
+      setGuestNickname(preferred);
     }
-  }, [auth.isAuthenticated, auth.user]);
+  }, [auth.isAuthenticated, auth.user, setNickname]);
 
   const handleConnect = () => {
     saveQuickSwap();
@@ -116,13 +94,12 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setNickname(guestNickname);
     setHasCustomNickname(true);
 
-    localStorage.setItem("nickname", guestNickname);
     localStorage.setItem("stdbConnectDomain", domain);
     localStorage.setItem("stdbConnectModule", moduleName);
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
     setInstanceSettings({
-      token: idToken,
+      token: auth.user?.id_token ?? undefined,
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -134,22 +111,19 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const quickSwap = localStorage.getItem("poglyQuickSwap");
     const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: guestNickname, auth: authKey };
 
-    // If pre-existing swap list exists and is not empty
     if (quickSwap && quickSwap.length > 0) {
       const modules: QuickSwapType[] = JSON.parse(quickSwap);
 
-      // Delete quickswap option
       if (!moduleName) {
         const filteredModules = modules.filter((module: QuickSwapType) => module.module !== quickSwapSelected?.module);
         setQuickSwapModules(filteredModules);
         setQuickSwapSelected(null);
-
         return localStorage.setItem("poglyQuickSwap", JSON.stringify(filteredModules));
       }
 
       const isModuleAlreadySaved = modules.findIndex((module: QuickSwapType) => module.module === moduleName);
 
-      if (isModuleAlreadySaved != -1) {
+      if (isModuleAlreadySaved !== -1) {
         modules[isModuleAlreadySaved] = newConnection;
       } else {
         modules.push(newConnection);
@@ -195,15 +169,17 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setDomain(module.domain);
     setQuickSwapSelected(module);
 
+    if (!domainRef.current) return;
+
     switch (module.domain) {
       case "wss://maincloud.spacetimedb.com":
-        domainRef.current!.value = "Cloud";
+        domainRef.current.value = "Cloud";
         break;
       case "ws://127.0.0.1:3000":
-        domainRef.current!.value = "Local";
+        domainRef.current.value = "Local";
         break;
       default:
-        domainRef.current!.value = "Custom";
+        domainRef.current.value = "Custom";
         setCustomDomain(true);
         break;
     }
@@ -214,18 +190,19 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
     setGuestNickname(newNickname);
-    localStorage.setItem("nickname", newNickname);
     setHasCustomNickname(true);
   };
+
+  if (isOverlay) return <></>;
 
   return (
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyTitle />
 
       {!auth.isLoading && !auth.isAuthenticated && (
-        <div className="absolute z-20 flex flex-col justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-25">
-          <Button
-            className="flex "
+        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
+          <StyledButton
+            className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
             onClick={() => {
               auth.signinRedirect();
               setSubtitle("SpacetimeAuth");
@@ -233,7 +210,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
           >
             <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
             <span>login with SpacetimeAuth</span>
-          </Button>
+          </StyledButton>
         </div>
       )}
 
@@ -251,93 +228,109 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             <div className="flex flex-col gap-3">
               <div className="flex text-center bg-[#10121a] p-3 rounded-md justify-center">
                 logged in as
-                <HintBubble hint="change nickname" className={hasCustomNickname ? "hidden" : ""}>
+                <HintBubble
+                  hint="change nickname"
+                  className={!isGuestLogin || hasCustomNickname ? "hidden" : ""}
+                  style={{ left: "50px" }}
+                >
                   <input
                     ref={nicknameFieldRef}
                     type="text"
                     defaultValue={guestNickname}
-                    disabled={auth.isAuthenticated ? true : false}
-                    className={`${
-                      auth.isAuthenticated ? "text-[#9146FF]" : "text-[#7e97a5]"
-                    } ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
+                    disabled={!isGuestLogin}
+                    className={` ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
                     onBlur={handleUpdateNickname}
+                    style={{ color: loginMethodThemeColor }}
                   />
                 </HintBubble>
               </div>
 
-              <TextInput
-                title="module name"
-                placeholder="module name"
-                onChange={(value: any) => setModuleName(value.target.value)}
-                value={moduleName}
-              />
+              <div className="w-full">
+                <p className="text-sm text-[#aeb4d4]">module name</p>
+                <input
+                  type="text"
+                  placeholder="module name"
+                  value={moduleName}
+                  className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                  onChange={(value: any) => setModuleName(value.target.value)}
+                />
+              </div>
 
-              <TextInput
-                title="module password"
-                subTitle="(if required by module)"
-                placeholder="password"
-                password={true}
-                onChange={(value: any) => setAuthKey(value.target.value)}
-                value={authKey}
-              />
+              <div className="w-full">
+                <p className="text-sm text-[#aeb4d4] flex">
+                  module password <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">(if required by module)</span>
+                </p>
+                <input
+                  type="password"
+                  placeholder="password"
+                  value={authKey}
+                  className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                  onChange={(value: any) => setAuthKey(value.target.value)}
+                />
+              </div>
 
-              <div className="flex">
-                <Select
-                  title="quick select"
-                  onChange={(value: any) => handleQuickSwapChange(value.target.value)}
-                  disabled={quickSwapModules.length === 0}
-                  defaultValue={quickSwapModules.length === 0 ? "no connections saved" : "select"}
-                  className="w-full"
-                >
-                  {quickSwapModules.map((module) => (
-                    <option key={module.module} value={module.module}>
-                      {module.module}
-                    </option>
-                  ))}
-                </Select>
-
-                <Button
-                  onClick={saveQuickSwap}
-                  disabled={!moduleName && !quickSwapSelected}
-                  className=" w-[54px] h-[44px] self-end"
-                >
-                  {moduleName.length === 0 && quickSwapSelected ? <Trash /> : <SaveIcon />}
-                </Button>
+              <div className="relative w-full">
+                <p className="text-sm text-[#aeb4d4]">quick select</p>
+                <div className="flex">
+                  <StyledSelect
+                    onChange={(value: any) => handleQuickSwapChange(value.target.value)}
+                    disabled={quickSwapModules.length === 0}
+                  >
+                    <option value="select">{quickSwapModules.length === 0 ? "no connections saved" : "select"}</option>
+                    {quickSwapModules.map((module) => (
+                      <option key={module.module} value={module.module}>
+                        {module.module}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                  <div className="pointer-events-none absolute right-18 top-1/2 text-gray-400">
+                    <ChevronDown />
+                  </div>
+                  <StyledButton disabled={!moduleName && !quickSwapSelected} onClick={saveQuickSwap}>
+                    {moduleName.length === 0 && quickSwapSelected ? <Trash /> : <SaveIcon />}
+                  </StyledButton>
+                </div>
               </div>
 
               {customDomain && (
-                <TextInput
-                  title="custom domain"
-                  placeholder="ws(s)://127.0.0.1"
-                  onChange={(value: any) => setDomain(value.target.value)}
-                  value={domain}
-                />
+                <div className="w-full">
+                  <p className="text-sm text-[#aeb4d4]">Custom domain</p>
+                  <input
+                    type="text"
+                    placeholder="ws(s)://127.0.0.1"
+                    defaultValue={domain}
+                    className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md shadow-inner placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
+                    onChange={(value: any) => setDomain(value.target.value)}
+                  />
+                </div>
               )}
             </div>
 
             <div className="flex justify-end gap-2">
-              {idToken && (
-                <Button
-                  className="absolute left-5 bg-[#82a5ff]! text-[#10121a]!"
-                  onClick={() => {
-                    localStorage.removeItem("StdbIdToken");
-                    localStorage.removeItem("nickname");
-                    auth.signoutRedirect();
-                  }}
+              {auth.isAuthenticated && (
+                <StyledButton
+                  className="absolute left-5"
+                  onClick={() => auth.signoutRedirect()}
+                  logintheme={loginMethodThemeColor}
                 >
                   logout
-                </Button>
+                </StyledButton>
               )}
 
-              <Select onChange={(value) => handleDomainChange(value)} className="w-30">
-                <option value="Cloud">cloud</option>
-                <option value="Local">local</option>
-                <option value="Custom">custom</option>
-              </Select>
+              <div className="w-30 relative">
+                <StyledSelect ref={domainRef} onChange={(value) => handleDomainChange(value)}>
+                  <option value="Cloud">cloud</option>
+                  <option value="Local">local</option>
+                  <option value="Custom">custom</option>
+                </StyledSelect>
+                <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <ChevronDown />
+                </div>
+              </div>
 
-              <Button disabled={!moduleName} onClick={handleConnect}>
+              <StyledButton disabled={!moduleName} onClick={handleConnect}>
                 connect
-              </Button>
+              </StyledButton>
             </div>
           </div>
         </Container>
@@ -345,3 +338,56 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     </div>
   );
 };
+
+const StyledSelect = styled.select`
+  width: 100%;
+  appearance: none;
+  background-color: #10121a;
+  color: #e9eeff;
+
+  padding: 10px;
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    background-color: #10121a80;
+  }
+
+  & > option {
+    background-color: #10121a;
+  }
+
+  &:disabled {
+    background-color: #10121a80;
+    color: #edf1ff21;
+    cursor: not-allowed;
+  }
+`;
+
+const StyledButton = styled.button<{ logintheme?: string }>`
+  background-color: ${(props) => (props.logintheme ? props.logintheme : "#10121a")};
+  color: ${(props) => (props.logintheme ? "#10121a" : "#edf1ff")};
+
+  padding: 10px 15px 10px 15px;
+  border-radius: 7px;
+
+  margin-left: 5px;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) => props.theme + "80"};
+  }
+
+  &:disabled {
+    background-color: #10121a80;
+    color: #edf1ff21;
+
+    cursor: not-allowed;
+  }
+`;
