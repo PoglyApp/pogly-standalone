@@ -21,6 +21,7 @@ export const UserInputHandler = (
   selectoElements: Array<SVGElement | HTMLElement>,
   compressPaste: boolean | undefined,
   transformRef: ReactZoomPanPinchRef | null,
+  transformSelect: any,
   setTransformSelect: Function
 ): any => {
   const userInputs = [];
@@ -821,6 +822,7 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
+      if (transformSelect.warp) return;
 
       setTransformSelect({
         size: false,
@@ -847,6 +849,7 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
+      if (transformSelect.clip) return;
 
       setTransformSelect({
         size: false,
@@ -873,6 +876,7 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
+      if (transformSelect.size) return;
 
       if (selectedElement) {
         const element = Elements.findById(selectedElement.Elements.id);

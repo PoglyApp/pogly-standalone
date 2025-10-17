@@ -114,6 +114,7 @@ export const Canvas = (props: IProps) => {
       selectoTargets,
       settings.compressPaste,
       transformRef.current,
+      transformSelect,
       setTransformSelect
     )
   );
