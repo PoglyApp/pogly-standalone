@@ -19,7 +19,7 @@ const StyledButton = styled.button`
   background-color: #10121a;
   color: #edf1ff;
 
-  padding: 10px 15px 10px 15px;
+  padding: 8px 15px 10px 15px;
   border-radius: 7px;
 
   margin-left: 5px;

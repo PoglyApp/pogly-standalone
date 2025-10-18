@@ -193,14 +193,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setHasCustomNickname(true);
   };
 
-  if (isOverlay) return <></>;
+  if (isOverlay) return null;
 
   return (
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyTitle />
 
       {!auth.isLoading && !auth.isAuthenticated && (
-        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-45">
+        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-30">
           <StyledButton
             className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
             onClick={() => {
@@ -306,7 +306,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
               )}
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 mt-5">
               {auth.isAuthenticated && (
                 <StyledButton
                   className="absolute left-5"

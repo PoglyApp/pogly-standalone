@@ -5,6 +5,14 @@ import DiscordIcon from "@/Assets/Icons/DiscordIcon.svg";
 import LogoutIcon from "@/Assets/Icons/LogoutIcon.svg";
 
 export const Footer = () => {
+  const disconnect = () => {
+    localStorage.removeItem("stdbConnectDomain");
+    localStorage.removeItem("stdbConnectModule");
+    localStorage.removeItem("stdbConnectModuleAuthKey");
+
+    window.location.reload();
+  };
+
   return (
     <div className="ml-10">
       <div className="flex gap-2.5">
@@ -20,7 +28,7 @@ export const Footer = () => {
           <ButtonIcon src={DiscordIcon} alt="discord" />
         </Button>
 
-        <Button>
+        <Button onClick={disconnect}>
           <ButtonIcon src={LogoutIcon} alt="logout" />
         </Button>
       </div>
