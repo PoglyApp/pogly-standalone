@@ -37,7 +37,6 @@ export type AddElementToLayout = {
   transform: string,
   clip: string,
   layoutId: number,
-  folderId: number | undefined,
 };
 /**
  * An object for generated helper functions.
@@ -55,7 +54,6 @@ export const AddElementToLayout = {
         { name: "transform", algebraicType: __AlgebraicTypeValue.String},
         { name: "clip", algebraicType: __AlgebraicTypeValue.String},
         { name: "layoutId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
       ]
     });
   },

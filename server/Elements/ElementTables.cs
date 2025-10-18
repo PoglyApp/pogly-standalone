@@ -15,8 +15,7 @@ public partial class Module
         public string Transform;
         public string Clip;
         public bool Locked;
-
-        public uint? FolderId;
+        
         public uint LayoutId;
 
         public string PlacedBy;

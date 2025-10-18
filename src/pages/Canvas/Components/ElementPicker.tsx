@@ -3,12 +3,14 @@ import ImageIcon from "@/Assets/Icons/ImagePickIcon.svg";
 import { useContext, useEffect, useState } from "react";
 import { TextInput } from "@/Components/Inputs/TextInput";
 import { Button } from "@/Components/Inputs/Button";
-import { ElementData } from "@/module_bindings";
+import { ElementData, Folders } from "@/module_bindings";
 import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { useChannelEmotes } from "@/Hooks/useChannelEmotes";
 import SevenTVEmote from "@/Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmote from "@/Types/BetterTVTypes/BetterTVEmoteType";
-import { PlusCircleIcon } from "lucide-react";
+import { FolderPlusIcon, ImagePlayIcon } from "lucide-react";
+
+import { DndContext, useDraggable, useDroppable, DragEndEvent } from "@dnd-kit/core";
 
 enum Category {
   Images,
@@ -23,9 +25,13 @@ export const ElementPicker = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category>(Category.Images);
 
   const [images, setImages] = useState<ElementData[]>([]);
+  const [folders, setFolders] = useState<Folders[]>([]);
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[] | null>(null);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[] | null>(null);
   const [widgets, setWidgets] = useState<ElementData[]>([]);
+
+  const [showFolderNameInput, setShowFolderInput] = useState<boolean>(false);
+  const [folderNameInput, setFolderNameInput] = useState<string>();
 
   useChannelEmotes(setSevenTVEmotes, setBetterTVEmotes);
 
@@ -33,13 +39,34 @@ export const ElementPicker = () => {
     if (!spacetimeDB) return;
 
     const elementData: ElementData[] = Array.from(spacetimeDB.Client.db.elementData.iter());
+    const imageFolders: Folders[] = Array.from(spacetimeDB.Client.db.folders.iter());
 
     setImages(elementData.filter((data: ElementData) => data.dataType.tag === "ImageElement"));
     setWidgets(elementData.filter((data: ElementData) => data.dataType.tag === "WidgetElement"));
+    setFolders(imageFolders);
   }, [spacetimeDB]);
 
+  const changeCategory = (category: Category) => {
+    if (selectedCategory === category) return;
+
+    setSelectedCategory(category);
+    setShowFolderInput(false);
+  };
+
   const addNewFolder = () => {
-    spacetimeDB.Client.reducers.addFolder("New folder", "");
+    if (!folderNameInput || folderNameInput.length === 0) return;
+    spacetimeDB.Client.reducers.addFolder(folderNameInput);
+    setShowFolderInput(false);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const elementDataID = active.id.toString().replace("_IMAGE_DATA", "");
+    const folderID = over.id.toString().replace("_IMAGE_FOLDER", "");
+
+    spacetimeDB.Client.reducers.updateElementDataFolder(elementDataID, folderID);
   };
 
   return (
@@ -49,54 +76,100 @@ export const ElementPicker = () => {
           <div className="flex pt-4 pl-4 gap-2">
             <CategoryButton
               selected={selectedCategory === Category.Images}
-              onClick={() => setSelectedCategory(Category.Images)}
+              onClick={() => changeCategory(Category.Images)}
             >
-              Images
+              images
             </CategoryButton>
             <CategoryButton
               selected={selectedCategory === Category.Emotes}
-              onClick={() => setSelectedCategory(Category.Emotes)}
+              onClick={() => changeCategory(Category.Emotes)}
             >
-              Emotes
+              emotes
             </CategoryButton>
             <CategoryButton
               selected={selectedCategory === Category.Widgets}
-              onClick={() => setSelectedCategory(Category.Widgets)}
+              onClick={() => changeCategory(Category.Widgets)}
             >
-              Widgets
+              widgets
             </CategoryButton>
           </div>
 
           <div className="flex mt-3 ml-4 mr-4">
-            <TextInput placeholder="Search..." onChange={() => {}} inputClassName="h-[37px] text-[14px]" />
+            <TextInput placeholder="search..." onChange={() => {}} inputClassName="h-[37px] text-[14px]" />
             {selectedCategory === Category.Images && (
-              <Button onClick={() => {}} className="w-[150px] h-[37px] text-[14px]">
-                Add images
-              </Button>
+              <>
+                <Button onClick={() => setShowFolderInput(!showFolderNameInput)} className="w-fit h-[37px] text-[14px]">
+                  <FolderPlusIcon className="w-[20px] h-[20px]" />
+                </Button>
+                <Button onClick={() => {}} className="w-fit h-[37px] text-[14px]">
+                  <ImagePlayIcon className="w-[20px] h-[20px]" />
+                </Button>
+              </>
             )}
           </div>
 
+          {showFolderNameInput && (
+            <div className="flex mt-3 ml-4 mr-4">
+              <TextInput
+                placeholder="folder name"
+                onChange={(event) => setFolderNameInput(event.target.value)}
+                value={folderNameInput}
+                inputClassName="h-[37px] text-[14px]"
+              />
+              <Button
+                onClick={addNewFolder}
+                className="w-fit h-[37px] text-[14px]"
+                disabled={!folderNameInput || folderNameInput.length === 0}
+              >
+                create
+              </Button>
+            </div>
+          )}
+
           <div className="h-full w-full mt-2 border-t-1 border-[#14151b] overflow-y-scroll dark-scrollbar">
-            {selectedCategory === Category.Images && (
-              <div>
-                <div className="absolute h-full w-[50px] pt-3 bg-[#22242c] text-center">
-                  <ItemButton onClick={addNewFolder}>
-                    <PlusCircleIcon className="w-[32px] h-[32px]" />
-                  </ItemButton>
-                </div>
-                <ItemList $iscolumn className="ml-14 pl-0">
-                  {images.map((data) => {
+            <DndContext onDragEnd={handleDragEnd}>
+              {selectedCategory === Category.Images && (
+                <>
+                  {folders.map((folder: Folders) => {
                     return (
-                      <li key={data.id + "_IMAGE_DATA"} className="w-fit h-fit">
-                        <ItemButton>
-                          <img src={data.data} className="w-[50px] h-[50px]" />
-                        </ItemButton>
-                      </li>
+                      <DroppableContainer key={folder.id + "_IMAGE_FOLDER"} id={folder.id + "_IMAGE_FOLDER"}>
+                        <span className="ml-4 text-[12px]">{folder.name}</span>
+                        <ItemList $iscolumn className="pt-1!">
+                          {images
+                            .filter((data) => data.folderId === folder.id)
+                            .map((data) => {
+                              return (
+                                <DraggableImage key={data.id + "_IMAGE_DATA"} id={data.id + "_IMAGE_DATA"}>
+                                  <ItemButton>
+                                    <img src={data.data} className="w-[50px] h-[50px]" />
+                                  </ItemButton>
+                                </DraggableImage>
+                              );
+                            })}
+                        </ItemList>
+                      </DroppableContainer>
                     );
                   })}
-                </ItemList>
-              </div>
-            )}
+
+                  <DroppableContainer id="default_IMAGE_FOLDER">
+                    <span className="ml-4 text-[12px]">Default</span>
+                    <ItemList $iscolumn className="pt-1!">
+                      {images
+                        .filter((data) => data.folderId === undefined)
+                        .map((data) => {
+                          return (
+                            <DraggableImage key={data.id + "_IMAGE_DATA"} id={data.id + "_IMAGE_DATA"}>
+                              <ItemButton>
+                                <img src={data.data} className="w-[50px] h-[50px]" />
+                              </ItemButton>
+                            </DraggableImage>
+                          );
+                        })}
+                    </ItemList>
+                  </DroppableContainer>
+                </>
+              )}
+            </DndContext>
 
             {selectedCategory === Category.Emotes && (
               <ItemList $iscolumn>
@@ -166,6 +239,25 @@ export const ElementPicker = () => {
   );
 };
 
+const DraggableImage: React.FC<{ id: any; children: React.ReactNode }> = ({ id, children }) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id,
+  });
+
+  const style = transform != null ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+
+  return (
+    <li ref={setNodeRef} style={style} {...listeners} {...attributes} className="w-fit h-fit">
+      {children}
+    </li>
+  );
+};
+
+const DroppableContainer: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  const { setNodeRef } = useDroppable({ id });
+  return <div ref={setNodeRef}>{children}</div>;
+};
+
 const PickerButton = styled.button`
   cursor: pointer;
 
@@ -222,6 +314,7 @@ const ItemList = styled.ul<{ $iscolumn?: boolean }>`
       grid-template-columns: repeat(auto-fit, minmax(50px, max-content));
     `}
   list-style: none;
-  gap: 10px;
+  gap: 13px;
   padding: 10px;
+  margin-left: 7px;
 `;

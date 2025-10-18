@@ -5,7 +5,7 @@ public partial class Module
 {
     [Reducer]
     public static void AddElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip, uint? folderId = null)
+        string clip)
     {
         string func = "AddElement";
         
@@ -43,7 +43,6 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = GetActiveLayout(ctx),
-                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
@@ -60,7 +59,7 @@ public partial class Module
     
     [Reducer]
     public static void AddElementToLayout(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip, uint layoutId, uint? folderId = null)
+        string clip, uint layoutId)
     {
         string func = "AddElementToLayout";
         
@@ -98,7 +97,6 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = layoutId,
-                FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
                 ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
@@ -115,7 +113,7 @@ public partial class Module
     
     [Reducer]
     public static void ImportElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
-        string clip, uint layoutId, string placedBy, string lastEditedBy, int zindex, uint? folderId = null)
+        string clip, uint layoutId, string placedBy, string lastEditedBy, int zindex)
     {
         string func = "ImportElement";
 
@@ -131,7 +129,6 @@ public partial class Module
                 Clip = clip,
                 Locked = false,
                 LayoutId = layoutId,
-                FolderId = folderId,
                 PlacedBy = placedBy,
                 LastEditedBy = lastEditedBy,
                 ZIndex = zindex
@@ -954,46 +951,6 @@ public partial class Module
         catch(Exception e)
         {
             Log.Error($"[{func}] Error updating elements layout with id {elementId} and layoutId {layoutId}, requested by {ctx.Sender}! " + e.Message);
-        }
-    }
-    
-    [Reducer]
-    public static void UpdateElementFolder(ReducerContext ctx, uint elementId, uint? folderId)
-    {
-        string func = "UpdateElementFolder";
-        
-        if (ctx.ConnectionId is null) return;
-        if (!GetGuest(func, ctx, out var guest)) return;
-        if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
-        
-        try
-        {
-            var oldElement = ctx.Db.Elements.Id.Find(elementId);
-
-            if (oldElement.HasValue)
-            {
-                var updatedElement = oldElement.Value;
-                updatedElement.FolderId = folderId;
-                updatedElement.LastEditedBy = guest.Nickname;
-
-                ctx.Db.Elements.Id.Update(updatedElement);
-            
-                //TODO: Update AuditLog Elements ChangeStruct to include Layout Column
-                if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
-                    Log.Info($"[Elements - {func}] {guest.Nickname} updated elementId {elementId} to folder {folderId}!");
-            }
-            else
-            {
-                Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! Couldn't find existing Element!");
-            }
-        }
-        catch(Exception e)
-        {
-            Log.Error($"[{func}] Error updating elements layout with id {elementId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
     

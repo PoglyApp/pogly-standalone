@@ -40,7 +40,6 @@ export type ImportElement = {
   placedBy: string,
   lastEditedBy: string,
   zindex: number,
-  folderId: number | undefined,
 };
 /**
  * An object for generated helper functions.
@@ -61,7 +60,6 @@ export const ImportElement = {
         { name: "placedBy", algebraicType: __AlgebraicTypeValue.String},
         { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String},
         { name: "zindex", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
       ]
     });
   },

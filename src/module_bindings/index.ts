@@ -138,12 +138,12 @@ import { UpdateElementData } from "./update_element_data_reducer.ts";
 export { UpdateElementData };
 import { UpdateElementDataData } from "./update_element_data_data_reducer.ts";
 export { UpdateElementDataData };
+import { UpdateElementDataFolder } from "./update_element_data_folder_reducer.ts";
+export { UpdateElementDataFolder };
 import { UpdateElementDataName } from "./update_element_data_name_reducer.ts";
 export { UpdateElementDataName };
 import { UpdateElementDataSize } from "./update_element_data_size_reducer.ts";
 export { UpdateElementDataSize };
-import { UpdateElementFolder } from "./update_element_folder_reducer.ts";
-export { UpdateElementFolder };
 import { UpdateElementLayout } from "./update_element_layout_reducer.ts";
 export { UpdateElementLayout };
 import { UpdateElementLocked } from "./update_element_locked_reducer.ts";
@@ -631,6 +631,10 @@ const REMOTE_MODULE = {
       reducerName: "UpdateElementDataData",
       argsType: UpdateElementDataData.getTypeScriptAlgebraicType(),
     },
+    UpdateElementDataFolder: {
+      reducerName: "UpdateElementDataFolder",
+      argsType: UpdateElementDataFolder.getTypeScriptAlgebraicType(),
+    },
     UpdateElementDataName: {
       reducerName: "UpdateElementDataName",
       argsType: UpdateElementDataName.getTypeScriptAlgebraicType(),
@@ -638,10 +642,6 @@ const REMOTE_MODULE = {
     UpdateElementDataSize: {
       reducerName: "UpdateElementDataSize",
       argsType: UpdateElementDataSize.getTypeScriptAlgebraicType(),
-    },
-    UpdateElementFolder: {
-      reducerName: "UpdateElementFolder",
-      argsType: UpdateElementFolder.getTypeScriptAlgebraicType(),
     },
     UpdateElementLayout: {
       reducerName: "UpdateElementLayout",
@@ -835,9 +835,9 @@ export type Reducer = never
 | { name: "UpdateElementClip", args: UpdateElementClip }
 | { name: "UpdateElementData", args: UpdateElementData }
 | { name: "UpdateElementDataData", args: UpdateElementDataData }
+| { name: "UpdateElementDataFolder", args: UpdateElementDataFolder }
 | { name: "UpdateElementDataName", args: UpdateElementDataName }
 | { name: "UpdateElementDataSize", args: UpdateElementDataSize }
-| { name: "UpdateElementFolder", args: UpdateElementFolder }
 | { name: "UpdateElementLayout", args: UpdateElementLayout }
 | { name: "UpdateElementLocked", args: UpdateElementLocked }
 | { name: "UpdateElementStruct", args: UpdateElementStruct }
@@ -870,19 +870,19 @@ export type Reducer = never
 export class RemoteReducers {
   constructor(private connection: __DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
 
-  addElement(element: ElementStruct, transparency: number, transform: string, clip: string, folderId: number | undefined) {
-    const __args = { element, transparency, transform, clip, folderId };
+  addElement(element: ElementStruct, transparency: number, transform: string, clip: string) {
+    const __args = { element, transparency, transform, clip };
     let __writer = new __BinaryWriter(1024);
     AddElement.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("AddElement", __argsBuffer, this.setCallReducerFlags.addElementFlags);
   }
 
-  onAddElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, folderId: number | undefined) => void) {
+  onAddElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string) => void) {
     this.connection.onReducer("AddElement", callback);
   }
 
-  removeOnAddElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, folderId: number | undefined) => void) {
+  removeOnAddElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string) => void) {
     this.connection.offReducer("AddElement", callback);
   }
 
@@ -950,19 +950,19 @@ export class RemoteReducers {
     this.connection.offReducer("AddElementDataWithId", callback);
   }
 
-  addElementToLayout(element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, folderId: number | undefined) {
-    const __args = { element, transparency, transform, clip, layoutId, folderId };
+  addElementToLayout(element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number) {
+    const __args = { element, transparency, transform, clip, layoutId };
     let __writer = new __BinaryWriter(1024);
     AddElementToLayout.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("AddElementToLayout", __argsBuffer, this.setCallReducerFlags.addElementToLayoutFlags);
   }
 
-  onAddElementToLayout(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, folderId: number | undefined) => void) {
+  onAddElementToLayout(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number) => void) {
     this.connection.onReducer("AddElementToLayout", callback);
   }
 
-  removeOnAddElementToLayout(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, folderId: number | undefined) => void) {
+  removeOnAddElementToLayout(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number) => void) {
     this.connection.offReducer("AddElementToLayout", callback);
   }
 
@@ -1286,19 +1286,19 @@ export class RemoteReducers {
     this.connection.offReducer("ImportConfig", callback);
   }
 
-  importElement(element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number, folderId: number | undefined) {
-    const __args = { element, transparency, transform, clip, layoutId, placedBy, lastEditedBy, zindex, folderId };
+  importElement(element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number) {
+    const __args = { element, transparency, transform, clip, layoutId, placedBy, lastEditedBy, zindex };
     let __writer = new __BinaryWriter(1024);
     ImportElement.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("ImportElement", __argsBuffer, this.setCallReducerFlags.importElementFlags);
   }
 
-  onImportElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number, folderId: number | undefined) => void) {
+  onImportElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number) => void) {
     this.connection.onReducer("ImportElement", callback);
   }
 
-  removeOnImportElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number, folderId: number | undefined) => void) {
+  removeOnImportElement(callback: (ctx: ReducerEventContext, element: ElementStruct, transparency: number, transform: string, clip: string, layoutId: number, placedBy: string, lastEditedBy: string, zindex: number) => void) {
     this.connection.offReducer("ImportElement", callback);
   }
 
@@ -1686,6 +1686,22 @@ export class RemoteReducers {
     this.connection.offReducer("UpdateElementDataData", callback);
   }
 
+  updateElementDataFolder(dataId: number, folderId: number) {
+    const __args = { dataId, folderId };
+    let __writer = new __BinaryWriter(1024);
+    UpdateElementDataFolder.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("UpdateElementDataFolder", __argsBuffer, this.setCallReducerFlags.updateElementDataFolderFlags);
+  }
+
+  onUpdateElementDataFolder(callback: (ctx: ReducerEventContext, dataId: number, folderId: number) => void) {
+    this.connection.onReducer("UpdateElementDataFolder", callback);
+  }
+
+  removeOnUpdateElementDataFolder(callback: (ctx: ReducerEventContext, dataId: number, folderId: number) => void) {
+    this.connection.offReducer("UpdateElementDataFolder", callback);
+  }
+
   updateElementDataName(dataId: number, name: string) {
     const __args = { dataId, name };
     let __writer = new __BinaryWriter(1024);
@@ -1716,22 +1732,6 @@ export class RemoteReducers {
 
   removeOnUpdateElementDataSize(callback: (ctx: ReducerEventContext, dataId: number, width: number, height: number) => void) {
     this.connection.offReducer("UpdateElementDataSize", callback);
-  }
-
-  updateElementFolder(elementId: number, folderId: number | undefined) {
-    const __args = { elementId, folderId };
-    let __writer = new __BinaryWriter(1024);
-    UpdateElementFolder.serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("UpdateElementFolder", __argsBuffer, this.setCallReducerFlags.updateElementFolderFlags);
-  }
-
-  onUpdateElementFolder(callback: (ctx: ReducerEventContext, elementId: number, folderId: number | undefined) => void) {
-    this.connection.onReducer("UpdateElementFolder", callback);
-  }
-
-  removeOnUpdateElementFolder(callback: (ctx: ReducerEventContext, elementId: number, folderId: number | undefined) => void) {
-    this.connection.offReducer("UpdateElementFolder", callback);
   }
 
   updateElementLayout(elementId: number, layoutId: number) {
@@ -2429,6 +2429,11 @@ export class SetReducerFlags {
     this.updateElementDataDataFlags = flags;
   }
 
+  updateElementDataFolderFlags: __CallReducerFlags = 'FullUpdate';
+  updateElementDataFolder(flags: __CallReducerFlags) {
+    this.updateElementDataFolderFlags = flags;
+  }
+
   updateElementDataNameFlags: __CallReducerFlags = 'FullUpdate';
   updateElementDataName(flags: __CallReducerFlags) {
     this.updateElementDataNameFlags = flags;
@@ -2437,11 +2442,6 @@ export class SetReducerFlags {
   updateElementDataSizeFlags: __CallReducerFlags = 'FullUpdate';
   updateElementDataSize(flags: __CallReducerFlags) {
     this.updateElementDataSizeFlags = flags;
-  }
-
-  updateElementFolderFlags: __CallReducerFlags = 'FullUpdate';
-  updateElementFolder(flags: __CallReducerFlags) {
-    this.updateElementFolderFlags = flags;
   }
 
   updateElementLayoutFlags: __CallReducerFlags = 'FullUpdate';

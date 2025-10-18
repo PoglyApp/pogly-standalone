@@ -327,6 +327,43 @@ public partial class Module
             Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. " + e.Message);
         }
     }
+    
+    [Reducer]
+    public static void UpdateElementDataFolder(ReducerContext ctx, uint dataId, uint folderId)
+    {
+        string func = "UpdateElementDataFolder";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
+        {
+            if (!IsGuestModerator(func, ctx)) return;
+        }
+        
+        try
+        {
+            var oldData = ctx.Db.ElementData.Id.Find(dataId);
+
+            if (oldData.HasValue)
+            {
+                var updatedData = oldData.Value;
+                updatedData.FolderId = folderId;
+                
+                ctx.Db.ElementData.Id.Update(updatedData);
+            
+                LogAudit(ctx,func,GetChangeStructFromElementData(oldData.Value),GetChangeStructFromElementData(updatedData), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
+            }
+            else
+            {
+                Log.Error($"[{func}] Error updating element data folder with id {dataId} and folderId {folderId}, requested by {ctx.Sender}! Couldn't find existing Element!");
+            }
+        }
+        catch(Exception e)
+        {
+            Log.Error($"[{func}] Error updating element data folder with id {dataId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message);
+        }
+    }
 
     [Reducer]
     public static void DeleteElementDataById(ReducerContext ctx, uint id)

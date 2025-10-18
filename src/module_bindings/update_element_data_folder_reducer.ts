@@ -27,14 +27,14 @@ import {
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
 } from "spacetimedb";
 
-export type UpdateElementFolder = {
-  elementId: number,
-  folderId: number | undefined,
+export type UpdateElementDataFolder = {
+  dataId: number,
+  folderId: number,
 };
 /**
  * An object for generated helper functions.
  */
-export const UpdateElementFolder = {
+export const UpdateElementDataFolder = {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
@@ -42,21 +42,21 @@ export const UpdateElementFolder = {
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
     return __AlgebraicTypeValue.Product({
       elements: [
-        { name: "elementId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
+        { name: "dataId", algebraicType: __AlgebraicTypeValue.U32},
+        { name: "folderId", algebraicType: __AlgebraicTypeValue.U32},
       ]
     });
   },
 
-  serialize(writer: __BinaryWriter, value: UpdateElementFolder): void {
-    __AlgebraicTypeValue.serializeValue(writer, UpdateElementFolder.getTypeScriptAlgebraicType(), value);
+  serialize(writer: __BinaryWriter, value: UpdateElementDataFolder): void {
+    __AlgebraicTypeValue.serializeValue(writer, UpdateElementDataFolder.getTypeScriptAlgebraicType(), value);
   },
 
-  deserialize(reader: __BinaryReader): UpdateElementFolder {
-    return __AlgebraicTypeValue.deserializeValue(reader, UpdateElementFolder.getTypeScriptAlgebraicType());
+  deserialize(reader: __BinaryReader): UpdateElementDataFolder {
+    return __AlgebraicTypeValue.deserializeValue(reader, UpdateElementDataFolder.getTypeScriptAlgebraicType());
   },
 
 }
 
-export default UpdateElementFolder;
+export default UpdateElementDataFolder;
 
