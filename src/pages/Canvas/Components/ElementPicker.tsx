@@ -46,6 +46,7 @@ export const ElementPicker = () => {
   const [showFolderNameInput, setShowFolderInput] = useState<boolean>(false);
   const [folderNameInput, setFolderNameInput] = useState<string>();
   const [hiddenFolders, setHiddenFolders] = useState<Folders[]>([]);
+  const [dragging, setDragging] = useState<boolean>(false);
 
   const [showImageUpload, setShowImageUpload] = useState<boolean>(false);
   const [showDirectUpload, setShowDirectUpload] = useState<boolean>(false);
@@ -161,6 +162,8 @@ export const ElementPicker = () => {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    setDragging(false);
+
     const { active, over } = event;
     if (!over) return;
 
@@ -302,12 +305,16 @@ export const ElementPicker = () => {
           )}
 
           <div className="h-full w-full mt-2 border-t-1 border-[#14151b] overflow-y-scroll dark-scrollbar">
-            <DndContext onDragEnd={handleDragEnd}>
+            <DndContext onDragEnd={handleDragEnd} onDragStart={() => setDragging(true)}>
               {selectedCategory === Category.Images && (
                 <>
                   {folders.map((folder: Folders) => {
                     return (
-                      <DroppableContainer key={folder.id + "_IMAGE_FOLDER"} id={folder.id + "_IMAGE_FOLDER"}>
+                      <DroppableContainer
+                        key={folder.id + "_IMAGE_FOLDER"}
+                        id={folder.id + "_IMAGE_FOLDER"}
+                        dragging={dragging}
+                      >
                         <FolderTitle className="ml-4 text-[12px] flex select-none">
                           {folder.name}{" "}
                           <ChevronDown
@@ -343,7 +350,7 @@ export const ElementPicker = () => {
                     );
                   })}
 
-                  <DroppableContainer id="0_IMAGE_FOLDER">
+                  <DroppableContainer id="0_IMAGE_FOLDER" dragging={dragging}>
                     <span className="ml-4 text-[12px] select-none">Default</span>
                     <ItemList $iscolumn className="pt-1! select-none" id="0_IMAGE_FOLDER">
                       {images
@@ -459,10 +466,17 @@ const DraggableImage: React.FC<{ id: any; children: React.ReactNode }> = ({ id, 
   );
 };
 
-const DroppableContainer: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+const DroppableContainer: React.FC<{ id: string; dragging: boolean; children: React.ReactNode }> = ({
+  id,
+  dragging,
+  children,
+}) => {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className="mt-2">
+    <div
+      ref={setNodeRef}
+      className={`mt-2 border rounded-[4px] ${dragging ? "border-[#2c2f3a]" : "border-transparent"}`}
+    >
       {children}
     </div>
   );
