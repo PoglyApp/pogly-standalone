@@ -902,51 +902,51 @@ export class RemoteReducers {
     this.connection.offReducer("AddElementData", callback);
   }
 
-  addElementDataArray(name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) {
-    const __args = { name, type, data, array, width, height };
+  addElementDataArray(name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) {
+    const __args = { name, type, data, array, width, height, folderId };
     let __writer = new __BinaryWriter(1024);
     AddElementDataArray.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("AddElementDataArray", __argsBuffer, this.setCallReducerFlags.addElementDataArrayFlags);
   }
 
-  onAddElementDataArray(callback: (ctx: ReducerEventContext, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) => void) {
+  onAddElementDataArray(callback: (ctx: ReducerEventContext, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) => void) {
     this.connection.onReducer("AddElementDataArray", callback);
   }
 
-  removeOnAddElementDataArray(callback: (ctx: ReducerEventContext, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) => void) {
+  removeOnAddElementDataArray(callback: (ctx: ReducerEventContext, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) => void) {
     this.connection.offReducer("AddElementDataArray", callback);
   }
 
-  addElementDataArrayWithId(id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) {
-    const __args = { id, name, type, data, array, width, height };
+  addElementDataArrayWithId(id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) {
+    const __args = { id, name, type, data, array, width, height, folderId };
     let __writer = new __BinaryWriter(1024);
     AddElementDataArrayWithId.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("AddElementDataArrayWithId", __argsBuffer, this.setCallReducerFlags.addElementDataArrayWithIdFlags);
   }
 
-  onAddElementDataArrayWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) => void) {
+  onAddElementDataArrayWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) => void) {
     this.connection.onReducer("AddElementDataArrayWithId", callback);
   }
 
-  removeOnAddElementDataArrayWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number) => void) {
+  removeOnAddElementDataArrayWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, array: Uint8Array, width: number, height: number, folderId: number) => void) {
     this.connection.offReducer("AddElementDataArrayWithId", callback);
   }
 
-  addElementDataWithId(id: number, name: string, type: DataType, data: string, width: number, height: number) {
-    const __args = { id, name, type, data, width, height };
+  addElementDataWithId(id: number, name: string, type: DataType, data: string, width: number, height: number, folderId: number) {
+    const __args = { id, name, type, data, width, height, folderId };
     let __writer = new __BinaryWriter(1024);
     AddElementDataWithId.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("AddElementDataWithId", __argsBuffer, this.setCallReducerFlags.addElementDataWithIdFlags);
   }
 
-  onAddElementDataWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, width: number, height: number) => void) {
+  onAddElementDataWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, width: number, height: number, folderId: number) => void) {
     this.connection.onReducer("AddElementDataWithId", callback);
   }
 
-  removeOnAddElementDataWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, width: number, height: number) => void) {
+  removeOnAddElementDataWithId(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, width: number, height: number, folderId: number) => void) {
     this.connection.offReducer("AddElementDataWithId", callback);
   }
 
@@ -1302,19 +1302,19 @@ export class RemoteReducers {
     this.connection.offReducer("ImportElement", callback);
   }
 
-  importElementData(id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, createdBy: string) {
-    const __args = { id, name, type, data, byteArray, width, height, createdBy };
+  importElementData(id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, folderId: number, createdBy: string) {
+    const __args = { id, name, type, data, byteArray, width, height, folderId, createdBy };
     let __writer = new __BinaryWriter(1024);
     ImportElementData.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("ImportElementData", __argsBuffer, this.setCallReducerFlags.importElementDataFlags);
   }
 
-  onImportElementData(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, createdBy: string) => void) {
+  onImportElementData(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, folderId: number, createdBy: string) => void) {
     this.connection.onReducer("ImportElementData", callback);
   }
 
-  removeOnImportElementData(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, createdBy: string) => void) {
+  removeOnImportElementData(callback: (ctx: ReducerEventContext, id: number, name: string, type: DataType, data: string, byteArray: Uint8Array, width: number, height: number, folderId: number, createdBy: string) => void) {
     this.connection.offReducer("ImportElementData", callback);
   }
 

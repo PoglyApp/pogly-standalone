@@ -39,7 +39,7 @@ export type ElementData = {
   byteArray: Uint8Array | undefined,
   dataWidth: number,
   dataHeight: number,
-  folderId: number | undefined,
+  folderId: number,
   createdBy: string,
 };
 /**
@@ -60,7 +60,7 @@ export const ElementData = {
         { name: "byteArray", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8))},
         { name: "dataWidth", algebraicType: __AlgebraicTypeValue.I32},
         { name: "dataHeight", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
+        { name: "folderId", algebraicType: __AlgebraicTypeValue.U32},
         { name: "createdBy", algebraicType: __AlgebraicTypeValue.String},
       ]
     });

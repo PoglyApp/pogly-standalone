@@ -31,6 +31,7 @@ public partial class Module
                 Data = data,
                 DataWidth = width,
                 DataHeight = height,
+                FolderId = 0,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -44,7 +45,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataWithId(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height)
+    public static void AddElementDataWithId(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height, uint folderId)
     {
         string func = "AddElementDataWithId";
         
@@ -66,6 +67,7 @@ public partial class Module
                 Data = data,
                 DataWidth = width,
                 DataHeight = height,
+                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -79,7 +81,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height)
+    public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height, uint folderId)
     {
         string func = "AddElementDataArray";
         
@@ -108,6 +110,7 @@ public partial class Module
                 ByteArray = array,
                 DataWidth = width,
                 DataHeight = height,
+                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -121,7 +124,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataArrayWithId(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] array, int width, int height)
+    public static void AddElementDataArrayWithId(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] array, int width, int height, uint folderId)
     {
         string func = "AddElementDataArrayWithId";
         
@@ -144,6 +147,7 @@ public partial class Module
                 ByteArray = array,
                 DataWidth = width,
                 DataHeight = height,
+                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -157,7 +161,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, string createdBy)
+    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, uint folderId, string createdBy)
     {
         string func = "ImportElementDataArrayWithId";
         
@@ -174,6 +178,7 @@ public partial class Module
                 ByteArray = byteArray,
                 DataWidth = width,
                 DataHeight = height,
+                FolderId = folderId,
                 CreatedBy = createdBy
             };
             ctx.Db.ElementData.Insert(elementData);

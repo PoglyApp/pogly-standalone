@@ -139,7 +139,7 @@ public partial class Module
                 if (preserveElements)
                 {
                     var newE = e;
-                    newE.FolderId = null;
+                    newE.FolderId = 0;
                     ctx.Db.ElementData.Id.Update(newE);
                 }
                 else
@@ -180,7 +180,7 @@ public partial class Module
                 if (preserveElements)
                 {
                     var newE = e;
-                    newE.FolderId = null;
+                    newE.FolderId = 0;
                     ctx.Db.ElementData.Id.Update(newE);
                 }
                 else

@@ -39,6 +39,7 @@ export type ImportElementData = {
   byteArray: Uint8Array,
   width: number,
   height: number,
+  folderId: number,
   createdBy: string,
 };
 /**
@@ -59,6 +60,7 @@ export const ImportElementData = {
         { name: "byteArray", algebraicType: __AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8)},
         { name: "width", algebraicType: __AlgebraicTypeValue.I32},
         { name: "height", algebraicType: __AlgebraicTypeValue.I32},
+        { name: "folderId", algebraicType: __AlgebraicTypeValue.U32},
         { name: "createdBy", algebraicType: __AlgebraicTypeValue.String},
       ]
     });

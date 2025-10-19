@@ -38,6 +38,7 @@ export type AddElementDataWithId = {
   data: string,
   width: number,
   height: number,
+  folderId: number,
 };
 /**
  * An object for generated helper functions.
@@ -56,6 +57,7 @@ export const AddElementDataWithId = {
         { name: "data", algebraicType: __AlgebraicTypeValue.String},
         { name: "width", algebraicType: __AlgebraicTypeValue.I32},
         { name: "height", algebraicType: __AlgebraicTypeValue.I32},
+        { name: "folderId", algebraicType: __AlgebraicTypeValue.U32},
       ]
     });
   },
