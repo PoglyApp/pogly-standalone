@@ -18,8 +18,9 @@ import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigTy
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Config, DbConnection } from "../../module_bindings";
+import { Config, DbConnection, ElementData } from "../../module_bindings";
 import { useAuth } from "react-oidc-context";
+import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
 
 interface IProp {
   client: DbConnection;
@@ -98,7 +99,12 @@ export const InitialSetupModal = (props: IProp) => {
     );
 
     (async () => {
-      UploadElementDataFromString(props.client, defaultElements);
+      const elementData: ElementData = getElementDataByID(props.client, 1);
+
+      if (!elementData) {
+        UploadElementDataFromString(props.client, defaultElements);
+      }
+
       setInitializing(true);
     })();
 

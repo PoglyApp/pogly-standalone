@@ -21,8 +21,6 @@ import {
   ImageElement,
   ImageElementData,
   Layouts,
-  Reducer,
-  ReducerEventContext,
   TextElement,
   WidgetElement,
 } from "../../module_bindings";
@@ -34,7 +32,9 @@ export const useElementsEvents = (
   setSelectoTargets: Function,
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function,
-  layout: Layouts | undefined
+  layout: Layouts | undefined,
+  transformEditType: any,
+  setTransformEditType: Function
 ) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
@@ -233,6 +233,10 @@ export const useElementsEvents = (
           return;
       }
 
+      if (newElement.transform.includes("matrix") && transformEditType.scale) {
+        setTransformEditType({ scale: false, warp: false, clip: false });
+      }
+
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
 
@@ -249,8 +253,7 @@ export const useElementsEvents = (
 
       // UPDATE CLIP
       if (oldElement.clip !== newElement.clip) {
-        component.style.clipPath = newElement.clip;
-        component.style.setProperty("transform", newElement.transform);
+        component.style.setProperty("clip-path", newElement.clip);
       }
     });
 
@@ -276,5 +279,7 @@ export const useElementsEvents = (
     layout,
     dispatch,
     spacetimeDB.Client,
+    transformEditType.scale,
+    setTransformEditType,
   ]);
 };

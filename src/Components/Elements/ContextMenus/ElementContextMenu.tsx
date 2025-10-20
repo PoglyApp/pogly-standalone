@@ -22,13 +22,15 @@ import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import CheckIcon from "@mui/icons-material/Check";
 import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal";
-import { ElementData, Elements, PermissionLevel, WidgetElement } from "../../../module_bindings";
+import { Elements, PermissionLevel, WidgetElement } from "../../../module_bindings";
 
 interface IProps {
   contextMenu: any;
   setContextMenu: Function;
   canvasElements: CanvasElementType[];
+  transformSelect: any;
   setTransformSelect: Function;
   setSelected: Function;
   setSelectoTargets: Function;
@@ -45,7 +47,7 @@ export const ElementContextMenu = (props: IProps) => {
     spacetimeDB.Identity.identity
   )?.permissionLevel;
 
-  const [transformEdit, setTransformEdit] = useState("Scale");
+  const [showTransformEditMenuItem, setShowTransformEditMenuItem] = useState(true);
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);
   const [showResetTransformMenuItem, setShowResetTransformMenuItem] = useState(true);
   const [showTransparencyMenuItem, setShowTransparencyMenuItem] = useState(true);
@@ -58,6 +60,8 @@ export const ElementContextMenu = (props: IProps) => {
 
   let element: Elements | undefined;
   if (selectedElement) element = spacetimeDB.Client.db.elements.id.find(selectedElement.id);
+
+  const hasElementBeenWarped = element?.transform.includes("matrix");
 
   useEffect(() => {
     if (selectedElement)
@@ -135,38 +139,68 @@ export const ElementContextMenu = (props: IProps) => {
       MenuListProps={{ onMouseLeave: handleClose }}
       className="canvas-font"
     >
-      {/* <StyledMenuItem
-        sx={{
-          paddingLeft: "0px",
-          paddingRight: "0px",
-          paddingTop: "15px",
-        }}
-      >
+      <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
-          <InputLabel sx={{ color: "#ffffffa6", "&.Mui-focused": { color: "#ffffffa6" } }}>Edit Transform</InputLabel>
           <StyledSelect
-            label="Edit transform"
-            value={transformEdit !== "" ? transformEdit : "Scale"}
-            onChange={(event: any) => setTransformEdit(event.target.value)}
-            variant={"outlined"}
+            value={"Edit transform"}
+            variant={"standard"}
             sx={{
-              ".MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
+              ".MuiStandardInput-notchedOutline": { borderColor: "#ffffffa6" },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffffa6" },
               ".MuiSvgIcon-root": { fill: "#ffffffa6" },
+              marginRight: "5px !important",
+              marginTop: "0px !important",
             }}
+            onOpen={(prev) => setShowTransformEditMenuItem(false)}
+            onClose={(prev) => setShowTransformEditMenuItem(true)}
           >
-            <MenuItem value={"Scale"} onClick={() => handleEditTransform(TransformType.Scale, props.setTransformSelect)}>
-              Scale
+            <MenuItem value={"Edit transform"} style={{ display: showTransformEditMenuItem ? "block" : "none" }}>
+              Edit
             </MenuItem>
-            <MenuItem value={"Warp"} onClick={() => handleEditTransform(TransformType.Warp, props.setTransformSelect)}>
-              Warp
-            </MenuItem>
-            <MenuItem value={"Clip"} onClick={() => handleEditTransform(TransformType.Clip, props.setTransformSelect)}>
+            <Tooltip
+              title="Scale cannot be modified if the element has been warped. Reset warp to scale the element."
+              disableHoverListener={!hasElementBeenWarped}
+              placement="top"
+            >
+              <StyledMenuItem
+                value={"Scale"}
+                onClick={() => {
+                  if (!hasElementBeenWarped) props.setTransformSelect({ size: true, warp: false, clip: false });
+                  handleClose();
+                }}
+                style={hasElementBeenWarped ? { cursor: "not-allowed", color: "#364f68" } : {}}
+              >
+                Scale
+                {props.transformSelect.size && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
+                {hasElementBeenWarped && (
+                  <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingLeft: "5px" }} />
+                )}
+              </StyledMenuItem>
+            </Tooltip>
+
+            <StyledMenuItem
+              value={"Clip"}
+              onClick={() => {
+                props.setTransformSelect({ size: false, warp: false, clip: true });
+                handleClose();
+              }}
+            >
               Clip
-            </MenuItem>
+              {props.transformSelect.clip && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
+            </StyledMenuItem>
+            <StyledMenuItem
+              value={"Wrap"}
+              onClick={() => {
+                props.setTransformSelect({ size: false, warp: true, clip: false });
+                handleClose();
+              }}
+            >
+              Warp
+              {props.transformSelect.warp && <CheckIcon sx={{ color: "green", marginLeft: "3px" }} />}
+            </StyledMenuItem>
           </StyledSelect>
         </FormControl>
-      </StyledMenuItem> */}
+      </StyledMenuItem>
 
       <StyledMenuItem sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <FormControl fullWidth>
@@ -202,18 +236,30 @@ export const ElementContextMenu = (props: IProps) => {
             >
               Rotation
             </StyledMenuItem>
-            {/* <StyledMenuItem
+            <StyledMenuItem
+              value={"Clip"}
+              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Clip, handleClose)}
+            >
+              Clip
+            </StyledMenuItem>
+            <StyledMenuItem
               value={"Warp"}
-              onClick={() => handleResetTransform(selectedElement, TransformType.Warp, handleClose)}
+              onClick={() => handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Warp, handleClose)}
             >
               Warp
             </StyledMenuItem>
             <StyledMenuItem
-              value={"Clip"}
-              onClick={() => handleResetTransform(selectedElement, TransformType.Clip, handleClose)}
+              value={"All"}
+              onClick={() => {
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Scale, () => {});
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Rotation, () => {});
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Clip, () => {});
+                handleResetTransform(spacetimeDB.Client, selectedElement, TransformType.Warp, () => {});
+                handleClose();
+              }}
             >
-              Clip
-            </StyledMenuItem> */}
+              All
+            </StyledMenuItem>
           </StyledSelect>
         </FormControl>
       </StyledMenuItem>

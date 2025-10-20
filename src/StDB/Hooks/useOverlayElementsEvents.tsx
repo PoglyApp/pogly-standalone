@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
-import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
@@ -197,8 +195,7 @@ export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbC
 
         // UPDATE CLIP
         if (oldElement.clip !== newElement.clip) {
-          component.style.clipPath = newElement.clip;
-          component.style.setProperty("transform", newElement.transform);
+          component.style.setProperty("clip-path", newElement.clip);
         }
       }
     });

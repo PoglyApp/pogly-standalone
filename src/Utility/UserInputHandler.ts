@@ -2,13 +2,14 @@ import { toast } from "react-toastify";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
-import { GetCoordsFromTransform, GetTransformFromCoords } from "./ConvertCoordinates";
+import { GetCoordsFromTransform, GetMatrixFromElement, GetTransformFromCoords } from "./ConvertCoordinates";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { handleFlipElement } from "./ContextMenuMethods";
-import { DbConnection, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
+import { DbConnection, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
+import { getElementByID } from "../StDB/SpacetimeDBUtils";
 
 let hobbesArmed = false;
 let hobbesTimer: number | null = null;
@@ -34,7 +35,9 @@ export const UserInputHandler = (
   selectedElement: SelectedType | undefined,
   selectoElements: Array<SVGElement | HTMLElement>,
   compressPaste: boolean | undefined,
-  transformRef: ReactZoomPanPinchRef | null
+  transformRef: ReactZoomPanPinchRef | null,
+  transformSelect: any,
+  setTransformSelect: Function
 ): any => {
   const userInputs = [];
 
@@ -147,14 +150,12 @@ export const UserInputHandler = (
         DebugLogger("Duplicating element");
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
-        if (element)
-          insertElement(
-            Client,
-            element.element,
-            activeLayout,
-            element.transparency,
-            OffsetElementForCanvas(element).transform
-          );
+        if (element) {
+          const matrix = GetMatrixFromElement(element.transform) || undefined;
+          const transform = OffsetElementForCanvas(element).transform;
+
+          insertElement(Client, element.element, activeLayout, element.transparency, transform, element.clip, matrix);
+        }
       } catch {
         console.log("Pogly encountered an issue when attempting to Duplicate an element!");
       }
@@ -243,12 +244,17 @@ export const UserInputHandler = (
 
             DebugLogger("Inserting new text");
 
+            const matrix = GetMatrixFromElement(json.transform) || undefined;
+            const transform = OffsetElementForCanvas(json).transform;
+
             insertElement(
               Client,
               json.element as ElementStruct,
               activeLayout,
               json.transparency,
-              OffsetElementForCanvas(json as Elements).transform
+              transform,
+              json.clip,
+              matrix
             );
           } catch (error) {
             const isImageUrl = /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg|webp|avif))/i.test(text);
@@ -832,6 +838,107 @@ export const UserInputHandler = (
       event.preventDefault();
 
       handleFlipElement(Client, true, selectedElement!.Elements);
+    },
+  });
+
+  userInputs.push({
+    name: "enablewarp",
+    keys: "shift+w",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+      if (transformSelect.warp) return;
+
+      setTransformSelect({
+        size: false,
+        warp: true,
+        clip: false,
+      });
+
+      toast.info("Warp transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    },
+  });
+
+  userInputs.push({
+    name: "enableclip",
+    keys: "shift+c",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+      if (transformSelect.clip) return;
+
+      setTransformSelect({
+        size: false,
+        warp: false,
+        clip: true,
+      });
+
+      toast.info("Clip transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    },
+  });
+
+  userInputs.push({
+    name: "enablescale",
+    keys: "shift+s",
+    action: "keydown",
+    callback: (event: any) => {
+      event.preventDefault();
+      if (transformSelect.size) return;
+
+      if (selectedElement) {
+        const element = getElementByID(Client, selectedElement.Elements.id);
+
+        if (element) {
+          const hasElementBeenWarped = element.transform.includes("matrix");
+          if (hasElementBeenWarped) {
+            return toast.error("Warped elements cannot be scaled.", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          }
+        }
+      }
+
+      setTransformSelect({
+        size: true,
+        warp: false,
+        clip: false,
+      });
+
+      toast.info("Scale transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     },
   });
 

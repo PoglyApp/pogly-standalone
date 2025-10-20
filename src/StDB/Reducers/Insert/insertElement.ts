@@ -1,8 +1,14 @@
-import { DataType, DbConnection, ElementStruct, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../../module_bindings";
 import {
-  GetCoordsFromTransform,
-  GetTransformFromCoords,
-} from "../../../Utility/ConvertCoordinates";
+  DataType,
+  DbConnection,
+  ElementStruct,
+  ImageElement,
+  ImageElementData,
+  Layouts,
+  TextElement,
+  WidgetElement,
+} from "../../../module_bindings";
+import { GetCoordsFromTransform, GetTransformFromCoords } from "../../../Utility/ConvertCoordinates";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 
 export const insertElement = (
@@ -11,12 +17,13 @@ export const insertElement = (
   activeLayout: Layouts,
   transparency?: number,
   transform?: string,
-  clip?: string
+  clip?: string,
+  matrix?: string | undefined
 ) => {
   DebugLogger("Inserting new element");
 
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 1100px)");
-  const newTransform = GetTransformFromCoords(
+  let newTransform = GetTransformFromCoords(
     transformCoords.x,
     transformCoords.y,
     transformCoords.rotation,
@@ -25,6 +32,10 @@ export const insertElement = (
     transformCoords.scaleX,
     transformCoords.scaleY
   );
+
+  if (matrix) {
+    newTransform += " " + matrix;
+  }
 
   let element: any;
 

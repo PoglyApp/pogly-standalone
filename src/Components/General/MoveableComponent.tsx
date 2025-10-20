@@ -3,10 +3,6 @@ import Moveable, { OnDragGroup, OnRotateGroup } from "react-moveable";
 import Selecto from "react-selecto";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
-import { SettingsContext } from "../../Contexts/SettingsContext";
-import { GetCoordsFromTransform } from "../../Utility/ConvertCoordinates";
-import { DebugLogger } from "../../Utility/DebugLogger";
-import { Config } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
@@ -18,26 +14,20 @@ interface IProp {
 }
 
 export const MoveableComponent = (props: IProp) => {
-  const { settings } = useContext(SettingsContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
 
-  const debugText = document.getElementById("debug-text" + props.selected?.Elements.id);
-  const stream = document.getElementById("stream")?.getBoundingClientRect();
-
   const [isShiftPressed, setIsShiftPressed] = useState(false);
-  //const [isResize, setIsResize] = useState(false);
+  const [hasElementBeenWarped, sethasElementBeenWarped] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
       if (event.key === "Shift") {
-        DebugLogger("Shift is being pressed");
         setIsShiftPressed(true);
       }
     };
 
     const handleKeyUp = (event: any) => {
       if (event.key === "Shift") {
-        DebugLogger("Shift is let go");
         setIsShiftPressed(false);
       }
     };
@@ -45,7 +35,6 @@ export const MoveableComponent = (props: IProp) => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
-    // Clean up event listeners on component unmount
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
@@ -53,21 +42,14 @@ export const MoveableComponent = (props: IProp) => {
   }, []);
 
   useEffect(() => {
-    if (!debugText) return;
-
-    if (!settings.debug) {
-      DebugLogger("Hide debug text");
-      debugText.style.display = "none";
-    } else {
-      DebugLogger("Show debug text");
-      debugText.style.display = "Inline";
-    }
-  }, [settings.debug, debugText]);
+    if (!props.selected) return;
+    const hasMatrix =
+      document.getElementById(props.selected.Elements.id.toString())?.style.transform.includes("matrix") || false;
+    sethasElementBeenWarped(hasMatrix);
+  }, [props.selected]);
 
   const onTransformStop = (event: any) => {
     if (!event.isDrag || !props.selected) return;
-
-    DebugLogger("Updating element transform");
 
     updateElementTransform(spacetimeDB.Client, props.selected.Elements.id, event.lastEvent.style.transform);
   };
@@ -75,31 +57,9 @@ export const MoveableComponent = (props: IProp) => {
   let transformWaitUntil = 0;
 
   const onTransform = (event: any) => {
-    //if (!props.selected) return;
-
     if (Date.now() < transformWaitUntil) return;
 
-    if (settings.debug && debugText) {
-      if (!stream) return;
-      const bounds = event.target.getBoundingClientRect();
-
-      const insideStream =
-        bounds.right >= stream.left &&
-        bounds.left <= stream.right &&
-        bounds.bottom >= stream.top &&
-        bounds.top <= stream.bottom;
-
-      const coords = GetCoordsFromTransform(event.target.style.transform);
-
-      debugText.innerHTML = `Pos: ${coords.x},${coords.y}<br />Vis: ${insideStream}`;
-    }
-
-    updateElementTransform(
-      //props.selected.Elements.id,
-      spacetimeDB.Client,
-      event.target.id,
-      event.target.style.transform
-    );
+    updateElementTransform(spacetimeDB.Client, event.target.id, event.target.style.transform);
 
     transformWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
   };
@@ -118,24 +78,23 @@ export const MoveableComponent = (props: IProp) => {
   };
 
   const onResizeStop = (event: any) => {
-    //setIsResize(false);
-    if (!event.isDrag || !props.selected) return;
-
-    if (!event) return;
-
-    if (!event.lastEvent) return;
-
-    DebugLogger("Updating element size");
+    if (!event || !event.lastEvent || !event.isDrag || !props.selected) return;
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-
-      spacetimeDB.Client.reducers.updateImageElementSize(event.target.id, event.lastEvent.width, event.lastEvent.height);
+        spacetimeDB.Client.reducers.updateImageElementSize(
+          event.target.id,
+          event.lastEvent.width,
+          event.lastEvent.height
+        );
         break;
 
       case "WidgetElement":
-
-      spacetimeDB.Client.reducers.updateWidgetElementSize(event.target.id, event.lastEvent.width, event.lastEvent.height);
+        spacetimeDB.Client.reducers.updateWidgetElementSize(
+          event.target.id,
+          event.lastEvent.width,
+          event.lastEvent.height
+        );
         break;
     }
 
@@ -145,22 +104,17 @@ export const MoveableComponent = (props: IProp) => {
   let resizeWaitUntil = 0;
 
   const onResize = (event: any) => {
-    //setIsResize(true);
-    if (!props.selected) return;
-
-    if (!event) return;
+    if (!event || !props.selected) return;
 
     if (Date.now() < resizeWaitUntil) return;
 
     switch (props.selected.Elements.element.tag) {
       case "ImageElement":
-
-      spacetimeDB.Client.reducers.updateImageElementSize(event.target.id, event.width, event.height);
+        spacetimeDB.Client.reducers.updateImageElementSize(event.target.id, event.width, event.height);
         break;
 
       case "WidgetElement":
-
-      spacetimeDB.Client.reducers.updateWidgetElementSize(event.target.id, event.width, event.height);
+        spacetimeDB.Client.reducers.updateWidgetElementSize(event.target.id, event.width, event.height);
         break;
     }
 
@@ -171,12 +125,7 @@ export const MoveableComponent = (props: IProp) => {
 
   const onClip = (event: any) => {
     if (!props.selected) return;
-    //updateElementClip(props.selected.Elements.id, event.style.clipPath);
-  };
-
-  const onClipStop = (event: any) => {
-    if (!event.isDrag || !props.selected) return;
-    //updateElementClip(props.selected.Elements.id, event.lastEvent.style.clipPath);
+    spacetimeDB.Client.reducers.updateElementClip(event.target.id, event.clipStyle);
   };
 
   return (
@@ -194,11 +143,15 @@ export const MoveableComponent = (props: IProp) => {
       // snappable={isShiftPressed && !isResize}
       // snapGridWidth={10}
       // snapGridHeight={10}
-      resizable={true && props.transformSelect.size && props.selected?.Elements.element.tag !== "TextElement"}
-      // warpable={true && props.transformSelect.warp}
-      // clippable={true && props.transformSelect.clip}
-      warpable={false}
-      clippable={false}
+      resizable={
+        true &&
+        props.transformSelect.size &&
+        props.selected?.Elements.element.tag !== "TextElement" &&
+        !hasElementBeenWarped
+      }
+      warpable={true && props.transformSelect.warp}
+      clippable={true && props.transformSelect.clip}
+      clipTargetBounds
       throttleResize={1}
       throttleDrag={1}
       throttleRotate={1}
@@ -250,7 +203,6 @@ export const MoveableComponent = (props: IProp) => {
         event.target.style.clipPath = event.clipStyle;
         onClip(event);
       }}
-      onClipEnd={(event) => onClipStop(event)}
     />
   );
 };

@@ -61,9 +61,14 @@ export const ElementSelectionContextMenu = (props: IProps) => {
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>
 
       {showExamine && (
-        <Paper sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
-          Created by: {props.contextMenu ? props.contextMenu.elementData.createdBy : ""}
-        </Paper>
+        <div>
+          <Paper sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            Created by: {props.contextMenu ? props.contextMenu.elementData.createdBy : ""}
+          </Paper>
+          <Paper sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            Data ID: {props.contextMenu ? props.contextMenu.elementData.id : ""}
+          </Paper>
+        </div>
       )}
 
       {strictMode && !permissions ? (

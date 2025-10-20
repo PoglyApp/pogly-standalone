@@ -1,10 +1,13 @@
 import {
   GetCoordsFromTransform,
+  GetMatrixFromElement,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
 import { DbConnection } from "../../../module_bindings";
 
 export const updateElementTransform = (Client: DbConnection, elementId: number, transform: string) => {
+  const matrix = GetMatrixFromElement(transform);
+
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -16,10 +19,22 @@ export const updateElementTransform = (Client: DbConnection, elementId: number, 
     transformCoords.scaleY
   );
 
-  Client.reducers.updateElementTransform(elementId, newTransform);
+  let transformString = newTransform;
+
+  if (matrix) {
+    transformString += " " + matrix;
+  }
+
+  Client.reducers.updateElementTransform(elementId, transformString);
 };
 
-export const updateElementTransformNoViewportAdjustment = (Client: DbConnection, elementId: number, transform: string) => {
+export const updateElementTransformNoViewportAdjustment = (
+  Client: DbConnection,
+  elementId: number,
+  transform: string
+) => {
+  const matrix = GetMatrixFromElement(transform);
+
   const transformCoords = GetCoordsFromTransform(transform);
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -31,5 +46,11 @@ export const updateElementTransformNoViewportAdjustment = (Client: DbConnection,
     transformCoords.scaleY
   );
 
-  Client.reducers.updateElementTransform(elementId, newTransform);
+  let transformString = newTransform;
+
+  if (matrix) {
+    transformString += " " + matrix;
+  }
+
+  Client.reducers.updateElementTransform(elementId, transformString);
 };

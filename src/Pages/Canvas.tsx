@@ -33,7 +33,6 @@ import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
 import { Elements, Layouts, PermissionLevel } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -94,7 +93,9 @@ export const Canvas = () => {
     setSelectoTargets,
     canvasInitialized,
     setCanvasInitialized,
-    activeLayout
+    activeLayout,
+    transformSelect,
+    setTransformSelect
   );
 
   const userDisconnected = useGuestsEvents(canvasInitialized, setCanvasInitialized, transformRef);
@@ -112,7 +113,9 @@ export const Canvas = () => {
       selected,
       selectoTargets,
       settings.compressPaste,
-      transformRef.current
+      transformRef.current,
+      transformSelect,
+      setTransformSelect
     )
   );
 
@@ -272,6 +275,7 @@ export const Canvas = () => {
             contextMenu={contextMenu}
             setContextMenu={setContextMenu}
             canvasElements={canvasElements}
+            transformSelect={transformSelect}
             setTransformSelect={setTransformSelect}
             setSelected={setSelected}
             setSelectoTargets={setSelectoTargets}
