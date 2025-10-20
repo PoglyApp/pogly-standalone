@@ -254,11 +254,7 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer
-                  moduleName={spacetimeDB.Runtime.module}
-                  platform={spacetimeDB.Config.streamingPlatform}
-                  streamName={spacetimeDB.Config.streamName}
-                />
+                <StreamContainer />
               </div>
             </Container>
 

@@ -30,12 +30,17 @@ export const Error: React.FC = () => {
         <div className="content">
           <div className="title-holder">
             <h1>
-              <img src="./assets/notlikethis.png" alt="notlikethis" />
+              <img
+                src="./assets/notlikethis.png"
+                alt="notlikethis"
+                style={{ justifySelf: "center", display: "grid" }}
+              />
               <pre className="error">
                 <code>{errorMessage(error)}</code>
               </pre>
               <p>
-                {location.pathname}<br />
+                {location.pathname}
+                <br />
                 Report this in our{" "}
                 <a className="glow" href="https://discord.gg/pogly">
                   Discord
