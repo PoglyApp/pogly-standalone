@@ -1,15 +1,16 @@
-import { useState, useEffect, useContext, memo } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import styled from "styled-components";
 import { Alert, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Config } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
-const StreamContainer = () => {
-  const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+interface IProps {
+  Runtime: any;
+  spacetimeDB: any;
+}
 
+const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
 
@@ -228,9 +229,9 @@ const StreamContainer = () => {
       )}
     </>
   );
-};
+});
 
-export default memo(StreamContainer, (prevProps, nextProps) => true);
+export default StreamContainer;
 
 const StyledAlert = styled(Alert)`
   position: absolute;

@@ -48,7 +48,7 @@ export const Canvas = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
@@ -254,7 +254,7 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer />
+                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} />
               </div>
             </Container>
 

@@ -37,7 +37,6 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
 
   const [overlayURL, setOverlayURL] = useState<string>("");
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  const [copyAuthButtonText, setAuthButtonText] = useState("Copy authentication token");
 
   const [defaultElements, setDefaultElements] = useState<string>("");
   const [initializing, setInitializing] = useState<boolean>(false);
