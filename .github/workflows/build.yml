@@ -28,8 +28,8 @@ jobs:
       - name: Install SpacetimeDB CLI
         shell: bash
         run: |
-          curl -sSf https://install.spacetimedb.com | sh
-          echo "$HOME/.spacetime/bin" >> $GITHUB_PATH
+          curl -sSf https://install.spacetimedb.com | sh -s -- -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Build module
         run: |
