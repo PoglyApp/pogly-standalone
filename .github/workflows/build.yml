@@ -23,7 +23,7 @@ jobs:
           sudo apt-get update && sudo apt-get install -y binaryen
           dotnet workload install wasi-experimental
           curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.6.0/spacetime-x86_64-unknown-linux-gnu.tar.gz | sudo tar -xzC /usr/bin/
-          sudo chmod +x /usr/bin/spacetime-cli
+          sudo chmod +x /usr/bin/spacetimedb-cli
       - name: "Build module"
         run: |
           spacetime build -p server
