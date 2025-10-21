@@ -10,7 +10,8 @@ WORKDIR /app
 COPY . .
 RUN npm install && npm run build
 
-FROM clockworklabs/spacetimedb:latest
+FROM clockworklabs/spacetime:latest
+
 RUN apt-get update \
     && apt-get install -y caddy \
     && apt-get clean \
