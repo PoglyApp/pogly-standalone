@@ -5,12 +5,14 @@ COPY --chown=spacetime:spacetime server .
 RUN spacetime build \
     && mv /app/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
 
-FROM node:20-alpine AS web
+FROM node:25-alpine3.21 AS web
 WORKDIR /app
 COPY . .
 RUN npm install && npm run build
 
 FROM clockworklabs/spacetime:latest
+
+USER root
 
 RUN apt-get update \
     && apt-get install -y caddy \
