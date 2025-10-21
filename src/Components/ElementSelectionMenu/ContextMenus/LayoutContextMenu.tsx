@@ -71,7 +71,7 @@ export const LayoutContextMenu = (props: IProps) => {
 
   const copyLayoutOverlayURL = (layoutName: string) => {
     let overlayURL = window.location.origin + "/overlay?module=" + spacetimeDB.Runtime?.module;
-    const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://pogly.spacetimedb.com";
+    const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://maincloud.spacetimedb.com";
 
     if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + spacetimeDB.Runtime?.domain;
 
