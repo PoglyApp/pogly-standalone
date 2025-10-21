@@ -15,26 +15,11 @@ export const useChannelEmotes = (
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   useEffect(() => {
-    if (channelEmotesInitialized || !Runtime) return;
+    if (channelEmotesInitialized) return;
 
     DebugLogger("Initializing Channel emotes.");
 
     (async () => {
-      let streamName: string = config.streamName;
-      let streamPlatform: string = config.streamingPlatform;
-
-      const sevenTVOverrides = localStorage.getItem("sevenTVOverrides");
-
-      if (sevenTVOverrides) {
-        const parsedOverrides = JSON.parse(sevenTVOverrides);
-        const sevenTVOverride = parsedOverrides.find((obj: any) => obj.module === Runtime!.module);
-
-        if (sevenTVOverride) {
-          streamName = sevenTVOverride.override;
-          streamPlatform = sevenTVOverride.platform;
-        }
-      }
-
       // 7TV
       const sevenTVUserID = await SevenTVWrap.SearchForUser(spacetimeDB.Config.streamName);
       if (!sevenTVUserID) {
@@ -48,7 +33,7 @@ export const useChannelEmotes = (
         return setChannelEmotesInitialized(true);
       }
 
-      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID, streamPlatform);
+      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID);
       if (!emoteSetID) {
         console.log("Could not find 7TV emote set ID.");
         return setChannelEmotesInitialized(true);
@@ -86,5 +71,11 @@ export const useChannelEmotes = (
       setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
-  }, [channelEmotesInitialized, spacetimeDB.Config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
+  }, [
+    channelEmotesInitialized,
+    spacetimeDB.Config.streamName,
+    setSevenTVEmotes,
+    setBTTVEmotes,
+    setChannelEmotesInitialized,
+  ]);
 };

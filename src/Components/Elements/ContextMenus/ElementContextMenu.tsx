@@ -23,7 +23,6 @@ import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import CheckIcon from "@mui/icons-material/Check";
 import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal";
 import { Elements, PermissionLevel, WidgetElement } from "../../../module_bindings";
 
@@ -61,8 +60,6 @@ export const ElementContextMenu = (props: IProps) => {
 
   let element: Elements | undefined;
   if (selectedElement) element = spacetimeDB.Client.db.elements.id.find(selectedElement.id);
-
-  const hasElementBeenWarped = element?.transform.includes("matrix");
 
   const hasElementBeenWarped = element?.transform.includes("matrix");
 
