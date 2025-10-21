@@ -192,6 +192,7 @@ export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbC
           component.style.width = newImageElement.width + "px";
           component.style.height = newImageElement.height + "px";
         }
+      }
 
         // UPDATE CLIP
         if (oldElement.clip !== newElement.clip) {

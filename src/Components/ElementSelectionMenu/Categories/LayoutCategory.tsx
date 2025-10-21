@@ -22,7 +22,6 @@ export const LayoutCategory = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
-
   const [contextMenu, setContextMenu] = useState<any>(null);
 
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;

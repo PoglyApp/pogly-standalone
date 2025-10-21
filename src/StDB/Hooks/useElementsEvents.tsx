@@ -237,6 +237,10 @@ export const useElementsEvents = (
         setTransformEditType({ scale: false, warp: false, clip: false });
       }
 
+      if (newElement.transform.includes("matrix") && transformEditType.scale) {
+        setTransformEditType({ scale: false, warp: false, clip: false });
+      }
+
       const offsetElement = OffsetElementForCanvas(newElement);
       component.style.setProperty("transform", offsetElement.transform);
 
@@ -277,6 +281,8 @@ export const useElementsEvents = (
     setSelected,
     setSelectoTargets,
     layout,
+    transformEditType.scale,
+    setTransformEditType,
     dispatch,
     spacetimeDB.Client,
     transformEditType.scale,

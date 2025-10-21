@@ -1,8 +1,9 @@
-import { Divider, FormControl, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
+import { Divider, FormControl, InputLabel, Menu, MenuItem, Paper, Select, Slider, Tooltip } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { CanvasElementType } from "../../../Types/General/CanvasElementType";
 import LockIcon from "@mui/icons-material/Lock";
+import CheckIcon from "@mui/icons-material/Check";
 import {
   handleDelete,
   handleFlipElement,
@@ -63,6 +64,8 @@ export const ElementContextMenu = (props: IProps) => {
 
   const hasElementBeenWarped = element?.transform.includes("matrix");
 
+  const hasElementBeenWarped = element?.transform.includes("matrix");
+
   useEffect(() => {
     if (selectedElement)
       setTransparency(spacetimeDB.Client.db.elements.id.find(selectedElement.id)!.transparency.valueOf());
@@ -86,6 +89,9 @@ export const ElementContextMenu = (props: IProps) => {
       setWidgetVariables(() => (toggleVariables.length > 0 ? toggleVariables : null));
     } else {
       const widgetCodeJson = JSON.parse(widgetElement.rawData);
+
+      if (!widgetCodeJson.variables) return;
+
       const toggleVariables = widgetCodeJson.variables.filter(
         (variable: WidgetVariableType) => variable.variableType === 3
       );
@@ -424,6 +430,10 @@ export const ElementContextMenu = (props: IProps) => {
 
           <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
             Added by: {element.placedBy}
+          </Paper>
+
+          <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
+            ID: {element.id}
           </Paper>
         </div>
       )}

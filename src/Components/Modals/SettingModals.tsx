@@ -27,6 +27,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
 import ContentPaste from "@mui/icons-material/ContentPaste";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { BackupModal } from "./BackupModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { ModalContext } from "../../Contexts/ModalContext";
@@ -146,8 +147,6 @@ export const SettingsModal = () => {
 
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
-
-    closeModal("settings_modal", modals, setModals);
   };
 
   useEffect(() => {
@@ -191,6 +190,10 @@ export const SettingsModal = () => {
     setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
+  const showLocalOverridesModal = () => {
+    setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
+  };
+
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
 
@@ -211,6 +214,11 @@ export const SettingsModal = () => {
 
   const openInNewTab = (url: string) => {
     window.open(url, "_blank", "noreferrer");
+  };
+
+  const handleCloseModal = () => {
+    saveSettings();
+    closeModal("settings_modal", modals, setModals);
   };
 
   const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
@@ -454,17 +462,20 @@ export const SettingsModal = () => {
               >
                 Clear Connection Settings
               </Button>
-            </div>
 
-            <div style={{ marginTop: "15px" }}>
-              <StyledInput
-                focused={false}
-                label="Local stream container override"
-                color="#ffffffa6"
-                onChange={setStreamOverride}
-                defaultValue={streamOverride}
-                style={{ width: "100%" }}
-              />
+              <Button
+                variant="outlined"
+                startIcon={<PublishedWithChangesIcon />}
+                sx={{
+                  color: "#ffffffa6",
+                  borderColor: "#ffffffa6",
+                  "&:hover": { borderColor: "white" },
+                  marginTop: "10px",
+                }}
+                onClick={showLocalOverridesModal}
+              >
+                Local override settings
+              </Button>
             </div>
           </SettingsTabPanel>
           <SettingsTabPanel value={tabValue} index={2}>
@@ -561,7 +572,7 @@ export const SettingsModal = () => {
                 }}
                 onClick={() => spacetimeDB.Client.reducers.refreshOverlay()}
               >
-                Force refresh canvas
+                Force refresh overlay
               </Button>
 
               <Button
@@ -575,7 +586,7 @@ export const SettingsModal = () => {
                 }}
                 onClick={() => spacetimeDB.Client.reducers.refreshOverlayClearStorage()}
               >
-                Force hard refresh canvas
+                Force hard refresh overlay
               </Button>
             </div>
           </SettingsTabPanel>
@@ -677,7 +688,13 @@ export const SettingsModal = () => {
                   sx={{ alignItems: "start" }}
                   control={
                     <Checkbox
-                      onChange={() => setAuth(!auth)}
+                      onChange={() => {
+                        if (!config.authentication) {
+                          showInstancePassword();
+                        }
+
+                        setAuth(!auth);
+                      }}
                       checked={auth}
                       sx={{
                         color: "#ffffffa6",
@@ -740,7 +757,7 @@ export const SettingsModal = () => {
             borderColor: "#ffffffa6",
             "&:hover": { borderColor: "white" },
           }}
-          onClick={saveSettings}
+          onClick={handleCloseModal}
         >
           Save
         </Button>

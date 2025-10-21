@@ -21,6 +21,8 @@ export const MoveableComponent = (props: IProp) => {
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
+      if (event.repeat) return;
+
       if (event.key === "Shift") {
         setIsShiftPressed(true);
       }

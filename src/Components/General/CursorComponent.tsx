@@ -1,7 +1,7 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import CssFilterConverter from "css-filter-converter";
 import { SettingsContext } from "../../Contexts/SettingsContext";
-import { GetCoordsFromTransform, GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
+import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { useTransformContext, useTransformEffect } from "react-zoom-pan-pinch";
 import { Guests } from "../../module_bindings";
 
@@ -10,7 +10,6 @@ interface IProp {
 }
 
 export const CursorComponent = (props: IProp) => {
-  const mouse = useRef<any>();
   const { settings } = useContext(SettingsContext);
 
   const result = CssFilterConverter.hexToFilter(props.guest.color);
@@ -40,14 +39,15 @@ export const CursorComponent = (props: IProp) => {
     setScale(state.scale);
   });
 
+  if (!props.guest) return null;
+
   return (
-    <>
+    <div>
       <div
         id={`${props.guest.nickname}_cursor`}
         style={{ position: "fixed", zIndex: 20000000, scale: `${1 / scale || 1}` }}
       >
         <img
-          ref={mouse}
           style={{
             width: "15px",
             height: "22px",
@@ -58,7 +58,7 @@ export const CursorComponent = (props: IProp) => {
           alt="cursor"
         />
         {settings.cursorName || true ? (
-          <>
+          <div>
             <p
               style={{
                 position: "fixed",
@@ -70,11 +70,11 @@ export const CursorComponent = (props: IProp) => {
             >
               {props.guest.nickname}
             </p>
-          </>
+          </div>
         ) : (
           <></>
         )}
       </div>
-    </>
+    </div>
   );
 };

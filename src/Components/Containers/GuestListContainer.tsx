@@ -22,7 +22,7 @@ export const GuestListContainer = () => {
 
   useEffect(() => {
     if (guestStore.length > 5) {
-      const guestsArray = [...guestStore];
+      const guestsArray = [...guestStore.filter((guest: Guests) => guest.nickname !== "")];
 
       DebugLogger("Initializing more than 5 guests");
 

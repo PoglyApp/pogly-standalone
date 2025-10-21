@@ -66,8 +66,10 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/EMIRU" rel="noreferrer" target="_blank" title="Emiru"><img src="./images/streamers/emiru.svg" /></a>
 <a href="https://www.twitch.tv/npmlol" rel="noreferrer" target="_blank" title="Npmlol"><img src="./images/streamers/npmlol.svg" /></a>
 <a href="https://www.twitch.tv/tubbo" rel="noreferrer" target="_blank" title="Tubbo"><img src="./images/streamers/tubbo.svg" /></a>
+<a href="https://www.twitch.tv/jasontheween" rel="noreferrer" target="_blank" title="jasontheween"><img src="./images/streamers/jasontheween.svg" /></a>
 <a href="https://www.twitch.tv/orophia" rel="noreferrer" target="_blank" title="orophia"><img src="./images/streamers/orophia.svg" /></a>
 <a href="https://www.twitch.tv/maya" rel="noreferrer" target="_blank" title="Maya"><img src="./images/streamers/maya.svg" /></a>
+<a href="https://www.twitch.tv/zoil" rel="noreferrer" target="_blank" title="Zoil"><img src="./images/streamers/zoil.svg" /></a>
 <a href="https://www.twitch.tv/alveussanctuary" rel="noreferrer" target="_blank" title="AlveusSanctuary"><img src="./images/streamers/alveussanctuary.svg" /></a>
 <a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
 <a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
@@ -99,6 +101,9 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/greywolf" rel="noreferrer" target="_blank" title="greywolf"><img src="./images/streamers/greywolf.svg" /></a>
 <a href="https://www.twitch.tv/shyfox_vr" rel="noreferrer" target="_blank" title="shyfox_vr"><img src="./images/streamers/shyfoxvr.svg" /></a>
 <a href="https://www.twitch.tv/supertf" rel="noreferrer" target="_blank" title="supertf"><img src="./images/streamers/supertf.svg" /></a>
+<a href="https://www.twitch.tv/amedoll" rel="noreferrer" target="_blank" title="AmeDoll"><img src="./images/streamers/amedoll.svg" /></a>
+<a href="https://www.twitch.tv/sakurasassi" rel="noreferrer" target="_blank" title="SakuraSassi"><img src="./images/streamers/sakurasassi.svg" /></a>
+<a href="https://www.twitch.tv/asby" rel="noreferrer" target="_blank" title="Asby"><img src="./images/streamers/asby.svg" /></a>
 
 ## Contributing
 
