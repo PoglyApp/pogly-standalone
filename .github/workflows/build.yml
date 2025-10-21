@@ -10,25 +10,33 @@ on:
 
 jobs:
   backend:
-    name: "SpacetimeDB Module"
+    name: SpacetimeDB Module
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: "Setup .NET"
+
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8"
-      - name: "Setup build env"
+
+      - name: Setup build env
         run: |
           sudo apt-get update && sudo apt-get install -y binaryen
           dotnet workload install wasi-experimental
-          curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.6.0/spacetime-x86_64-unknown-linux-gnu.tar.gz | sudo tar -xzC /usr/bin/
-          sudo chmod +x /usr/bin/spacetimedb-cli
-      - name: "Build module"
+
+      - name: Install SpacetimeDB CLI
+        shell: bash
+        run: |
+          curl -sSf https://install.spacetimedb.com | sh
+          echo "$HOME/.spacetime/bin" >> $GITHUB_PATH
+
+      - name: Build module
         run: |
           spacetime build -p server
           mv server/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
-      - name: "Upload artifact"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: spacetimedb-module
