@@ -28,40 +28,40 @@ import {
   type TableHandle as __TableHandle,
 } from "spacetimedb";
 
-export type NewPermissions = {
+export type Permissions = {
   identity: __Identity,
   permissionType: number,
 };
-let _cached_NewPermissions_type_value: __AlgebraicTypeType | null = null;
+let _cached_Permissions_type_value: __AlgebraicTypeType | null = null;
 
 /**
  * An object for generated helper functions.
  */
-export const NewPermissions = {
+export const Permissions = {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    if (_cached_NewPermissions_type_value) return _cached_NewPermissions_type_value;
-    _cached_NewPermissions_type_value = __AlgebraicTypeValue.Product({ elements: [] });
-    _cached_NewPermissions_type_value.value.elements.push(
+    if (_cached_Permissions_type_value) return _cached_Permissions_type_value;
+    _cached_Permissions_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_Permissions_type_value.value.elements.push(
       { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
       { name: "permissionType", algebraicType: __AlgebraicTypeValue.U32 },
     );
-    return _cached_NewPermissions_type_value;
+    return _cached_Permissions_type_value;
   },
 
-  serialize(writer: __BinaryWriter, value: NewPermissions): void {
-    __AlgebraicTypeValue.serializeValue(writer, NewPermissions.getTypeScriptAlgebraicType(), value);
+  serialize(writer: __BinaryWriter, value: Permissions): void {
+    __AlgebraicTypeValue.serializeValue(writer, Permissions.getTypeScriptAlgebraicType(), value);
   },
 
-  deserialize(reader: __BinaryReader): NewPermissions {
-    return __AlgebraicTypeValue.deserializeValue(reader, NewPermissions.getTypeScriptAlgebraicType());
+  deserialize(reader: __BinaryReader): Permissions {
+    return __AlgebraicTypeValue.deserializeValue(reader, Permissions.getTypeScriptAlgebraicType());
   },
 
 }
 
-export default NewPermissions;
+export default Permissions;
 
 

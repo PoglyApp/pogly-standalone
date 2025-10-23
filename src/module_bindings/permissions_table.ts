@@ -27,26 +27,26 @@ import {
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
   type TableHandle as __TableHandle,
 } from "spacetimedb";
-import { NewPermissions } from "./new_permissions_type";
+import { Permissions } from "./permissions_type";
 import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
 declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
 
 /**
- * Table handle for the table `NewPermissions`.
+ * Table handle for the table `Permissions`.
  *
- * Obtain a handle from the [`newPermissions`] property on [`RemoteTables`],
- * like `ctx.db.newPermissions`.
+ * Obtain a handle from the [`permissions`] property on [`RemoteTables`],
+ * like `ctx.db.permissions`.
  *
  * Users are encouraged not to explicitly reference this type,
  * but to directly chain method calls,
- * like `ctx.db.newPermissions.on_insert(...)`.
+ * like `ctx.db.permissions.on_insert(...)`.
  */
-export class NewPermissionsTableHandle<TableName extends string> implements __TableHandle<TableName> {
+export class PermissionsTableHandle<TableName extends string> implements __TableHandle<TableName> {
   // phantom type to track the table name
   readonly tableName!: TableName;
-  tableCache: __TableCache<NewPermissions>;
+  tableCache: __TableCache<Permissions>;
 
-  constructor(tableCache: __TableCache<NewPermissions>) {
+  constructor(tableCache: __TableCache<Permissions>) {
     this.tableCache = tableCache;
   }
 
@@ -54,23 +54,23 @@ export class NewPermissionsTableHandle<TableName extends string> implements __Ta
     return this.tableCache.count();
   }
 
-  iter(): Iterable<NewPermissions> {
+  iter(): Iterable<Permissions> {
     return this.tableCache.iter();
   }
 
-  onInsert = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
+  onInsert = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.onInsert(cb);
   }
 
-  removeOnInsert = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
+  removeOnInsert = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.removeOnInsert(cb);
   }
 
-  onDelete = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
+  onDelete = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.onDelete(cb);
   }
 
-  removeOnDelete = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
+  removeOnDelete = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.removeOnDelete(cb);
   }
 }

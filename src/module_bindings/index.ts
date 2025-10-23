@@ -221,12 +221,12 @@ import { KeepAliveWorkerTableHandle } from "./keep_alive_worker_table.ts";
 export { KeepAliveWorkerTableHandle };
 import { LayoutsTableHandle } from "./layouts_table.ts";
 export { LayoutsTableHandle };
-import { NewPermissionsTableHandle } from "./new_permissions_table.ts";
-export { NewPermissionsTableHandle };
 import { OverlayCommandTableHandle } from "./overlay_command_table.ts";
 export { OverlayCommandTableHandle };
 import { OwnerRecoveryKeyTableHandle } from "./owner_recovery_key_table.ts";
 export { OwnerRecoveryKeyTableHandle };
+import { PermissionsTableHandle } from "./permissions_table.ts";
+export { PermissionsTableHandle };
 import { ZIndexTableHandle } from "./z_index_table.ts";
 export { ZIndexTableHandle };
 
@@ -273,10 +273,10 @@ import { KeepAliveWorker } from "./keep_alive_worker_type.ts";
 export { KeepAliveWorker };
 import { Layouts } from "./layouts_type.ts";
 export { Layouts };
-import { NewPermissions } from "./new_permissions_type.ts";
-export { NewPermissions };
 import { OverlayCommand } from "./overlay_command_type.ts";
 export { OverlayCommand };
+import { Permissions } from "./permissions_type.ts";
+export { Permissions };
 import { TextElement } from "./text_element_type.ts";
 export { TextElement };
 import { WidgetElement } from "./widget_element_type.ts";
@@ -376,10 +376,6 @@ const REMOTE_MODULE = {
         colType: (Layouts.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
-    NewPermissions: {
-      tableName: "NewPermissions" as const,
-      rowType: NewPermissions.getTypeScriptAlgebraicType(),
-    },
     OverlayCommand: {
       tableName: "OverlayCommand" as const,
       rowType: OverlayCommand.getTypeScriptAlgebraicType(),
@@ -397,6 +393,10 @@ const REMOTE_MODULE = {
         colName: "version",
         colType: (AuthenticationKey.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
+    },
+    Permissions: {
+      tableName: "Permissions" as const,
+      rowType: Permissions.getTypeScriptAlgebraicType(),
     },
     ZIndex: {
       tableName: "ZIndex" as const,
@@ -2628,11 +2628,6 @@ export class RemoteTables {
     return new LayoutsTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<Layouts>(REMOTE_MODULE.tables.Layouts));
   }
 
-  get newPermissions(): NewPermissionsTableHandle<'NewPermissions'> {
-    // clientCache is a private property
-    return new NewPermissionsTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<NewPermissions>(REMOTE_MODULE.tables.NewPermissions));
-  }
-
   get overlayCommand(): OverlayCommandTableHandle<'OverlayCommand'> {
     // clientCache is a private property
     return new OverlayCommandTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<OverlayCommand>(REMOTE_MODULE.tables.OverlayCommand));
@@ -2641,6 +2636,11 @@ export class RemoteTables {
   get ownerRecoveryKey(): OwnerRecoveryKeyTableHandle<'OwnerRecoveryKey'> {
     // clientCache is a private property
     return new OwnerRecoveryKeyTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<AuthenticationKey>(REMOTE_MODULE.tables.OwnerRecoveryKey));
+  }
+
+  get permissions(): PermissionsTableHandle<'Permissions'> {
+    // clientCache is a private property
+    return new PermissionsTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<Permissions>(REMOTE_MODULE.tables.Permissions));
   }
 
   get zIndex(): ZIndexTableHandle<'ZIndex'> {
