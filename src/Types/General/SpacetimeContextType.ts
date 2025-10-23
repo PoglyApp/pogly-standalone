@@ -3,7 +3,7 @@ import { ConnectionConfigType } from "../ConfigTypes/ConnectionConfigType";
 import { DbConnection, Guests } from "../../module_bindings";
 
 export type SpacetimeContextType = {
-  Client: DbConnection;
+  Client: DbConnection | undefined;
   Identity: Guests;
   Runtime: ConnectionConfigType | undefined;
   Elements: number[];

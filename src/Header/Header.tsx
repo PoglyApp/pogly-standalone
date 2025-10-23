@@ -37,10 +37,10 @@ export const Header = () => {
   useEffect(() => {
     if (location.pathname.startsWith("/overlay") || !spacetimeDB) return;
 
-    const heartBeat = spacetimeDB.Client.db.heartbeat.id.find(0)!;
-    const config = spacetimeDB.Client.db.config.version.find(0)!;
+    const heartBeat = spacetimeDB.Client?.db.heartbeat.id.find(0);
+    const config = spacetimeDB.Client?.db.config.version.find(0);
 
-    if (config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString()) setShowVerificationButton(true);
+    if (config?.ownerIdentity.toHexString() === heartBeat?.serverIdentity.toHexString()) setShowVerificationButton(true);
   }, [spacetimeDB]);
 
   useEffect(() => {
