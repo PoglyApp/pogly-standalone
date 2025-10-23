@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { Guests } from "../../../module_bindings";
 import { useContext } from "react";
-import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 import { getPermissions } from "../../../Utility/PermissionsHelper";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
 
@@ -14,7 +13,7 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const identityPermission = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
   
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;

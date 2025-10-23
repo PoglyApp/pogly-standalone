@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Alert, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Config } from "../../module_bindings";
 
 interface IProps {
   Runtime: any;
@@ -13,6 +14,7 @@ interface IProps {
 const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   const ua = navigator.userAgent.toLowerCase();
   const chrome = ua.includes("chrome") || ua.includes("crios");
@@ -112,7 +114,7 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
 
   return (
     <>
-      {spacetimeDB.Config.streamingPlatform === "twitch" && !streamOverride && (
+      {config.streamingPlatform === "twitch" && !streamOverride && (
         <>
           {chrome && (
             <StyledAlert severity="warning" id="chromealert" style={{ display: "none" }}>
@@ -130,7 +132,7 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
               height="100%"
               width="100%"
               id="stream"
-              channel={spacetimeDB.Config.streamName}
+              channel={config.streamName}
               autoplay
               muted
               onReady={streamOnReady}
@@ -182,27 +184,27 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
         </>
       )}
 
-      {spacetimeDB.Config.streamingPlatform === "youtube" && !streamOverride && (
+      {config.streamingPlatform === "youtube" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
           src={
-            "https://www.youtube.com/embed/live_stream?channel=" + spacetimeDB.Config.streamName + "&autoplay=1&mute=1"
+            "https://www.youtube.com/embed/live_stream?channel=" + config.streamName + "&autoplay=1&mute=1"
           }
           allowFullScreen
           title="YoutubeStream"
         />
       )}
 
-      {spacetimeDB.Config.streamingPlatform === "kick" && !streamOverride && (
+      {config.streamingPlatform === "kick" && !streamOverride && (
         <iframe
           style={{ zIndex: 0, pointerEvents: "none", border: "none" }}
           height="100%"
           width="100%"
           id="stream"
-          src={"https://player.kick.com/" + spacetimeDB.Config.streamName + "?autoplay=true&muted=true"}
+          src={"https://player.kick.com/" + config.streamName + "?autoplay=true&muted=true"}
           allowFullScreen
           title="KickStream"
         />
