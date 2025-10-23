@@ -5,6 +5,8 @@ import BetterTVWrap from "../Utility/BetterTVWrap";
 import SevenTVEmoteType from "../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../Types/BetterTVTypes/BetterTVEmoteType";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
+import { Config } from "../module_bindings";
 
 export const useChannelEmotes = (
   setSevenTVEmotes: Function,
@@ -12,7 +14,8 @@ export const useChannelEmotes = (
   channelEmotesInitialized: boolean,
   setChannelEmotesInitialized: Function
 ) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0)!;
 
   useEffect(() => {
     if (channelEmotesInitialized) return;
@@ -21,7 +24,7 @@ export const useChannelEmotes = (
 
     (async () => {
       // 7TV
-      const sevenTVUserID = await SevenTVWrap.SearchForUser(spacetimeDB.Config.streamName);
+      const sevenTVUserID = await SevenTVWrap.SearchForUser(config.streamName);
       if (!sevenTVUserID) {
         console.log("Could not find 7TV user ID.");
         return setChannelEmotesInitialized(true);
@@ -73,7 +76,7 @@ export const useChannelEmotes = (
     })();
   }, [
     channelEmotesInitialized,
-    spacetimeDB.Config.streamName,
+    config.streamName,
     setSevenTVEmotes,
     setBTTVEmotes,
     setChannelEmotesInitialized,

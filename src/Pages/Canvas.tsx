@@ -31,10 +31,11 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Elements, Layouts } from "../module_bindings";
+import { Config, Elements, Layouts } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
 import { PermissionTypes } from "../Types/General/PermissionType";
 import { getPermissions } from "../Utility/PermissionsHelper";
+import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -50,7 +51,8 @@ export const Canvas = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0)!;
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
@@ -157,7 +159,7 @@ export const Canvas = () => {
 
     spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
-    waitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
+    waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
   if (userDisconnected || spacetimeDB.Disconnected) {
@@ -256,7 +258,7 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} />
+                <StreamContainer Runtime={spacetimeDB.Runtime} spacetimeDB={spacetimeDB} />
               </div>
             </Container>
 

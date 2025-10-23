@@ -5,10 +5,11 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const VerifyOwnershipModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const [verifyKey, setVerifyKey] = useState<string>("");
   const [claimButtonText, setClaimButtonText] = useState<string>("Verify");

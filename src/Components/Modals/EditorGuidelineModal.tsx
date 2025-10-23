@@ -12,6 +12,8 @@ import remark from "remark-gfm";
 import styled from "styled-components";
 import { PermissionTypes } from "../../Types/General/PermissionType";
 import { getPermissions } from "../../Utility/PermissionsHelper";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
+import { Config } from "../../module_bindings";
 
 interface IProp {
   setAcceptedGuidelines?: Function;
@@ -20,10 +22,11 @@ interface IProp {
 export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0)!;
   const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
   const isOwner = permissions.includes(PermissionTypes.Owner);
-  const [guidelineText, setGuidelineText] = useState<string>(spacetimeDB.Config.editorGuidelines.toString());
+  const [guidelineText, setGuidelineText] = useState<string>(config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
   const initGuidelineAccept = () => {

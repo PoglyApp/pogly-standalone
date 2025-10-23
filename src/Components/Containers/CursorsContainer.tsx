@@ -4,12 +4,14 @@ import { CursorComponent } from "../General/CursorComponent";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { Guests } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const CursorsContainer = () => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const { activeLayout } = useContext(LayoutContext);
 
   const guests = useAppSelector((state: any) => state.guests.guests);
+  const config = spacetimeDB.Client.db.config.version.find(0)!;
 
   return (
     <>
@@ -21,7 +23,7 @@ export const CursorsContainer = () => {
             activeLayout.id === guest.selectedLayoutId
         )
         .map((guest: Guests) => {
-          if (spacetimeDB.Config.authentication && !guest.authenticated) return <></>;
+          if (config.authentication && !guest.authenticated) return <></>;
           return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
         })}
     </>

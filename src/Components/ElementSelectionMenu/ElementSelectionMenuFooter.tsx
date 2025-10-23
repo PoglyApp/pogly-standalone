@@ -12,10 +12,11 @@ import { ChangelogType } from "../../Types/General/ChangelogType";
 import { GetLatestChangelogVersion, useChangeLog } from "../../Hooks/useChangeLog";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const ElementSelectionMenuFooter = () => {
   const { setModals } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const [changelog, setChangelog] = useState<ChangelogType | undefined>(undefined);
   const [latestChangelogVersion, setLatestChangelogVersion] = useState<string>("");

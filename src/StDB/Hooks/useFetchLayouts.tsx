@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 const useFetchLayouts = (setLayouts: Function) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   useEffect(() => {
     DebugLogger("Fetching layouts");

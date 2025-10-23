@@ -6,6 +6,7 @@ import { styled } from "styled-components";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { Elements, ElementStruct, ImageElement, ImageElementData } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   selectedElement: Elements;
@@ -13,7 +14,7 @@ interface IProps {
 
 export const UpdateElementSourceModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [element, setElement] = useState<Elements>();

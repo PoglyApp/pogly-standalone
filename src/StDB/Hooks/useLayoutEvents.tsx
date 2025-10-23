@@ -4,10 +4,11 @@ import { LayoutContext } from "../../Contexts/LayoutContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { Layouts, EventContext } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const useLayoutEvents = (setLayouts: Function) => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
   const theActiveLayout = useRef<Layouts>(activeLayout);

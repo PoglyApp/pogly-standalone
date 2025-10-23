@@ -18,13 +18,14 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
+import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
 
 export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { setModals } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isDroppingSelectionMenu, setIsDroppingSelectionMenu] = useState(false);
@@ -36,8 +37,8 @@ export const Header = () => {
   useEffect(() => {
     if (location.pathname.startsWith("/overlay") || !spacetimeDB) return;
 
-    const heartBeat = spacetimeDB.Client.db.heartbeat.id.find(0);
-    const config = spacetimeDB.Client.db.config.version.find(0);
+    const heartBeat = spacetimeDB.Client.db.heartbeat.id.find(0)!;
+    const config = spacetimeDB.Client.db.config.version.find(0)!;
 
     if (config.ownerIdentity.toHexString() === heartBeat.serverIdentity.toHexString()) setShowVerificationButton(true);
   }, [spacetimeDB]);

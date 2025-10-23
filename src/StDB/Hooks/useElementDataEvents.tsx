@@ -6,10 +6,11 @@ import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ElementData, EventContext } from "../../module_bindings";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const useElementDataEvents = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
   const dispatch = useAppDispatch();
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   useEffect(() => {
     if (canvasInitialized.elementDataEventsInitialized) return;

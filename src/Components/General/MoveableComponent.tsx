@@ -4,6 +4,8 @@ import Selecto from "react-selecto";
 import { updateElementTransform } from "../../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
+import { Config } from "../../module_bindings";
 
 interface IProp {
   transformSelect: any;
@@ -14,7 +16,8 @@ interface IProp {
 }
 
 export const MoveableComponent = (props: IProp) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0)!;
 
   const [isShiftPressed, setIsShiftPressed] = useState(false);
   const [hasElementBeenWarped, sethasElementBeenWarped] = useState(false);
@@ -63,7 +66,7 @@ export const MoveableComponent = (props: IProp) => {
 
     updateElementTransform(spacetimeDB.Client, event.target.id, event.target.style.transform);
 
-    transformWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
+    transformWaitUntil = Date.now() + 1000 / config.updateHz;
   };
 
   let transformMultiWaitUntil = 0;
@@ -76,7 +79,7 @@ export const MoveableComponent = (props: IProp) => {
       updateElementTransform(spacetimeDB.Client, parseInt(ev.target.id), ev.target.style.transform);
     });
 
-    transformMultiWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
+    transformMultiWaitUntil = Date.now() + 1000 / config.updateHz;
   };
 
   const onResizeStop = (event: any) => {
@@ -122,7 +125,7 @@ export const MoveableComponent = (props: IProp) => {
 
     updateElementTransform(spacetimeDB.Client, event.target.id, event.target.style.transform);
 
-    resizeWaitUntil = Date.now() + 1000 / spacetimeDB.Config.updateHz;
+    resizeWaitUntil = Date.now() + 1000 / config.updateHz;
   };
 
   const onClip = (event: any) => {

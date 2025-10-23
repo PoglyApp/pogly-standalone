@@ -24,6 +24,7 @@ import {
   TextElement,
   WidgetElement,
 } from "../../module_bindings";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -36,7 +37,7 @@ export const useElementsEvents = (
   transformEditType: any,
   setTransformEditType: Function
 ) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const dispatch = useAppDispatch();
 

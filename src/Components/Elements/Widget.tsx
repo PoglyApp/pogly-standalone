@@ -6,6 +6,7 @@ import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { Elements, WidgetElement } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProp {
   elements: Elements;
@@ -13,7 +14,7 @@ interface IProp {
 
 export const Widget = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const { setModals } = useContext(ModalContext);
   const widgetElement: WidgetElement = props.elements.element.value as WidgetElement;

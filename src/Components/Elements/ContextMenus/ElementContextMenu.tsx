@@ -27,6 +27,7 @@ import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal"
 import { Elements, WidgetElement } from "../../../module_bindings";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
 import { getPermissions } from "../../../Utility/PermissionsHelper";
+import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   contextMenu: any;
@@ -39,7 +40,7 @@ interface IProps {
 }
 
 export const ElementContextMenu = (props: IProps) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const { setModals } = useContext(ModalContext);
 
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;

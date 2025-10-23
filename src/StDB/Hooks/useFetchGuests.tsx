@@ -4,9 +4,10 @@ import { initGuests } from "../../Store/Features/GuestSlice";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

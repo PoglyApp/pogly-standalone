@@ -16,6 +16,7 @@ import { convertBinaryToDataURI } from "../../../Utility/ImageConversion";
 import { ElementData, ElementStruct, ImageElementData } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   elementData: ElementData[];
@@ -28,7 +29,7 @@ interface IProps {
 
 export const ImageCategory = React.memo((props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const [searchimage, setSearchImage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(!props.isSearch);

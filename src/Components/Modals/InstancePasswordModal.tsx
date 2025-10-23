@@ -5,10 +5,11 @@ import { StyledInput } from "../StyledComponents/StyledInput";
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const InstancePasswordModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [password, setPassword] = useState<string>("");

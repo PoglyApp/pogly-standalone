@@ -3,9 +3,10 @@ import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Heartbeat } from "../../module_bindings";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const useHeartbeatEvents = (canvasInitialized: CanvasInitializedType) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   useEffect(() => {
     if (!spacetimeDB.Identity || canvasInitialized.elementEventsInitialized) return;

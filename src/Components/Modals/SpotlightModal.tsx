@@ -15,6 +15,7 @@ import styled from "styled-components";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData, ElementStruct, ImageElementData } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmoteType[] | undefined;
@@ -23,7 +24,7 @@ interface IProps {
 
 export const SpotlightModal = (props: IProps) => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 

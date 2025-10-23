@@ -17,11 +17,12 @@ import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import { Layouts } from "../../../module_bindings";
 import { getPermissions } from "../../../Utility/PermissionsHelper";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
   const [contextMenu, setContextMenu] = useState<any>(null);

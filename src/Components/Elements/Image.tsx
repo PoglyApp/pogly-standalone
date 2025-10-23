@@ -6,6 +6,7 @@ import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData, Elements, ImageElement } from "../../module_bindings";
 import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
+import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProp {
   elements: Elements;
@@ -14,7 +15,7 @@ interface IProp {
 export const Image = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [imageData, setImageData] = useState<string>("");

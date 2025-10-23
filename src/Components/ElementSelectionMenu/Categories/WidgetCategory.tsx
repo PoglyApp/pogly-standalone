@@ -13,6 +13,7 @@ import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementData, ElementStruct } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   elementData: ElementData[];
@@ -24,7 +25,7 @@ interface IProps {
 export const WidgetCategory = React.memo((props: IProps) => {
   const { setModals } = useContext(ModalContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const { spacetimeDB } = useContext(SpacetimeContext);
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
   const perms = props.strictSettings.Permissions ?? [];
   const isOwner = perms.includes(PermissionTypes.Owner);
   const isModerator = perms.includes(PermissionTypes.Moderator);
