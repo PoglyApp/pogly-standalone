@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type UpdateConfig = {
@@ -34,6 +35,8 @@ export type UpdateConfig = {
   authentication: boolean,
   strictMode: boolean,
 };
+let _cached_UpdateConfig_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -43,15 +46,16 @@ export const UpdateConfig = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "platform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "channel", algebraicType: __AlgebraicTypeValue.String},
-        { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool},
-      ]
-    });
+    if (_cached_UpdateConfig_type_value) return _cached_UpdateConfig_type_value;
+    _cached_UpdateConfig_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_UpdateConfig_type_value.value.elements.push(
+      { name: "platform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "channel", algebraicType: __AlgebraicTypeValue.String },
+      { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool },
+    );
+    return _cached_UpdateConfig_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: UpdateConfig): void {

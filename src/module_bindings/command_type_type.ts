@@ -25,12 +25,15 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import * as CommandTypeVariants from './command_type_variants'
 
 // The tagged union or sum type for the algebraic type `CommandType`.
 export type CommandType = CommandTypeVariants.Refresh |
   CommandTypeVariants.HardRefresh;
+
+let _cached_CommandType_type_value: __AlgebraicTypeType | null = null;
 
 // A value with helper functions to construct the type.
 export const CommandType = {
@@ -44,12 +47,13 @@ export const CommandType = {
   HardRefresh: { tag: "HardRefresh" } as const,
 
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Sum({
-      variants: [
-        { name: "Refresh", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
-        { name: "HardRefresh", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
-      ]
-    });
+    if (_cached_CommandType_type_value) return _cached_CommandType_type_value;
+    _cached_CommandType_type_value = __AlgebraicTypeValue.Sum({ variants: [] });
+    _cached_CommandType_type_value.value.variants.push(
+      { name: "Refresh", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
+      { name: "HardRefresh", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
+    );
+    return _cached_CommandType_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: CommandType): void {

@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 import { ElementStruct } from "./element_struct_type";
@@ -38,6 +39,8 @@ export type AddElement = {
   clip: string,
   folderId: number | undefined,
 };
+let _cached_AddElement_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -47,15 +50,16 @@ export const AddElement = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType()},
-        { name: "transparency", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "transform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "clip", algebraicType: __AlgebraicTypeValue.String},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
-      ]
-    });
+    if (_cached_AddElement_type_value) return _cached_AddElement_type_value;
+    _cached_AddElement_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_AddElement_type_value.value.elements.push(
+      { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType() },
+      { name: "transparency", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "transform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "clip", algebraicType: __AlgebraicTypeValue.String },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32) },
+    );
+    return _cached_AddElement_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: AddElement): void {

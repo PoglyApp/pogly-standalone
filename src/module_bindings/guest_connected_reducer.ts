@@ -25,9 +25,12 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type GuestConnected = {};
+let _cached_GuestConnected_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -37,10 +40,11 @@ export const GuestConnected = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-      ]
-    });
+    if (_cached_GuestConnected_type_value) return _cached_GuestConnected_type_value;
+    _cached_GuestConnected_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_GuestConnected_type_value.value.elements.push(
+    );
+    return _cached_GuestConnected_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: GuestConnected): void {

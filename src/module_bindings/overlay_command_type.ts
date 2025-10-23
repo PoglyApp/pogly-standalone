@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { CommandType } from "./command_type_type";
 // Mark import as potentially unused
@@ -38,6 +39,8 @@ export type OverlayCommand = {
   timestamp: bigint,
   completed: boolean,
 };
+let _cached_OverlayCommand_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -47,15 +50,16 @@ export const OverlayCommand = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "command", algebraicType: CommandType.getTypeScriptAlgebraicType()},
-        { name: "issuedBy", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "timestamp", algebraicType: __AlgebraicTypeValue.I64},
-        { name: "completed", algebraicType: __AlgebraicTypeValue.Bool},
-      ]
-    });
+    if (_cached_OverlayCommand_type_value) return _cached_OverlayCommand_type_value;
+    _cached_OverlayCommand_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_OverlayCommand_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "command", algebraicType: CommandType.getTypeScriptAlgebraicType() },
+      { name: "issuedBy", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "timestamp", algebraicType: __AlgebraicTypeValue.I64 },
+      { name: "completed", algebraicType: __AlgebraicTypeValue.Bool },
+    );
+    return _cached_OverlayCommand_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: OverlayCommand): void {

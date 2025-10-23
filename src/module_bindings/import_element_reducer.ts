@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 import { ElementStruct } from "./element_struct_type";
@@ -42,6 +43,8 @@ export type ImportElement = {
   zindex: number,
   folderId: number | undefined,
 };
+let _cached_ImportElement_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -51,19 +54,20 @@ export const ImportElement = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType()},
-        { name: "transparency", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "transform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "clip", algebraicType: __AlgebraicTypeValue.String},
-        { name: "layoutId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "placedBy", algebraicType: __AlgebraicTypeValue.String},
-        { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String},
-        { name: "zindex", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32)},
-      ]
-    });
+    if (_cached_ImportElement_type_value) return _cached_ImportElement_type_value;
+    _cached_ImportElement_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ImportElement_type_value.value.elements.push(
+      { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType() },
+      { name: "transparency", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "transform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "clip", algebraicType: __AlgebraicTypeValue.String },
+      { name: "layoutId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "placedBy", algebraicType: __AlgebraicTypeValue.String },
+      { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String },
+      { name: "zindex", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32) },
+    );
+    return _cached_ImportElement_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImportElement): void {

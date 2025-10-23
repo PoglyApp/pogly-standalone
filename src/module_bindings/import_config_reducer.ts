@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type ImportConfig = {
@@ -40,6 +41,8 @@ export type ImportConfig = {
   zmax: number,
   authKey: string,
 };
+let _cached_ImportConfig_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -49,21 +52,22 @@ export const ImportConfig = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "platform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "channel", algebraicType: __AlgebraicTypeValue.String},
-        { name: "ownerIdentity", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "debug", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "editorBorder", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "zmin", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "zmax", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "authKey", algebraicType: __AlgebraicTypeValue.String},
-      ]
-    });
+    if (_cached_ImportConfig_type_value) return _cached_ImportConfig_type_value;
+    _cached_ImportConfig_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ImportConfig_type_value.value.elements.push(
+      { name: "platform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "channel", algebraicType: __AlgebraicTypeValue.String },
+      { name: "ownerIdentity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "debug", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "editorBorder", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "zmin", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "zmax", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "authKey", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_ImportConfig_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImportConfig): void {

@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 import { DataType } from "./data_type_type";
@@ -41,6 +42,8 @@ export type ImportElementData = {
   height: number,
   createdBy: string,
 };
+let _cached_ImportElementData_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -50,18 +53,19 @@ export const ImportElementData = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "name", algebraicType: __AlgebraicTypeValue.String},
-        { name: "type", algebraicType: DataType.getTypeScriptAlgebraicType()},
-        { name: "data", algebraicType: __AlgebraicTypeValue.String},
-        { name: "byteArray", algebraicType: __AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8)},
-        { name: "width", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "height", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "createdBy", algebraicType: __AlgebraicTypeValue.String},
-      ]
-    });
+    if (_cached_ImportElementData_type_value) return _cached_ImportElementData_type_value;
+    _cached_ImportElementData_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ImportElementData_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "name", algebraicType: __AlgebraicTypeValue.String },
+      { name: "type", algebraicType: DataType.getTypeScriptAlgebraicType() },
+      { name: "data", algebraicType: __AlgebraicTypeValue.String },
+      { name: "byteArray", algebraicType: __AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8) },
+      { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "createdBy", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_ImportElementData_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImportElementData): void {

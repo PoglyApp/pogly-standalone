@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import * as DataTypeVariants from './data_type_variants'
 
@@ -32,6 +33,8 @@ import * as DataTypeVariants from './data_type_variants'
 export type DataType = DataTypeVariants.TextElement |
   DataTypeVariants.ImageElement |
   DataTypeVariants.WidgetElement;
+
+let _cached_DataType_type_value: __AlgebraicTypeType | null = null;
 
 // A value with helper functions to construct the type.
 export const DataType = {
@@ -46,13 +49,14 @@ export const DataType = {
   WidgetElement: { tag: "WidgetElement" } as const,
 
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Sum({
-      variants: [
-        { name: "TextElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
-        { name: "ImageElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
-        { name: "WidgetElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
-      ]
-    });
+    if (_cached_DataType_type_value) return _cached_DataType_type_value;
+    _cached_DataType_type_value = __AlgebraicTypeValue.Sum({ variants: [] });
+    _cached_DataType_type_value.value.variants.push(
+      { name: "TextElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
+      { name: "ImageElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
+      { name: "WidgetElement", algebraicType: __AlgebraicTypeValue.Product({ elements: [] }) },
+    );
+    return _cached_DataType_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: DataType): void {

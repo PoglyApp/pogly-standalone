@@ -25,12 +25,15 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type UpdateGuestPosition = {
   positionX: number,
   positionY: number,
 };
+let _cached_UpdateGuestPosition_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -40,12 +43,13 @@ export const UpdateGuestPosition = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "positionX", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "positionY", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
+    if (_cached_UpdateGuestPosition_type_value) return _cached_UpdateGuestPosition_type_value;
+    _cached_UpdateGuestPosition_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_UpdateGuestPosition_type_value.value.elements.push(
+      { name: "positionX", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "positionY", algebraicType: __AlgebraicTypeValue.I32 },
+    );
+    return _cached_UpdateGuestPosition_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: UpdateGuestPosition): void {

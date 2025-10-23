@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 import { ElementStruct } from "./element_struct_type";
@@ -35,6 +36,8 @@ export type UpdateElementStruct = {
   elementId: number,
   elementStruct: ElementStruct,
 };
+let _cached_UpdateElementStruct_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -44,12 +47,13 @@ export const UpdateElementStruct = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "elementId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "elementStruct", algebraicType: ElementStruct.getTypeScriptAlgebraicType()},
-      ]
-    });
+    if (_cached_UpdateElementStruct_type_value) return _cached_UpdateElementStruct_type_value;
+    _cached_UpdateElementStruct_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_UpdateElementStruct_type_value.value.elements.push(
+      { name: "elementId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "elementStruct", algebraicType: ElementStruct.getTypeScriptAlgebraicType() },
+    );
+    return _cached_UpdateElementStruct_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: UpdateElementStruct): void {

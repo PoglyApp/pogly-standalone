@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { TextElement } from "./text_element_type";
 // Mark import as potentially unused
@@ -43,6 +44,8 @@ export type ElementStruct = ElementStructVariants.TextElement |
   ElementStructVariants.ImageElement |
   ElementStructVariants.WidgetElement;
 
+let _cached_ElementStruct_type_value: __AlgebraicTypeType | null = null;
+
 // A value with helper functions to construct the type.
 export const ElementStruct = {
   // Helper functions for constructing each variant of the tagged union.
@@ -51,18 +54,19 @@ export const ElementStruct = {
   // assert!(foo.tag === "A");
   // assert!(foo.value === 42);
   // ```
-  TextElement: (value: TextElement): ElementStruct => ({ tag: "TextElement", value }),
-  ImageElement: (value: ImageElement): ElementStruct => ({ tag: "ImageElement", value }),
-  WidgetElement: (value: WidgetElement): ElementStruct => ({ tag: "WidgetElement", value }),
+  TextElement: (value: TextElement): ElementStructVariants.TextElement => ({ tag: "TextElement", value }),
+  ImageElement: (value: ImageElement): ElementStructVariants.ImageElement => ({ tag: "ImageElement", value }),
+  WidgetElement: (value: WidgetElement): ElementStructVariants.WidgetElement => ({ tag: "WidgetElement", value }),
 
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Sum({
-      variants: [
-        { name: "TextElement", algebraicType: TextElement.getTypeScriptAlgebraicType() },
-        { name: "ImageElement", algebraicType: ImageElement.getTypeScriptAlgebraicType() },
-        { name: "WidgetElement", algebraicType: WidgetElement.getTypeScriptAlgebraicType() },
-      ]
-    });
+    if (_cached_ElementStruct_type_value) return _cached_ElementStruct_type_value;
+    _cached_ElementStruct_type_value = __AlgebraicTypeValue.Sum({ variants: [] });
+    _cached_ElementStruct_type_value.value.variants.push(
+      { name: "TextElement", algebraicType: TextElement.getTypeScriptAlgebraicType() },
+      { name: "ImageElement", algebraicType: ImageElement.getTypeScriptAlgebraicType() },
+      { name: "WidgetElement", algebraicType: WidgetElement.getTypeScriptAlgebraicType() },
+    );
+    return _cached_ElementStruct_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ElementStruct): void {

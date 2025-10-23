@@ -25,45 +25,43 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
-import { PermissionLevel } from "./permission_level_type";
-// Mark import as potentially unused
-declare type __keep_PermissionLevel = PermissionLevel;
 
-
-export type Permissions = {
+export type NewPermissions = {
   identity: __Identity,
-  nickname: string,
-  permissionLevel: PermissionLevel,
+  permissionType: number,
 };
+let _cached_NewPermissions_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
-export const Permissions = {
+export const NewPermissions = {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "nickname", algebraicType: __AlgebraicTypeValue.String},
-        { name: "permissionLevel", algebraicType: PermissionLevel.getTypeScriptAlgebraicType()},
-      ]
-    });
+    if (_cached_NewPermissions_type_value) return _cached_NewPermissions_type_value;
+    _cached_NewPermissions_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_NewPermissions_type_value.value.elements.push(
+      { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "permissionType", algebraicType: __AlgebraicTypeValue.U32 },
+    );
+    return _cached_NewPermissions_type_value;
   },
 
-  serialize(writer: __BinaryWriter, value: Permissions): void {
-    __AlgebraicTypeValue.serializeValue(writer, Permissions.getTypeScriptAlgebraicType(), value);
+  serialize(writer: __BinaryWriter, value: NewPermissions): void {
+    __AlgebraicTypeValue.serializeValue(writer, NewPermissions.getTypeScriptAlgebraicType(), value);
   },
 
-  deserialize(reader: __BinaryReader): Permissions {
-    return __AlgebraicTypeValue.deserializeValue(reader, Permissions.getTypeScriptAlgebraicType());
+  deserialize(reader: __BinaryReader): NewPermissions {
+    return __AlgebraicTypeValue.deserializeValue(reader, NewPermissions.getTypeScriptAlgebraicType());
   },
 
 }
 
-export default Permissions;
+export default NewPermissions;
 
 

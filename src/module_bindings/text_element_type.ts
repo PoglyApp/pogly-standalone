@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type TextElement = {
@@ -34,6 +35,8 @@ export type TextElement = {
   font: string,
   css: string,
 };
+let _cached_TextElement_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -43,15 +46,16 @@ export const TextElement = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "text", algebraicType: __AlgebraicTypeValue.String},
-        { name: "size", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "color", algebraicType: __AlgebraicTypeValue.String},
-        { name: "font", algebraicType: __AlgebraicTypeValue.String},
-        { name: "css", algebraicType: __AlgebraicTypeValue.String},
-      ]
-    });
+    if (_cached_TextElement_type_value) return _cached_TextElement_type_value;
+    _cached_TextElement_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_TextElement_type_value.value.elements.push(
+      { name: "text", algebraicType: __AlgebraicTypeValue.String },
+      { name: "size", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "color", algebraicType: __AlgebraicTypeValue.String },
+      { name: "font", algebraicType: __AlgebraicTypeValue.String },
+      { name: "css", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_TextElement_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: TextElement): void {

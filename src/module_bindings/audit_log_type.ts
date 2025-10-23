@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { ChangeStruct } from "./change_struct_type";
 // Mark import as potentially unused
@@ -40,6 +41,8 @@ export type AuditLog = {
   oldChange: ChangeStruct,
   newChange: ChangeStruct,
 };
+let _cached_AuditLog_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -49,17 +52,18 @@ export const AuditLog = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "unixTime", algebraicType: __AlgebraicTypeValue.I64},
-        { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "nickname", algebraicType: __AlgebraicTypeValue.String},
-        { name: "reducer", algebraicType: __AlgebraicTypeValue.String},
-        { name: "oldChange", algebraicType: ChangeStruct.getTypeScriptAlgebraicType()},
-        { name: "newChange", algebraicType: ChangeStruct.getTypeScriptAlgebraicType()},
-      ]
-    });
+    if (_cached_AuditLog_type_value) return _cached_AuditLog_type_value;
+    _cached_AuditLog_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_AuditLog_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "unixTime", algebraicType: __AlgebraicTypeValue.I64 },
+      { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "nickname", algebraicType: __AlgebraicTypeValue.String },
+      { name: "reducer", algebraicType: __AlgebraicTypeValue.String },
+      { name: "oldChange", algebraicType: ChangeStruct.getTypeScriptAlgebraicType() },
+      { name: "newChange", algebraicType: ChangeStruct.getTypeScriptAlgebraicType() },
+    );
+    return _cached_AuditLog_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: AuditLog): void {

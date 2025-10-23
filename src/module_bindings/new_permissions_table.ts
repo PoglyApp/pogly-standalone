@@ -27,26 +27,26 @@ import {
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
   type TableHandle as __TableHandle,
 } from "spacetimedb";
-import { Folders } from "./folders_type";
+import { NewPermissions } from "./new_permissions_type";
 import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
 declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
 
 /**
- * Table handle for the table `Folders`.
+ * Table handle for the table `NewPermissions`.
  *
- * Obtain a handle from the [`folders`] property on [`RemoteTables`],
- * like `ctx.db.folders`.
+ * Obtain a handle from the [`newPermissions`] property on [`RemoteTables`],
+ * like `ctx.db.newPermissions`.
  *
  * Users are encouraged not to explicitly reference this type,
  * but to directly chain method calls,
- * like `ctx.db.folders.on_insert(...)`.
+ * like `ctx.db.newPermissions.on_insert(...)`.
  */
-export class FoldersTableHandle<TableName extends string> implements __TableHandle<TableName> {
+export class NewPermissionsTableHandle<TableName extends string> implements __TableHandle<TableName> {
   // phantom type to track the table name
   readonly tableName!: TableName;
-  tableCache: __TableCache<Folders>;
+  tableCache: __TableCache<NewPermissions>;
 
-  constructor(tableCache: __TableCache<Folders>) {
+  constructor(tableCache: __TableCache<NewPermissions>) {
     this.tableCache = tableCache;
   }
 
@@ -54,53 +54,23 @@ export class FoldersTableHandle<TableName extends string> implements __TableHand
     return this.tableCache.count();
   }
 
-  iter(): Iterable<Folders> {
+  iter(): Iterable<NewPermissions> {
     return this.tableCache.iter();
   }
-  /**
-   * Access to the `id` unique index on the table `Folders`,
-   * which allows point queries on the field of the same name
-   * via the [`FoldersIdUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.folders.id().find(...)`.
-   *
-   * Get a handle on the `id` unique index on the table `Folders`.
-   */
-  id = {
-    // Find the subscribed row whose `id` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: number): Folders | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (__deepEqual(row.id, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
 
-  onInsert = (cb: (ctx: EventContext, row: Folders) => void) => {
+  onInsert = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
     return this.tableCache.onInsert(cb);
   }
 
-  removeOnInsert = (cb: (ctx: EventContext, row: Folders) => void) => {
+  removeOnInsert = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
     return this.tableCache.removeOnInsert(cb);
   }
 
-  onDelete = (cb: (ctx: EventContext, row: Folders) => void) => {
+  onDelete = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
     return this.tableCache.onDelete(cb);
   }
 
-  removeOnDelete = (cb: (ctx: EventContext, row: Folders) => void) => {
+  removeOnDelete = (cb: (ctx: EventContext, row: NewPermissions) => void) => {
     return this.tableCache.removeOnDelete(cb);
   }
-
-  // Updates are only defined for tables with primary keys.
-  onUpdate = (cb: (ctx: EventContext, oldRow: Folders, newRow: Folders) => void) => {
-    return this.tableCache.onUpdate(cb);
-  }
-
-  removeOnUpdate = (cb: (ctx: EventContext, onRow: Folders, newRow: Folders) => void) => {
-    return this.tableCache.removeOnUpdate(cb);
-  }}
+}

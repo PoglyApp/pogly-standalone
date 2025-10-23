@@ -25,12 +25,15 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import * as ImageElementDataVariants from './image_element_data_variants'
 
 // The tagged union or sum type for the algebraic type `ImageElementData`.
 export type ImageElementData = ImageElementDataVariants.ElementDataId |
   ImageElementDataVariants.RawData;
+
+let _cached_ImageElementData_type_value: __AlgebraicTypeType | null = null;
 
 // A value with helper functions to construct the type.
 export const ImageElementData = {
@@ -40,16 +43,17 @@ export const ImageElementData = {
   // assert!(foo.tag === "A");
   // assert!(foo.value === 42);
   // ```
-  ElementDataId: (value: number): ImageElementData => ({ tag: "ElementDataId", value }),
-  RawData: (value: string): ImageElementData => ({ tag: "RawData", value }),
+  ElementDataId: (value: number): ImageElementDataVariants.ElementDataId => ({ tag: "ElementDataId", value }),
+  RawData: (value: string): ImageElementDataVariants.RawData => ({ tag: "RawData", value }),
 
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Sum({
-      variants: [
-        { name: "ElementDataId", algebraicType: __AlgebraicTypeValue.U32 },
-        { name: "RawData", algebraicType: __AlgebraicTypeValue.String },
-      ]
-    });
+    if (_cached_ImageElementData_type_value) return _cached_ImageElementData_type_value;
+    _cached_ImageElementData_type_value = __AlgebraicTypeValue.Sum({ variants: [] });
+    _cached_ImageElementData_type_value.value.variants.push(
+      { name: "ElementDataId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "RawData", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_ImageElementData_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImageElementData): void {

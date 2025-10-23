@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type WidgetElement = {
@@ -33,6 +34,8 @@ export type WidgetElement = {
   height: number,
   rawData: string,
 };
+let _cached_WidgetElement_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -42,14 +45,15 @@ export const WidgetElement = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "elementDataId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "width", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "height", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "rawData", algebraicType: __AlgebraicTypeValue.String},
-      ]
-    });
+    if (_cached_WidgetElement_type_value) return _cached_WidgetElement_type_value;
+    _cached_WidgetElement_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_WidgetElement_type_value.value.elements.push(
+      { name: "elementDataId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "rawData", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_WidgetElement_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: WidgetElement): void {
