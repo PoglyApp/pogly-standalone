@@ -23,7 +23,7 @@ static partial class Module
         //Get existing thing (Using Config table as example)
         var oldThing = ctx.Db.Config.Version.Find(0);
     
-        //Check if thing is has value
+        //Check if thing has a value
         if (oldThing.HasValue)
         {
             //Do stuff
@@ -34,7 +34,7 @@ static partial class Module
         }
         else
         {
-            //Error - thing doesnt have value
+            //Error - thing doesn't have value
             Log.Error($"[{func}] Error doing thing - old thing missing value");
         }
     }

@@ -113,12 +113,7 @@ public partial class Module
 
                 try
                 {
-                    ctx.Db.Permissions.Insert(new Permissions
-                    {
-                        Identity = newConfig.OwnerIdentity,
-                        Nickname = "",
-                        PermissionLevel = PermissionLevel.Owner
-                    });
+                    SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
                 }
                 catch (Exception e)
                 {
@@ -176,12 +171,7 @@ public partial class Module
                 newConfig.OwnerIdentity = guest.Identity;
                 ctx.Db.Config.Version.Update(newConfig);
                 
-                ctx.Db.Permissions.Insert(new Permissions
-                {
-                    Identity = guest.Identity,
-                    Nickname = "",
-                    PermissionLevel = PermissionLevel.Owner
-                });
+                SetPermission(ctx, guest.Identity, PermissionTypes.Owner);
             }
             else
             {
@@ -190,7 +180,7 @@ public partial class Module
         }
         catch (Exception e)
         {
-            Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - there was an issue!");
+            Log.Error($"[ClaimOwnership] {ctx.Sender} tried to Claim Ownership - there was an issue! " + e.Message);
         }
         
     }

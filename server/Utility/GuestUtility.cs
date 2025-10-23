@@ -39,32 +39,87 @@ public partial class Module
         return g && guest.Authenticated;
     }
 
-    private static bool GetPermission(string reducerContext, ReducerContext ctx, out Permissions permissions)
+    private static bool HasPermission(ReducerContext ctx, Identity identity, PermissionTypes type)
     {
-        var p = ctx.Db.Permissions.Identity.Find(ctx.Sender);
-        
-        if (p is null)
-        {
-            Log.Warn($"[{reducerContext}] Unable to GetPermission: {ctx} does not have Permission entry.");
-            permissions = new Permissions();
-            return false;
-        }
-
-        permissions = p.Value;
-        return true;
+        return ctx.Db.NewPermissions.UserPermissions.Filter((identity, (uint)type)).Any() == true;
     }
+    
+    private static bool HasAnyPermission(ReducerContext ctx, Identity identity, PermissionTypes[] types)
+    {
+        foreach (var type in types)
+        {
+            if (ctx.Db.NewPermissions.UserPermissions.Filter((identity, (uint)type))?.Any() == true)
+                return true;
+        }
+        return false;
+    }
+
+    private static uint[] GetPermissionsAsUint(ReducerContext ctx, Identity identity)
+    {
+        return ctx.Db.NewPermissions.UserPermissions
+            .Filter(identity)
+            .Select(p => p.PermissionType)
+            .ToArray();
+    }
+    
+    private static PermissionTypes[] GetPermissionsAsType(ReducerContext ctx, Identity identity)
+    {
+        return ctx.Db.NewPermissions.UserPermissions
+            .Filter(identity)
+            .Select(p => (PermissionTypes)p.PermissionType)
+            .ToArray();
+    }
+
+    private static void ClearPermissions(ReducerContext ctx, Identity identity)
+    {
+        foreach (var p in ctx.Db.NewPermissions.UserPermissions.Filter(identity))
+        {
+            ctx.Db.NewPermissions.Delete(p);
+        }
+    }
+
+    private static void SetPermission(ReducerContext ctx, Identity identity, PermissionTypes permission)
+    {
+        ctx.Db.NewPermissions.Insert(new NewPermissions
+        {
+            Identity = identity,
+            PermissionType = (uint)permission
+        });
+    }
+
+    private static void SetPermissions(ReducerContext ctx, Identity identity, PermissionTypes[] types)
+    {
+        foreach (var p in types)
+        {
+            ctx.Db.NewPermissions.Insert(new NewPermissions
+            {
+                Identity = identity,
+                PermissionType = (uint)p
+            });
+        }
+    }
+    
+    private static void SetPermissions(ReducerContext ctx, Identity identity, uint[] types)
+    {
+        foreach (var p in types)
+        {
+            ctx.Db.NewPermissions.Insert(new NewPermissions
+            {
+                Identity = identity,
+                PermissionType = p
+            });
+        }
+    }
+
+    private static uint[] SinglePermission(PermissionTypes type) => [(uint)type];
 
     private static bool IsGuestOwner(string reducerContext, ReducerContext ctx)
     {
-        var p = GetPermission(reducerContext, ctx, out var permissions);
-
-        return p && permissions.PermissionLevel is PermissionLevel.Owner;
+        return HasPermission(ctx, ctx.Sender,PermissionTypes.Owner);
     }
 
     private static bool IsGuestModerator(string reducerContext, ReducerContext ctx)
     {
-        var p = GetPermission(reducerContext, ctx, out var permissions);
-
-        return p && permissions.PermissionLevel is PermissionLevel.Moderator or PermissionLevel.Owner;
+        return HasPermission(ctx, ctx.Sender, PermissionTypes.Moderator) || HasPermission(ctx, ctx.Sender, PermissionTypes.Owner);
     }
 }
