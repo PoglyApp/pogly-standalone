@@ -12,9 +12,9 @@ public partial class Module
     //     public PermissionLevel PermissionLevel;
     // }
 
-    [Table(Public = true, Name = "NewPermissions")]
+    [Table(Public = true, Name = "Permissions")]
     [SpacetimeDB.Index.BTree(Name = "UserPermissions", Columns = [nameof(Identity), nameof(PermissionType)])]
-    public partial struct NewPermissions
+    public partial struct Permissions
     {
         public Identity Identity;
         public uint PermissionType;

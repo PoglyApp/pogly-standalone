@@ -41,14 +41,14 @@ public partial class Module
 
     private static bool HasPermission(ReducerContext ctx, Identity identity, PermissionTypes type)
     {
-        return ctx.Db.NewPermissions.UserPermissions.Filter((identity, (uint)type)).Any() == true;
+        return ctx.Db.Permissions.UserPermissions.Filter((identity, (uint)type)).Any() == true;
     }
     
     private static bool HasAnyPermission(ReducerContext ctx, Identity identity, PermissionTypes[] types)
     {
         foreach (var type in types)
         {
-            if (ctx.Db.NewPermissions.UserPermissions.Filter((identity, (uint)type))?.Any() == true)
+            if (ctx.Db.Permissions.UserPermissions.Filter((identity, (uint)type))?.Any() == true)
                 return true;
         }
         return false;
@@ -56,7 +56,7 @@ public partial class Module
 
     private static uint[] GetPermissionsAsUint(ReducerContext ctx, Identity identity)
     {
-        return ctx.Db.NewPermissions.UserPermissions
+        return ctx.Db.Permissions.UserPermissions
             .Filter(identity)
             .Select(p => p.PermissionType)
             .ToArray();
@@ -64,7 +64,7 @@ public partial class Module
     
     private static PermissionTypes[] GetPermissionsAsType(ReducerContext ctx, Identity identity)
     {
-        return ctx.Db.NewPermissions.UserPermissions
+        return ctx.Db.Permissions.UserPermissions
             .Filter(identity)
             .Select(p => (PermissionTypes)p.PermissionType)
             .ToArray();
@@ -72,15 +72,15 @@ public partial class Module
 
     private static void ClearPermissions(ReducerContext ctx, Identity identity)
     {
-        foreach (var p in ctx.Db.NewPermissions.UserPermissions.Filter(identity))
+        foreach (var p in ctx.Db.Permissions.UserPermissions.Filter(identity))
         {
-            ctx.Db.NewPermissions.Delete(p);
+            ctx.Db.Permissions.Delete(p);
         }
     }
 
     private static void SetPermission(ReducerContext ctx, Identity identity, PermissionTypes permission)
     {
-        ctx.Db.NewPermissions.Insert(new NewPermissions
+        ctx.Db.Permissions.Insert(new Permissions
         {
             Identity = identity,
             PermissionType = (uint)permission
@@ -91,7 +91,7 @@ public partial class Module
     {
         foreach (var p in types)
         {
-            ctx.Db.NewPermissions.Insert(new NewPermissions
+            ctx.Db.Permissions.Insert(new Permissions
             {
                 Identity = identity,
                 PermissionType = (uint)p
@@ -103,7 +103,7 @@ public partial class Module
     {
         foreach (var p in types)
         {
-            ctx.Db.NewPermissions.Insert(new NewPermissions
+            ctx.Db.Permissions.Insert(new Permissions
             {
                 Identity = identity,
                 PermissionType = p
