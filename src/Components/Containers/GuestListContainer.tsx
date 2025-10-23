@@ -5,14 +5,12 @@ import { Avatar, Menu } from "@mui/material";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Config, Guests } from "../../module_bindings";
+import { Guests } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const GuestListContainer = () => {
   const guestStore = useAppSelector((state: any) => state.guests.guests);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
-  const config: Config = spacetimeDB.Client.db.config.version.find(0)!;
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [displayedGuests, setDisplayedGuests] = useState<Guests[]>([]);
   const [hiddenGuests, setHiddenGuests] = useState<Guests[]>([]);
@@ -56,7 +54,7 @@ export const GuestListContainer = () => {
     <>
       <Container id="GuestList">
         {displayedGuests.map((guest: Guests) => {
-          if ((config.authentication && guest.authenticated) || !config.authentication) {
+          if ((spacetimeDB.Config.authentication && guest.authenticated) || !spacetimeDB.Config.authentication) {
             //Authentication Enabled - Guest Authenticated
             if (guest.nickname !== "") {
               return (
@@ -106,7 +104,7 @@ export const GuestListContainer = () => {
               }}
             >
               {hiddenGuests.map((guest: Guests) => {
-                if ((config.authentication && guest.authenticated) || !config.authentication) {
+                if ((spacetimeDB.Config.authentication && guest.authenticated) || !spacetimeDB.Config.authentication) {
                   //Authentication Enabled - Guest Authenticated
                   if (guest.nickname !== "") {
                     return (

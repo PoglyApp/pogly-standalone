@@ -5,7 +5,6 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { HandleQuickSwapContextMenu } from "../Utility/HandleContextMenu";
 import { QuickSwapContextMenu } from "./ContextMenu/QuickSwapContextMenu";
-import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
 
 interface IProps {
   quickSwapMenuAnchor: any;
@@ -14,7 +13,7 @@ interface IProps {
 }
 
 export const QuickSwapMenu = (props: IProps) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [contextMenu, setContextMenu] = useState<any>(null);

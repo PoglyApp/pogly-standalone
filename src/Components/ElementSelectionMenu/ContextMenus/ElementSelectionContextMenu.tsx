@@ -10,7 +10,6 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import { ElementData } from "../../../module_bindings";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
 import { getPermissions } from "../../../Utility/PermissionsHelper";
-import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   contextMenu: any;
@@ -19,7 +18,7 @@ interface IProps {
 
 export const ElementSelectionContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;

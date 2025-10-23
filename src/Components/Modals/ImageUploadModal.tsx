@@ -22,14 +22,13 @@ import { CompressImage } from "../../Utility/CompressImage";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { DataType } from "../../module_bindings";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   dragnAndDropFile?: any;
 }
 
 export const ImageUploadModal = (props: IProps) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);

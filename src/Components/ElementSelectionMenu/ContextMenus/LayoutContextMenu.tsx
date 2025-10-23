@@ -10,7 +10,6 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
 import { PermissionTypes } from "../../../Types/General/PermissionType";
 import { getPermissions } from "../../../Utility/PermissionsHelper";
-import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   contextMenu: any;
@@ -19,7 +18,7 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [showExamine, setShowExamine] = useState(false);
 

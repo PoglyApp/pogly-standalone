@@ -44,7 +44,6 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import { DataType, ElementStruct, WidgetElement } from "../../module_bindings";
 import { PermissionTypes } from "../../Types/General/PermissionType";
 import { getPermissions } from "../../Utility/PermissionsHelper";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -58,7 +57,7 @@ interface IProps {
 }
 
 export const WidgetCreationModal = (props: IProps) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [widgetName, setWidgetName] = useState<string>("");

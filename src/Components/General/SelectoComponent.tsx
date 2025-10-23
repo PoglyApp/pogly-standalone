@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { Elements } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { useContext } from "react";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProp {
   moveableRef: React.RefObject<Moveable>;
@@ -16,7 +15,7 @@ interface IProp {
 }
 
 export const SelectoComponent = (props: IProp) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   return (
     <Selecto

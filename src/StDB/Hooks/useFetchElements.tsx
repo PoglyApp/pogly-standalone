@@ -10,7 +10,6 @@ import { initCanvasElements } from "../../Store/Features/CanvasElementSlice";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { ElementData, Elements, Layouts } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 const useFetchElement = (
   layout: Layouts | undefined,
@@ -18,7 +17,7 @@ const useFetchElement = (
   setCanvasInitialized: Function
 ) => {
   const dispatch = useAppDispatch();
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [fetchedLayout, setFetchedLayout] = useState<Layouts>();
@@ -55,7 +54,7 @@ const useFetchElement = (
     const canvasElements: CanvasElementType[] = [];
 
     offsetElements.forEach((element: Elements) => {
-      canvasElements.push(CreateElementComponent(element));
+      canvasElements.push(CreateElementComponent(element, isOverlay));
     });
 
     dispatch(initCanvasElements(canvasElements));

@@ -4,7 +4,6 @@ import { StyledInput } from "../StyledComponents/StyledInput";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   layoutId?: number;
@@ -12,7 +11,7 @@ interface IProps {
 
 export const LayoutCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layoutName, setLayoutName] = useState<string>("");
   const [error, setError] = useState<string>("");

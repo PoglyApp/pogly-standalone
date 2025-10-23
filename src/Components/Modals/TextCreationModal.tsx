@@ -37,7 +37,6 @@ import { highlight, languages } from "prismjs";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ElementStruct, TextElement } from "../../module_bindings";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   editElementId?: number;
@@ -54,7 +53,7 @@ const hightlightWithLineNumbers = (input: string, language: any, languageString:
 export const TextCreationModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [text, setText] = useState<string>("");
 

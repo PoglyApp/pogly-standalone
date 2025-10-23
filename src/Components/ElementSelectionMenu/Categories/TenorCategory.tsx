@@ -11,11 +11,10 @@ import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementStruct, ImageElementData } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 export const TenorCategory = () => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [tenorEmotes, setTenorEmotes] = useState<any>();
   const [searchEmotes, setSearchEmotes] = useState<string>("");

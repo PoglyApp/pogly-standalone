@@ -15,7 +15,6 @@ import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { ElementStruct, ImageElementData } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmote[] | undefined;
@@ -24,7 +23,7 @@ interface IProps {
 
 export const ChannelEmoteCategory = (props: IProps) => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);

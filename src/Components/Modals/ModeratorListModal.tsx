@@ -8,11 +8,10 @@ import { Identity } from "spacetimedb";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Permissions } from "../../module_bindings";
 import { PermissionTypes } from "../../Types/General/PermissionType";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const ModeratorListModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [moderators, setModerators] = useState<Permissions[]>([]);

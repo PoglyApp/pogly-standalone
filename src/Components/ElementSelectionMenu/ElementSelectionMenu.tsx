@@ -18,14 +18,13 @@ import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
 import { SpotlightModal } from "../Modals/SpotlightModal";
 import { Config, ElementData } from "../../module_bindings";
 import { getPermissions } from "../../Utility/PermissionsHelper";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 interface IProps {
   isDropping: boolean;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
   const memoizedData = useMemo(() => elementData, [elementData]);

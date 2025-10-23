@@ -9,14 +9,13 @@ import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { EventContext, Guests } from "../../module_bindings";
-import { SpacetimeContextType } from "../../Types/General/SpacetimeContextType";
 
 export const useGuestsEvents = (
   canvasInitialized: CanvasInitializedType,
   setCanvasInitialized: Function,
   transformRef: React.RefObject<ReactZoomPanPinchRef>
 ) => {
-  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const [disconnected, setDisconnected] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
