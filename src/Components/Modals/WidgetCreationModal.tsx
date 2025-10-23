@@ -41,7 +41,9 @@ import { WidgetVariableType } from "../../Types/General/WidgetVariableType";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import { DataType, ElementStruct, PermissionLevel, WidgetElement } from "../../module_bindings";
+import { DataType, ElementStruct, WidgetElement } from "../../module_bindings";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -77,10 +79,13 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
+  const strictSettings: { StrictMode: boolean; Permissions: PermissionTypes[] } = {
     StrictMode: spacetimeDB.Client.db.config.version.find(0)!.strictMode,
-    Permission: spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel,
+    Permissions: getPermissions(spacetimeDB, spacetimeDB.Identity.identity),
   };
+
+  const isOwner = strictSettings.Permissions.includes(PermissionTypes.Owner);
+  const isModerator = strictSettings.Permissions.includes(PermissionTypes.Moderator);
 
   const loadByElementDataID = useCallback(() => {
     if (!props.editElementDataId) return;
@@ -541,8 +546,8 @@ export const WidgetCreationModal = (props: IProps) => {
                 </Button>
 
                 {strictSettings.StrictMode &&
-                strictSettings.Permission?.tag !== "Owner" &&
-                strictSettings.Permission?.tag !== "Moderator" ? (
+                !isOwner &&
+                !isModerator ? (
                   <></>
                 ) : (
                   <Button

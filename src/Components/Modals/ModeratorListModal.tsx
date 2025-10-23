@@ -7,6 +7,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Identity } from "spacetimedb";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Permissions } from "../../module_bindings";
+import { PermissionTypes } from "../../Types/General/PermissionType";
 
 export const ModeratorListModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -17,7 +18,7 @@ export const ModeratorListModal = () => {
 
   useEffect(() => {
     const permissions: Permissions[] = Array.from(spacetimeDB.Client.db.permissions.iter());
-    const filterModerators = permissions.filter((obj: Permissions) => obj.permissionLevel.tag === "Moderator");
+    const filterModerators = permissions.filter((obj: Permissions) => obj.permissionType === PermissionTypes.Moderator);
 
     setModerators(() => filterModerators);
   }, [spacetimeDB.Client]);
@@ -53,7 +54,9 @@ export const ModeratorListModal = () => {
                 return (
                   <Container key={"mod_" + mod.identity.toHexString().substring(0, 5)}>
                     <StyledDeleteIcon onClick={() => handleDeletePermission(mod.identity)} />
-                    <IdentitySpan>{mod.nickname !== "" ? mod.nickname : "Unknown..."}</IdentitySpan>
+                    {
+                      //<IdentitySpan>{mod.nickname !== "" ? mod.nickname : "Unknown..."}</IdentitySpan>
+                    }
                   </Container>
                 );
               })}

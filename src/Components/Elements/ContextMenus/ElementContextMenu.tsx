@@ -24,7 +24,9 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { UpdateElementSourceModal } from "../../Modals/UpdateElementSourceModal";
-import { Elements, PermissionLevel, WidgetElement } from "../../../module_bindings";
+import { Elements, WidgetElement } from "../../../module_bindings";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
 
 interface IProps {
   contextMenu: any;
@@ -43,9 +45,7 @@ export const ElementContextMenu = (props: IProps) => {
   const selectedElement: Elements | null = props.contextMenu ? props.contextMenu.element : null;
 
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(
-    spacetimeDB.Identity.identity
-  )?.permissionLevel;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   const [showTransformEditMenuItem, setShowTransformEditMenuItem] = useState(true);
   const [showFlipMenuItem, setFlipShowMenuItem] = useState(true);

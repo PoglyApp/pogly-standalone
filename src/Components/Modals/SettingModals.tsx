@@ -38,10 +38,14 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { ModeratorListModal } from "./ModeratorListModal";
 import { Config } from "../../module_bindings";
 import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 export const SettingsModal = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const config: Config = spacetimeDB.Client.db.config.version.find(0)!
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  const isOwner = permissions.includes(PermissionTypes.Owner);
 
   const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://maincloud.spacetimedb.com";
 
@@ -98,7 +102,7 @@ export const SettingsModal = () => {
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
     spacetimeDB.Client.reducers.updateGuestNickname(nicknameInput);
 
-    if (permission && permission.tag === "Owner") {
+    if (permissions && isOwner) {
       const doUpdate =
         platform !== spacetimeDB.Config.streamingPlatform ||
         streamName !== spacetimeDB.Config.streamName ||
@@ -190,9 +194,9 @@ export const SettingsModal = () => {
     setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
-  const showLocalOverridesModal = () => {
-    setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
-  };
+  // const showLocalOverridesModal = () => {
+  //   setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
+  // };
 
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
@@ -221,7 +225,7 @@ export const SettingsModal = () => {
     closeModal("settings_modal", modals, setModals);
   };
 
-  const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
+  const tabWidth = permissions && isOwner ? "25%" : "33%";
 
   if (isOverlay) return <></>;
 
@@ -251,7 +255,7 @@ export const SettingsModal = () => {
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="General" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Advanced" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Debug" />
-            {permission && permission.tag === "Owner" && (
+            {permissions && isOwner && (
               <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />
             )}
           </Tabs>
@@ -472,7 +476,7 @@ export const SettingsModal = () => {
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
                 }}
-                onClick={showLocalOverridesModal}
+                //onClick={showLocalOverridesModal}
               >
                 Local override settings
               </Button>
@@ -590,7 +594,7 @@ export const SettingsModal = () => {
               </Button>
             </div>
           </SettingsTabPanel>
-          {permission && permission.tag === "Owner" && (
+          {permissions && isOwner && (
             <SettingsTabPanel value={tabValue} index={3}>
               <div style={{ display: "grid" }}>
                 <RadioGroup

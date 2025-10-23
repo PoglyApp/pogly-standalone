@@ -2,8 +2,11 @@ import { Menu, MenuItem, Paper } from "@mui/material";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import styled from "styled-components";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { Guests, PermissionLevel } from "../../../module_bindings";
+import { Guests } from "../../../module_bindings";
 import { useContext } from "react";
+import { SpacetimeContextType } from "../../../Types/General/SpacetimeContextType";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 interface IProps {
   contextMenu: any;
@@ -11,15 +14,18 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const { spacetimeDB } = useContext(SpacetimeContext);
-  const identityPermission = spacetimeDB.Client.db.permissions.identity.find(
-    spacetimeDB.Identity.identity
-  )?.permissionLevel;
-
+  const spacetimeDB: SpacetimeContextType = useContext(SpacetimeContext);
+  const identityPermission = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
-  let selectedGuestPermission: PermissionLevel | undefined;
+  let selectedGuestPermission: PermissionTypes[] | undefined;
   if (selectedGuest !== null && selectedGuest.identity)
-    selectedGuestPermission = spacetimeDB.Client.db.permissions.identity.find(selectedGuest.identity)?.permissionLevel;
+    selectedGuestPermission = getPermissions(spacetimeDB, selectedGuest.identity);
+
+  const isSelf = selectedGuest?.identity.isEqual(spacetimeDB.Identity.identity);
+  const viewerIsOwner = (identityPermission ?? []).includes(PermissionTypes.Owner);
+  const selectedIsModerator = (selectedGuestPermission ?? []).includes(PermissionTypes.Moderator);
+  const selectedIsOwner = (selectedGuestPermission ?? []).includes(PermissionTypes.Owner);
 
   const handleClose = () => {
     DebugLogger("Handling close context");
@@ -50,45 +56,47 @@ export const GuestListContextMenu = (props: IProps) => {
 
         <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
           {"Permission: "}
-          {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
+          {selectedGuestPermission?.length === 0 ? "User" : selectedGuestPermission?.map(p => PermissionTypes[p]).join(", ")}
         </Paper>
 
-        {!selectedGuest.identity.isEqual(spacetimeDB.Identity.identity) &&
-        identityPermission &&
-        identityPermission.tag === "Owner" ? (
-          <>
-            {selectedGuestPermission?.tag === "Moderator" ? (
-              <StyledMenuItemOrange
-                onClick={() => {
-                  spacetimeDB.Client.reducers.clearIdentityPermission(selectedGuest.identity);
-                  handleClose();
-                }}
-                sx={{ color: "#008205" }}
-              >
-                Revoke Moderator
-              </StyledMenuItemOrange>
-            ) : (
-              <StyledMenuItemGreen
-                onClick={() => {
-                  spacetimeDB.Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
-                  handleClose();
-                }}
-              >
-                Grant Moderator
-              </StyledMenuItemGreen>
-            )}
-            <StyledMenuItemRed
-              onClick={() => {
-                spacetimeDB.Client.reducers.kickGuest(selectedGuest.address);
-                handleClose();
-              }}
-            >
-              Kick Guest
-            </StyledMenuItemRed>
-          </>
-        ) : (
-          <></>
-        )}
+        {!isSelf && viewerIsOwner ? (
+            <>
+              {selectedIsModerator ? (
+                <StyledMenuItemOrange
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.clearIdentityPermission(selectedGuest.identity);
+                    handleClose();
+                  }}
+                  sx={{ color: "#008205" }}
+                >
+                  Revoke Moderator
+                </StyledMenuItemOrange>
+              ) : (
+                <StyledMenuItemGreen
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
+                    handleClose();
+                  }}
+                >
+                  Grant Moderator
+                </StyledMenuItemGreen>
+              )}
+
+              {!selectedIsOwner && (
+                <StyledMenuItemRed
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.kickGuest(selectedGuest.address);
+                    handleClose();
+                  }}
+                >
+                  Kick Guest
+                </StyledMenuItemRed>
+              )}
+            </>
+          ) : (
+            <></>
+          )
+        }
 
         {selectedGuest.identity.isEqual(spacetimeDB.Identity.identity) ? (
           <>

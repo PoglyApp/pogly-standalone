@@ -31,8 +31,10 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Elements, Layouts, PermissionLevel } from "../module_bindings";
+import { Elements, Layouts } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
+import { PermissionTypes } from "../Types/General/PermissionType";
+import { getPermissions } from "../Utility/PermissionsHelper";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -52,7 +54,7 @@ export const Canvas = () => {
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
-  const [permission, setPermission] = useState<PermissionLevel>();
+  const [permission, setPermission] = useState<PermissionTypes[]>(getPermissions(spacetimeDB, spacetimeDB.Identity.identity));
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -76,7 +78,7 @@ export const Canvas = () => {
 
   const initGuidelineAccept = () => {
     if (isOverlay) return true;
-    if (permission && permission.tag === "Owner") return true;
+    if (permission && permission.includes(PermissionTypes.Owner)) return true;
     if (localStorage.getItem("Accept_EditorGuidelines")) return true;
     return false;
   };
@@ -122,7 +124,7 @@ export const Canvas = () => {
   useEffect(() => {
     if (permission) return;
 
-    setPermission(spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel);
+    setPermission(getPermissions(spacetimeDB, spacetimeDB.Identity.identity));
   }, []);
 
   useEffect(() => {
@@ -184,7 +186,7 @@ export const Canvas = () => {
     );
   }
 
-  if (!acceptedGuidelines && permission?.tag !== "Owner") {
+  if (!acceptedGuidelines && !permission.includes(PermissionTypes.Owner)) {
     DebugLogger("Guest has not accepted guidelines");
     return <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} />;
   }

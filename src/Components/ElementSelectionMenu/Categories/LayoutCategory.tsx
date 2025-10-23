@@ -14,7 +14,9 @@ import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import { Layouts, PermissionLevel } from "../../../module_bindings";
+import { Layouts } from "../../../module_bindings";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
@@ -25,7 +27,7 @@ export const LayoutCategory = () => {
   const [contextMenu, setContextMenu] = useState<any>(null);
 
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);

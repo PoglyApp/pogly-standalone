@@ -10,6 +10,8 @@ import { MarkdownEditor } from "../General/MarkdownEditor";
 import Markdown from "react-markdown";
 import remark from "remark-gfm";
 import styled from "styled-components";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 interface IProp {
   setAcceptedGuidelines?: Function;
@@ -19,13 +21,14 @@ export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { modals, setModals, closeModal } = useContext(ModalContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
-  const permission = spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  const isOwner = permissions.includes(PermissionTypes.Owner);
   const [guidelineText, setGuidelineText] = useState<string>(spacetimeDB.Config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
   const initGuidelineAccept = () => {
     if (isOverlay) return true;
-    if (permission && permission.tag === "Owner") return true;
+    if (permissions && isOwner) return true;
     if (localStorage.getItem("Accept_EditorGuidelines")) return true;
     return false;
   };
@@ -33,7 +36,7 @@ export const EditorGuidelineModal = (props: IProp) => {
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
 
   const saveGuidelines = () => {
-    if (permission && permission.tag !== "Owner") return;
+    if (permissions && !isOwner) return true;
     DebugLogger("Saved editor guidelines");
     spacetimeDB.Client.reducers.updateEditorGuidelines(guidelineText);
     closeModal("guideline_modal", modals, setModals);
@@ -86,7 +89,7 @@ export const EditorGuidelineModal = (props: IProp) => {
           minWidth: "480px !important",
         }}
       >
-        {permission && permission.tag === "Owner" ? (
+        {permissions && isOwner ? (
           <>
             <StyledMarkdown remarkPlugins={[remark]}>{guidelineText}</StyledMarkdown>
             <br />
@@ -97,7 +100,7 @@ export const EditorGuidelineModal = (props: IProp) => {
         )}
       </DialogContent>
       <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-        {permission && permission.tag === "Owner" && (
+        {permissions && isOwner && (
           <Button
             variant="outlined"
             startIcon={<SaveIcon />}
@@ -113,7 +116,7 @@ export const EditorGuidelineModal = (props: IProp) => {
         )}
         {acceptedGuidelines ? (
           <>
-            {permission?.tag !== "Owner" && (
+            {isOwner && (
               <DialogContentText sx={{ color: "#ffffffa6" }}>
                 {"Accepted on " + localStorage.getItem("Accept_EditorGuidelines")}
               </DialogContentText>

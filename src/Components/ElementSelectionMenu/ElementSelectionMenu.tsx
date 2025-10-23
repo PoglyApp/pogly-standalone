@@ -17,6 +17,7 @@ import SevenTVEmote from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
 import { SpotlightModal } from "../Modals/SpotlightModal";
 import { Config, ElementData } from "../../module_bindings";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 interface IProps {
   isDropping: boolean;
@@ -37,17 +38,17 @@ export const ElementSelectionMenu = (props: IProps) => {
   const [contextMenu, setContextMenu] = useState<any>(null);
 
   const strictMode = useMemo(() => spacetimeDB.Client.db.config.version.find(0)!.strictMode, [spacetimeDB.Client]);
-  const permissionLevel = useMemo(
-    () => spacetimeDB.Client.db.permissions.identity.find(spacetimeDB.Identity.identity)?.permissionLevel,
+  const permission = useMemo(
+    () => getPermissions(spacetimeDB, spacetimeDB.Identity.identity),
     [spacetimeDB.Identity.identity, spacetimeDB.Client]
   );
 
   const memoizedStrictSettings = useMemo(
     () => ({
       StrictMode: strictMode,
-      Permission: permissionLevel,
+      Permissions: permission,
     }),
-    [strictMode, permissionLevel]
+    [strictMode, permission]
   );
 
   return (

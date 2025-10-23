@@ -10,12 +10,13 @@ import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContex
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import { ElementData, ElementStruct, PermissionLevel } from "../../../module_bindings";
+import { ElementData, ElementStruct } from "../../../module_bindings";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 interface IProps {
   elementData: ElementData[];
-  strictSettings: { StrictMode: boolean; Permission?: PermissionLevel };
+  strictSettings: { StrictMode: boolean; Permissions: PermissionTypes[] };
   contextMenu: any;
   setContextMenu: Function;
 }
@@ -24,6 +25,11 @@ export const WidgetCategory = React.memo((props: IProps) => {
   const { setModals } = useContext(ModalContext);
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB } = useContext(SpacetimeContext);
+  const perms = props.strictSettings.Permissions ?? [];
+  const isOwner = perms.includes(PermissionTypes.Owner);
+  const isModerator = perms.includes(PermissionTypes.Moderator);
+  const canBypassStrict = isOwner || isModerator;
+  const canAddWidget = !props.strictSettings.StrictMode || canBypassStrict;
 
   // Memoize the filtered elements (prevents recalculation on every render)
   const filteredElementData = useMemo(() => {
@@ -60,31 +66,19 @@ export const WidgetCategory = React.memo((props: IProps) => {
         expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
         aria-controls="panel1-content"
         id="panel1-header"
-        sx={{
-          color: "#ffffffa6",
-        }}
+        sx={{ color: "#ffffffa6" }}
       >
         <WidgetsIcon sx={{ marginRight: "5px" }} />
         <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Widgets</span>
-        {props.strictSettings.StrictMode &&
-        props.strictSettings.Permission?.tag !== "Owner" &&
-        props.strictSettings.Permission?.tag !== "Moderator" ? (
+        {props.strictSettings.StrictMode && !canBypassStrict ? (
           <Tooltip title="Strict mode is enabled and preventing you from uploading a new Widget. Ask the instance owner!">
             <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingLeft: "5px" }} />
           </Tooltip>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </AccordionSummary>
-      <AccordionDetails
-        sx={{
-          backgroundColor: "#000c17",
-          paddingBottom: "5px",
-        }}
-      >
-        {!props.strictSettings.StrictMode ||
-        props.strictSettings.Permission?.tag === "Owner" ||
-        props.strictSettings.Permission?.tag === "Moderator" ? (
+
+      <AccordionDetails sx={{ backgroundColor: "#000c17", paddingBottom: "5px" }}>
+        {canAddWidget && (
           <Button
             variant="text"
             startIcon={<AddCircleOutlineIcon />}
@@ -98,8 +92,6 @@ export const WidgetCategory = React.memo((props: IProps) => {
           >
             Add Widget
           </Button>
-        ) : (
-          <></>
         )}
 
         {filteredElementData.map((elementData: ElementData) => (

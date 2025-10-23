@@ -7,7 +7,9 @@ import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import { ElementData, PermissionLevel } from "../../../module_bindings";
+import { ElementData } from "../../../module_bindings";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
 
 interface IProps {
   contextMenu: any;
@@ -20,9 +22,7 @@ export const ElementSelectionContextMenu = (props: IProps) => {
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
   const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = spacetimeDB.Client.db.permissions.identity.find(
-    spacetimeDB.Identity.identity
-  )?.permissionLevel;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   const [showExamine, setShowExamine] = useState(false);
 
