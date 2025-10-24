@@ -1,11 +1,12 @@
 import styled from "styled-components";
-import { StrictMode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
 import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
   legacyLogin: boolean;
@@ -24,6 +25,8 @@ const steps = [
 export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: IProps) => {
   // Just to display debug box of doom
   const debug: boolean = false;
+
+  const navigate = useNavigate();
 
   const [step, setStep] = useState<number>(0);
 
@@ -90,9 +93,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       setInitializing(true);
     })();
 
-    setTimeout(function () {
-      window.location.reload();
-    }, 3000);
+    return navigate("login");
   };
 
   if (isOverlay) return <></>;

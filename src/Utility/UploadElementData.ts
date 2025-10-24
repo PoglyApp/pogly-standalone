@@ -1,5 +1,5 @@
 import { DebugLogger } from "./DebugLogger";
-import { DbConnection, ElementData, Elements, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
+import { DbConnection } from "../module_bindings";
 import initSqlJs from "sql.js";
 import { PoglyModuleImporter } from "./ModuleImporter";
 
