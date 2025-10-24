@@ -24,8 +24,6 @@ export const Widget = (props: IProp) => {
     try {
       let htmlCode: string = "";
 
-      console.log(widgetElement);
-
       if (widgetElement.rawData === "")
         htmlCode = WidgetCodeCompiler(
           spacetimeDB.Client,

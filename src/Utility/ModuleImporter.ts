@@ -1,4 +1,5 @@
 import type initSqlJs from "sql.js";
+import { DataType } from "../module_bindings";
 
 export class PoglyModuleImporter {
   private SQL: Awaited<ReturnType<typeof initSqlJs>>;
@@ -91,16 +92,15 @@ export class PoglyModuleImporter {
 
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
-      console.log(r.dataType);
-
       const id = toUInt(r.id);
       const name = String(r.name ?? "");
-      const dataType = toInt(r.dataType);
+      const dataType = mapDataType(r.dataType);
       let data = r.data == null ? "" : String(r.data);
       const bytes = asBytes(r.byteArray);
       const width = toInt(r.dataWidth);
       const height = toInt(r.dataHeight);
       const createdBy = String(r.createdBy ?? "");
+      
 
       if (!data && looksLikeUtf8Json(bytes)) {
         try {
@@ -109,15 +109,6 @@ export class PoglyModuleImporter {
           // Do nothing
         }
       }
-
-      console.log("id", id);
-      console.log("name", name);
-      console.log("dataType", dataType);
-      console.log("data", data);
-      console.log("bytes", Array.from(bytes));
-      console.log("width", width);
-      console.log("height", height);
-      console.log("createdBy", createdBy);
 
       client.reducers.importElementData(id, name, dataType, data, Array.from(bytes), width, height, createdBy);
       n++;
@@ -147,7 +138,7 @@ export class PoglyModuleImporter {
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
       const identityText = String(r.identity ?? "");
-      const level = String(r.permissionLevel ?? "");
+      const level = mapPermissionLevel(r.permissionLevel);
       client.reducers.importPermission(identityText, level);
       n++;
     }
@@ -202,59 +193,85 @@ export class PoglyModuleImporter {
     return (id: number) => (map.has(id) ? map.get(id)! : null);
   };
 
-  private reconstructElement = (r: any, widgetDefaults: (id: number) => string | null): any => {
-    const tag: string = String(r.element_Tag ?? r.elementTag ?? "");
-    switch (tag) {
-      case "TextElement": {
-        const te = {
-          Text: String(r.textElement_Text ?? ""),
-          Size: r.textElement_Size == null ? 0 : toInt(r.textElement_Size),
-          Color: String(r.textElement_Color ?? ""),
-          Font: String(r.textElement_Font ?? ""),
-          Css: String(r.textElement_Css ?? ""),
-        };
-        return { tag: "TextElement", TextElement_: te };
-      }
-      case "ImageElement": {
-        let dataCase: any;
-        const dataTag = String(r.imageElement_ImageElementData_Tag ?? "");
-        if (dataTag === "ElementDataId") {
-          const id =
-            r.imageElement_ImageElementData_ElementDataId == null
-              ? 0
-              : toUInt(r.imageElement_ImageElementData_ElementDataId);
-          dataCase = { kind: "ElementDataId", ElementDataId_: id };
-        } else {
-          const raw = String(r.imageElement_ImageElementData_RawData ?? "");
-          dataCase = { kind: "RawData", RawData_: raw };
-        }
-        const ie = {
-          ImageElementData: dataCase,
-          Width: r.imageElement_Width == null ? 0 : toInt(r.imageElement_Width),
-          Height: r.imageElement_Height == null ? 0 : toInt(r.imageElement_Height),
-        };
-        return { tag: "ImageElement", ImageElement_: ie };
-      }
-      case "WidgetElement": {
-        const elementDataId = r.widgetElement_ElementDataId == null ? null : toUInt(r.widgetElement_ElementDataId);
-        const width = r.widgetElement_Width == null ? 0 : toInt(r.widgetElement_Width);
-        const height = r.widgetElement_Height == null ? 0 : toInt(r.widgetElement_Height);
-        let raw: string | null = r.widgetElement_RawData == null ? null : String(r.widgetElement_RawData);
+  private reconstructElement = (
+    r: any,
+    widgetDefaults: (id: number) => string | null
+  ): any /* ElementStruct */ => {
+    // Tag can be "element_Tag" (raw) or "elementTag" (after keysToCamel)
+    const tag = String(firstDefined(r, "element_Tag", "elementTag") ?? "");
 
-        if ((!raw || raw.length === 0) && elementDataId != null) {
-          raw = widgetDefaults(elementDataId);
-        }
-        const we = {
-          ElementDataId: elementDataId ?? 0,
-          Width: width,
-          Height: height,
-          RawData: raw ?? "",
-        };
-        return { tag: "WidgetElement", WidgetElement_: we };
-      }
-      default:
-        throw new Error(`Unknown Element_Tag '${tag}'`);
+    if (tag === "TextElement") {
+      const value = {
+        // Text columns in both styles
+        text:  getStr(r, "textElement_Text",  "textElementText"),
+        size:  getInt(r, "textElement_Size",  "textElementSize"),
+        color: getStr(r, "textElement_Color", "textElementColor"),
+        font:  getStr(r, "textElement_Font",  "textElementFont"),
+        css:   getStr(r, "textElement_Css",   "textElementCss"),
+      };
+      return { tag: "TextElement", value };
     }
+
+    if (tag === "ImageElement") {
+      // Flattened inner sum: tag + either elementDataId or rawData
+      const dataTag = String(
+        firstDefined(
+          r,
+          "imageElement_ImageElementData_Tag",
+          "imageElementImageElementDataTag"
+        ) ?? ""
+      );
+
+      let imageElementData: any;
+      if (dataTag === "ElementDataId") {
+        const id = getIntOrNull(
+          r,
+          "imageElement_ImageElementData_ElementDataId",
+          "imageElementImageElementDataElementDataId"
+        ) ?? 0;
+        imageElementData = { tag: "ElementDataId", value: id };
+      } else {
+        const raw = getStr(
+          r,
+          "imageElement_ImageElementData_RawData",
+          "imageElementImageElementDataRawData"
+        );
+        imageElementData = { tag: "RawData", value: raw };
+      }
+
+      const value = {
+        imageElementData,
+        width:  getInt(r, "imageElement_Width",  "imageElementWidth"),
+        height: getInt(r, "imageElement_Height", "imageElementHeight"),
+      };
+      return { tag: "ImageElement", value };
+    }
+
+    if (tag === "WidgetElement") {
+      const elementDataId = getIntOrNull(
+        r,
+        "widgetElement_ElementDataId",
+        "widgetElementElementDataId"
+      );
+      const width  = getInt(r, "widgetElement_Width",  "widgetElementWidth");
+      const height = getInt(r, "widgetElement_Height", "widgetElementHeight");
+      let raw: string = getStr(r, "widgetElement_RawData", "widgetElementRawData");
+
+      // Fallback: if rawData empty but we have a template in ElementData.Data
+      if ((!raw || raw.length === 0) && elementDataId != null) {
+        raw = widgetDefaults(elementDataId) ?? "";
+      }
+
+      const value = {
+        elementDataId: elementDataId ?? 0,
+        width,
+        height,
+        rawData: raw,
+      };
+      return { tag: "WidgetElement", value };
+    }
+
+    throw new Error(`Unknown Element_Tag '${tag}'`);
   };
 
   private all = (sql: string): any[] => {
@@ -325,4 +342,38 @@ const looksLikeUtf8Json = (bytes: Uint8Array): boolean => {
   if (i >= bytes.length) return false;
   const ch = bytes[i];
   return ch === 0x7b || ch === 0x5b;
+};
+
+const mapDataType = (x: any): any => {
+  const n = toInt(x);
+  switch (n) {
+    case 0: return DataType.TextElement;
+    case 1: return DataType.ImageElement;
+    case 2: return DataType.WidgetElement;
+    default: return DataType.TextElement;
+  }
+};
+
+const mapPermissionLevel = (x: any): string => {
+  switch (toInt(x)) {
+    case 1: return 'Editor';
+    case 2: return 'Moderator';
+    case 3: return 'Owner';
+    default: return 'None';
+  }
+};
+
+const firstDefined = (obj: any, ...keys: string[]) => {
+  for (const k of keys) if (obj[k] !== undefined && obj[k] !== null) return obj[k];
+  return undefined;
+};
+const getStr = (obj: any, ...keys: string[]) =>
+  firstDefined(obj, ...keys) == null ? "" : String(firstDefined(obj, ...keys));
+const getInt = (obj: any, ...keys: string[]) => {
+  const v = firstDefined(obj, ...keys);
+  return v == null ? 0 : Number(v) | 0;
+};
+const getIntOrNull = (obj: any, ...keys: string[]) => {
+  const v = firstDefined(obj, ...keys);
+  return v == null ? null : Number(v) | 0;
 };

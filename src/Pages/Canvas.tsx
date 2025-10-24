@@ -31,7 +31,7 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Elements, Layouts } from "../module_bindings";
+import { Config, Elements, Layouts } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
 import { PermissionTypes } from "../Types/General/PermissionType";
 import { getPermissions } from "../Utility/PermissionsHelper";
@@ -51,6 +51,7 @@ export const Canvas = () => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
   const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+  const [ disconnectedState, setDisconnectedState ] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
@@ -129,6 +130,11 @@ export const Canvas = () => {
   }, []);
 
   useEffect(() => {
+    if(!spacetimeDB.Disconnected) return;
+    setDisconnectedState(spacetimeDB.Disconnected);
+  },[spacetimeDB.Disconnected])
+
+  useEffect(() => {
     if (!activeLayout) {
       DebugLogger("Setting active layout");
       setActiveLayout(
@@ -161,7 +167,7 @@ export const Canvas = () => {
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (userDisconnected || spacetimeDB.Disconnected) {
+  if (userDisconnected || spacetimeDB.Disconnected || disconnectedState) {
     DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
