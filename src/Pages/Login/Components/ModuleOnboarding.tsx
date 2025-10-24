@@ -95,8 +95,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       setInitializing(true);
     })();
 
-    await auth.removeUser();
-    auth.signinRedirect();
+    return navigate("login");
   };
 
   if (isOverlay) return <></>;
