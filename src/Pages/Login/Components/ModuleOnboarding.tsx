@@ -95,7 +95,6 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       setInitializing(true);
     })();
 
-    //return navigate("login");
     await auth.removeUser();
     auth.signinRedirect();
   };
