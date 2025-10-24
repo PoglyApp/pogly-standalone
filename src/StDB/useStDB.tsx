@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { Identity, ConnectionId, SubscriptionEventContextInterface } from "spacetimedb";
+import { useContext, useEffect, useState } from "react";
+import { Identity, SubscriptionEventContextInterface } from "spacetimedb";
 import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
 import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { StopHeartbeat } from "../Utility/PingHeartbeat";
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
 import { useAuth } from "react-oidc-context";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 const useStDB = (
   connectionConfig: ConnectionConfigType | undefined,
@@ -14,6 +15,8 @@ const useStDB = (
   setStdbAuthenticated?: Function
 ) => {
   const auth = useAuth();
+  const { setSpacetimeDB } = useContext(SpacetimeContext);
+
   const [identity, setIdentity] = useState<Identity>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
@@ -56,6 +59,7 @@ const useStDB = (
     const onDisconnect = (ErrCtx: ErrorContext, error: Error | undefined) => {
       setDisconnected(true);
       StopHeartbeat();
+      setSpacetimeDB((old: any) => ({ ...old, Disconnected: true }));
       console.log("Disconnected!", ErrCtx.event?.message, error);
     };
 
