@@ -67,17 +67,8 @@ export const BackupModal = (props: IProps) => {
   const handleUpload = async () => {
     console.log(file);
 
-    if (!deleteOnUpload) {
-      await UploadBackupFromFile(spacetimeDB.Client, file);
-      closeModal("backup_modal", modals, setModals);
-    } else {
-      spacetimeDB.Client.reducers.deleteAllElements();
-      spacetimeDB.Client.reducers.deleteAllElementData();
-      spacetimeDB.Client.reducers.deleteAllLayouts(false);
-      spacetimeDB.Client.reducers.deleteAllFolders(false);
-      await UploadBackupFromFile(spacetimeDB.Client, file);
-      closeModal("backup_modal", modals, setModals);
-    }
+    await UploadBackupFromFile(spacetimeDB.Client, file, deleteOnUpload);
+    closeModal("backup_modal", modals, setModals);
   };
 
   const handleDownload = () => {

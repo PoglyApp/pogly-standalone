@@ -119,7 +119,10 @@ public partial class Module
     {
         string func = "ImportElement";
 
-        if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        if (!IsGuestOwner(func, ctx))
+        {
+            if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        }
         
         try
         {

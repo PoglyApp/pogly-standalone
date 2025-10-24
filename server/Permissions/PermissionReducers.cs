@@ -28,8 +28,11 @@ public partial class Module
     public static void ImportPermission(ReducerContext ctx, Identity identity, string permissionLevel)
     {
         string func = "ImportPermission";
-        
-        if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+
+        if (!IsGuestOwner(func, ctx))
+        {
+            if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        }
 
         try
         {

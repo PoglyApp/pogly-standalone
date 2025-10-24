@@ -35,7 +35,14 @@ export const UploadElementDataFromString = (Client: DbConnection, data: string) 
   });
 };
 
-export const UploadBackupFromFile = async (Client: DbConnection, backupFile: any) => {
+export const UploadBackupFromFile = async (Client: DbConnection, backupFile: any, deleteOnUpload: boolean) => {
+  if(deleteOnUpload) {
+    Client.reducers.deleteAllElements();
+    Client.reducers.deleteAllElementData();
+    Client.reducers.deleteAllLayouts(false);
+    Client.reducers.deleteAllFolders(false);
+  }
+
   const SQL = await initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` });
 
   const importer = new PoglyModuleImporter(SQL);
@@ -47,4 +54,8 @@ export const UploadBackupFromFile = async (Client: DbConnection, backupFile: any
   console.log("IMPORT RESULT", res);
 
   importer.close();
+
+  setTimeout(function () {
+      window.location.reload();
+    }, 1000);
 };

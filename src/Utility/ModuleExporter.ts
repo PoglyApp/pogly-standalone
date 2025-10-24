@@ -274,7 +274,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     this.runMany(stmt, rows, (r) => [
       toInt(r.id),
       strOrEmpty(r.name),
-      toInt(r.dataType),
+      toDataTypeInt(r.dataType),
       strOrEmpty(r.data),
       r.byteArray ?? null,
       toInt(r.dataWidth),
@@ -351,53 +351,119 @@ const nullableStr = (x: any): string | null => (x == null ? null : String(x));
 const nullableInt = (x: any): number | null => (x == null ? null : x | 0);
 
 const flattenElement = (element: any): any => {
-  if (!element || typeof element !== "object") return {};
-  if ("Tag" in element || "TextElement_Text" in element) return element;
-
   const out: any = {};
-  const tag = element.tag || element.Tag || "";
+  if (!element || typeof element !== "object") return out;
 
-  switch (tag) {
+  const getTag = (u: any): string =>
+    String(u?.tag ?? u?.Tag ?? u?.kind ?? "");
+  const getVal = (u: any): any =>
+    u?.value ?? u?.Value ?? u;
+
+  const elemTag = getTag(element) ||
+                  String(element?.Tag ?? element?.tag ?? "");
+  const elemVal =
+    getVal(element) ??
+    element.TextElement_ ??
+    element.ImageElement_ ??
+    element.WidgetElement_ ??
+    {};
+
+  switch (elemTag) {
     case "TextElement": {
+      const t = elemVal;
       out.Tag = "TextElement";
-      const t = element.TextElement_ || {};
-      out.TextElement_Text = t.Text ?? null;
-      out.TextElement_Size = t.Size ?? null;
-      out.TextElement_Color = t.Color ?? null;
-      out.TextElement_Font = t.Font ?? null;
-      out.TextElement_Css = t.Css ?? null;
+      out.TextElement_Text  = t.Text  ?? t.text  ?? null;
+      out.TextElement_Size  = t.Size  ?? t.size  ?? null;
+      out.TextElement_Color = t.Color ?? t.color ?? null;
+      out.TextElement_Font  = t.Font  ?? t.font  ?? null;
+      out.TextElement_Css   = t.Css   ?? t.css   ?? null;
       break;
     }
+
     case "ImageElement": {
+      const img = elemVal;
       out.Tag = "ImageElement";
-      const img = element.ImageElement_ || {};
-      out.ImageElement_Width = img.Width ?? null;
-      out.ImageElement_Height = img.Height ?? null;
-      const d = img.ImageElementData || {};
-      if (d.kind === "ElementDataId" || d.Tag === "ElementDataId") {
+
+      out.ImageElement_Width  = img.Width  ?? img.width  ?? null;
+      out.ImageElement_Height = img.Height ?? img.height ?? null;
+
+      const dataNode =
+        img.ImageElementData ??
+        img.imageElementData ??
+        {};
+
+      const dTag = getTag(dataNode);
+      const dVal = getVal(dataNode);
+
+      if (dTag === "ElementDataId") {
+        const id =
+          dVal?.ElementDataId_ ??
+          dVal?.elementDataId ??
+          (typeof dVal === "number" ? dVal : null);
         out.ImageElement_ImageElementData_Tag = "ElementDataId";
-        out.ImageElement_ImageElementData_ElementDataId = d.ElementDataId_ ?? d.ElementDataId ?? null;
+        out.ImageElement_ImageElementData_ElementDataId = id ?? null;
         out.ImageElement_ImageElementData_RawData = null;
-      } else if (d.kind === "RawData" || d.Tag === "RawData") {
+      } else if (dTag === "RawData") {
+        const raw =
+          dVal?.RawData_ ??
+          dVal?.rawData ??
+          (typeof dVal === "string" ? dVal : null);
         out.ImageElement_ImageElementData_Tag = "RawData";
         out.ImageElement_ImageElementData_ElementDataId = null;
-        out.ImageElement_ImageElementData_RawData = d.RawData_ ?? d.RawData ?? null;
+        out.ImageElement_ImageElementData_RawData = raw ?? null;
+      } else {
+        out.ImageElement_ImageElementData_Tag = null;
+        out.ImageElement_ImageElementData_ElementDataId = null;
+        out.ImageElement_ImageElementData_RawData = null;
       }
       break;
     }
+
     case "WidgetElement": {
+      const w = elemVal;
       out.Tag = "WidgetElement";
-      const w = element.WidgetElement_ || {};
-      out.WidgetElement_ElementDataId = w.ElementDataId ?? null;
-      out.WidgetElement_Width = w.Width ?? null;
-      out.WidgetElement_Height = w.Height ?? null;
-      out.WidgetElement_RawData = w.RawData ?? null;
+      out.WidgetElement_ElementDataId = w.ElementDataId ?? w.elementDataId ?? null;
+      out.WidgetElement_Width         = w.Width         ?? w.width         ?? null;
+      out.WidgetElement_Height        = w.Height        ?? w.height        ?? null;
+      out.WidgetElement_RawData       = w.RawData       ?? w.rawData       ?? null;
       break;
     }
+
     default: {
+      if ("Element_Tag" in element || "TextElement_Text" in element) return element;
       out.Tag = "";
+      break;
     }
   }
 
   return out;
+};
+
+const DT_MAP: Record<string, number> = {
+  textelement: 0,
+  imageelement: 1,
+  widgetelement: 2,
+};
+
+const toDataTypeInt = (v: any): number => {
+  if (typeof v === "number" && Number.isFinite(v)) return v | 0;
+
+  if (typeof v === "string") {
+    const k = v.trim().toLowerCase();
+    if (k in DT_MAP) return DT_MAP[k];
+  }
+
+  if (v && typeof v === "object") {
+    const t = (v.tag ?? v.kind);
+    if (typeof t === "string") {
+      const k = t.trim().toLowerCase();
+      if (k in DT_MAP) return DT_MAP[k];
+    }
+    for (const key of Object.keys(v)) {
+      const k = key.toLowerCase();
+      if (k in DT_MAP) return DT_MAP[k];
+    }
+  }
+
+  return 0;
 };
