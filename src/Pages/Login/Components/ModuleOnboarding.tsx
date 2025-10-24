@@ -7,6 +7,7 @@ import { UploadElementDataFromString } from "../../../Utility/UploadElementData"
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
 
 interface IProps {
   legacyLogin: boolean;
@@ -26,6 +27,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   // Just to display debug box of doom
   const debug: boolean = false;
 
+  const auth = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<number>(0);
@@ -70,7 +72,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
     setPassword(value);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
 
     if (usePassword && password) {
@@ -93,7 +95,9 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       setInitializing(true);
     })();
 
-    return navigate("login");
+    //return navigate("login");
+    await auth.removeUser();
+    auth.signinRedirect();
   };
 
   if (isOverlay) return <></>;
