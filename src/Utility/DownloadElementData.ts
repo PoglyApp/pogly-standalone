@@ -1,7 +1,9 @@
-import { Config, DbConnection } from "../module_bindings";
-import { DebugLogger } from "./DebugLogger";
+import initSqlJs from "sql.js";
+import { Config, DbConnection, ElementData, Elements, Layouts } from "../module_bindings";
+import { PoglyModuleExporter } from "./ModuleExporter";
+import { IncludeFlags } from "../Types/ExportTypes/IncludeFlagsType";
 
-export const DownloadElementData = (
+export const DownloadElementData = async (
   Client: DbConnection,
   downData: boolean,
   downElement: boolean,
@@ -11,32 +13,31 @@ export const DownloadElementData = (
   setModals: any,
   closeModal: any
 ) => {
+  const elementData: ElementData[] = Client.db.elementData.iter() as ElementData[];
+  const elements: Elements[] = Client.db.elements.iter() as Elements[];
+  const layouts: Layouts[] = Client.db.layouts.iter() as Layouts[];
 
-  DebugLogger("Downloading element data");
-  const blobData = JSON.stringify(Client.db.elementData.iter());
-  const blobElements = JSON.stringify(Client.db.elements.iter());
-  const blobLayouts = JSON.stringify(Client.db.layouts.iter());
+  const SQL = await initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` });
+  const exporter = new PoglyModuleExporter(SQL);
 
-  const data = new Blob(
-    [
-      JSON.stringify({
-        data: downData ? blobData : null,
-        elements: downElement ? blobElements : null,
-        layouts: downLayout ? blobLayouts : null,
-      }),
-    ],
-    { type: "text/json" }
+  const { blob } = exporter.buildAndExport(
+    {
+      ElementData: downData ? elementData : undefined,
+      Elements: downElement ? elements : undefined,
+      Layouts: downLayout ? layouts : undefined,
+    },
+    {
+      ElementData: true,
+      Elements: true,
+      Layouts: true,
+    } as IncludeFlags
   );
 
-  const tempURL = window.URL.createObjectURL(data);
-  var tempLink = document.createElement("a");
-  tempLink.href = tempURL;
   const timestamp = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "2-digit", day: "2-digit" }).format(
     Date.now()
   );
-  tempLink.setAttribute("download", timestamp + " Pogly Backup [" + config.streamName + "].json");
-  tempLink.click();
-  tempLink.remove();
+
+  exporter.triggerDownload(`${timestamp} + Pogly Backup [${config.streamName}].sqlite`, blob);
 
   closeModal("backup_modal", modals, setModals);
 };

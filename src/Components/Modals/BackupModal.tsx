@@ -19,6 +19,7 @@ import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Config } from "../../module_bindings";
 
 interface IProps {
   download: boolean;
@@ -35,31 +36,27 @@ export const BackupModal = (props: IProps) => {
   const [downData, setDownData] = useState<boolean>(true);
   const [downElement, setDownElement] = useState<boolean>(false);
   const [downLayout, setDownLayout] = useState<boolean>(false);
-  const [deleteOnUpload,setDeleteOnUpload] = useState<boolean>(false);
+  const [deleteOnUpload, setDeleteOnUpload] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.download) return;
 
     if (downElement) setDownData(true);
-    DebugLogger("Setting download data");
   }, [downData, downElement, downLayout, props.download]);
 
   const handleOnClose = () => {
-    DebugLogger("Handling backup modal close");
     setFile(null);
     setError("");
     closeModal("backup_modal", modals, setModals);
   };
 
   const handleFileChange = (file: any) => {
-    DebugLogger("Handling backup modal file change");
     setError("");
 
-    const isJson = file.target.files[0].type === "application/json";
+    const isSqlite = file.target.files[0].name.endsWith(".sqlite");
 
-    if (!isJson) {
-      DebugLogger("File not JSON");
-      setError("Incorrect file format. File must be a .json file.");
+    if (!isSqlite) {
+      setError("Incorrect file format. File must be a sqlite file.");
       setFile(null);
       return;
     }
@@ -67,18 +64,18 @@ export const BackupModal = (props: IProps) => {
     setFile(file.target.files[0]);
   };
 
-  const handleUpload = () => {
-    if(!deleteOnUpload) {
-      DebugLogger("Uploading backup data");
-      UploadBackupFromFile(spacetimeDB.Client, file);
+  const handleUpload = async () => {
+    console.log(file);
+
+    if (!deleteOnUpload) {
+      await UploadBackupFromFile(spacetimeDB.Client, file);
       closeModal("backup_modal", modals, setModals);
     } else {
-      DebugLogger("Uploading backup data - clearing existing data");
       spacetimeDB.Client.reducers.deleteAllElements();
       spacetimeDB.Client.reducers.deleteAllElementData();
       spacetimeDB.Client.reducers.deleteAllLayouts(false);
       spacetimeDB.Client.reducers.deleteAllFolders(false);
-      UploadBackupFromFile(spacetimeDB.Client, file);
+      await UploadBackupFromFile(spacetimeDB.Client, file);
       closeModal("backup_modal", modals, setModals);
     }
   };
@@ -106,22 +103,22 @@ export const BackupModal = (props: IProps) => {
             </Typography>
             <Input type="file" onChange={(event: any) => handleFileChange(event)} />
             <div style={{ display: "grid", marginTop: "10px" }}>
-                <FormControlLabel
-                  componentsProps={{
-                    typography: { color: "#ffffffa6", paddingTop: "1px" },
-                  }}
-                  sx={{ alignItems: "start" }}
-                  control={
-                    <Checkbox
-                      onChange={() => setDeleteOnUpload(!deleteOnUpload)}
-                      defaultChecked={deleteOnUpload}
-                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
-                    />
-                  }
-                  label="Clear existing data"
-                  title="Recommended for large modules with multiple layouts!"
-                />
-              </div>
+              <FormControlLabel
+                componentsProps={{
+                  typography: { color: "#ffffffa6", paddingTop: "1px" },
+                }}
+                sx={{ alignItems: "start" }}
+                control={
+                  <Checkbox
+                    onChange={() => setDeleteOnUpload(!deleteOnUpload)}
+                    defaultChecked={deleteOnUpload}
+                    sx={{ color: "#ffffffa6", paddingTop: "0px" }}
+                  />
+                }
+                label="Clear existing data"
+                title="Recommended for large modules with multiple layouts!"
+              />
+            </div>
             {error !== "" && (
               <Alert
                 variant="filled"
