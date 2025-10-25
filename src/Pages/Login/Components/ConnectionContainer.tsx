@@ -109,7 +109,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   const saveQuickSwap = () => {
     const quickSwap = localStorage.getItem("poglyQuickSwap");
-    const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: guestNickname, auth: authKey };
+    const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: "", auth: authKey };
 
     if (quickSwap && quickSwap.length > 0) {
       const modules: QuickSwapType[] = JSON.parse(quickSwap);
