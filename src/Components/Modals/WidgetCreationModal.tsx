@@ -178,8 +178,8 @@ export const WidgetCreationModal = (props: IProps) => {
       DebugLogger("Saving widget");
       if (props.editElementId) {
         const element = spacetimeDB.Client.db.elements.id.find(props.editElementId);
+
         if (!element) return;
-        const widgetStruct: ElementStruct = element.element as ElementStruct;
 
         const widgetJson = StringifyRawDataWidgetCode(
           widgetName,
@@ -192,10 +192,7 @@ export const WidgetCreationModal = (props: IProps) => {
           variables
         );
 
-        (widgetStruct.value as WidgetElement).rawData = widgetJson;
-
-        updateElementStruct(spacetimeDB.Client, props.editElementId, widgetStruct);
-
+        spacetimeDB.Client.reducers.updateWidgetElementRawData(props.editElementId, widgetJson);
         return handleOnClose();
       }
 
@@ -545,9 +542,7 @@ export const WidgetCreationModal = (props: IProps) => {
                   Cancel
                 </Button>
 
-                {strictSettings.StrictMode &&
-                !isOwner &&
-                !isModerator ? (
+                {strictSettings.StrictMode && !isOwner && !isModerator ? (
                   <></>
                 ) : (
                   <Button
