@@ -4,6 +4,7 @@ import { StyledButton } from "../StyledComponents/StyledButton";
 import { ClearConnectionSettings } from "../../Utility/ClearConnectionSettings";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { DbConnection } from "../../module_bindings/index";
+import { useNavigate } from "react-router-dom";
 
 interface IProp {
   type: string; //should be "timer" or "button"
@@ -14,11 +15,14 @@ interface IProp {
   clearSettings: boolean;
   kickSelf?: boolean;
   client?: DbConnection;
+  redirectBackToLogin?: boolean;
 }
 
 export const ErrorRefreshModal = (props: IProp) => {
   const [timer, setTimer] = useState<number>(props.refreshTimer || 5);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+
+  const navigate = useNavigate();
 
   //Clear out connection settings to prevent getting stuck
   if (props.clearSettings) ClearConnectionSettings();
@@ -30,7 +34,13 @@ export const ErrorRefreshModal = (props: IProp) => {
 
     DebugLogger("Initializing refresh");
 
-    if (timer === 0) window.location.reload();
+    if (timer === 0) {
+      if (props.redirectBackToLogin) {
+        navigate("login");
+      } else {
+        window.location.reload();
+      }
+    }
 
     setTimeout(function () {
       setTimer(timer - 1);
@@ -41,7 +51,11 @@ export const ErrorRefreshModal = (props: IProp) => {
     DebugLogger("Handling refresh click");
     if (props.kickSelf && props.client) props.client.reducers.kickSelf();
 
-    window.location.reload();
+    if (props.redirectBackToLogin) {
+      navigate("login");
+    } else {
+      window.location.reload();
+    }
   };
 
   if (isOverlay) return <></>;

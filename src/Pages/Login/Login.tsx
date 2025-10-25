@@ -84,6 +84,8 @@ export const Login = () => {
       Identity: guestWithNickname,
       Runtime: spacetime.Runtime,
       Config: spacetime.InstanceConfig,
+      Disconnected: false,
+      TokenExpired: false,
       Elements: [],
       ElementData: [],
       Guests: [],
@@ -96,6 +98,19 @@ export const Login = () => {
     DebugLogger("Setting SpacetimeDB authenticated ref");
     stdbAuthenticatedRef.current = stdbAuthenticated;
   }, [stdbAuthenticated]);
+
+  if (spacetime.TokenExpired) {
+    return (
+      <ErrorRefreshModal
+        type="button"
+        buttonText="Reload"
+        titleText="Authentication token has expired!"
+        contentText="You need to re-authenticate through the login page."
+        clearSettings={true}
+        redirectBackToLogin={true}
+      />
+    );
+  }
 
   // Step 1) Are connection settings configured?
   if (!connectionConfig) {

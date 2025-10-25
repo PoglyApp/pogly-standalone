@@ -21,6 +21,7 @@ const useStDB = (
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
+  const [tokenExpired, setTokenExpired] = useState<boolean>(false);
   const [client, setClient] = useState<DbConnection>();
 
   useEffect(() => {
@@ -67,6 +68,10 @@ const useStDB = (
       setError(true);
       StopHeartbeat();
       console.log("Error with SpacetimeDB: ", ErrCtx.event?.message, error);
+
+      if (error && error.message.includes("Unauthorized")) {
+        setTokenExpired(true);
+      }
     };
 
     const client = DbConnection.builder()
@@ -108,6 +113,7 @@ const useStDB = (
     InstanceConfig: config,
     Error: error,
     Disconnected: disconnected,
+    TokenExpired: tokenExpired,
     Runtime: connectionConfig,
   };
 };
