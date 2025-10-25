@@ -138,23 +138,23 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   if (isOverlay) return <></>;
 
   return (
-    <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bg-[#10121a]">
+    <div className="w-screen h-screen relative flex flex-col items-center justify-center bg-[#10121a] max-md:flex-col p-5">
       <PoglyLogo />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30 overflow-scroll">
         <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
-            <span className="text-[#82a5ff]">
+            <span className="text-[#82a5ff] whitespace-nowrap">
               {step + 1} / {steps.length}
             </span>
           </h2>
-          <ul className="space-y-3">
+          <ul className="space-y-3 max-md:flex max-md:flex-wrap max-md:items-center max-md:space-y-0 max-md:space-x-2.5">
             {steps.map((category, index) => (
               <li
                 key={index}
-                className={`flex items-center space-x-3 text-sm ${step === index ? "text-[#82a5ff]" : "text-gray-500"}`}
+                className={`flex items-center gap-3 text-sm ${step === index ? "text-[#82a5ff]" : "text-gray-500"}`}
               >
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full bg-[#1e212b]`}>
+                <span className="w-5 h-5 flex items-center justify-center rounded-full bg-[#1e212b]">
                   {step > index && <Check size={13} className="text-green-500" />}
                 </span>
                 <span>{category.label}</span>
@@ -164,11 +164,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         </div>
 
         {step === 0 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg text-[#edf1ff] max-md:h-[350px]">
               <p>In order to start using Pogly, you must first configure your module.</p>
               <br />
               <p>
@@ -188,58 +188,68 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                 </a>
                 !
               </p>
-            </div>
 
-            <StyledButton className="mt-18" onClick={() => setStep((s) => s + 1)}>
-              Lets get started!
-            </StyledButton>
+              <StyledButton
+                className="absolute bottom-0 max-md:relative max-md:mt-3 max-md:mb-3"
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Lets get started!
+              </StyledButton>
+            </div>
           </div>
         )}
 
         {step === 1 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg text-[#edf1ff] max-md:h-[290px]">
               <p className="mb-15">
                 Pogly currently supports Twitch, Youtube and Kick officially. This can be manually overwritten from
                 settings later but proper functionality is not guaranteed.
               </p>
-              <StyledButton
-                className="bg-[#8956FB]! w-[120px] mb-5 flex justify-center"
-                onClick={() => {
-                  setPlatform("twitch");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
-                Twitch
-              </StyledButton>
-              <StyledButton
-                className="bg-[#FF0000]! w-[120px] mb-5 flex justify-center"
-                onClick={() => {
-                  setPlatform("youtube");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/youtube.png" />
-                Youtube
-              </StyledButton>
-              <StyledButton
-                className="bg-[#00e701]! w-[120px] text-black! flex justify-center"
-                onClick={() => {
-                  setPlatform("kick");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/kick.svg" />
-                Kick
-              </StyledButton>
+              <div className="max-md:flex max-md:gap-2">
+                <StyledButton
+                  className="bg-[#8956FB]! w-[120px] mb-5 flex justify-center"
+                  onClick={() => {
+                    setPlatform("twitch");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
+                  Twitch
+                </StyledButton>
+
+                <StyledButton
+                  className="bg-[#FF0000]! w-[120px] mb-5 flex justify-center"
+                  onClick={() => {
+                    setPlatform("youtube");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/youtube.png" />
+                  Youtube
+                </StyledButton>
+
+                <StyledButton
+                  className="bg-[#00e701]! w-[120px] text-black! flex max-md:items-center h-fit"
+                  onClick={() => {
+                    setPlatform("kick");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/kick.svg" />
+                  Kick
+                </StyledButton>
+              </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
-              <StyledButton className="bg-gray-700 hover:bg-gray-600" onClick={() => setStep((s) => s - 1)}>
+            <div className="flex justify-between">
+              <StyledButton
+                className="absolute bottom-0 max-md:relative max-md:mt-3 max-md:mb-3"
+                onClick={() => setStep((s) => s - 1)}
+              >
                 Back
               </StyledButton>
             </div>
@@ -247,11 +257,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 2 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:h-[290px]">
               <p className="mb-5">
                 This channel will be shown in the preview in middle of the canvas so you can place elements pixel
                 perfectly on the screen.
@@ -292,7 +302,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               )}
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton disabled={!channelName ? true : false} onClick={() => setStep((s) => s + 1)}>
                 Next
@@ -302,11 +312,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 3 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:h-[310px]">
               <p>
                 Pogly has couple of security measures you can enable to make sure unauthorized users cannot wreak havoc
                 on your stream. While these options are optional, we <b>highly</b> recommend you turn them on.
@@ -368,7 +378,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton
                 disabled={(usePassword && !password) || passwordError ? true : false}
@@ -381,11 +391,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 4 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:mb-20 max-sm:mb-30">
               <p>
                 And that's it! Your module is now setup. Remember, as the owner of the module you can always change the
                 configuration from the settings.
@@ -465,7 +475,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="flex justify-between">
               <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>
