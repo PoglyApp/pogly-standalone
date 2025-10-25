@@ -2,7 +2,6 @@ import { Accordion, AccordionDetails, AccordionSummary, Button } from "@mui/mate
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
-import Layouts from "../../../module_bindings/layouts";
 import useFetchLayouts from "../../../StDB/Hooks/useFetchLayouts";
 import CheckIcon from "@mui/icons-material/Check";
 import { useContext, useState } from "react";
@@ -14,29 +13,28 @@ import { LayoutContextMenu } from "../ContextMenus/LayoutContextMenu";
 import styled from "styled-components";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import UpdateGuestSelectedLayoutReducer from "../../../module_bindings/update_guest_selected_layout_reducer";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Config from "../../../module_bindings/config";
-import Permissions from "../../../module_bindings/permissions";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { Layouts } from "../../../module_bindings";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 export const LayoutCategory = () => {
   const { setModals } = useContext(ModalContext);
-  const layoutContext = useContext(LayoutContext);
-  const { Identity } = useSpacetimeContext();
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [layouts, setLayouts] = useState<Layouts[]>([]);
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   useFetchLayouts(setLayouts);
   useLayoutEvents(setLayouts);
 
   const changeLayout = (layout: Layouts) => {
-    UpdateGuestSelectedLayoutReducer.call(layout.id);
-    layoutContext.setActiveLayout(layout);
+    spacetimeDB.Client.reducers.updateGuestSelectedLayout(layout.id);
+    setActiveLayout(layout);
   };
 
   const showLayoutCreationModal = () => {
@@ -56,7 +54,7 @@ export const LayoutCategory = () => {
           }}
         >
           <AddToQueueIcon sx={{ marginRight: "5px" }} />
-          <LayoutName>Layouts ({layoutContext.activeLayout.name})</LayoutName>
+          <LayoutName>Layouts ({activeLayout.name})</LayoutName>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -113,7 +111,7 @@ export const LayoutCategory = () => {
                     textTransform: "initial",
                     justifyContent: "left",
                     width: "100%",
-                    border: layoutContext.activeLayout.id === layout.id ? "solid 2px #022440" : "solid 2px #000C17",
+                    border: activeLayout.id === layout.id ? "solid 2px #022440" : "solid 2px #000C17",
                   }}
                   onClick={() => {
                     changeLayout(layout);

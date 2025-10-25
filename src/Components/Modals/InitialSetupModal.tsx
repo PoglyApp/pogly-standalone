@@ -13,24 +13,24 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import Config from "../../module_bindings/config";
-import SetConfigReducer from "../../module_bindings/set_config_reducer";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ConnectionConfigType } from "../../Types/ConfigTypes/ConnectionConfigType";
 import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import Elements from "../../module_bindings/elements";
-import ElementData from "../../module_bindings/element_data";
+import { Config, DbConnection, ElementData } from "../../module_bindings";
+import { useAuth } from "react-oidc-context";
+import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
 
 interface IProp {
+  client: DbConnection;
   config: Config;
   connectionConfig: ConnectionConfigType;
   setInstanceConfigured: Function;
-  versionNumber: string;
 }
 
 export const InitialSetupModal = (props: IProp) => {
+  const auth = useAuth();
   const [platform, setPlatform] = useState<string>(props.config.streamingPlatform);
   const [channel, setChannel] = useState<string>(props.config.streamName);
   const [debug, setDebug] = useState<boolean>(props.config.debugMode);
@@ -44,7 +44,7 @@ export const InitialSetupModal = (props: IProp) => {
   const [initializing, setInitializing] = useState<boolean>(false);
   const [defaultElements, setDefaultElements] = useState<string>("");
 
-  const isPoglyInstance: Boolean = props.connectionConfig.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = props.connectionConfig.domain === "wss://maincloud.spacetimedb.com";
 
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
   const [copyAuthButtonText, setAuthButtonText] = useState("Copy Auth Token");
@@ -87,7 +87,7 @@ export const InitialSetupModal = (props: IProp) => {
       return setError("Update Hz has to be a number.");
     }
 
-    SetConfigReducer.call(
+    props.client.reducers.setConfig(
       platform,
       channel,
       debug,
@@ -99,10 +99,10 @@ export const InitialSetupModal = (props: IProp) => {
     );
 
     (async () => {
-      const elementData: ElementData = ElementData.filterById(1).next().value;
+      const elementData: ElementData = getElementDataByID(props.client, 1);
 
       if (!elementData) {
-        UploadElementDataFromString(defaultElements);
+        UploadElementDataFromString(props.client, defaultElements);
       }
 
       setInitializing(true);
@@ -232,21 +232,6 @@ export const InitialSetupModal = (props: IProp) => {
             }
             label="Strict Mode"
           />
-
-          <Button
-            variant="outlined"
-            title="This is your token to prove that you are the owner of this Pogly instance. Keep this saved somewhere in case your local cache gets cleared!"
-            onClick={() => {
-              navigator.clipboard.writeText(localStorage.getItem("stdbToken")!);
-              setAuthButtonText("Copied!");
-
-              setTimeout(() => {
-                setAuthButtonText("Copy Auth Token");
-              }, 1000);
-            }}
-          >
-            {copyAuthButtonText}
-          </Button>
 
           <Button
             variant="outlined"

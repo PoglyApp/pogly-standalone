@@ -24,15 +24,10 @@ import "prismjs/components/prism-css";
 import "prismjs/themes/prism-solarizedlight.css";
 import { StyledInput } from "../StyledComponents/StyledInput";
 import { ElementDataType } from "../../Types/General/ElementDataType";
-import DataType from "../../module_bindings/data_type";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
-import ElementData from "../../module_bindings/element_data";
 import { WidgetVariableTable } from "../General/WidgetVariableTable";
-import PermissionLevel from "../../module_bindings/permission_level";
-import Permissions from "../../module_bindings/permissions";
-import Config from "../../module_bindings/config";
 import { updateElementData } from "../../StDB/Reducers/Update/updateElementData";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "styled-components";
@@ -43,12 +38,12 @@ import {
   StringifyRawDataWidgetCode,
 } from "../../Utility/GetWidgetCodeJson";
 import { WidgetVariableType } from "../../Types/General/WidgetVariableType";
-import Elements from "../../module_bindings/elements";
-import WidgetElement from "../../module_bindings/widget_element";
-import ElementStruct from "../../module_bindings/element_struct";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
+import { DataType, ElementStruct, WidgetElement } from "../../module_bindings";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 const hightlightWithLineNumbers = (input: string, language: any, languageString: string) =>
   highlight(input, language, languageString)
@@ -62,7 +57,7 @@ interface IProps {
 }
 
 export const WidgetCreationModal = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [widgetName, setWidgetName] = useState<string>("");
@@ -84,17 +79,20 @@ export const WidgetCreationModal = (props: IProps) => {
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const strictSettings: { StrictMode: boolean; Permission?: PermissionLevel } = {
-    StrictMode: Config.findByVersion(0)!.strictMode,
-    Permission: Permissions.findByIdentity(Identity.identity)?.permissionLevel,
+  const strictSettings: { StrictMode: boolean; Permissions: PermissionTypes[] } = {
+    StrictMode: spacetimeDB.Client.db.config.version.find(0)!.strictMode,
+    Permissions: getPermissions(spacetimeDB, spacetimeDB.Identity.identity),
   };
+
+  const isOwner = strictSettings.Permissions.includes(PermissionTypes.Owner);
+  const isModerator = strictSettings.Permissions.includes(PermissionTypes.Moderator);
 
   const loadByElementDataID = useCallback(() => {
     if (!props.editElementDataId) return;
 
     try {
       DebugLogger("Loading widget by element data ID");
-      const elementData = ElementData.findById(props.editElementDataId);
+      const elementData = spacetimeDB.Client.db.elementData.id.find(props.editElementDataId);
       if (!elementData) return;
 
       const jsonObject = JSON.parse(elementData.data);
@@ -113,20 +111,21 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT DATA ID", error);
     }
-  }, [props]);
+  }, [props, spacetimeDB.Client]);
 
   const loadByElementID = useCallback(() => {
     if (!props.editElementId) return;
     try {
       DebugLogger("Loading widget by element ID");
 
-      const element = Elements.findById(props.editElementId);
+      const element = spacetimeDB.Client.db.elements.id.find(props.editElementId);
       if (!element) return;
       const widgetStruct: WidgetElement = element.element.value as WidgetElement;
 
       let widgetData: any = null;
 
-      if (widgetStruct.rawData === "") widgetData = GetWidgetCodeJsonByElementDataID(widgetStruct.elementDataId);
+      if (widgetStruct.rawData === "")
+        widgetData = GetWidgetCodeJsonByElementDataID(spacetimeDB.Client, widgetStruct.elementDataId);
       else widgetData = JSON.parse(widgetStruct.rawData);
 
       setWidgetName(widgetData.widgetName || "");
@@ -143,7 +142,7 @@ export const WidgetCreationModal = (props: IProps) => {
     } catch (error) {
       console.log("ERROR WHILE LOADING WIDGET BY ELEMENT ID", error);
     }
-  }, [props]);
+  }, [props, spacetimeDB.Client]);
 
   const loadByWidgetString = (widgetString: string) => {
     try {
@@ -178,9 +177,9 @@ export const WidgetCreationModal = (props: IProps) => {
     try {
       DebugLogger("Saving widget");
       if (props.editElementId) {
-        const element = Elements.findById(props.editElementId);
+        const element = spacetimeDB.Client.db.elements.id.find(props.editElementId);
+
         if (!element) return;
-        const widgetStruct: ElementStruct = element.element as ElementStruct;
 
         const widgetJson = StringifyRawDataWidgetCode(
           widgetName,
@@ -193,10 +192,7 @@ export const WidgetCreationModal = (props: IProps) => {
           variables
         );
 
-        (widgetStruct.value as WidgetElement).rawData = widgetJson;
-
-        updateElementStruct(props.editElementId, widgetStruct);
-
+        spacetimeDB.Client.reducers.updateWidgetElementRawData(props.editElementId, widgetJson);
         return handleOnClose();
       }
 
@@ -208,13 +204,13 @@ export const WidgetCreationModal = (props: IProps) => {
         Data: widgetJson,
         DataWidth: widgetWidth,
         DataHeight: widgetHeight,
-        CreatedBy: Identity.nickname,
+        CreatedBy: spacetimeDB.Identity.nickname,
       };
 
       if (!props.editElementDataId) {
-        insertElementData(newElementData);
+        insertElementData(spacetimeDB.Client, newElementData);
       } else {
-        updateElementData(props.editElementDataId, newElementData);
+        updateElementData(spacetimeDB.Client, props.editElementDataId, newElementData);
       }
 
       handleOnClose();
@@ -275,323 +271,323 @@ export const WidgetCreationModal = (props: IProps) => {
   return (
     <>
       {showModal && (
-        <Dialog fullWidth={true} open={true} onClose={handleOnClose}>
-          <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
-            {!props.editElementDataId && !props.editElementId && "Widget Creation"}
-            {props.editElementDataId && !props.editElementId && "Edit Widget Data"}
-            {!props.editElementDataId && props.editElementId && "Edit Widget Element"}
+        <div className="canvas-font" style={{ fontSize: "14px" }}>
+          <Dialog fullWidth={true} open={true} onClose={handleOnClose}>
+            <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6" }}>
+              {!props.editElementDataId && !props.editElementId && "Widget Creation"}
+              {props.editElementDataId && !props.editElementId && "Edit Widget Data"}
+              {!props.editElementDataId && props.editElementId && "Edit Widget Element"}
 
-            {!props.editElementDataId && !props.editElementId && (
-              <Typography color="#ffffffa6" fontSize={14}>
-                Find community made widgets in{" "}
-                <Link
-                  href="https://discord.gg/pogly"
-                  target="_blank"
-                  rel="noreferrer"
-                  underline="always"
-                  sx={{ color: "#ffffffa6" }}
+              {!props.editElementDataId && !props.editElementId && (
+                <Typography color="#ffffffa6" fontSize={14}>
+                  Find community made widgets in{" "}
+                  <Link
+                    href="https://discord.gg/pogly"
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="always"
+                    sx={{ color: "#ffffffa6" }}
+                  >
+                    Pogly Discord
+                  </Link>
+                  !
+                </Typography>
+              )}
+            </DialogTitle>
+
+            <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
+              <FormGroup row style={{ gap: "20px", color: "#ffffffa6" }}>
+                <StyledInput
+                  focused={true}
+                  label="Widget Name"
+                  color="#ffffffa6"
+                  onChange={(text: any) => setWidgetName(text)}
+                  value={widgetName}
+                />
+
+                {!props.editElementDataId && props.editElementId ? (
+                  <></>
+                ) : (
+                  <>
+                    <div style={{ maxWidth: "100px" }}>
+                      <StyledInput
+                        focused={false}
+                        label="Width"
+                        color="#ffffffa6"
+                        onChange={(text: any) => setWidgetWidth(parseInt(text))}
+                        defaultValue={widgetWidth ? widgetWidth.toString() : ""}
+                      />
+                    </div>
+                    <div style={{ maxWidth: "100px" }}>
+                      <StyledInput
+                        focused={false}
+                        label="Height"
+                        color="#ffffffa6"
+                        onChange={(text: any) => setWidgetHeight(parseInt(text))}
+                        defaultValue={widgetHeight ? widgetHeight.toString() : ""}
+                      />
+                    </div>
+                  </>
+                )}
+              </FormGroup>
+
+              <DialogContentText
+                sx={{
+                  color: "#ffffffa6",
+                  marginTop: "20px",
+                  paddingBottom: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {"Variables"}
+                <Tooltip
+                  title={
+                    <div>
+                      <span>System variables:</span>
+                      <br />
+                      <strong>
+                        {"{is_overlay}"}
+                        <span> {" => If widget is currently in overlay."}</span>
+                      </strong>
+                      <br />
+                      <strong>
+                        {"{widget_width}"}
+                        <span> {" => Widget width on spawn."}</span>
+                      </strong>
+                      <br />
+                      <strong>
+                        {"{widget_height}"}
+                        <span> {" => Widget height on spawn."}</span>
+                      </strong>
+                    </div>
+                  }
                 >
-                  Pogly Discord
-                </Link>
-                !
-              </Typography>
-            )}
-          </DialogTitle>
+                  <InfoOutlineIcon sx={{ fontSize: 16, paddingLeft: "5px" }} />
+                </Tooltip>
+              </DialogContentText>
 
-          <DialogContent sx={{ backgroundColor: "#0a2a47", paddingBottom: "3px", paddingTop: "10px !important" }}>
-            <FormGroup row style={{ gap: "20px", color: "#ffffffa6" }}>
-              <StyledInput
-                focused={true}
-                label="Widget Name"
-                color="#ffffffa6"
-                onChange={(text: any) => setWidgetName(text)}
-                value={widgetName}
+              <WidgetVariableTable
+                key={variablesKey}
+                variables={variables}
+                setVariables={setVariables}
+                setError={setWidgetError}
               />
 
-              {!props.editElementDataId && props.editElementId ? (
-                <></>
-              ) : (
-                <>
-                  <div style={{ maxWidth: "100px" }}>
-                    <StyledInput
-                      focused={false}
-                      label="Width"
-                      color="#ffffffa6"
-                      onChange={(text: any) => setWidgetWidth(parseInt(text))}
-                      defaultValue={widgetWidth ? widgetWidth.toString() : ""}
-                    />
-                  </div>
-                  <div style={{ maxWidth: "100px" }}>
-                    <StyledInput
-                      focused={false}
-                      label="Height"
-                      color="#ffffffa6"
-                      onChange={(text: any) => setWidgetHeight(parseInt(text))}
-                      defaultValue={widgetHeight ? widgetHeight.toString() : ""}
-                    />
-                  </div>
-                </>
-              )}
-            </FormGroup>
-
-            <DialogContentText
-              sx={{
-                color: "#ffffffa6",
-                marginTop: "20px",
-                paddingBottom: "5px",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {"Variables"}
-              <Tooltip
-                title={
-                  <div>
-                    <span>System variables:</span>
-                    <br />
-                    <strong>
-                      {"{is_overlay}"}
-                      <span> {" => If widget is currently in overlay."}</span>
-                    </strong>
-                    <br />
-                    <strong>
-                      {"{widget_width}"}
-                      <span> {" => Widget width on spawn."}</span>
-                    </strong>
-                    <br />
-                    <strong>
-                      {"{widget_height}"}
-                      <span> {" => Widget height on spawn."}</span>
-                    </strong>
-                  </div>
-                }
-              >
-                <InfoOutlineIcon sx={{ fontSize: 16, paddingLeft: "5px" }} />
-              </Tooltip>
-            </DialogContentText>
-
-            <WidgetVariableTable
-              key={variablesKey}
-              variables={variables}
-              setVariables={setVariables}
-              setError={setWidgetError}
-            />
-
-            {widgetError && (
-              <Alert
-                variant="filled"
-                severity="warning"
-                sx={{
-                  backgroundColor: "#f57c00 !important",
-                  color: "#212121",
-                  marginBottom: "20px",
-                }}
-              >
-                {widgetError}
-              </Alert>
-            )}
-
-            <StyledAccordion>
-              <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
-                aria-controls="header-content"
-                id="header-header"
-                sx={{ color: "#ffffffa6" }}
-              >
-                {"<header>"}
-              </StyledAccordionSummary>
-              <StyledAccordionDetails>
-                <StyledEditor
-                  value={headerCode}
-                  onValueChange={(code) => setHeaderCode(code)}
-                  highlight={(code) => hightlightWithLineNumbers(code, languages.cshtml, "cshtml")}
-                  padding={10}
-                  textareaId="codeArea"
-                  className="editor"
-                />
-              </StyledAccordionDetails>
-            </StyledAccordion>
-
-            <StyledAccordion>
-              <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
-                aria-controls="body-content"
-                id="body-header"
-                sx={{ color: "#ffffffa6" }}
-              >
-                {"<body>"}
-              </StyledAccordionSummary>
-              <StyledAccordionDetails>
-                <StyledEditor
-                  value={bodyCode}
-                  onValueChange={(code) => setBodyCode(code)}
-                  highlight={(code) => hightlightWithLineNumbers(code, languages.cshtml, "cshtml")}
-                  padding={10}
-                  textareaId="codeArea"
-                  className="editor"
-                />
-              </StyledAccordionDetails>
-            </StyledAccordion>
-
-            <StyledAccordion>
-              <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
-                aria-controls="style-content"
-                id="style-header"
-                sx={{ color: "#ffffffa6" }}
-              >
-                {"<style>"}
-              </StyledAccordionSummary>
-              <StyledAccordionDetails>
-                <StyledEditor
-                  value={styleCode}
-                  onValueChange={(code) => setStyleCode(code)}
-                  highlight={(code) => hightlightWithLineNumbers(code, languages.css, "css")}
-                  padding={10}
-                  textareaId="codeArea"
-                  className="editor"
-                />
-              </StyledAccordionDetails>
-            </StyledAccordion>
-
-            <StyledAccordion>
-              <StyledAccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
-                aria-controls="script-content"
-                id="script-header"
-                sx={{ color: "#ffffffa6" }}
-              >
-                {"<script>"}
-              </StyledAccordionSummary>
-              <StyledAccordionDetails>
-                <StyledEditor
-                  value={scriptCode}
-                  onValueChange={(code) => {
-                    if (code.includes("while")) {
-                      setShowWarning(true);
-                    } else {
-                      setShowWarning(false);
-                    }
-                    setScriptCode(code);
+              {widgetError && (
+                <Alert
+                  variant="filled"
+                  severity="warning"
+                  sx={{
+                    backgroundColor: "#f57c00 !important",
+                    color: "#212121",
+                    marginBottom: "20px",
                   }}
-                  highlight={(code) => hightlightWithLineNumbers(code, languages.javascript, "javascript")}
-                  padding={10}
-                  textareaId="codeArea"
-                  className="editor"
-                />
-              </StyledAccordionDetails>
-            </StyledAccordion>
-
-            {showWarning && (
-              <Alert
-                variant="filled"
-                severity="warning"
-                sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px" }}
-              >
-                WARNING! While loop detected, make sure you do NOT make a while loop that loops infinitely!
-                <a
-                  style={{ paddingLeft: "5px" }}
-                  href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/widgetElement.md#while-dont--"
-                  target="_blank"
-                  rel="noreferrer"
                 >
-                  Click here for more information
-                </a>
-              </Alert>
-            )}
-          </DialogContent>
+                  {widgetError}
+                </Alert>
+              )}
 
-          <DialogActions
-            sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px", display: "grid" }}
-          >
-            <div style={{ position: "fixed" }}>
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "#ffffffa6",
-                  borderColor: "#ffffffa6",
-                  "&:hover": { borderColor: "white" },
-                  marginRight: "10px",
-                }}
-                onClick={openImportModal}
-              >
-                Import
-              </Button>
+              <StyledAccordion>
+                <StyledAccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                  aria-controls="header-content"
+                  id="header-header"
+                  sx={{ color: "#ffffffa6" }}
+                >
+                  {"<header>"}
+                </StyledAccordionSummary>
+                <StyledAccordionDetails>
+                  <StyledEditor
+                    value={headerCode}
+                    onValueChange={(code) => setHeaderCode(code)}
+                    highlight={(code) => hightlightWithLineNumbers(code, languages.cshtml, "cshtml")}
+                    padding={10}
+                    textareaId="codeArea"
+                    className="editor"
+                  />
+                </StyledAccordionDetails>
+              </StyledAccordion>
 
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "#ffffffa6",
-                  borderColor: "#ffffffa6",
-                  "&:hover": { borderColor: "white" },
-                }}
-                onClick={openExportModal}
-              >
-                Export
-              </Button>
-            </div>
+              <StyledAccordion>
+                <StyledAccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                  aria-controls="body-content"
+                  id="body-header"
+                  sx={{ color: "#ffffffa6" }}
+                >
+                  {"<body>"}
+                </StyledAccordionSummary>
+                <StyledAccordionDetails>
+                  <StyledEditor
+                    value={bodyCode}
+                    onValueChange={(code) => setBodyCode(code)}
+                    highlight={(code) => hightlightWithLineNumbers(code, languages.cshtml, "cshtml")}
+                    padding={10}
+                    textareaId="codeArea"
+                    className="editor"
+                  />
+                </StyledAccordionDetails>
+              </StyledAccordion>
 
-            <div>
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "#ffffffa6",
-                  borderColor: "#ffffffa6",
-                  "&:hover": { borderColor: "white" },
-                  marginRight: "10px",
-                }}
-                onClick={handleOnClose}
-              >
-                Cancel
-              </Button>
+              <StyledAccordion>
+                <StyledAccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                  aria-controls="style-content"
+                  id="style-header"
+                  sx={{ color: "#ffffffa6" }}
+                >
+                  {"<style>"}
+                </StyledAccordionSummary>
+                <StyledAccordionDetails>
+                  <StyledEditor
+                    value={styleCode}
+                    onValueChange={(code) => setStyleCode(code)}
+                    highlight={(code) => hightlightWithLineNumbers(code, languages.css, "css")}
+                    padding={10}
+                    textareaId="codeArea"
+                    className="editor"
+                  />
+                </StyledAccordionDetails>
+              </StyledAccordion>
 
-              {strictSettings.StrictMode &&
-              strictSettings.Permission?.tag !== "Owner" &&
-              strictSettings.Permission?.tag !== "Moderator" ? (
-                <></>
-              ) : (
+              <StyledAccordion>
+                <StyledAccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
+                  aria-controls="script-content"
+                  id="script-header"
+                  sx={{ color: "#ffffffa6" }}
+                >
+                  {"<script>"}
+                </StyledAccordionSummary>
+                <StyledAccordionDetails>
+                  <StyledEditor
+                    value={scriptCode}
+                    onValueChange={(code) => {
+                      if (code.includes("while")) {
+                        setShowWarning(true);
+                      } else {
+                        setShowWarning(false);
+                      }
+                      setScriptCode(code);
+                    }}
+                    highlight={(code) => hightlightWithLineNumbers(code, languages.javascript, "javascript")}
+                    padding={10}
+                    textareaId="codeArea"
+                    className="editor"
+                  />
+                </StyledAccordionDetails>
+              </StyledAccordion>
+
+              {showWarning && (
+                <Alert
+                  variant="filled"
+                  severity="warning"
+                  sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px" }}
+                >
+                  WARNING! While loop detected, make sure you do NOT make a while loop that loops infinitely!
+                  <a
+                    style={{ paddingLeft: "5px" }}
+                    href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/widgetElement.md#while-dont--"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Click here for more information
+                  </a>
+                </Alert>
+              )}
+            </DialogContent>
+
+            <DialogActions
+              sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px", display: "grid" }}
+            >
+              <div style={{ position: "fixed" }}>
                 <Button
                   variant="outlined"
                   sx={{
                     color: "#ffffffa6",
                     borderColor: "#ffffffa6",
                     "&:hover": { borderColor: "white" },
-                    "&:disabled": {
-                      borderColor: "gray",
-                      color: "gray",
-                    },
+                    marginRight: "10px",
                   }}
-                  disabled={widgetError ? true : false}
-                  onClick={handleSave}
+                  onClick={openImportModal}
                 >
-                  {props.editElementDataId || props.editElementId ? "Save" : "Create"}
+                  Import
                 </Button>
-              )}
-            </div>
-          </DialogActions>
-        </Dialog>
+
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#ffffffa6",
+                    borderColor: "#ffffffa6",
+                    "&:hover": { borderColor: "white" },
+                  }}
+                  onClick={openExportModal}
+                >
+                  Export
+                </Button>
+              </div>
+
+              <div>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#ffffffa6",
+                    borderColor: "#ffffffa6",
+                    "&:hover": { borderColor: "white" },
+                    marginRight: "10px",
+                  }}
+                  onClick={handleOnClose}
+                >
+                  Cancel
+                </Button>
+
+                {strictSettings.StrictMode && !isOwner && !isModerator ? (
+                  <></>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: "#ffffffa6",
+                      borderColor: "#ffffffa6",
+                      "&:hover": { borderColor: "white" },
+                      "&:disabled": {
+                        borderColor: "gray",
+                        color: "gray",
+                      },
+                    }}
+                    disabled={widgetError ? true : false}
+                    onClick={handleSave}
+                  >
+                    {props.editElementDataId || props.editElementId ? "Save" : "Create"}
+                  </Button>
+                )}
+              </div>
+            </DialogActions>
+          </Dialog>
+        </div>
       )}
     </>
   );
 };
 
 const StyledAccordion = styled(Accordion)`
-  padding-bottom: 0px;
+  padding-bottom: 0px !important;
 `;
 
 const StyledAccordionSummary = styled(AccordionSummary)`
-  background-color: #05355f;
+  background-color: #05355f !important;
 `;
 
 const StyledAccordionDetails = styled(AccordionDetails)`
-  background-color: #032e53;
+  background-color: #032e53 !important;
 `;
 
 const StyledEditor = styled(Editor)`
-  font-family: "Fira code", "Fira Mono", monospace;
-  font-size: 12px;
-  outline: 0px;
-  background-color: #1f1f1f;
-  color: #9cdcfe;
-  margin-top: 10px;
+  font-family: "Fira code", "Fira Mono", monospace !important;
+  font-size: 12px !important;
+  outline: 0px !important;
+  background-color: #1f1f1f !important;
+  color: #9cdcfe !important;
+  margin-top: 10px !important;
 `;

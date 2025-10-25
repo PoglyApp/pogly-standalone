@@ -1,12 +1,3 @@
-import { createContext, useContext } from "react";
-import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
+import { createContext } from "react";
 
-export const SpacetimeContext = createContext<SpacetimeContextType | undefined>(undefined);
-
-export const useSpacetimeContext = () => {  
-  const identity = useContext(SpacetimeContext);
-
-  if (!identity || !identity.Identity) throw new Error("Somehow missing Spacetime identity.");
-
-  return identity;
-};
+export const SpacetimeContext = createContext<any>(null);

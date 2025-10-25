@@ -2,25 +2,24 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, Skeleton, Toolti
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ImageIcon from "@mui/icons-material/Image";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ElementData from "../../../module_bindings/element_data";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import styled from "styled-components";
 import { ImageUploadModal } from "../../Modals/ImageUploadModal";
 import React, { useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { StyledInput } from "../../StyledComponents/StyledInput";
 import { HandleElementSelectionContextMenu } from "../../../Utility/HandleContextMenu";
 import { ModalContext } from "../../../Contexts/ModalContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
 import { convertBinaryToDataURI } from "../../../Utility/ImageConversion";
+import { ElementData, ElementStruct, ImageElementData } from "../../../module_bindings";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 interface IProps {
   elementData: ElementData[];
-  strictSettings: { StrictMode: boolean; Permission?: PermissionLevel };
+  strictSettings: { StrictMode: boolean; Permissions: PermissionTypes[] };
   contextMenu: any;
   setContextMenu: Function;
   isSearch: boolean;
@@ -29,9 +28,15 @@ interface IProps {
 
 export const ImageCategory = React.memo((props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const layoutContext = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const [searchimage, setSearchImage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(!props.isSearch);
+  const perms = props.strictSettings.Permissions ?? [];
+  const isOwner = perms.includes(PermissionTypes.Owner);
+  const isModerator = perms.includes(PermissionTypes.Moderator);
+  const canBypassStrict = isOwner || isModerator;
+  const canUpload = (!props.strictSettings.StrictMode || canBypassStrict) && !props.isSearch;
 
   const showImageUploadModal = useCallback(() => {
     DebugLogger("Opening image upload modal");
@@ -42,19 +47,20 @@ export const ImageCategory = React.memo((props: IProps) => {
     (elementData: ElementData) => {
       DebugLogger("Adding element to canvas");
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.ElementDataId(elementData.id),
           width: elementData.dataWidth,
           height: elementData.dataHeight,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
 
       if (props.isSearch) {
         closeModal("spotlight_modal", modals, setModals);
       }
     },
-    [layoutContext.activeLayout, closeModal, modals, props.isSearch, setModals]
+    [activeLayout, closeModal, modals, props.isSearch, setModals, spacetimeDB.Client]
   );
 
   const filteredElements = useMemo(() => {
@@ -106,7 +112,7 @@ export const ImageCategory = React.memo((props: IProps) => {
   if (!visible) return <></>;
 
   return (
-    <Accordion defaultExpanded={props.isSearch ? true : false}>
+    <Accordion defaultExpanded={!!props.isSearch}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
         aria-controls="panel1-content"
@@ -116,41 +122,32 @@ export const ImageCategory = React.memo((props: IProps) => {
       >
         <ImageIcon sx={{ marginRight: "5px" }} />
         <span style={{ lineHeight: 1.5, fontSize: "15px" }}>Images</span>
-        {props.strictSettings.StrictMode &&
-        props.strictSettings.Permission?.tag !== "Owner" &&
-        props.strictSettings.Permission?.tag !== "Moderator" &&
-        !props.isSearch ? (
+        {props.strictSettings.StrictMode && !canBypassStrict && !props.isSearch ? (
           <Tooltip title="Strict mode is enabled and preventing you from uploading a new Image. Ask the instance owner!">
             <InfoOutlineIcon sx={{ fontSize: 16, color: "orange", alignSelf: "center", paddingLeft: "5px" }} />
           </Tooltip>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </AccordionSummary>
-      <AccordionDetails sx={{ backgroundColor: "#000c17", paddingBottom: "5px" }}>
-        {(!props.strictSettings.StrictMode ||
-          props.strictSettings.Permission?.tag === "Owner" ||
-          props.strictSettings.Permission?.tag === "Moderator") &&
-          !props.isSearch && (
-            <Button
-              variant="text"
-              startIcon={<AddCircleOutlineIcon />}
-              sx={{
-                color: "#ffffffa6",
-                textTransform: "initial",
-                justifyContent: "left",
-                width: "100%",
-                paddingBottom: "10px",
-              }}
-              onClick={showImageUploadModal}
-            >
-              Add Image
-            </Button>
-          )}
 
-        {props.isSearch ? (
-          <></>
-        ) : (
+      <AccordionDetails sx={{ backgroundColor: "#000c17", paddingBottom: "5px" }}>
+        {canUpload && (
+          <Button
+            variant="text"
+            startIcon={<AddCircleOutlineIcon />}
+            sx={{
+              color: "#ffffffa6",
+              textTransform: "initial",
+              justifyContent: "left",
+              width: "100%",
+              paddingBottom: "10px",
+            }}
+            onClick={showImageUploadModal}
+          >
+            Add Image
+          </Button>
+        )}
+
+        {props.isSearch ? null : (
           <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchImage} defaultValue={""} />
         )}
 

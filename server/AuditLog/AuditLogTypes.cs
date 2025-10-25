@@ -1,9 +1,8 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct ElementDataChange
     {
         public uint Id;
@@ -13,7 +12,7 @@ public partial class Module
         public string CreatedBy;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct ElementChange
     {
         public uint Id;
@@ -26,7 +25,7 @@ public partial class Module
         public int ZIndex;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct GuestChange
     {
         public Identity Identity;
@@ -37,17 +36,17 @@ public partial class Module
         public int PositionY;
     }
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct ChatMessage
     {
         public string Message;
     }
     
-    [SpacetimeDB.Type]
+    [Type]
     public partial struct EmptyChange
     {}
 
-    [SpacetimeDB.Type]
+    [Type]
     public partial record ChangeStruct : SpacetimeDB.TaggedEnum<(ElementDataChange ElementDataChange, ElementChange
         ElementChange, GuestChange GuestChange, EmptyChange EmptyChange, ChatMessage ChatMessage)> {}
 }

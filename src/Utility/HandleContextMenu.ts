@@ -1,7 +1,4 @@
-import Elements from "../module_bindings/elements";
-import ElementData from "../module_bindings/element_data";
-import Guests from "../module_bindings/guests";
-import Layouts from "../module_bindings/layouts";
+import { ElementData, Elements, Guests, Layouts } from "../module_bindings";
 import { DebugLogger } from "./DebugLogger";
 
 export const HandleElementContextMenu = (event: any, setContextMenu: Function, contextMenu: any, element: Elements) => {

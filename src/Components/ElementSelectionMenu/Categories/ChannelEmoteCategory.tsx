@@ -3,8 +3,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useContext, useEffect, useState } from "react";
 import SevenTVEmote from "../../../Types/SevenTVTypes/SevenTVEmoteType";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import SevenTVWrap from "../../../Utility/SevenTVWrap";
 import styled from "styled-components";
 import { StyledInput } from "../../StyledComponents/StyledInput";
@@ -15,6 +13,8 @@ import BetterTVWrap from "../../../Utility/BetterTVWrap";
 import { SevenTVIcon, BetterTVIcon } from "../../../Utility/SVGIcons";
 import ChannelEmote from "../../../Types/General/ChannelEmoteType";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ElementStruct, ImageElementData } from "../../../module_bindings";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmote[] | undefined;
@@ -22,7 +22,8 @@ interface IProps {
 }
 
 export const ChannelEmoteCategory = (props: IProps) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [sevenTVEmotes, setSevenTVEmotes] = useState<SevenTVEmote[]>([]);
   const [betterTVEmotes, setBetterTVEmotes] = useState<BetterTVEmote[]>([]);
@@ -32,8 +33,8 @@ export const ChannelEmoteCategory = (props: IProps) => {
   const [maxDisplayed, setMaxDisplayed] = useState<number>(10);
 
   useEffect(() => {
-    if(!props.sevenTVEmotes) return;
-    if(!props.betterTVEmotes) return;
+    if (!props.sevenTVEmotes) return;
+    if (!props.betterTVEmotes) return;
     setSevenTVEmotes(() => [...props.sevenTVEmotes!]);
     setBetterTVEmotes(() => [...props.betterTVEmotes!]);
   }, [props.sevenTVEmotes, props.betterTVEmotes]);
@@ -75,12 +76,13 @@ export const ChannelEmoteCategory = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };
@@ -93,12 +95,13 @@ export const ChannelEmoteCategory = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };
@@ -126,144 +129,154 @@ export const ChannelEmoteCategory = (props: IProps) => {
           "::-webkit-scrollbar": { width: "0", background: "transparent" },
         }}
       >
-        <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchEmote} defaultValue={""} />
-        <>
-          {searchEmote !== "" && sevenTVEmotes ? (
+        {sevenTVEmotes.length === 0 ? (
+          <h1 style={{ color: "#ffffffa6" }}>No emotes found</h1>
+        ) : (
+          <>
+            <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={setSearchEmote} defaultValue={""} />
             <>
-              {sevenTVEmotes.map((e) => {
-                if (searchEmote === "" || e.name.toLowerCase().includes(searchEmote.toLowerCase())) {
-                  return (
-                    <div key={e.id}>
-                      <Button
-                        sx={{
-                          color: "#ffffffa6",
-                          textTransform: "initial",
-                          justifyContent: "left",
-                          width: "100%",
-                        }}
-                        title={e.name}
-                        onClick={() => AddSevenTVElementToCanvas(e)}
-                      >
-                        <ElementIcon src={"https://cdn.7tv.app/emote/" + e.id + "/3x.webp"} alt={e.name} />
-                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
-                          {SevenTVIcon(true)}
-                        </SvgIcon>
-                        {e.name.length > 10 ? e.name.substring(0, 10) + "..." : e.name}
-                      </Button>
-                      <br />
-                    </div>
-                  );
-                }
-
-                return null;
-              })}
-              {betterTVEmotes.map((e) => {
-                if (searchEmote === "" || e.code.toLowerCase().includes(searchEmote.toLowerCase())) {
-                  return (
-                    <div key={e.id}>
-                      <Button
-                        sx={{
-                          color: "#ffffffa6",
-                          textTransform: "initial",
-                          justifyContent: "left",
-                          width: "100%",
-                        }}
-                        title={e.code}
-                        onClick={() => AddBetterTVElementToCanvas(e)}
-                      >
-                        <ElementIcon src={"https://cdn.betterttv.net/emote/" + e.id + "/3x.webp"} alt={e.code} />
-                        <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>{BetterTVIcon()}</SvgIcon>
-                        {e.code.length > 10 ? e.code.substring(0, 10) + "..." : e.code}
-                      </Button>
-                      <br />
-                    </div>
-                  );
-                }
-
-                return null;
-              })}
-            </>
-          ) : (
-            <>
-              {shownEmotes.map((e) => {
-                switch (e.type) {
-                  case "7tv":
-                    return (
-                      <div key={(e.emote as SevenTVEmote).id}>
-                        <Button
-                          sx={{
-                            color: "#ffffffa6",
-                            textTransform: "initial",
-                            justifyContent: "left",
-                            width: "100%",
-                          }}
-                          title={(e.emote as SevenTVEmote).name}
-                          onClick={() => AddSevenTVElementToCanvas(e.emote as SevenTVEmote)}
-                        >
-                          <ElementIcon
-                            src={"https://cdn.7tv.app/emote/" + (e.emote as SevenTVEmote).id + "/3x.webp"}
-                            alt={(e.emote as SevenTVEmote).name}
-                          />
-                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
-                            {SevenTVIcon(false)}
-                          </SvgIcon>
-                          {(e.emote as SevenTVEmote).name.length > 10
-                            ? (e.emote as SevenTVEmote).name.substring(0, 10) + "..."
-                            : (e.emote as SevenTVEmote).name}
-                        </Button>
-                        <br />
-                      </div>
-                    );
-                  case "bttv":
-                    return (
-                      <div key={(e.emote as BetterTVEmote).id}>
-                        <Button
-                          sx={{
-                            color: "#ffffffa6",
-                            textTransform: "initial",
-                            justifyContent: "left",
-                            width: "100%",
-                          }}
-                          title={(e.emote as BetterTVEmote).code}
-                          onClick={() => AddBetterTVElementToCanvas(e.emote as BetterTVEmote)}
-                        >
-                          <ElementIcon
-                            src={"https://cdn.betterttv.net/emote/" + (e.emote as BetterTVEmote).id + "/3x.webp"}
-                            alt={(e.emote as BetterTVEmote).code}
-                          />
-                          <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>{BetterTVIcon()}</SvgIcon>
-                          {(e.emote as BetterTVEmote).code.length > 10
-                            ? " " + (e.emote as BetterTVEmote).code.substring(0, 10) + "..."
-                            : " " + (e.emote as BetterTVEmote).code}
-                        </Button>
-                        <br />
-                      </div>
-                    );
-                  default:
-                    return <></>;
-                }
-              })}
-              {maxDisplayed - 1 < sevenTVEmotes.length + betterTVEmotes.length && (
+              {searchEmote !== "" && sevenTVEmotes ? (
                 <>
-                  <br />
-                  <Button
-                    sx={{
-                      color: "#ffffffa6",
-                      textTransform: "initial",
-                      justifyContent: "left",
-                      width: "100%",
-                    }}
-                    startIcon={<AddCircleOutlineIcon />}
-                    title="Load more"
-                    onClick={() => setMaxDisplayed((value) => value + 10)}
-                  >
-                    Load more {`(${maxDisplayed}/${sevenTVEmotes.length + betterTVEmotes.length})`}
-                  </Button>
+                  {sevenTVEmotes.map((e) => {
+                    if (searchEmote === "" || e.name.toLowerCase().includes(searchEmote.toLowerCase())) {
+                      return (
+                        <div key={e.id}>
+                          <Button
+                            sx={{
+                              color: "#ffffffa6",
+                              textTransform: "initial",
+                              justifyContent: "left",
+                              width: "100%",
+                            }}
+                            title={e.name}
+                            onClick={() => AddSevenTVElementToCanvas(e)}
+                          >
+                            <ElementIcon src={"https://cdn.7tv.app/emote/" + e.id + "/3x.webp"} alt={e.name} />
+                            <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
+                              {SevenTVIcon(true)}
+                            </SvgIcon>
+                            {e.name.length > 10 ? e.name.substring(0, 10) + "..." : e.name}
+                          </Button>
+                          <br />
+                        </div>
+                      );
+                    }
+
+                    return null;
+                  })}
+                  {betterTVEmotes.map((e) => {
+                    if (searchEmote === "" || e.code.toLowerCase().includes(searchEmote.toLowerCase())) {
+                      return (
+                        <div key={e.id}>
+                          <Button
+                            sx={{
+                              color: "#ffffffa6",
+                              textTransform: "initial",
+                              justifyContent: "left",
+                              width: "100%",
+                            }}
+                            title={e.code}
+                            onClick={() => AddBetterTVElementToCanvas(e)}
+                          >
+                            <ElementIcon src={"https://cdn.betterttv.net/emote/" + e.id + "/3x.webp"} alt={e.code} />
+                            <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
+                              {BetterTVIcon()}
+                            </SvgIcon>
+                            {e.code.length > 10 ? e.code.substring(0, 10) + "..." : e.code}
+                          </Button>
+                          <br />
+                        </div>
+                      );
+                    }
+
+                    return null;
+                  })}
+                </>
+              ) : (
+                <>
+                  {shownEmotes.map((e) => {
+                    switch (e.type) {
+                      case "7tv":
+                        return (
+                          <div key={(e.emote as SevenTVEmote).id}>
+                            <Button
+                              sx={{
+                                color: "#ffffffa6",
+                                textTransform: "initial",
+                                justifyContent: "left",
+                                width: "100%",
+                              }}
+                              title={(e.emote as SevenTVEmote).name}
+                              onClick={() => AddSevenTVElementToCanvas(e.emote as SevenTVEmote)}
+                            >
+                              <ElementIcon
+                                src={"https://cdn.7tv.app/emote/" + (e.emote as SevenTVEmote).id + "/3x.webp"}
+                                alt={(e.emote as SevenTVEmote).name}
+                              />
+                              <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
+                                {SevenTVIcon(false)}
+                              </SvgIcon>
+                              {(e.emote as SevenTVEmote).name.length > 10
+                                ? (e.emote as SevenTVEmote).name.substring(0, 10) + "..."
+                                : (e.emote as SevenTVEmote).name}
+                            </Button>
+                            <br />
+                          </div>
+                        );
+                      case "bttv":
+                        return (
+                          <div key={(e.emote as BetterTVEmote).id}>
+                            <Button
+                              sx={{
+                                color: "#ffffffa6",
+                                textTransform: "initial",
+                                justifyContent: "left",
+                                width: "100%",
+                              }}
+                              title={(e.emote as BetterTVEmote).code}
+                              onClick={() => AddBetterTVElementToCanvas(e.emote as BetterTVEmote)}
+                            >
+                              <ElementIcon
+                                src={"https://cdn.betterttv.net/emote/" + (e.emote as BetterTVEmote).id + "/3x.webp"}
+                                alt={(e.emote as BetterTVEmote).code}
+                              />
+                              <SvgIcon sx={{ marginRight: "5px", width: "16px", height: "16px" }}>
+                                {BetterTVIcon()}
+                              </SvgIcon>
+                              {(e.emote as BetterTVEmote).code.length > 10
+                                ? " " + (e.emote as BetterTVEmote).code.substring(0, 10) + "..."
+                                : " " + (e.emote as BetterTVEmote).code}
+                            </Button>
+                            <br />
+                          </div>
+                        );
+                      default:
+                        return <></>;
+                    }
+                  })}
+                  {maxDisplayed - 1 < sevenTVEmotes.length + betterTVEmotes.length && (
+                    <>
+                      <br />
+                      <Button
+                        sx={{
+                          color: "#ffffffa6",
+                          textTransform: "initial",
+                          justifyContent: "left",
+                          width: "100%",
+                        }}
+                        startIcon={<AddCircleOutlineIcon />}
+                        title="Load more"
+                        onClick={() => setMaxDisplayed((value) => value + 10)}
+                      >
+                        Load more {`(${maxDisplayed}/${sevenTVEmotes.length + betterTVEmotes.length})`}
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </>
-          )}
-        </>
+          </>
+        )}
       </AccordionDetails>
     </Accordion>
   );

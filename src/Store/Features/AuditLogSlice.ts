@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import AuditLog from "../../module_bindings/audit_log";
+import { AuditLog } from "../../module_bindings";
 
 interface AuditLogState {
   auditLog: AuditLog[];

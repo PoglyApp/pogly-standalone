@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Elements from "../../module_bindings/elements";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
+import { Elements } from "../../module_bindings";
 
 interface CanvasElementState {
   canvasElements: CanvasElementType[];

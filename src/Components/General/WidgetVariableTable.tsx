@@ -9,12 +9,12 @@ import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { HexColorPicker } from "react-colorful";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import ElementData from "../../module_bindings/element_data";
 import { useAppSelector } from "../../Store/Features/store";
 import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import { SpotlightElement } from "./SpotlightElement";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
+import { ElementData } from "../../module_bindings";
 
 interface Row {
   variableName: string;
@@ -159,7 +159,7 @@ export const WidgetVariableTable = (props: IProps) => {
   };
 
   return (
-    <TableWrapper>
+    <TableWrapper className="canvas-font" style={{ fontSize: "14px" }}>
       {rows.length > 0 ? (
         <StyledTable>
           <thead>
@@ -391,6 +391,7 @@ const StyledButton = styled.button`
   background-color: #3f80ea;
   color: white;
   cursor: pointer;
+  padding: 4px;
 
   &:hover {
     background-color: #4a90e2;

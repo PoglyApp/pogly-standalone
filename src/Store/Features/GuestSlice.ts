@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Guests from "../../module_bindings/guests";
+import { Guests } from "../../module_bindings";
 
 interface GuestState {
   guests: Guests[];

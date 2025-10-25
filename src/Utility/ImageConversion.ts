@@ -1,4 +1,4 @@
-import ElementData from "../module_bindings/element_data";
+import { ElementData } from "../module_bindings";
 
 export const convertDataURIToBinary = (dataURI: any) => {
     var base64Index = dataURI.indexOf(';base64,') + ';base64,'.length;
@@ -16,6 +16,7 @@ export const convertDataURIToBinary = (dataURI: any) => {
 
 export const convertBinaryToDataURI = (element: ElementData) => {
     if(!element.byteArray) return element.data;
+    if(element.byteArray.length <= 0) return element.data;
 
     var raw = "";
     for (var i = 0; i < element.byteArray.length; i++) {
@@ -29,6 +30,7 @@ export const convertBinaryToDataURI = (element: ElementData) => {
 
 export const convertBinaryToRaw = (element: ElementData) => {
   if(!element.byteArray) return element.data;
+  if(element.byteArray.length <= 0) return element.data;
 
   var raw = "";
   for (var i = 0; i < element.byteArray.length; i++) {

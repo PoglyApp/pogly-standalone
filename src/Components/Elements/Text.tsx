@@ -1,13 +1,12 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
-import Elements from "../../module_bindings/elements";
-import TextElement from "../../module_bindings/text_element";
 import { TextCreationModal } from "../Modals/TextCreationModal";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import Markdown from "react-markdown";
 import remark from "remark-gfm";
 import { parseCustomCss } from "../../Utility/ParseCustomCss";
+import { Elements, TextElement } from "../../module_bindings";
 
 interface IProp {
   elements: Elements;

@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { insertElementData } from "../../StDB/Reducers/Insert/insertElementData";
 import { ElementDataType } from "../../Types/General/ElementDataType";
-import DataType from "../../module_bindings/data_type";
 import {
   Dialog,
   DialogContent,
@@ -17,18 +16,19 @@ import {
 import { StyledInput } from "../StyledComponents/StyledInput";
 import styled from "styled-components";
 import WarningIcon from "@mui/icons-material/Warning";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { CompressImage } from "../../Utility/CompressImage";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { DataType } from "../../module_bindings";
 
 interface IProps {
   dragnAndDropFile?: any;
 }
 
 export const ImageUploadModal = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const { settings } = useContext(SettingsContext);
 
   const { modals, setModals, closeModal } = useContext(ModalContext);
@@ -125,13 +125,13 @@ export const ImageUploadModal = (props: IProps) => {
       DataType: DataType.ImageElement as DataType,
       Data: usedFile,
       DataFileSize: usedFile.size / 1024, //convert to KB's
-      CreatedBy: Identity.nickname,
+      CreatedBy: spacetimeDB.Identity.nickname,
     };
 
     const imageSkeleton = document.getElementById("imageSkeleton");
     if (imageSkeleton) imageSkeleton.style.display = "block";
 
-    insertElementData(newElementData);
+    insertElementData(spacetimeDB.Client, newElementData);
     handleOnClose();
   };
 

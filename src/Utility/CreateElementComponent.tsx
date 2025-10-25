@@ -1,10 +1,10 @@
-import Elements from "../module_bindings/elements";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { Text } from "../Components/Elements/Text";
 import { Image } from "../Components/Elements/Image";
 import { Widget } from "../Components/Elements/Widget";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { DebugLogger } from "./DebugLogger";
+import { Elements, TextElement } from "../module_bindings";
 
 export const CreateOffsetElementComponent = (elements: Elements) => {
   DebugLogger("Creating offset element component");
@@ -34,7 +34,7 @@ export const CreateOffsetElementComponent = (elements: Elements) => {
   return canvasElement;
 };
 
-export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) => {
+/*export const CreateElementComponent = (elements: Elements) => {
   DebugLogger("Creating element component");
   const newElement: Elements = {
     id: elements.id,
@@ -67,6 +67,31 @@ export const CreateElementComponent = (elements: Elements, isOverlay: Boolean) =
 
     case "WidgetElement":
       canvasElement.Component = <Widget elements={newElement} />;
+
+      break;
+  }
+
+  return canvasElement;
+};*/
+
+export const CreateElementComponent = (element: Elements) => {
+  const canvasElement: CanvasElementType = {
+    Elements: element,
+    ElementData: undefined,
+    Component: undefined,
+  };
+
+  switch (element.element.tag) {
+    case "TextElement":
+      canvasElement.Component = <Text elements={element} />;
+      break;
+
+    case "ImageElement":
+      canvasElement.Component = <Image elements={element} />;
+      break;
+
+    case "WidgetElement":
+      canvasElement.Component = <Widget elements={element} />;
 
       break;
   }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 306 330">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-4 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-2" width="306" height="330"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect class="cls-2" x="16" y="13" width="933.33" height="300"/>
+    </clipPath>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g class="cls-4">
+      <g class="cls-3">
+        <path class="cls-1" d="M16,13h100v66.67h33.33v-33.33h33.33V13h100v100h-33.33v33.33h-33.33v33.33h33.33v33.33h33.33v100h-100v-33.33h-33.33v-33.33h-33.33v66.67H16V13ZM682.67,13h100v66.67h33.33v-33.33h33.33V13h100v100h-33.33v33.33h-33.33v33.33h33.33v33.33h33.33v100h-100v-33.33h-33.33v-33.33h-33.33v66.67h-100V13ZM316,13h100v300h-100V13ZM549.33,13h-66.67v33.33h-33.33v233.33h33.33v33.33h166.67v-100h-100v-100h100V13h-100Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

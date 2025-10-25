@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import Elements from "../../module_bindings/elements";
-import WidgetElement from "../../module_bindings/widget_element";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../Modals/WidgetCreationModal";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
+import { Elements, WidgetElement } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProp {
   elements: Elements;
@@ -13,6 +13,7 @@ interface IProp {
 
 export const Widget = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const { setModals } = useContext(ModalContext);
   const widgetElement: WidgetElement = props.elements.element.value as WidgetElement;
@@ -24,8 +25,20 @@ export const Widget = (props: IProp) => {
       let htmlCode: string = "";
 
       if (widgetElement.rawData === "")
-        htmlCode = WidgetCodeCompiler(widgetElement.width, widgetElement.height, widgetElement.elementDataId);
-      else htmlCode = WidgetCodeCompiler(widgetElement.width, widgetElement.height, undefined, widgetElement.rawData);
+        htmlCode = WidgetCodeCompiler(
+          spacetimeDB.Client,
+          widgetElement.width,
+          widgetElement.height,
+          widgetElement.elementDataId
+        );
+      else
+        htmlCode = WidgetCodeCompiler(
+          spacetimeDB.Client,
+          widgetElement.width,
+          widgetElement.height,
+          undefined,
+          widgetElement.rawData
+        );
 
       DebugLogger("Creating widget");
 

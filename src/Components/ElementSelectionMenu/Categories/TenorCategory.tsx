@@ -6,14 +6,15 @@ import { StyledInput } from "../../StyledComponents/StyledInput";
 import styled from "styled-components";
 import TenorSearchResponseType from "../../../Types/TenorTypes/TenorSearchResponseType";
 import { insertElement } from "../../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../../module_bindings/element_struct";
-import ImageElementData from "../../../module_bindings/image_element_data";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { LayoutContext } from "../../../Contexts/LayoutContext";
 import { DebugLogger } from "../../../Utility/DebugLogger";
+import { ElementStruct, ImageElementData } from "../../../module_bindings";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 
 export const TenorCategory = () => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [tenorEmotes, setTenorEmotes] = useState<any>();
   const [searchEmotes, setSearchEmotes] = useState<string>("");
@@ -39,12 +40,13 @@ export const TenorCategory = () => {
     image.src = blob;
     image.onload = function () {
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
   };

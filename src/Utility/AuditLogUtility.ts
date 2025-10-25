@@ -1,4 +1,4 @@
-import AuditLog from "../module_bindings/audit_log";
+import { AuditLog } from "../module_bindings";
 import { DebugLogger } from "./DebugLogger";
 
 export const ParseAuditLog = (auditLog: AuditLog) => {

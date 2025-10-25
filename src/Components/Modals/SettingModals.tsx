@@ -26,42 +26,33 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PasswordIcon from "@mui/icons-material/Password";
-import Fingerprint from "@mui/icons-material/Fingerprint";
 import ContentPaste from "@mui/icons-material/ContentPaste";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { BackupModal } from "./BackupModal";
-import { AuthTokenModal } from "./AuthTokenModal";
 import { SettingsContext } from "../../Contexts/SettingsContext";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ModalContext } from "../../Contexts/ModalContext";
-import UpdateGuestNicknameReducer from "../../module_bindings/update_guest_nickname_reducer";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import Permissions from "../../module_bindings/permissions";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { InstancePasswordModal } from "./InstancePasswordModal";
-import Config from "../../module_bindings/config";
 import { SettingsTabPanel } from "../Settings/SettingsTabPanel";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
-import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
-import RefreshOverlayReducer from "../../module_bindings/refresh_overlay_reducer";
-import RefreshOverlayClearStorageReducer from "../../module_bindings/refresh_overlay_clear_storage_reducer";
-import UpdateConfigReducer from "../../module_bindings/update_config_reducer";
 import { ModeratorListModal } from "./ModeratorListModal";
-import { LocalOverridesModal } from "./LocalOverridesModal";
+import { Config } from "../../module_bindings";
+import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
-interface IProp {
-  onlineVersion: string;
-}
+export const SettingsModal = () => {
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  const isOwner = permissions.includes(PermissionTypes.Owner);
 
-export const SettingsModal = (props: IProp) => {
-  const config: Config = useContext(ConfigContext);
-  const { Runtime, Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
-
-  const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
+  const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://maincloud.spacetimedb.com";
 
   const { settings, setSettings } = useContext(SettingsContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
+
+  const [versionNumber, setVersionNumber] = useState<string>();
 
   // GENERAL
   const stream = document.getElementById("stream")!;
@@ -86,9 +77,9 @@ export const SettingsModal = (props: IProp) => {
     settings.compressPaste != null ? settings.compressPaste : true
   );
   const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
+  let overlayURL = window.location.origin + "/overlay?module=" + spacetimeDB.Runtime?.module;
 
-  if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
+  if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + spacetimeDB.Runtime?.domain;
 
   const [streamOverride, setStreamOverride] = useState<string>("");
 
@@ -104,12 +95,14 @@ export const SettingsModal = (props: IProp) => {
   const [auth, setAuth] = useState<boolean>(config.authentication);
   const [strictMode, setStrictMode] = useState<boolean>(config.strictMode);
 
+  useGetVersionNumber(setVersionNumber);
+
   const saveSettings = () => {
     localStorage.setItem("nickname", nicknameInput);
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
-    UpdateGuestNicknameReducer.call(nicknameInput);
+    spacetimeDB.Client.reducers.updateGuestNickname(nicknameInput);
 
-    if (permission && permission.tag === "Owner") {
+    if (permissions && isOwner) {
       const doUpdate =
         platform !== config.streamingPlatform ||
         streamName !== config.streamName ||
@@ -117,7 +110,7 @@ export const SettingsModal = (props: IProp) => {
         auth !== config.authentication ||
         strictMode !== config.strictMode;
 
-      if (doUpdate) UpdateConfigReducer.call(platform, streamName, updateHz, auth, strictMode);
+      if (doUpdate) spacetimeDB.Client.reducers.updateConfig(platform, streamName, updateHz, auth, strictMode);
     }
 
     let newSettings = settings;
@@ -128,13 +121,55 @@ export const SettingsModal = (props: IProp) => {
     newSettings.compressPaste = compressPaste;
     newSettings.urlAsDefault = urlAsDefault;
 
+    const streamOverrides = localStorage.getItem("streamOverride");
+
+    if (streamOverrides && spacetimeDB.Runtime) {
+      let oldList = JSON.parse(streamOverrides);
+      let oldOverride = oldList.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
+
+      if (!oldOverride && !streamOverride) return;
+
+      if (oldOverride) {
+        if (!streamOverride) {
+          oldList = oldList.filter((obj: any) => obj.module !== spacetimeDB.Runtime.module);
+        } else {
+          oldOverride.override = streamOverride;
+        }
+      } else {
+        oldList.push({ module: spacetimeDB.Runtime.module, override: streamOverride });
+      }
+
+      localStorage.setItem("streamOverride", JSON.stringify(oldList));
+    } else {
+      if (streamOverride && spacetimeDB.Runtime) {
+        localStorage.setItem(
+          "streamOverride",
+          JSON.stringify([{ module: spacetimeDB.Runtime.module, override: streamOverride }])
+        );
+      }
+    }
+
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
   };
 
   useEffect(() => {
     setSettings(settings);
-  }, [settings, setSettings, Runtime]);
+
+    const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
+
+    setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
+
+    const streamOverrides = localStorage.getItem("streamOverride");
+    if (!streamOverrides || !spacetimeDB.Runtime) return;
+
+    const overrideJson = JSON.parse(streamOverrides);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
+
+    if (!currentOverride) return;
+
+    setStreamOverride(currentOverride.override);
+  }, [settings, setSettings, spacetimeDB.Runtime]);
 
   function clearConnectionSettings() {
     localStorage.removeItem("stdbConnectDomain");
@@ -142,10 +177,6 @@ export const SettingsModal = (props: IProp) => {
     localStorage.removeItem("stdbConnectModuleAuthKey");
     closeModal("settings_modal", modals, setModals);
   }
-
-  const showAuthToken = () => {
-    setModals((oldModals: any) => [...oldModals, <AuthTokenModal key="authToken_modal" />]);
-  };
 
   const showInstancePassword = () => {
     setModals((oldModals: any) => [...oldModals, <InstancePasswordModal key="instancePassword_modal" />]);
@@ -163,9 +194,9 @@ export const SettingsModal = (props: IProp) => {
     setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
-  const showLocalOverridesModal = () => {
-    setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
-  };
+  // const showLocalOverridesModal = () => {
+  //   setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
+  // };
 
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
@@ -194,7 +225,7 @@ export const SettingsModal = (props: IProp) => {
     closeModal("settings_modal", modals, setModals);
   };
 
-  const tabWidth = permission && permission.tag === "Owner" ? "25%" : "33%";
+  const tabWidth = permissions && isOwner ? "25%" : "33%";
 
   if (isOverlay) return <></>;
 
@@ -224,7 +255,7 @@ export const SettingsModal = (props: IProp) => {
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="General" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Advanced" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Debug" />
-            {permission && permission.tag === "Owner" && (
+            {permissions && isOwner && (
               <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />
             )}
           </Tabs>
@@ -318,7 +349,7 @@ export const SettingsModal = (props: IProp) => {
                 </FormControl>
               )}
 
-              {props.onlineVersion !== `${process.env.REACT_APP_VERSION}` && (
+              {versionNumber !== `${process.env.REACT_APP_VERSION}` && (
                 <Alert
                   variant="filled"
                   severity="warning"
@@ -424,20 +455,6 @@ export const SettingsModal = (props: IProp) => {
 
               <Button
                 variant="outlined"
-                startIcon={<Fingerprint />}
-                sx={{
-                  color: "#ffa700",
-                  borderColor: "#ffa700",
-                  "&:hover": { borderColor: "#db8f00" },
-                  marginTop: "10px",
-                }}
-                onClick={showAuthToken}
-              >
-                Update Auth Token
-              </Button>
-
-              <Button
-                variant="outlined"
                 startIcon={<DeleteIcon />}
                 sx={{
                   color: "#ff5238",
@@ -459,7 +476,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
                 }}
-                onClick={showLocalOverridesModal}
+                //onClick={showLocalOverridesModal}
               >
                 Local override settings
               </Button>
@@ -526,7 +543,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#b23927" },
                   marginTop: "10px",
                 }}
-                onClick={() => DeleteAllElementsReducer.call()}
+                onClick={() => spacetimeDB.Client.reducers.deleteAllElements()}
               >
                 Delete all elements
               </Button>
@@ -541,8 +558,8 @@ export const SettingsModal = (props: IProp) => {
                   marginTop: "10px",
                 }}
                 onClick={() => {
-                  DeleteAllElementsReducer.call();
-                  DeleteAllElementDataReducer.call();
+                  spacetimeDB.Client.reducers.deleteAllElements();
+                  spacetimeDB.Client.reducers.deleteAllElementData();
                 }}
               >
                 Delete all element data
@@ -557,7 +574,7 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => RefreshOverlayReducer.call()}
+                onClick={() => spacetimeDB.Client.reducers.refreshOverlay()}
               >
                 Force refresh overlay
               </Button>
@@ -571,13 +588,13 @@ export const SettingsModal = (props: IProp) => {
                   "&:hover": { borderColor: "#376e37" },
                   marginTop: "10px",
                 }}
-                onClick={() => RefreshOverlayClearStorageReducer.call()}
+                onClick={() => spacetimeDB.Client.reducers.refreshOverlayClearStorage()}
               >
                 Force hard refresh overlay
               </Button>
             </div>
           </SettingsTabPanel>
-          {permission && permission.tag === "Owner" && (
+          {permissions && isOwner && (
             <SettingsTabPanel value={tabValue} index={3}>
               <div style={{ display: "grid" }}>
                 <RadioGroup

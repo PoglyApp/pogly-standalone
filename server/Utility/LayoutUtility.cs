@@ -1,9 +1,9 @@
-﻿using static SpacetimeDB.Runtime;
+﻿using SpacetimeDB;
 
 public partial class Module
 {
-    private static uint GetActiveLayout()
+    private static uint GetActiveLayout(ReducerContext ctx)
     {
-        return Layouts.FilterByActive(true).First().Id;
+        return ctx.Db.Layouts.ActiveLayout.Filter(true).First().Id;
     }
 }

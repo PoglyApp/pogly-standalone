@@ -3,12 +3,9 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material
 import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
-import Elements from "../../module_bindings/elements";
-import ImageElement from "../../module_bindings/image_element";
-import ElementData from "../../module_bindings/element_data";
-import ImageElementData from "../../module_bindings/image_element_data";
 import { updateElementStruct } from "../../StDB/Reducers/Update/updateElementStruct";
-import ElementStruct from "../../module_bindings/element_struct";
+import { Elements, ElementStruct, ImageElement, ImageElementData } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 interface IProps {
   selectedElement: Elements;
@@ -16,6 +13,7 @@ interface IProps {
 
 export const UpdateElementSourceModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [element, setElement] = useState<Elements>();
@@ -25,17 +23,17 @@ export const UpdateElementSourceModal = (props: IProps) => {
     if (!props.selectedElement) return;
     if (props.selectedElement.element.tag !== "ImageElement") return;
 
-    const oldElement: Elements = Elements.findById(props.selectedElement.id)!;
+    const oldElement: Elements = spacetimeDB.Client.db.elements.id.find(props.selectedElement.id)!;
     setElement(oldElement);
 
     const imageElement = oldElement.element.value as ImageElement;
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
-      setSource(ElementData.findById(imageElement.imageElementData.value)!.data);
+      setSource(spacetimeDB.Client.db.elementData.id.find(imageElement.imageElementData.value)!.data);
     } else {
       setSource(imageElement.imageElementData.value);
     }
-  }, [props.selectedElement]);
+  }, [props.selectedElement, spacetimeDB.Client]);
 
   const handleSave = () => {
     const newImageElementData: ImageElementData = { tag: "RawData", value: source };
@@ -47,7 +45,7 @@ export const UpdateElementSourceModal = (props: IProps) => {
       height: imageElement.height,
     });
 
-    updateElementStruct(props.selectedElement.id, newImageElement);
+    updateElementStruct(spacetimeDB.Client, props.selectedElement.id, newImageElement);
 
     handleOnClose();
   };

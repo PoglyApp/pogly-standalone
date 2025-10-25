@@ -12,17 +12,21 @@ export const useGetConnectionConfig = (setConnectionConfig: Function) => {
 
     if (isOverlay || (urlParams.get("domain") && urlParams.get("module"))) {
       setConnectionConfig({
+        token: "",
         domain: urlParams.get("domain") || "",
         module: urlParams.get("module") || "",
         authKey: urlParams.get("auth") || "",
+        remember: false
       });
     } else {
+      const stdbConnectToken = localStorage.getItem("twitchIdToken") || "";
       const stdbConnectDomain = localStorage.getItem("stdbConnectDomain") || "";
       const stdbConnectModule = localStorage.getItem("stdbConnectModule") || "";
       const stdbConnectModuleAuthKey = localStorage.getItem("stdbConnectModuleAuthKey") || "";
 
       if (stdbConnectDomain !== "" && stdbConnectModule !== "")
         setConnectionConfig({
+          token: stdbConnectToken,
           domain: stdbConnectDomain,
           module: stdbConnectModule,
           authKey: stdbConnectModuleAuthKey,

@@ -1,4 +1,4 @@
-import Elements from "../../module_bindings/elements";
+import { Elements } from "../../module_bindings";
 
 export type SelectedType = {
   Elements: Elements;

@@ -1,21 +1,16 @@
-import Elements from "../module_bindings/elements";
-import ElementData from "../module_bindings/element_data";
 import { updateElementStruct } from "../StDB/Reducers/Update/updateElementStruct";
 import { updateElementTransform } from "../StDB/Reducers/Update/updateElementTransform";
 import { getTransformValues } from "./GetTransformValues";
-import ElementStruct from "../module_bindings/element_struct";
-import UpdateElementStructReducer from "../module_bindings/update_element_struct_reducer";
-import ImageElementData from "../module_bindings/image_element_data";
-import WidgetElement from "../module_bindings/widget_element";
-import DeleteElementReducer from "../module_bindings/delete_element_reducer";
-import DeleteElementDataByIdReducer from "../module_bindings/delete_element_data_by_id_reducer";
-import UpdateElementLockedReducer from "../module_bindings/update_element_locked_reducer";
-import UpdateElementTransparencyReducer from "../module_bindings/update_element_transparency_reducer";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
-import UpdateWidgetElementRawDataReducer from "../module_bindings/update_widget_element_raw_data_reducer";
-import UpdateWidgetElementDataIdReducer from "../module_bindings/update_widget_element_data_id_reducer";
 import { DebugLogger } from "./DebugLogger";
-import UpdateElementClipReducer from "../module_bindings/update_element_clip_reducer";
+import {
+  DbConnection,
+  ElementData,
+  Elements,
+  ElementStruct,
+  ImageElementData,
+  WidgetElement,
+} from "../module_bindings";
 
 interface TransformObject {
   transformFunction: string;
@@ -59,7 +54,12 @@ export const handleEditTransform = (type: TransformType, setTransformType: Funct
   }
 };
 
-export const handleFlipElement = (vertical: boolean, selectedElement: Elements, handleClose?: Function) => {
+export const handleFlipElement = (
+  Client: DbConnection,
+  vertical: boolean,
+  selectedElement: Elements,
+  handleClose?: Function
+) => {
   DebugLogger("Handling element flip");
   const element = document.getElementById(selectedElement.id.toString());
 
@@ -85,14 +85,19 @@ export const handleFlipElement = (vertical: boolean, selectedElement: Elements, 
 
   const transformString = updatedTransform.map((obj) => `${obj.transformFunction}(${obj.transformValue})`).join(" ");
 
-  updateElementTransform(selectedElement.id, transformString);
+  updateElementTransform(Client, selectedElement.id, transformString);
 
   element.style.transform = transformString;
 
   if (handleClose) handleClose();
 };
 
-export const handleResetTransform = (elements: Elements, type: TransformType, handleClose: Function) => {
+export const handleResetTransform = (
+  Client: DbConnection,
+  elements: Elements,
+  type: TransformType,
+  handleClose: Function
+) => {
   DebugLogger("Handling transform reset");
   const element = document.getElementById(elements.id.toString());
 
@@ -108,7 +113,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
             case "ElementDataId":
               const dataId: ImageElementData.ElementDataId = imageElement.value
                 .imageElementData as ImageElementData.ElementDataId;
-              const imgElementData: ElementData | undefined = ElementData.findById(dataId.value);
+              const imgElementData: ElementData | undefined = Client.db.elementData.id.find(dataId.value);
 
               if (imgElementData !== undefined) {
                 const newWidth = imgElementData.dataWidth;
@@ -122,7 +127,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
                   imageElementData: dataId,
                 });
 
-                updateElementStruct(elements.id, newImageElement);
+                updateElementStruct(Client, elements.id, newImageElement);
               }
               break;
 
@@ -143,7 +148,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
                   imageElementData: rawData,
                 });
 
-                updateElementStruct(elements.id, newImageElement);
+                updateElementStruct(Client, elements.id, newImageElement);
                 image.remove();
               };
               break;
@@ -152,7 +157,9 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
 
         case "WidgetElement":
           const widgetElement: ElementStruct = elements.element as ElementStruct.WidgetElement;
-          const wgtElementData: ElementData | undefined = ElementData.findById(widgetElement.value.elementDataId);
+          const wgtElementData: ElementData | undefined = Client.db.elementData.id.find(
+            widgetElement.value.elementDataId
+          );
 
           if (wgtElementData !== undefined) {
             const newWidth = wgtElementData.dataWidth;
@@ -167,7 +174,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
               elementDataId: widgetElement.value.elementDataId,
             });
 
-            updateElementStruct(elements.id, newWidgetElement);
+            updateElementStruct(Client, elements.id, newWidgetElement);
           }
           break;
 
@@ -175,7 +182,7 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
           const textElement: ElementStruct = elements.element as ElementStruct.TextElement;
           element.style.width = `auto`;
           element.style.height = `auto`;
-          updateElementStruct(elements.id, textElement);
+          updateElementStruct(Client, elements.id, textElement);
           break;
       }
       break;
@@ -191,19 +198,19 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
         .map((obj) => (obj ? `${obj.transformFunction}(${obj.transformValue})` : null))
         .join(" ");
 
-      updateElementTransform(elements.id, transformString_Rotation);
+      updateElementTransform(Client, elements.id, transformString_Rotation);
 
       element.style.transform = transformString_Rotation;
       break;
 
     case TransformType.Warp:
       const newTransform = element.style.transform.replace(/matrix3d?\([^)]*\)\s*/g, "").trim();
-      updateElementTransform(elements.id, newTransform);
+      updateElementTransform(Client, elements.id, newTransform);
       element.style.transform = newTransform;
       break;
 
     case TransformType.Clip:
-      UpdateElementClipReducer.call(elements.id, "");
+      Client.reducers.updateElementClip(elements.id, "");
       element.style.removeProperty("clip-path");
       break;
   }
@@ -211,22 +218,23 @@ export const handleResetTransform = (elements: Elements, type: TransformType, ha
   handleClose();
 };
 
-export const handleLocked = (selectedElement: Elements, handleClose: Function) => {
+export const handleLocked = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement) return;
+
   DebugLogger("Handling locked");
   const lockedBool = document.getElementById(selectedElement.id.toString())?.getAttribute("data-locked") === "true";
 
-  UpdateElementLockedReducer.call(selectedElement.id, !lockedBool);
+  Client.reducers.updateElementLocked(selectedElement.id, !lockedBool);
 
   handleClose();
 };
 
-export const handleToggle = (selectedElement: Elements, handleClose: Function) => {
+export const handleToggle = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
   DebugLogger("Handling toggle");
 
   //const size = ViewportToStdbSize(selectedElement.element.value.width,selectedElement.element.value.height);
-  const element = Elements.findById(selectedElement.id);
+  const element = Client.db.elements.id.find(selectedElement.id);
 
   if (!element) return;
 
@@ -237,44 +245,64 @@ export const handleToggle = (selectedElement: Elements, handleClose: Function) =
     rawData: (element.element.value as WidgetElement).rawData,
   });
 
-  UpdateElementStructReducer.call(selectedElement.id, widgetStruct);
+  Client.reducers.updateElementStruct(selectedElement.id, widgetStruct);
   handleClose();
 };
 
 export const handleDelete = (
+  Client: DbConnection,
   selectedElement: Elements,
   setSelected: Function,
   setSelectoTargets: Function,
   handleClose: Function
 ) => {
   DebugLogger("Handling element deletion");
-  DeleteElementReducer.call(selectedElement.id);
+  Client.reducers.deleteElement(selectedElement.id);
   setSelected(undefined);
   setSelectoTargets([]);
   handleClose();
 };
 
-export const handleDeleteElementData = (selectedElementData: ElementData, handleClose: Function) => {
+export const handleDeleteElementData = (
+  Client: DbConnection,
+  selectedElementData: ElementData,
+  handleClose: Function
+) => {
   DebugLogger("Handling element data deletion");
-  DeleteElementDataByIdReducer.call(selectedElementData.id);
+  Client.reducers.deleteElementDataById(selectedElementData.id);
   handleClose();
 };
 
-export const handleTransparency = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
+export const handleTransparency = (
+  Client: DbConnection,
+  selectedElement: Elements,
+  setTransparencyState: Function,
+  value: any
+) => {
   DebugLogger("Handling element transparency");
   setTransparencyState(value);
-  UpdateElementTransparencyReducer.call(selectedElement.id, value);
+  Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
-export const handleHide = (selectedElement: Elements, setTransparencyState: Function, value: any) => {
+export const handleHide = (
+  Client: DbConnection,
+  selectedElement: Elements,
+  setTransparencyState: Function,
+  value: any
+) => {
   DebugLogger("Handling element hiding/showing");
   setTransparencyState(value);
-  UpdateElementTransparencyReducer.call(selectedElement.id, value);
+  Client.reducers.updateElementTransparency(selectedElement.id, value);
 };
 
-export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVariableType, handleClose: Function) => {
+export const handleWidgetToggle = (
+  Client: DbConnection,
+  selectedElementId: number,
+  variable: WidgetVariableType,
+  handleClose: Function
+) => {
   DebugLogger("Handling widget toggle");
-  const widgetElement: WidgetElement = Elements.findById(selectedElementId)?.element.value as WidgetElement;
+  const widgetElement: WidgetElement = Client.db.elements.id.find(selectedElementId)?.element.value as WidgetElement;
 
   if (widgetElement.rawData) {
     const rawDataJson = JSON.parse(widgetElement.rawData);
@@ -284,9 +312,9 @@ export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVa
 
     rawDataJson.variables[variableIndex].variableValue = !rawDataJson.variables[variableIndex].variableValue;
 
-    UpdateWidgetElementRawDataReducer.call(selectedElementId, JSON.stringify(rawDataJson));
+    Client.reducers.updateWidgetElementRawData(selectedElementId, JSON.stringify(rawDataJson));
   } else {
-    const elementData: ElementData = ElementData.findById(widgetElement.elementDataId)!;
+    const elementData: ElementData = Client.db.elementData.id.find(widgetElement.elementDataId)!;
 
     const elementDataJson = JSON.parse(elementData.data);
 
@@ -296,8 +324,8 @@ export const handleWidgetToggle = (selectedElementId: number, variable: WidgetVa
 
     elementDataJson.variables[variableIndex].variableValue = !elementDataJson.variables[variableIndex].variableValue;
 
-    UpdateWidgetElementRawDataReducer.call(selectedElementId, JSON.stringify(elementDataJson));
-    UpdateWidgetElementDataIdReducer.call(selectedElementId, elementData.id);
+    Client.reducers.updateWidgetElementRawData(selectedElementId, JSON.stringify(elementDataJson));
+    Client.reducers.updateWidgetElementDataId(selectedElementId, elementData.id);
   }
 
   handleClose();

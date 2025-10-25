@@ -1,12 +1,12 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Folders")]
     public partial struct Folders
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
+        [PrimaryKey]
+        [AutoInc]
         public uint Id;
 
         public string Icon;

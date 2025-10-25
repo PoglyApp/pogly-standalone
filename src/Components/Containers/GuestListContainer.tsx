@@ -1,18 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "../../Store/Features/store";
-import Guests from "../../module_bindings/guests";
 import styled from "styled-components";
-import Config from "../../module_bindings/config";
 import { Avatar, Menu } from "@mui/material";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Config, Guests } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const GuestListContainer = () => {
-  const config: Config = useContext(ConfigContext);
-
   const guestStore = useAppSelector((state: any) => state.guests.guests);
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   const [displayedGuests, setDisplayedGuests] = useState<Guests[]>([]);
   const [hiddenGuests, setHiddenGuests] = useState<Guests[]>([]);
@@ -56,7 +55,7 @@ export const GuestListContainer = () => {
     <>
       <Container id="GuestList">
         {displayedGuests.map((guest: Guests) => {
-          if (config.authentication || !config.authentication) {
+          if ((config.authentication && guest.authenticated) || !config.authentication) {
             //Authentication Enabled - Guest Authenticated
             if (guest.nickname !== "") {
               return (
@@ -78,7 +77,9 @@ export const GuestListContainer = () => {
                     {(showPedro && (
                       <img src="./assets/pedro.gif" style={{ width: "32px", height: "32px" }} alt="pedro" />
                     )) ||
-                      guest.nickname[0]}
+                    guest.nickname
+                      ? guest.nickname[0]
+                      : "?"}
                   </Avatar>
                 </div>
               );

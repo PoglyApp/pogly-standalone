@@ -1,9 +1,11 @@
-import ElementStruct from "../module_bindings/element_struct";
-import Elements from "../module_bindings/elements";
-import ImageElement from "../module_bindings/image_element";
-import ImageElementData from "../module_bindings/image_element_data";
-import TextElement from "../module_bindings/text_element";
-import WidgetElement from "../module_bindings/widget_element";
+import {
+  Elements,
+  ElementStruct,
+  ImageElement,
+  ImageElementData,
+  TextElement,
+  WidgetElement,
+} from "../module_bindings";
 import { GetCoordsFromTransform, GetMatrixFromElement, GetTransformFromCoords } from "./ConvertCoordinates";
 import { DebugLogger } from "./DebugLogger";
 

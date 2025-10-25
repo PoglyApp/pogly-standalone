@@ -1,4 +1,3 @@
-import ElementData from "../../module_bindings/element_data";
 import { styled } from "styled-components";
 import { TextCategory } from "./Categories/TextCategory";
 import { ImageCategory } from "./Categories/ImageCategory";
@@ -7,11 +6,8 @@ import { WidgetCategory } from "./Categories/WidgetCategory";
 import { ElementSelectionContextMenu } from "./ContextMenus/ElementSelectionContextMenu";
 import { useContext, useMemo, useState } from "react";
 import { ElementSelectionMenuFooter } from "./ElementSelectionMenuFooter";
-import Config from "../../module_bindings/config";
-import Permissions from "../../module_bindings/permissions";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { TenorCategory } from "./Categories/TenorCategory";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { LayoutCategory } from "./Categories/LayoutCategory";
 import { Divider, Typography } from "@mui/material";
 import { useAppSelector } from "../../Store/Features/store";
@@ -20,14 +16,15 @@ import BetterTVEmote from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import SevenTVEmote from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import { useChannelEmotes } from "../../Hooks/useChannelEmotes";
 import { SpotlightModal } from "../Modals/SpotlightModal";
+import { Config, ElementData } from "../../module_bindings";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 interface IProps {
   isDropping: boolean;
 }
 
 export const ElementSelectionMenu = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
-  const config: Config = useContext(ConfigContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData, shallowEqual);
   const memoizedData = useMemo(() => elementData, [elementData]);
@@ -40,23 +37,23 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const strictMode = useMemo(() => Config.findByVersion(0)!.strictMode, []);
-  const permissionLevel = useMemo(
-    () => Permissions.findByIdentity(Identity.identity)?.permissionLevel,
-    [Identity.identity]
+  const strictMode = useMemo(() => spacetimeDB.Client.db.config.version.find(0)!.strictMode, [spacetimeDB.Client]);
+  const permission = useMemo(
+    () => getPermissions(spacetimeDB, spacetimeDB.Identity.identity),
+    [spacetimeDB.Identity.identity, spacetimeDB.Client]
   );
 
   const memoizedStrictSettings = useMemo(
     () => ({
       StrictMode: strictMode,
-      Permission: permissionLevel,
+      Permissions: permission,
     }),
-    [strictMode, permissionLevel]
+    [strictMode, permission]
   );
 
   return (
     <>
-      <SelectionMenuContainer id="SelectionMenu">
+      <SelectionMenuContainer id="SelectionMenu" className="canvas-font">
         <CategoryContainer>
           <LayoutCategory />
 
