@@ -35,8 +35,14 @@ export const UploadElementDataFromString = (Client: DbConnection, data: string) 
   });
 };
 
-export const UploadBackupFromFile = async (Client: DbConnection, backupFile: any, deleteOnUpload: boolean) => {
-  if(deleteOnUpload) {
+export const UploadBackupFromFile = async (
+  Client: DbConnection,
+  backupFile: any,
+  deleteOnUpload: boolean,
+  reload?: boolean,
+  setBackupRowCount?: Function
+) => {
+  if (deleteOnUpload) {
     Client.reducers.deleteAllElements();
     Client.reducers.deleteAllElementData();
     Client.reducers.deleteAllLayouts(false);
@@ -49,13 +55,17 @@ export const UploadBackupFromFile = async (Client: DbConnection, backupFile: any
 
   await importer.openFrom(backupFile);
 
-  const res = await importer.importNormalBackup(Client);
+  if (setBackupRowCount) {
+    setBackupRowCount(await importer.getNormalBackupRowCount());
+  }
 
-  console.log("IMPORT RESULT", res);
+  await importer.importNormalBackup(Client);
 
   importer.close();
 
-  setTimeout(function () {
+  if (reload) {
+    setTimeout(function () {
       window.location.reload();
     }, 1000);
+  }
 };

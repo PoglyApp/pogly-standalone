@@ -65,9 +65,7 @@ export const BackupModal = (props: IProps) => {
   };
 
   const handleUpload = async () => {
-    console.log(file);
-
-    await UploadBackupFromFile(spacetimeDB.Client, file, deleteOnUpload);
+    await UploadBackupFromFile(spacetimeDB.Client, file, deleteOnUpload, true);
     closeModal("backup_modal", modals, setModals);
   };
 

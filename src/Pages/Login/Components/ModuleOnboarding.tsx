@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { Check, TriangleAlert } from "lucide-react";
+import { Check, TriangleAlert, X } from "lucide-react";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
-import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
+import { UploadBackupFromFile, UploadElementDataFromString } from "../../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { useNavigate } from "react-router-dom";
@@ -41,10 +41,15 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [overlayURL, setOverlayURL] = useState<string>("");
-  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState<string>("Copy Overlay URL");
 
   const [defaultElements, setDefaultElements] = useState<string>("");
   const [initializing, setInitializing] = useState<boolean>(false);
+
+  const [backupFile, setBackupFile] = useState<any>(null);
+  const [fileError, setFileError] = useState<boolean>(false);
+  const [backupRowCount, setBackupRowCount] = useState<any>(null);
+  const [showUploadingText, setShowUploadingText] = useState<boolean>(false);
 
   const isPoglyInstance: Boolean = connectionConfig.domain === "wss://maincloud.spacetimedb.com";
 
@@ -56,6 +61,23 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
 
     setOverlayURL(baseUrl);
   }, []);
+
+  useEffect(() => {
+    if (!backupRowCount) return;
+    const { elementDataCount, elementCount, layoutCount } = backupRowCount;
+
+    const rowChecker = setInterval(() => {
+      const elementDataRows = spacetime.Client.db.elementData.iter().length;
+      const elementRows = spacetime.Client.db.elements.iter().length;
+      const layoutRows = spacetime.Client.db.layouts.iter().length;
+
+      if (elementDataCount === elementDataRows && elementCount === elementRows && layoutCount === layoutRows) {
+        return navigate("login");
+      }
+    }, 2000);
+
+    return () => clearInterval(rowChecker);
+  }, [backupRowCount]);
 
   const handleChannelName = (value: string) => {
     if (value === "") setChannelName(null);
@@ -72,30 +94,44 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
     setPassword(value);
   };
 
+  const handleFileChange = (file: any) => {
+    const isSqlite = file.target.files[0].name.endsWith(".sqlite");
+
+    if (!isSqlite) {
+      setFileError(true);
+      setBackupFile(null);
+      return;
+    }
+
+    setFileError(false);
+    setBackupFile(file.target.files[0]);
+  };
+
   const handleSave = async () => {
+    setInitializing(true);
+
     spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
 
     if (usePassword && password) {
       localStorage.setItem("stdbConnectModuleAuthKey", password);
 
       const quickSwap = localStorage.getItem("poglyQuickSwap");
-
       if (quickSwap && quickSwap.length > 0) {
         const modules: QuickSwapType[] = JSON.parse(quickSwap);
-
-        const savedModule = modules.findIndex((module: QuickSwapType) => module.module === connectionConfig.module);
-        modules[savedModule] = { ...modules[savedModule], auth: password };
-
-        localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+        const savedModule = modules.findIndex((m: QuickSwapType) => m.module === connectionConfig.module);
+        if (savedModule !== -1) {
+          modules[savedModule] = { ...modules[savedModule], auth: password };
+          localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+        }
       }
     }
 
-    (async () => {
-      UploadElementDataFromString(spacetime.Client, defaultElements);
-      setInitializing(true);
-    })();
-
-    return navigate("login");
+    if (backupFile) {
+      setShowUploadingText(true);
+      await UploadBackupFromFile(spacetime.Client, backupFile, false, false, setBackupRowCount);
+    } else {
+      await UploadElementDataFromString(spacetime.Client, defaultElements);
+    }
   };
 
   if (isOverlay) return <></>;
@@ -407,15 +443,38 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                   {copyOverlayButtonText}
                 </StyledButton>
               </div>
+
+              <div className="grid mt-6">
+                <h3 className="flex text-xl font-semibold mb-2 text-[#e9eeff]">Load backup</h3>
+                <span>
+                  If you have a backup file, you can select it here. It will then be loaded once you finish onboarding.
+                </span>
+                <div className="flex gap-1 mt-3">
+                  <Input
+                    type="file"
+                    className="bg-[#10121a] text-[#ffffffa6] p-3 rounded-md  w-fit border border-[#2c2f3a]"
+                    onChange={(event: any) => {
+                      handleFileChange(event);
+                    }}
+                    accept=".sqlite"
+                  />
+                  {fileError && <X color="red" className="grid self-center" />}
+                  {!fileError && backupFile && <Check color="green" className="grid self-center" />}
+                </div>
+              </div>
             </div>
 
             <div className="mt-18 flex justify-between">
               <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>
-              <StyledButton disabled={initializing} onClick={handleSave}>
-                Finish
-              </StyledButton>
+              {!showUploadingText ? (
+                <StyledButton disabled={initializing} onClick={handleSave}>
+                  Finish
+                </StyledButton>
+              ) : (
+                <span className="grid self-center">Uploading backup, do not close the window.</span>
+              )}
             </div>
           </div>
         )}
@@ -458,5 +517,12 @@ const StyledButton = styled.button`
     &:hover {
       background-color: #10121a;
     }
+  }
+`;
+
+const Input = styled.input`
+  &::file-selector-button {
+    margin-right: 15px;
+    color: white;
   }
 `;

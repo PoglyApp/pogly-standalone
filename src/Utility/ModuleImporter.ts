@@ -21,34 +21,35 @@ export class PoglyModuleImporter {
     }
   };
 
+  getNormalBackupRowCount = async () => {
+    const elementDataCount = this.all("SELECT * FROM ElementData").length;
+    const elementCount = this.all("SELECT * FROM Elements").length;
+    const layoutCount = this.all("SELECT * FROM Layouts").length;
+
+    return { elementDataCount, elementCount, layoutCount };
+  };
+
   importAll = async (client: any) => {
-    let total = 0;
-
-    total += this.importElementData(client);
-    total += this.importLayouts(client);
-    total += this.importPermissions(client);
-    total += this.importElements(client);
-    total += this.importConfig(client);
-
-    return { total };
+    this.importElementData(client);
+    this.importLayouts(client);
+    this.importPermissions(client);
+    this.importElements(client);
+    this.importConfig(client);
   };
 
   importNormalBackup = async (client: any) => {
-    let total = 0;
-
-    total += this.importElementData(client);
-    total += this.importElements(client);
-    total += this.importLayouts(client);
-    return { total };
+    this.importElementData(client);
+    this.importElements(client);
+    this.importLayouts(client);
   };
 
-  private importConfig = (client: any): number => {
+  private importConfig = (client: any) => {
     const cfgRows = this.all(
       `SELECT StreamingPlatform, StreamName, OwnerIdentity, DebugMode, UpdateHz, EditorBorder, Authentication, StrictMode FROM Config LIMIT 1`
     );
-    if (cfgRows.length === 0) {
-      return 0;
-    }
+
+    if (cfgRows.length === 0) return;
+
     const cfg = this.keysToCamel(cfgRows[0]);
     const platform = String(cfg.streamingPlatform ?? "");
     const channel = String(cfg.streamName ?? "");
@@ -79,16 +80,12 @@ export class PoglyModuleImporter {
       zmax,
       authKey
     );
-
-    return 1;
   };
 
-  private importElementData = (client: any): number => {
+  private importElementData = (client: any) => {
     const rows = this.all(
       `SELECT Id, Name, DataType, Data, ByteArray, DataWidth, DataHeight, CreatedBy FROM ElementData`
     );
-
-    let n = 0;
 
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
@@ -100,7 +97,6 @@ export class PoglyModuleImporter {
       const width = toInt(r.dataWidth);
       const height = toInt(r.dataHeight);
       const createdBy = String(r.createdBy ?? "");
-      
 
       if (!data && looksLikeUtf8Json(bytes)) {
         try {
@@ -111,15 +107,12 @@ export class PoglyModuleImporter {
       }
 
       client.reducers.importElementData(id, name, dataType, data, Array.from(bytes), width, height, createdBy);
-      n++;
     }
-
-    return n;
   };
 
-  private importLayouts = (client: any): number => {
+  private importLayouts = (client: any) => {
     const rows = this.all(`SELECT Id, Name, CreatedBy, Active FROM Layouts`);
-    let n = 0;
+
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
       const id = toUInt(r.id);
@@ -127,31 +120,26 @@ export class PoglyModuleImporter {
       const createdBy = String(r.createdBy ?? "");
       const active = !!toBool(r.active);
       client.reducers.importLayout(id, name, createdBy, active);
-      n++;
     }
-    return n;
   };
 
-  private importPermissions = (client: any): number => {
+  private importPermissions = (client: any) => {
     const rows = this.all(`SELECT Identity, PermissionLevel FROM Permissions`);
-    let n = 0;
+
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
       const identityText = String(r.identity ?? "");
       const level = mapPermissionLevel(r.permissionLevel);
       client.reducers.importPermission(identityText, level);
-      n++;
     }
-    return n;
   };
 
-  private importElements = (client: any): number => {
+  private importElements = (client: any) => {
     const rows = this.all(`SELECT * FROM Elements`);
-    if (rows.length === 0) return 0;
+    if (rows.length === 0) return;
 
     const widgetDefaults = this.buildWidgetDefaults();
 
-    let n = 0;
     for (const rRaw of rows) {
       const r = this.keysToCamel(rRaw);
 
@@ -176,9 +164,7 @@ export class PoglyModuleImporter {
         zIndex,
         folderId
       );
-      n++;
     }
-    return n;
   };
 
   private buildWidgetDefaults = (): ((id: number) => string | null) => {
@@ -193,71 +179,50 @@ export class PoglyModuleImporter {
     return (id: number) => (map.has(id) ? map.get(id)! : null);
   };
 
-  private reconstructElement = (
-    r: any,
-    widgetDefaults: (id: number) => string | null
-  ): any /* ElementStruct */ => {
-    // Tag can be "element_Tag" (raw) or "elementTag" (after keysToCamel)
+  private reconstructElement = (r: any, widgetDefaults: (id: number) => string | null): any => {
     const tag = String(firstDefined(r, "element_Tag", "elementTag") ?? "");
 
     if (tag === "TextElement") {
       const value = {
-        // Text columns in both styles
-        text:  getStr(r, "textElement_Text",  "textElementText"),
-        size:  getInt(r, "textElement_Size",  "textElementSize"),
+        text: getStr(r, "textElement_Text", "textElementText"),
+        size: getInt(r, "textElement_Size", "textElementSize"),
         color: getStr(r, "textElement_Color", "textElementColor"),
-        font:  getStr(r, "textElement_Font",  "textElementFont"),
-        css:   getStr(r, "textElement_Css",   "textElementCss"),
+        font: getStr(r, "textElement_Font", "textElementFont"),
+        css: getStr(r, "textElement_Css", "textElementCss"),
       };
       return { tag: "TextElement", value };
     }
 
     if (tag === "ImageElement") {
-      // Flattened inner sum: tag + either elementDataId or rawData
       const dataTag = String(
-        firstDefined(
-          r,
-          "imageElement_ImageElementData_Tag",
-          "imageElementImageElementDataTag"
-        ) ?? ""
+        firstDefined(r, "imageElement_ImageElementData_Tag", "imageElementImageElementDataTag") ?? ""
       );
 
       let imageElementData: any;
       if (dataTag === "ElementDataId") {
-        const id = getIntOrNull(
-          r,
-          "imageElement_ImageElementData_ElementDataId",
-          "imageElementImageElementDataElementDataId"
-        ) ?? 0;
+        const id =
+          getIntOrNull(r, "imageElement_ImageElementData_ElementDataId", "imageElementImageElementDataElementDataId") ??
+          0;
         imageElementData = { tag: "ElementDataId", value: id };
       } else {
-        const raw = getStr(
-          r,
-          "imageElement_ImageElementData_RawData",
-          "imageElementImageElementDataRawData"
-        );
+        const raw = getStr(r, "imageElement_ImageElementData_RawData", "imageElementImageElementDataRawData");
         imageElementData = { tag: "RawData", value: raw };
       }
 
       const value = {
         imageElementData,
-        width:  getInt(r, "imageElement_Width",  "imageElementWidth"),
+        width: getInt(r, "imageElement_Width", "imageElementWidth"),
         height: getInt(r, "imageElement_Height", "imageElementHeight"),
       };
       return { tag: "ImageElement", value };
     }
 
     if (tag === "WidgetElement") {
-      const elementDataId = getIntOrNull(
-        r,
-        "widgetElement_ElementDataId",
-        "widgetElementElementDataId"
-      );
-      const width  = getInt(r, "widgetElement_Width",  "widgetElementWidth");
+      const elementDataId = getIntOrNull(r, "widgetElement_ElementDataId", "widgetElementElementDataId");
+      const width = getInt(r, "widgetElement_Width", "widgetElementWidth");
       const height = getInt(r, "widgetElement_Height", "widgetElementHeight");
       let raw: string = getStr(r, "widgetElement_RawData", "widgetElementRawData");
 
-      // Fallback: if rawData empty but we have a template in ElementData.Data
       if ((!raw || raw.length === 0) && elementDataId != null) {
         raw = widgetDefaults(elementDataId) ?? "";
       }
@@ -347,19 +312,27 @@ const looksLikeUtf8Json = (bytes: Uint8Array): boolean => {
 const mapDataType = (x: any): any => {
   const n = toInt(x);
   switch (n) {
-    case 0: return DataType.TextElement;
-    case 1: return DataType.ImageElement;
-    case 2: return DataType.WidgetElement;
-    default: return DataType.TextElement;
+    case 0:
+      return DataType.TextElement;
+    case 1:
+      return DataType.ImageElement;
+    case 2:
+      return DataType.WidgetElement;
+    default:
+      return DataType.TextElement;
   }
 };
 
 const mapPermissionLevel = (x: any): string => {
   switch (toInt(x)) {
-    case 1: return 'Editor';
-    case 2: return 'Moderator';
-    case 3: return 'Owner';
-    default: return 'None';
+    case 1:
+      return "Editor";
+    case 2:
+      return "Moderator";
+    case 3:
+      return "Owner";
+    default:
+      return "None";
   }
 };
 
@@ -367,12 +340,15 @@ const firstDefined = (obj: any, ...keys: string[]) => {
   for (const k of keys) if (obj[k] !== undefined && obj[k] !== null) return obj[k];
   return undefined;
 };
+
 const getStr = (obj: any, ...keys: string[]) =>
   firstDefined(obj, ...keys) == null ? "" : String(firstDefined(obj, ...keys));
+
 const getInt = (obj: any, ...keys: string[]) => {
   const v = firstDefined(obj, ...keys);
   return v == null ? 0 : Number(v) | 0;
 };
+
 const getIntOrNull = (obj: any, ...keys: string[]) => {
   const v = firstDefined(obj, ...keys);
   return v == null ? null : Number(v) | 0;
