@@ -15,6 +15,8 @@ import { HandleDragAndDropFiles } from "../Utility/HandleDragAndDropFiles";
 import { ElementSelectionMenu } from "../Components/ElementSelectionMenu/ElementSelectionMenu";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
+import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
+import { useGetVersionNumber } from "../Hooks/useGetVersionNumber";
 
 interface IProps {
   activePage: Number;
@@ -31,6 +33,9 @@ export const Header = (props: IProps) => {
   const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
 
   const { setModals } = useContext(ModalContext);
+
+  const [version, setVersion] = useState<string>();
+  useGetVersionNumber(setVersion);
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
@@ -98,6 +103,20 @@ export const Header = (props: IProps) => {
               </Tabs>
             </Box>
 
+            {version && version !== "0.2.2" && (
+              <StyledNoOwner
+                icon={<ReportGmailerrorredIcon />}
+                iconPosition="start"
+                label="You are using a legacy version of Pogly. Click here to find out how to update!"
+                onClick={() =>
+                  window.open(
+                    "https://github.com/PoglyApp/pogly-documentation/blob/main/use/moduleMigration.md",
+                    "_blank"
+                  )
+                }
+              />
+            )}
+
             <GuestListContainer />
           </Toolbar>
         </AppBar>
@@ -151,8 +170,21 @@ const StyledGuidelines = styled(Tab)`
   }
 `;
 
-const StyledMenuItem = styled(MenuItem)`
+const StyledNoOwner = styled(Tab)`
+  text-transform: none !important;
+  color: #ff0000 !important;
+
+  border: 1px solid red !important;
+  border-radius: 15px !important;
+
+  background-color: #ff000044 !important;
+
+  min-height: unset;
+  max-width: unset;
+  height: 40px !important;
+  width: fit-content !important;
+
   &:hover {
-    background-color: #020e1a !important;
+    background-color: #ff000058 !important;
   }
 `;
