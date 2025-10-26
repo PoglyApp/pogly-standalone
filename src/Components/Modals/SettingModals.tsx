@@ -40,6 +40,7 @@ import { Config } from "../../module_bindings";
 import { useGetVersionNumber } from "../../Hooks/useGetVersionNumber";
 import { PermissionTypes } from "../../Types/General/PermissionType";
 import { getPermissions } from "../../Utility/PermissionsHelper";
+import { LocalOverridesModal } from "./LocalOverridesModal";
 
 export const SettingsModal = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
@@ -195,9 +196,12 @@ export const SettingsModal = () => {
     setModals((oldModals: any) => [...oldModals, <ModeratorListModal key="moderatorList_modal" />]);
   };
 
-  // const showLocalOverridesModal = () => {
-  //   setModals((oldModals: any) => [...oldModals, <LocalOverridesModal key="localOverrides_modal" />]);
-  // };
+  const showLocalOverridesModal = () => {
+    setModals((oldModals: any) => [
+      ...oldModals,
+      <LocalOverridesModal key="localOverrides_modal" Runtime={spacetimeDB.Runtime} />,
+    ]);
+  };
 
   const handleStreamPlayerInteractable = () => {
     const stream = document.getElementById("stream")!;
@@ -475,7 +479,7 @@ export const SettingsModal = () => {
                   "&:hover": { borderColor: "white" },
                   marginTop: "10px",
                 }}
-                //onClick={showLocalOverridesModal}
+                onClick={showLocalOverridesModal}
               >
                 Local override settings
               </Button>

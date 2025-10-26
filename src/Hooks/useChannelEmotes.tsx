@@ -22,8 +22,23 @@ export const useChannelEmotes = (
     DebugLogger("Initializing Channel emotes.");
 
     (async () => {
+      let streamName: string = config.streamName;
+      let streamPlatform: string = config.streamingPlatform;
+
+      const sevenTVOverrides = localStorage.getItem("sevenTVOverrides");
+
+      if (sevenTVOverrides) {
+        const parsedOverrides = JSON.parse(sevenTVOverrides);
+        const sevenTVOverride = parsedOverrides.find((obj: any) => obj.module === spacetimeDB.Runtime!.module);
+
+        if (sevenTVOverride) {
+          streamName = sevenTVOverride.override;
+          streamPlatform = sevenTVOverride.platform;
+        }
+      }
+
       // 7TV
-      const sevenTVUserID = await SevenTVWrap.SearchForUser(config.streamName);
+      const sevenTVUserID = await SevenTVWrap.SearchForUser(streamName);
       if (!sevenTVUserID) {
         console.log("Could not find 7TV user ID.");
         return setChannelEmotesInitialized(true);
@@ -73,11 +88,5 @@ export const useChannelEmotes = (
       setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
-  }, [
-    channelEmotesInitialized,
-    config.streamName,
-    setSevenTVEmotes,
-    setBTTVEmotes,
-    setChannelEmotesInitialized,
-  ]);
+  }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
 };

@@ -12,12 +12,14 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { StyledInput } from "../StyledComponents/StyledInput";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-export const LocalOverridesModal = () => {
-  const { Runtime } = useSpacetimeContext();
+interface IProps {
+  Runtime: any;
+}
+
+export const LocalOverridesModal = ({ Runtime }: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
 
   const [streamOverride, setStreamOverride] = useState<string>();
@@ -53,7 +55,7 @@ export const LocalOverridesModal = () => {
     }
 
     setValueInitialization(true);
-  }, [Runtime]);
+  }, []);
 
   const saveStreamOverride = () => {
     const streamOverrides = localStorage.getItem("streamOverride");
