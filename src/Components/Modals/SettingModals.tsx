@@ -57,9 +57,7 @@ export const SettingsModal = () => {
 
   // GENERAL
   const stream = document.getElementById("stream")!;
-  const [nicknameInput, setNicknameInput] = useState<string>(localStorage.getItem("nickname")!);
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
-  const [cursorNameCheckbox, setCursorNameCheckbox] = useState<boolean>(true);
   const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
     stream.style.pointerEvents === "none" ? false : true
   );
@@ -99,9 +97,7 @@ export const SettingsModal = () => {
   useGetVersionNumber(setVersionNumber);
 
   const saveSettings = () => {
-    localStorage.setItem("nickname", nicknameInput);
     localStorage.setItem("TenorAPIKey", tenorAPIKey);
-    spacetimeDB.Client.reducers.updateGuestNickname(nicknameInput);
 
     if (permissions && isOwner) {
       const doUpdate =
@@ -117,7 +113,6 @@ export const SettingsModal = () => {
     let newSettings = settings;
 
     newSettings.debug = debugCheckbox;
-    newSettings.cursorName = cursorNameCheckbox;
     newSettings.compressUpload = compressUpload;
     newSettings.compressPaste = compressPaste;
     newSettings.urlAsDefault = urlAsDefault;
@@ -263,16 +258,7 @@ export const SettingsModal = () => {
             {permissions && isOwner && <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />}
           </Tabs>
           <SettingsTabPanel value={tabValue} index={0}>
-            <StyledInput
-              focused={false}
-              label="Nickname"
-              color="#ffffffa6"
-              onChange={setNicknameInput}
-              defaultValue={localStorage.getItem("nickname")!}
-              style={{ width: "100%" }}
-            />
-
-            <div style={{ display: "grid", marginTop: "20px" }}>
+            <div style={{ display: "grid" }}>
               <StyledInput
                 focused={false}
                 label="Tenor v2 API Key"
