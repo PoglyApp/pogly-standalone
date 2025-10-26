@@ -120,6 +120,7 @@ export const SettingsModal = () => {
     newSettings.compressUpload = compressUpload;
     newSettings.compressPaste = compressPaste;
     newSettings.urlAsDefault = urlAsDefault;
+    newSettings.streamInteractable = streamPlayerInteractable;
 
     const streamOverrides = localStorage.getItem("streamOverride");
 
@@ -255,9 +256,7 @@ export const SettingsModal = () => {
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="General" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Advanced" />
             <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Debug" />
-            {permissions && isOwner && (
-              <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />
-            )}
+            {permissions && isOwner && <Tab sx={{ backgroundColor: "#001529", width: tabWidth }} label="Owner" />}
           </Tabs>
           <SettingsTabPanel value={tabValue} index={0}>
             <StyledInput

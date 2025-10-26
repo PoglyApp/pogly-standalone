@@ -155,3 +155,12 @@ h1 {
 .animate-float {
   animation: float 1.5s ease-in-out infinite;
 }
+
+.hideScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hideScrollbar::-webkit-scrollbar {
+  display: none;
+}

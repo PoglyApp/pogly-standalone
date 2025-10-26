@@ -3,15 +3,15 @@ import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import styled from "styled-components";
 import { Alert, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Config } from "../../module_bindings";
 
 interface IProps {
   Runtime: any;
   spacetimeDB: any;
+  settings: any;
 }
 
-const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
+const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
@@ -69,7 +69,10 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
 
   const closeAlert = () => {
     try {
-      document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+      if (settings && !settings.streamInteractable) {
+        document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+      }
+
       document.getElementById("chromealert")?.remove();
     } catch (error) {
       console.log("[ERROR] Failed to close alert", error);
@@ -190,9 +193,7 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB }: IProps) => {
           height="100%"
           width="100%"
           id="stream"
-          src={
-            "https://www.youtube.com/embed/live_stream?channel=" + config.streamName + "&autoplay=1&mute=1"
-          }
+          src={"https://www.youtube.com/embed/live_stream?channel=" + config.streamName + "&autoplay=1&mute=1"}
           allowFullScreen
           title="YoutubeStream"
         />

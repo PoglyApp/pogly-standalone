@@ -51,12 +51,14 @@ export const Canvas = () => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
   const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
-  const [ disconnectedState, setDisconnectedState ] = useState<boolean>(false);
+  const [disconnectedState, setDisconnectedState] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
 
-  const [permission, setPermission] = useState<PermissionTypes[]>(getPermissions(spacetimeDB, spacetimeDB.Identity.identity));
+  const [permission, setPermission] = useState<PermissionTypes[]>(
+    getPermissions(spacetimeDB, spacetimeDB.Identity.identity)
+  );
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -130,9 +132,9 @@ export const Canvas = () => {
   }, []);
 
   useEffect(() => {
-    if(!spacetimeDB.Disconnected) return;
+    if (!spacetimeDB.Disconnected) return;
     setDisconnectedState(spacetimeDB.Disconnected);
-  },[spacetimeDB.Disconnected])
+  }, [spacetimeDB.Disconnected]);
 
   useEffect(() => {
     if (!activeLayout) {
@@ -263,7 +265,7 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} />
+                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} settings={settings} />
               </div>
             </Container>
 
