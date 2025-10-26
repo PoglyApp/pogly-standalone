@@ -54,6 +54,9 @@ export const Header = () => {
     }
   }, [location, navigate]);
 
+  const [version, setVersion] = useState<string>();
+  useGetVersionNumber(setVersion);
+
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
     setModals((oldModals: any) => [...oldModals, <SettingsModal key="settings_modal" />]);
@@ -128,6 +131,20 @@ export const Header = () => {
               </Tabs>
             </Box>
 
+            {version && version !== "0.2.2" && (
+              <StyledNoOwner
+                icon={<ReportGmailerrorredIcon />}
+                iconPosition="start"
+                label="You are using a legacy version of Pogly. Click here to find out how to update!"
+                onClick={() =>
+                  window.open(
+                    "https://github.com/PoglyApp/pogly-documentation/blob/main/use/moduleMigration.md",
+                    "_blank"
+                  )
+                }
+              />
+            )}
+
             <GuestListContainer />
           </Toolbar>
         </AppBar>
@@ -199,6 +216,6 @@ const StyledNoOwner = styled(Tab)`
 
 const StyledMenuItem = styled(MenuItem)`
   &:hover {
-    background-color: #020e1a !important;
+    background-color: #ff000058 !important;
   }
 `;
