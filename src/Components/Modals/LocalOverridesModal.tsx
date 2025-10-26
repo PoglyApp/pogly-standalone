@@ -171,9 +171,9 @@ export const LocalOverridesModal = ({ Runtime }: IProps) => {
                   color="#ffffffa6"
                   onChange={setSevenTVUsername}
                   defaultValue={sevenTVUsername}
-                  style={{}}
+                  style={{ width: "217px" }}
                 />
-                <RadioGroup row sx={{ color: "#ffffffa6", display: "block", textAlign: "center" }}>
+                <RadioGroup row sx={{ color: "#ffffffa6", display: "flex", textAlign: "center" }}>
                   <FormControlLabel
                     control={
                       <Radio
