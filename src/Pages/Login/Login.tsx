@@ -50,6 +50,7 @@ export const Login = () => {
   }, [spacetimeDB]);
 
   useEffect(() => {
+    if(isOverlay) return;
     const exp = (auth.user?.profile as any)?.exp;
     const now = Math.floor(Date.now() / 1000);
     if (typeof exp === "number" && exp <= now) {
@@ -59,6 +60,7 @@ export const Login = () => {
   }, [auth.user]);
 
   useEffect(() => {
+    if(isOverlay) return;
     if (spacetime.TokenExpired) {
       auth.removeUser();
       navigate("/login", { replace: true });
