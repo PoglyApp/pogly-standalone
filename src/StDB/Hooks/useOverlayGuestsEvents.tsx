@@ -8,8 +8,12 @@ export const useOverlayGuestsEvents = (spacetimeDB: any, setDisconnected: Functi
     if (initialized || !spacetimeDB.Client) return;
 
     spacetimeDB.Client.db.guests.onDelete((ctx: EventContext, guest: Guests) => {
-      if (guest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) {
-        setDisconnected(true);
+      try {
+        if (guest.address.toHexString() === spacetimeDB.Client.connectionId.toHexString()) {
+          setDisconnected(true);
+        }
+      } catch (error) {
+        console.log(error);
       }
     });
 
