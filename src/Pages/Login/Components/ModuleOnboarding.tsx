@@ -131,7 +131,10 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       await UploadBackupFromFile(spacetime.Client, backupFile, false, false, setBackupRowCount);
     } else {
       await UploadElementDataFromString(spacetime.Client, defaultElements);
-      return navigate("login");
+
+      setTimeout(() => {
+        return navigate("login");
+      }, 1500);
     }
   };
 
