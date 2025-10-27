@@ -1,4 +1,4 @@
-import DataType from "../../module_bindings/data_type";
+import { DataType } from "../../module_bindings";
 
 export type ElementDataType = {
   Id?: number;

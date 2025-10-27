@@ -1,21 +1,20 @@
+import { DataType, DbConnection } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
-import DataType from "../../../module_bindings/data_type";
-import UpdateElementDataDataReducer from "../../../module_bindings/update_element_data_data_reducer";
 
-export const updateElementDataData = (dataId: number, elementData: ElementDataType) => {
+export const updateElementDataData = (Client: DbConnection, dataId: number, elementData: ElementDataType) => {
   switch (elementData.DataType) {
     case DataType.TextElement:
-      UpdateElementDataDataReducer.call(dataId, elementData.Data);
+      Client.reducers.updateElementDataData(dataId, elementData.Data);
       break;
 
     case DataType.ImageElement:
       getBase64(elementData.Data, (result: any) => {
-        UpdateElementDataDataReducer.call(dataId, result);
+        Client.reducers.updateElementDataData(dataId, result);
       });
       break;
 
     case DataType.WidgetElement:
-      UpdateElementDataDataReducer.call(dataId, elementData.Data);
+      Client.reducers.updateElementDataData(dataId, elementData.Data);
       break;
   }
 };

@@ -1,10 +1,7 @@
-import ElementStruct from "../../../module_bindings/element_struct";
-import ImageElement from "../../../module_bindings/image_element";
-import TextElement from "../../../module_bindings/text_element";
-import UpdateElementStructReducer from "../../../module_bindings/update_element_struct_reducer";
-import WidgetElement from "../../../module_bindings/widget_element";
+import { DbConnection, ElementStruct, ImageElement, TextElement, WidgetElement } from "../../../module_bindings";
 
-export const updateElementStruct = (elementId: number, element: ElementStruct) => {
+
+export const updateElementStruct = (Client: DbConnection, elementId: number, element: ElementStruct) => {
   switch (element.tag) {
     case "TextElement":
       const textElement: TextElement = element.value as TextElement;
@@ -40,5 +37,5 @@ export const updateElementStruct = (elementId: number, element: ElementStruct) =
       break;
   }
 
-  UpdateElementStructReducer.call(elementId, element);
+  Client.reducers.updateElementStruct(elementId, element);
 };

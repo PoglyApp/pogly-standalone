@@ -1,58 +1,48 @@
-import { useAppSelector } from "../Store/Features/store";
-import { useOverlayElementsEvents } from "../StDB/Hooks/useOverlayElementsEvents";
-import { useOverlayElementDataEvents } from "../StDB/Hooks/useOverlayElementDataEvents";
 import { useEffect, useState } from "react";
-import useFetchElement from "../StDB/Hooks/useFetchElements";
-import { CanvasElementType } from "../Types/General/CanvasElementType";
-import { Loading } from "../Components/General/Loading";
-import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
-import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
-import Layouts from "../module_bindings/layouts";
-import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
-import ClearRefreshOverlayRequestsReducer from "../module_bindings/clear_refresh_overlay_requests_reducer";
-import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
 import { DebugLogger } from "../Utility/DebugLogger";
-import UpdateGuestNicknameReducer from "../module_bindings/update_guest_nickname_reducer";
+import useStDB from "../StDB/useStDB";
+import { useGetConnectionConfig } from "../Hooks/useGetConnectionConfig";
+import { ConnectionConfigType } from "../Types/ConfigTypes/ConnectionConfigType";
+import useFetchElement from "../StDB/Hooks/useFetchElementsNEW";
+import { SetSubscriptions } from "../Utility/SetSubscriptions";
+import { CanvasElementType } from "../Types/General/CanvasElementType";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { useOverlayGuestsEvents } from "../StDB/Hooks/useOverlayGuestsEvents";
+import { useOverlayElementsEvents } from "../StDB/Hooks/useOverlayElementsEvents";
+import { useOverlayLayoutEvents } from "../StDB/Hooks/useOverlayLayoutEvents";
+import { useOverlayHeartbeatEvents } from "../StDB/Hooks/useOverlayHeartbeatEvents";
 
-interface IProps {
-  disconnected: boolean;
-}
+export const Overlay = () => {
+  const [stdbConnected, setStdbConnected] = useState<boolean>(false);
+  const [subscriptionsApplied, setSubscriptionsApplied] = useState<boolean>(false);
+  const [userDisconnected, setUserDisconnected] = useState<boolean>(false);
+  const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
 
-export const Overlay = (props: IProps) => {
-  const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
-    overlayElementDataEventsInitialized: false,
-    overlayElementEventsInitialized: false,
-    overlayGuestEventsInitialized: false,
-  });
+  useGetConnectionConfig(setConnectionConfig);
 
-  const canvasElements: CanvasElementType[] = useAppSelector((state: any) => state.canvasElements.canvasElements);
+  const spacetimeDB = useStDB(connectionConfig, setStdbConnected);
 
-  const [activeLayout, setActiveLayout] = useState<Layouts>();
+  const [elements, setElements] = useState<CanvasElementType[]>([]);
+  const [refetchElements, setRefetchElements] = useState<boolean>(true);
 
-  useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
+  useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements, refetchElements, setRefetchElements);
 
-  useOverlayElementDataEvents(canvasInitialized, setCanvasInitialized);
-  useOverlayElementsEvents(activeLayout, canvasInitialized, setCanvasInitialized);
-  useOverlayLayoutEvents(activeLayout, setActiveLayout);
-  const disconnected = useOverlayGuestsEvents(canvasInitialized, setCanvasInitialized);
-
-  useHeartbeatEvents(canvasInitialized);
+  useOverlayElementsEvents(setElements, spacetimeDB.Client);
+  useOverlayGuestsEvents(spacetimeDB, setUserDisconnected);
+  useOverlayLayoutEvents(spacetimeDB, setRefetchElements);
+  useOverlayHeartbeatEvents(spacetimeDB);
 
   useEffect(() => {
+    if (!spacetimeDB || !spacetimeDB.Client) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const layoutParam = urlParams.get("layout");
     const transparent = urlParams.get("transparent");
     const nickname = urlParams.get("nickname");
 
-    ClearRefreshOverlayRequestsReducer.call();
+    SetSubscriptions(spacetimeDB.Client, setSubscriptionsApplied);
 
-    if (layoutParam) {
-      DebugLogger("Getting layout by name");
-      setActiveLayout(Layouts.filterByName(layoutParam).next().value);
-    } else {
-      DebugLogger("Getting layout by active ID");
-      setActiveLayout(Layouts.filterByActive(true).next().value);
-    }
+    spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
 
     if (transparent != null) {
       document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
@@ -60,29 +50,25 @@ export const Overlay = (props: IProps) => {
     }
 
     if (nickname != null) {
-      UpdateGuestNicknameReducer.call(nickname);
+      spacetimeDB.Client.reducers.updateGuestNickname(nickname);
     }
-  }, []);
+  }, [spacetimeDB, spacetimeDB.Client]);
 
-  if (disconnected || props.disconnected) {
-    DebugLogger("Overlay is disconnected");
-    localStorage.removeItem("stdbToken");
-    window.location.reload();
-  }
+  useEffect(() => {
+    if (userDisconnected || spacetimeDB.Disconnected) {
+      DebugLogger("Overlay is disconnected");
+      localStorage.removeItem("stdbToken");
+      window.location.reload();
+    }
+  }, [userDisconnected]);
 
   return (
-    <>
-      {canvasInitialized.elementsFetchInitialized ? (
-        <>
-          <div className="elementContent">
-            {canvasElements.map((element: CanvasElementType) => {
-              return <div key={element.Elements.id.toString()}>{element.Component}</div>;
-            })}
-          </div>
-        </>
-      ) : (
-        <Loading text="Loading..." />
-      )}
-    </>
+    <SpacetimeContext.Provider value={{ spacetimeDB }}>
+      <div className="elementContent">
+        {elements.map((element: CanvasElementType) => {
+          return <div key={element.Elements.id.toString()}>{element.Component}</div>;
+        })}
+      </div>
+    </SpacetimeContext.Provider>
   );
 };

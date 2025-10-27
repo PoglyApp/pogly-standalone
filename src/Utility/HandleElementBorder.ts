@@ -1,15 +1,15 @@
-import { Address } from "@clockworklabs/spacetimedb-sdk";
-import Guests from "../module_bindings/guests";
+import { ConnectionId } from "spacetimedb";
 import { DebugLogger } from "./DebugLogger";
+import { DbConnection, Guests } from "../module_bindings";
 
-const handleElementBorder = (address: Address, elementID: string) => {
+const handleElementBorder = (Client: DbConnection, address: ConnectionId, elementID: string) => {
   DebugLogger("Handling element border");
   const element = document.getElementById(elementID);
 
   if (!element) return;
 
-  const guestsWithElementSelected = Array.from(Guests.filterBySelectedElementId(parseInt(elementID))).filter(
-    (g: Guests) => g.address.toHexString() !== address.toHexString()
+  const guestsWithElementSelected: Guests[] = Array.from(Client.db.guests.iter()).filter(
+    (g: Guests) => g.address.toHexString() !== address.toHexString() && g.selectedElementId === parseInt(elementID)
   );
 
   element.style.borderStyle = "solid";

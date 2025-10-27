@@ -1,17 +1,28 @@
-import { SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
 import { DebugLogger } from "./DebugLogger";
+import { DbConnection, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
+import { SubscriptionEventContextInterface } from "spacetimedb";
 
-export const SetSubscriptions = (client: SpacetimeDBClient, setStdbSubscriptions: Function) => {
+export const SetSubscriptions = (
+  client: DbConnection,
+  setStdbSubscriptions: Function,
+  setStdbInitialized?: Function
+) => {
   DebugLogger("Subscribing to tables");
-  client.subscribe([
-    "SELECT * FROM Heartbeat",
-    "SELECT * FROM Guests",
-    "SELECT * FROM Elements",
-    "SELECT * FROM ElementData",
-    "SELECT * FROM Config",
-    "SELECT * FROM Permissions",
-    "SELECT * FROM Layouts",
-  ]);
-  setStdbSubscriptions(true);
-  return true;
+
+  client
+    .subscriptionBuilder()
+    .onApplied((ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>) => {
+      setStdbSubscriptions(true);
+    })
+    .subscribe([
+      "SELECT * FROM Heartbeat",
+      "SELECT * FROM Guests",
+      "SELECT * FROM Elements",
+      "SELECT * FROM ElementData",
+      "SELECT * FROM Config",
+      "SELECT * FROM Permissions",
+      "SELECT * FROM Layouts",
+    ]);
+
+  if (setStdbInitialized) setStdbInitialized(true);
 };

@@ -10,25 +10,37 @@ on:
 
 jobs:
   backend:
-    name: "SpacetimeDB Module"
+    name: SpacetimeDB Module
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: "Setup .NET"
+
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8'
-      - name: "Setup build env"
+          dotnet-version: "8.0.x"
+          global-json-file: global.json
+
+      - name: Verify dotnet version
+        run: dotnet --info
+
+      - name: Setup build env
         run: |
           sudo apt-get update && sudo apt-get install -y binaryen
           dotnet workload install wasi-experimental
-          curl -sL https://github.com/clockworklabs/SpacetimeDB/releases/download/v0.11.1-beta/spacetime.linux-amd64.tar.gz | sudo tar -xzC /usr/bin/
-          sudo chmod +x /usr/bin/spacetime
-      - name: "Build module"
+
+      - name: Install SpacetimeDB CLI
+        shell: bash
+        run: |
+          curl -sSf https://install.spacetimedb.com | sh -s -- -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Build module
         run: |
           spacetime build -p server
           mv server/obj/Release/net8.0/wasi-wasm/wasm/for-publish/StdbModule.wasm pogly.wasm
-      - name: "Upload artifact"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: spacetimedb-module
@@ -43,15 +55,15 @@ jobs:
       - name: "Setup node.js"
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: "latest"
+          cache: "npm"
       - name: "Build web"
         run: |
           npm install
           npm run build
-# Disables warnings failing production builds
-#        env:
-#          CI: ""
+      # Disables warnings failing production builds
+      #        env:
+      #          CI: ""
       - name: "Upload artifact"
         uses: actions/upload-artifact@v4
         with:
@@ -59,19 +71,19 @@ jobs:
           path: build/
           overwrite: true
 
-#  deploy:
-#    name: "Deploy"
-#    needs: frontend
-#    if: >
-#      github.ref == 'refs/heads/main' ||
-#      github.ref == 'refs/heads/dev' ||
-#      startsWith(github.ref, 'refs/tags/v')
-#    uses: ./.github/workflows/deploy.yml
-#    secrets: inherit
+  #  deploy:
+  #    name: "Deploy"
+  #    needs: frontend
+  #    if: >
+  #      github.ref == 'refs/heads/main' ||
+  #      github.ref == 'refs/heads/dev' ||
+  #      startsWith(github.ref, 'refs/tags/v')
+  #    uses: ./.github/workflows/deploy.yml
+  #    secrets: inherit
 
   release:
     name: "Release"
-    needs: [ backend, frontend ]
+    needs: [backend, frontend]
     if: github.event_name == 'release'
     uses: ./.github/workflows/release.yml
     secrets: inherit

@@ -1,11 +1,10 @@
+import { DataType, DbConnection } from "../../../module_bindings";
 import { ElementDataType } from "../../../Types/General/ElementDataType";
-import DataType from "../../../module_bindings/data_type";
-import UpdateElementDataReducer from "../../../module_bindings/update_element_data_reducer";
 
-export const updateElementData = (dataId: number, elementData: ElementDataType) => {
+export const updateElementData = (Client: DbConnection, dataId: number, elementData: ElementDataType) => {
   switch (elementData.DataType) {
     case DataType.TextElement:
-      UpdateElementDataReducer.call(
+      Client.reducers.updateElementData(
         dataId,
         elementData.Name,
         elementData.Data,
@@ -16,12 +15,12 @@ export const updateElementData = (dataId: number, elementData: ElementDataType) 
 
     case DataType.ImageElement:
       getBase64(elementData.Data, (result: any) => {
-        UpdateElementDataReducer.call(dataId, elementData.Name, result.r, result.w, result.h);
+        Client.reducers.updateElementData(dataId, elementData.Name, result.r, result.w, result.h);
       });
       break;
 
     case DataType.WidgetElement:
-      UpdateElementDataReducer.call(
+      Client.reducers.updateElementData(
         dataId,
         elementData.Name,
         elementData.Data,

@@ -1,12 +1,11 @@
 import { useContext, useEffect } from "react";
 import SevenTVWrap from "../Utility/SevenTVWrap";
-import Config from "../module_bindings/config";
-import { ConfigContext } from "../Contexts/ConfigContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import BetterTVWrap from "../Utility/BetterTVWrap";
 import SevenTVEmoteType from "../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../Types/BetterTVTypes/BetterTVEmoteType";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
+import { Config } from "../module_bindings";
 
 export const useChannelEmotes = (
   setSevenTVEmotes: Function,
@@ -14,11 +13,11 @@ export const useChannelEmotes = (
   channelEmotesInitialized: boolean,
   setChannelEmotesInitialized: Function
 ) => {
-  const { Runtime } = useSpacetimeContext();
-  const config: Config = useContext(ConfigContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   useEffect(() => {
-    if (channelEmotesInitialized || !Runtime) return;
+    if (channelEmotesInitialized) return;
 
     DebugLogger("Initializing Channel emotes.");
 
@@ -30,7 +29,7 @@ export const useChannelEmotes = (
 
       if (sevenTVOverrides) {
         const parsedOverrides = JSON.parse(sevenTVOverrides);
-        const sevenTVOverride = parsedOverrides.find((obj: any) => obj.module === Runtime!.module);
+        const sevenTVOverride = parsedOverrides.find((obj: any) => obj.module === spacetimeDB.Runtime!.module);
 
         if (sevenTVOverride) {
           streamName = sevenTVOverride.override;
@@ -51,7 +50,7 @@ export const useChannelEmotes = (
         return setChannelEmotesInitialized(true);
       }
 
-      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID, streamPlatform);
+      const emoteSetID = await SevenTVWrap.GetEmoteSetId(sevenTVUserID);
       if (!emoteSetID) {
         console.log("Could not find 7TV emote set ID.");
         return setChannelEmotesInitialized(true);
@@ -89,13 +88,5 @@ export const useChannelEmotes = (
       setSevenTVEmotes(allSevenTvEmotes);
       setChannelEmotesInitialized(true);
     })();
-  }, [
-    Runtime,
-    channelEmotesInitialized,
-    config.streamName,
-    setSevenTVEmotes,
-    setBTTVEmotes,
-    setChannelEmotesInitialized,
-    config.streamingPlatform,
-  ]);
+  }, [channelEmotesInitialized, config.streamName, setSevenTVEmotes, setBTTVEmotes, setChannelEmotesInitialized]);
 };

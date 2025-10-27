@@ -2,15 +2,14 @@ import { Menu, MenuItem, Paper, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import styled from "styled-components";
 import { handleDeleteElementData } from "../../../Utility/ContextMenuMethods";
-import ElementData from "../../../module_bindings/element_data";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { WidgetCreationModal } from "../../Modals/WidgetCreationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import Config from "../../../module_bindings/config";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
+import { ElementData } from "../../../module_bindings";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
 
 interface IProps {
   contextMenu: any;
@@ -19,11 +18,11 @@ interface IProps {
 
 export const ElementSelectionContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const selectedElementData: ElementData | null = props.contextMenu ? props.contextMenu.elementData : null;
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   const [showExamine, setShowExamine] = useState(false);
 
@@ -82,7 +81,7 @@ export const ElementSelectionContextMenu = (props: IProps) => {
       ) : (
         <StyledDeleteMenuItem
           onClick={() => {
-            handleDeleteElementData(selectedElementData, handleClose);
+            handleDeleteElementData(spacetimeDB.Client, selectedElementData, handleClose);
           }}
         >
           Delete
@@ -104,7 +103,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
   margin-left: 5px;
   margin-right: 5px;
@@ -112,12 +111,12 @@ const StyledDeleteMenuItem = styled(MenuItem)`
   padding-left: 5px;
 
   &:hover {
-    color: #960000;
+    color: #960000 !important;
   }
 `;
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
+  color: #681c1c !important;
 
   margin-left: 5px;
   margin-right: 5px;

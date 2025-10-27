@@ -1,26 +1,29 @@
-import { useEffect, useRef } from "react";
-import Elements from "../../module_bindings/elements";
+import { useContext, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Store/Features/store";
 import { CreateOffsetElementComponent } from "../../Utility/CreateElementComponent";
 import { addElement, removeElement } from "../../Store/Features/ElementsSlice";
 import { addCanvasElement, removeCanvasElement } from "../../Store/Features/CanvasElementSlice";
-import ElementData from "../../module_bindings/element_data";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { OffsetElementForCanvas } from "../../Utility/OffsetElementForCanvas";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import TextElement from "../../module_bindings/text_element";
-import WidgetElement from "../../module_bindings/widget_element";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import Selecto from "react-selecto";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
-import Layouts from "../../module_bindings/layouts";
 import { ApplyCustomFont } from "../../Utility/ApplyCustomFont";
 import { SelectedType } from "../../Types/General/SelectedType";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { marked } from "marked";
 import { parseCustomCss, removedCssProperties } from "../../Utility/ParseCustomCss";
-import ImageElement from "../../module_bindings/image_element";
-import ImageElementData from "../../module_bindings/image_element_data";
+import {
+  ElementData,
+  Elements,
+  EventContext,
+  ImageElement,
+  ImageElementData,
+  Layouts,
+  TextElement,
+  WidgetElement,
+} from "../../module_bindings";
 
 export const useElementsEvents = (
   selectoRef: React.RefObject<Selecto>,
@@ -33,7 +36,7 @@ export const useElementsEvents = (
   transformEditType: any,
   setTransformEditType: Function
 ) => {
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const dispatch = useAppDispatch();
 
@@ -55,9 +58,9 @@ export const useElementsEvents = (
 
     DebugLogger("Initializing element events");
 
-    Elements.onInsert((element, reducerEvent) => {
+    spacetimeDB.Client.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+      if (!ctx.event) return;
       if (!activeLayout.current) return;
-      if (reducerEvent && reducerEvent.reducerName !== "AddElementToLayout") return;
       if (element.layoutId !== activeLayout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateOffsetElementComponent(element);
@@ -66,7 +69,7 @@ export const useElementsEvents = (
       dispatch(addCanvasElement(newElement));
     });
 
-    Elements.onUpdate(async (oldElement, newElement, reducerEvent) => {
+    spacetimeDB.Client.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
       if (!activeLayout.current) return;
       if (newElement.layoutId !== activeLayout.current.id) return;
 
@@ -207,6 +210,7 @@ export const useElementsEvents = (
           // UPDATE RAW DATA
           if (oldWidgetElement.rawData !== newWidgetElement.rawData) {
             const htmlTag = WidgetCodeCompiler(
+              spacetimeDB.Client,
               newWidgetElement.width,
               newWidgetElement.height,
               undefined,
@@ -221,7 +225,17 @@ export const useElementsEvents = (
       // ======================================================================
 
       // ===== MOVEABLE OBJECT RELATED =====
-      if (reducerEvent?.callerAddress?.toHexString() === Identity.address.toHexString() || !component) return;
+      if (ctx.event.tag === "Reducer") {
+        if (
+          ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Client.connectionId.toHexString() ||
+          !component
+        )
+          return;
+      }
+
+      if (newElement.transform.includes("matrix") && transformEditType.scale) {
+        setTransformEditType({ scale: false, warp: false, clip: false });
+      }
 
       if (newElement.transform.includes("matrix") && transformEditType.scale) {
         setTransformEditType({ scale: false, warp: false, clip: false });
@@ -247,8 +261,7 @@ export const useElementsEvents = (
       }
     });
 
-    Elements.onDelete((element, reducerEvent) => {
-      if (!reducerEvent) return;
+    spacetimeDB.Client.db.elements.onDelete((ctx: EventContext, element: Elements) => {
       if (!activeLayout.current) return;
       if (element.layoutId !== activeLayout.current.id) return;
 
@@ -261,8 +274,8 @@ export const useElementsEvents = (
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, elementEventsInitialized: true }));
   }, [
     canvasInitialized.elementEventsInitialized,
-    Identity.identity,
-    Identity.address,
+    spacetimeDB.Identity.identity,
+    spacetimeDB.Client.connectionId,
     selectoRef,
     setCanvasInitialized,
     setSelected,
@@ -271,5 +284,8 @@ export const useElementsEvents = (
     transformEditType.scale,
     setTransformEditType,
     dispatch,
+    spacetimeDB.Client,
+    transformEditType.scale,
+    setTransformEditType,
   ]);
 };

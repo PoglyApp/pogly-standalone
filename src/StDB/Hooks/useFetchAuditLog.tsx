@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "../../Store/Features/store";
-import AuditLog from "../../module_bindings/audit_log";
 import { initAuditLog } from "../../Store/Features/AuditLogSlice";
 import { DebugLogger } from "../../Utility/DebugLogger";
 

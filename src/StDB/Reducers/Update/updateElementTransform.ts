@@ -3,9 +3,9 @@ import {
   GetMatrixFromElement,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
-import UpdateElementTransformReducer from "../../../module_bindings/update_element_transform_reducer";
+import { DbConnection } from "../../../module_bindings";
 
-export const updateElementTransform = (elementId: number, transform: string) => {
+export const updateElementTransform = (Client: DbConnection, elementId: number, transform: string) => {
   const matrix = GetMatrixFromElement(transform);
 
   const transformCoords = GetCoordsFromTransform(transform);
@@ -25,10 +25,14 @@ export const updateElementTransform = (elementId: number, transform: string) => 
     transformString += " " + matrix;
   }
 
-  UpdateElementTransformReducer.call(elementId, transformString);
+  Client.reducers.updateElementTransform(elementId, transformString);
 };
 
-export const updateElementTransformNoViewportAdjustment = (elementId: number, transform: string) => {
+export const updateElementTransformNoViewportAdjustment = (
+  Client: DbConnection,
+  elementId: number,
+  transform: string
+) => {
   const matrix = GetMatrixFromElement(transform);
 
   const transformCoords = GetCoordsFromTransform(transform);
@@ -48,5 +52,5 @@ export const updateElementTransformNoViewportAdjustment = (elementId: number, tr
     transformString += " " + matrix;
   }
 
-  UpdateElementTransformReducer.call(elementId, transformString);
+  Client.reducers.updateElementTransform(elementId, transformString);
 };

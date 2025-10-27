@@ -1,35 +1,30 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useAppSelector } from "../../Store/Features/store";
-import Guests from "../../module_bindings/guests";
 import { CursorComponent } from "../General/CursorComponent";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { LayoutContext } from "../../Contexts/LayoutContext";
+import { Config, Guests } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const CursorsContainer = () => {
-  const { Identity } = useSpacetimeContext();
-  const layoutContext = useContext(LayoutContext);
-
-  const [visibleCursors, setVisibleCursors] = useState<Guests[]>([]);
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const { activeLayout } = useContext(LayoutContext);
 
   const guests = useAppSelector((state: any) => state.guests.guests);
-
-  useEffect(() => {
-    setVisibleCursors(() => {
-      return guests.filter(
-        (guest: Guests) =>
-          guest.address.toHexString() !== Identity.address.toHexString() &&
-          guest.nickname !== "" &&
-          layoutContext.activeLayout.id === guest.selectedLayoutId
-      );
-    });
-  }, [layoutContext.activeLayout, guests, Identity.address]);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   return (
-    <div>
-      {visibleCursors &&
-        visibleCursors.map((guest: Guests) => {
-          return <CursorComponent key={guest.identity.toHexString()} guest={guest} />;
+    <>
+      {guests
+        .filter(
+          (guest: Guests) =>
+            guest.address.toHexString() !== spacetimeDB.Client.connectionId.toHexString() &&
+            guest.nickname !== "" &&
+            activeLayout.id === guest.selectedLayoutId
+        )
+        .map((guest: Guests) => {
+          if (config.authentication && !guest.authenticated) return <></>;
+          return <CursorComponent key={guest.nickname + "_cursor"} guest={guest} />;
         })}
-    </div>
+    </>
   );
 };

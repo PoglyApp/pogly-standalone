@@ -2,7 +2,6 @@ import { Dialog, DialogContent, FormGroup } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { StyledInput } from "../StyledComponents/StyledInput";
-import ElementData from "../../module_bindings/element_data";
 import { useAppSelector } from "../../Store/Features/store";
 import { shallowEqual } from "react-redux";
 import { SpotlightElement } from "../General/SpotlightElement";
@@ -10,11 +9,11 @@ import SevenTVEmoteType from "../../Types/SevenTVTypes/SevenTVEmoteType";
 import BetterTVEmoteType from "../../Types/BetterTVTypes/BetterTVEmoteType";
 import BetterTVWrap from "../../Utility/BetterTVWrap";
 import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
-import ElementStruct from "../../module_bindings/element_struct";
-import ImageElementData from "../../module_bindings/image_element_data";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import SevenTVWrap from "../../Utility/SevenTVWrap";
 import styled from "styled-components";
+import { ElementData, ElementStruct, ImageElementData } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProps {
@@ -23,7 +22,8 @@ interface IProps {
 }
 
 export const SpotlightModal = (props: IProps) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
@@ -60,12 +60,13 @@ export const SpotlightModal = (props: IProps) => {
     DebugLogger("Adding ElementData to canvas");
 
     insertElement(
+      spacetimeDB.Client,
       ElementStruct.ImageElement({
         imageElementData: ImageElementData.ElementDataId(elementData.id),
         width: elementData.dataWidth || 128,
         height: elementData.dataHeight || 128,
       }),
-      layoutContext.activeLayout
+      activeLayout
     );
 
     handleOnClose();
@@ -79,12 +80,13 @@ export const SpotlightModal = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
 
@@ -99,12 +101,13 @@ export const SpotlightModal = (props: IProps) => {
     image.src = blob;
     image.onload = function () {
       insertElement(
+        spacetimeDB.Client,
         ElementStruct.ImageElement({
           imageElementData: ImageElementData.RawData(blob),
           width: image.width || 128,
           height: image.height || 128,
         }),
-        layoutContext.activeLayout
+        activeLayout
       );
     };
 

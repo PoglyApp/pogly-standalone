@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Elements from "../../module_bindings/elements";
+import { Elements } from "../../module_bindings";
 
 interface ElementsState {
   elements: Elements[];

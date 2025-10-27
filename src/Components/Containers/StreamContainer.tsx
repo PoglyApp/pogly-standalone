@@ -1,18 +1,20 @@
-import { useState, useEffect, useContext, memo } from "react";
-import Config from "../../module_bindings/config";
+import React, { useState, useEffect, useContext } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
-import { ConfigContext } from "../../Contexts/ConfigContext";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
 import styled from "styled-components";
 import { Alert, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { Config } from "../../module_bindings";
 
-const StreamContainer = () => {
-  const config: Config = useContext(ConfigContext);
-  const { Runtime } = useSpacetimeContext();
+interface IProps {
+  Runtime: any;
+  spacetimeDB: any;
+  settings: any;
+}
 
+const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   const ua = navigator.userAgent.toLowerCase();
   const chrome = ua.includes("chrome") || ua.includes("crios");
@@ -67,7 +69,10 @@ const StreamContainer = () => {
 
   const closeAlert = () => {
     try {
-      document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+      if (settings && !settings.streamInteractable) {
+        document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+      }
+
       document.getElementById("chromealert")?.remove();
     } catch (error) {
       console.log("[ERROR] Failed to close alert", error);
@@ -227,9 +232,9 @@ const StreamContainer = () => {
       )}
     </>
   );
-};
+});
 
-export default memo(StreamContainer, (prevProps, nextProps) => true);
+export default StreamContainer;
 
 const StyledAlert = styled(Alert)`
   position: absolute;
@@ -304,8 +309,12 @@ const ExplanationContent = styled.div`
   justify-self: center;
   align-self: center;
 
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.12), 0 4px 4px rgba(0, 0, 0, 0.12),
-    0 8px 8px rgba(0, 0, 0, 0.12), 0 16px 16px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.12),
+    0 2px 2px rgba(0, 0, 0, 0.12),
+    0 4px 4px rgba(0, 0, 0, 0.12),
+    0 8px 8px rgba(0, 0, 0, 0.12),
+    0 16px 16px rgba(0, 0, 0, 0.12);
 `;
 
 const ExplanationTitle = styled.div`

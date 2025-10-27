@@ -1,12 +1,10 @@
-import ElementData from "../module_bindings/element_data";
-import Elements from "../module_bindings/elements";
-import Layouts from "../module_bindings/layouts";
-import Config from "../module_bindings/config";
 import initSqlJs from "sql.js";
+import { Config, DbConnection, ElementData, Elements, Layouts } from "../module_bindings";
 import { PoglyModuleExporter } from "./ModuleExporter";
 import { IncludeFlags } from "../Types/ExportTypes/IncludeFlagsType";
 
 export const DownloadElementData = async (
+  Client: DbConnection,
   downData: boolean,
   downElement: boolean,
   downLayout: boolean,
@@ -15,9 +13,9 @@ export const DownloadElementData = async (
   setModals: any,
   closeModal: any
 ) => {
-  const elementData: ElementData[] = ElementData.all() as ElementData[];
-  const elements: Elements[] = Elements.all() as Elements[];
-  const layouts: Layouts[] = Layouts.all() as Layouts[];
+  const elementData: ElementData[] = Client.db.elementData.iter() as ElementData[];
+  const elements: Elements[] = Client.db.elements.iter() as Elements[];
+  const layouts: Layouts[] = Client.db.layouts.iter() as Layouts[];
 
   const SQL = await initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` });
   const exporter = new PoglyModuleExporter(SQL);

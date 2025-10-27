@@ -2,10 +2,11 @@
 
 public partial class Module
 {
-    [SpacetimeDB.Table(Public = true)]
+    [Table(Public = true, Name = "Elements")]
     public partial struct Elements
     {
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
+        [PrimaryKey]
+        [AutoInc]
         public uint Id;
 
         public ElementStruct Element;

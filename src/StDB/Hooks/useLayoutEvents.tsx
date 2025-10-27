@@ -1,30 +1,32 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import Layouts from "../../module_bindings/layouts";
 import { toast } from "react-toastify";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { Layouts, EventContext } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 export const useLayoutEvents = (setLayouts: Function) => {
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [eventsInitialized, setEventsInitialized] = useState<boolean>(false);
-  const activeLayout = useRef<Layouts>(layoutContext.activeLayout);
+  const theActiveLayout = useRef<Layouts>(activeLayout);
 
   useEffect(() => {
     DebugLogger("Updating layout refs");
-    activeLayout.current = layoutContext.activeLayout;
-  }, [layoutContext]);
+    theActiveLayout.current = activeLayout;
+  }, [theActiveLayout]);
 
   useEffect(() => {
     if (eventsInitialized) return;
 
     DebugLogger("Initializing layout events");
 
-    Layouts.onInsert((newLayout) => {
+    spacetimeDB.Client.db.layouts.onInsert((ctx: EventContext, newLayout: Layouts) => {
       setLayouts((oldLayouts: any) => [...oldLayouts, newLayout]);
     });
 
-    Layouts.onUpdate((oldLayout, newLayout) => {
+    spacetimeDB.Client.db.layouts.onUpdate((ctx: EventContext, oldLayout: Layouts, newLayout: Layouts) => {
       // ACTIVITY CHANGE
       if (oldLayout.active === false && newLayout.active === true) {
         const layoutIcon = document.getElementById(newLayout.id + "_layout_icon");
@@ -53,15 +55,15 @@ export const useLayoutEvents = (setLayouts: Function) => {
       }
     });
 
-    Layouts.onDelete((layout) => {
+    spacetimeDB.Client.db.layouts.onDelete((ctx: EventContext, layout: Layouts) => {
       const menuItem = document.getElementById(layout.id + "_layout");
       menuItem?.remove();
 
       if (layout.id !== activeLayout.current.id) return;
 
-      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
+      setActiveLayout((Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true));
     });
 
     setEventsInitialized(true);
-  }, [eventsInitialized, setLayouts, layoutContext]);
+  }, [eventsInitialized, setLayouts, activeLayout, setActiveLayout, spacetimeDB.Client]);
 };

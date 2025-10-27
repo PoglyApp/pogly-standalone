@@ -1,18 +1,17 @@
 import { useContext, useState } from "react";
 import { ModalContext } from "../../Contexts/ModalContext";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
-import Permissions from "../../module_bindings/permissions";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import SaveIcon from "@mui/icons-material/Save";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import Config from "../../module_bindings/config";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { MarkdownEditor } from "../General/MarkdownEditor";
 import Markdown from "react-markdown";
 import remark from "remark-gfm";
 import styled from "styled-components";
-import UpdateEditorGuidelinesReducer from "../../module_bindings/update_editor_guidelines_reducer";
+import { PermissionTypes } from "../../Types/General/PermissionType";
+import { getPermissions } from "../../Utility/PermissionsHelper";
 
 interface IProp {
   setAcceptedGuidelines?: Function;
@@ -20,16 +19,17 @@ interface IProp {
 
 export const EditorGuidelineModal = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config: Config = useContext(ConfigContext);
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const { Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  const isOwner = permissions.includes(PermissionTypes.Owner);
   const [guidelineText, setGuidelineText] = useState<string>(config.editorGuidelines.toString());
   const [error, setError] = useState<string>("");
 
   const initGuidelineAccept = () => {
     if (isOverlay) return true;
-    if (permission && permission.tag === "Owner") return true;
+    if (permissions && isOwner) return true;
     if (localStorage.getItem("Accept_EditorGuidelines")) return true;
     return false;
   };
@@ -37,9 +37,9 @@ export const EditorGuidelineModal = (props: IProp) => {
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
 
   const saveGuidelines = () => {
-    if (permission && permission.tag !== "Owner") return;
+    if (permissions && !isOwner) return true;
     DebugLogger("Saved editor guidelines");
-    UpdateEditorGuidelinesReducer.call(guidelineText);
+    spacetimeDB.Client.reducers.updateEditorGuidelines(guidelineText);
     closeModal("guideline_modal", modals, setModals);
   };
 
@@ -90,7 +90,7 @@ export const EditorGuidelineModal = (props: IProp) => {
           minWidth: "480px !important",
         }}
       >
-        {permission && permission.tag === "Owner" ? (
+        {permissions && isOwner ? (
           <>
             <StyledMarkdown remarkPlugins={[remark]}>{guidelineText}</StyledMarkdown>
             <br />
@@ -101,10 +101,10 @@ export const EditorGuidelineModal = (props: IProp) => {
         )}
       </DialogContent>
       <DialogActions sx={{ backgroundColor: "#0a2a47", paddingTop: "25px", paddingBottom: "20px" }}>
-        {permission && permission.tag === "Owner" && (
+        {permissions && isOwner && (
           <Button
             variant="outlined"
-            startIcon={<CancelIcon />}
+            startIcon={<SaveIcon />}
             sx={{
               color: "#ffffffa6",
               borderColor: "#ffffffa6",
@@ -117,7 +117,7 @@ export const EditorGuidelineModal = (props: IProp) => {
         )}
         {acceptedGuidelines ? (
           <>
-            {permission?.tag !== "Owner" && (
+            {isOwner && (
               <DialogContentText sx={{ color: "#ffffffa6" }}>
                 {"Accepted on " + localStorage.getItem("Accept_EditorGuidelines")}
               </DialogContentText>

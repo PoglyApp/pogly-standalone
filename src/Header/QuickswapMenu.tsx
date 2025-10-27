@@ -1,8 +1,8 @@
 import { Menu, MenuItem, styled, Tooltip } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { QuickSwapType } from "../Types/General/QuickSwapType";
 import { DebugLogger } from "../Utility/DebugLogger";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { HandleQuickSwapContextMenu } from "../Utility/HandleContextMenu";
 import { QuickSwapContextMenu } from "./ContextMenu/QuickSwapContextMenu";
 
@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export const QuickSwapMenu = (props: IProps) => {
-  const { Client } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [contextMenu, setContextMenu] = useState<any>(null);
@@ -33,7 +33,7 @@ export const QuickSwapMenu = (props: IProps) => {
     localStorage.setItem("stdbConnectDomain", module.domain);
     localStorage.setItem("stdbConnectModule", module.module);
     localStorage.setItem("stdbConnectModuleAuthKey", module.auth);
-    Client.disconnect();
+    spacetimeDB.Client.disconnect();
     window.location.reload();
   };
 

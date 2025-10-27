@@ -1,8 +1,9 @@
-import ElementData from "../module_bindings/element_data";
 import { DebugLogger } from "./DebugLogger";
+import { DbConnection } from "../module_bindings";
 
 // "Compiler" is a very generous term for what this method does
 export const WidgetCodeCompiler = (
+  Client: DbConnection,
   widgetWidth?: Number,
   widgetHeight?: Number,
   elementDataId?: number,
@@ -15,7 +16,8 @@ export const WidgetCodeCompiler = (
 
   if (!widgetData) {
     if (!elementDataId) return "";
-    const elementData = ElementData.findById(elementDataId);
+    const elementData = Client.db.elementData.id.find(elementDataId);
+    
     if (!elementData) return "";
     const data = elementData.data;
 

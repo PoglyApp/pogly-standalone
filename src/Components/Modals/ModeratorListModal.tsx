@@ -4,25 +4,27 @@ import { StyledButton } from "../StyledComponents/StyledButton";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { styled } from "styled-components";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import Permissions from "../../module_bindings/permissions";
-import ClearIdentityPermissionReducer from "../../module_bindings/clear_identity_permission_reducer";
-import { Identity } from "@clockworklabs/spacetimedb-sdk";
+import { Identity } from "spacetimedb";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Permissions } from "../../module_bindings";
+import { PermissionTypes } from "../../Types/General/PermissionType";
 
 export const ModeratorListModal = () => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [moderators, setModerators] = useState<Permissions[]>([]);
 
   useEffect(() => {
-    const permissions: Permissions[] = Permissions.all();
-    const filterModerators = permissions.filter((obj: Permissions) => obj.permissionLevel.tag === "Moderator");
+    const permissions: Permissions[] = Array.from(spacetimeDB.Client.db.permissions.iter());
+    const filterModerators = permissions.filter((obj: Permissions) => obj.permissionType === PermissionTypes.Moderator);
 
     setModerators(() => filterModerators);
-  }, []);
+  }, [spacetimeDB.Client]);
 
   const handleDeletePermission = (identity: Identity) => {
-    ClearIdentityPermissionReducer.call(identity);
+    spacetimeDB.Client.reducers.clearIdentityPermission(identity);
 
     const newList = moderators.filter((mod: Permissions) => mod.identity !== identity);
 
@@ -48,20 +50,13 @@ export const ModeratorListModal = () => {
             </div>
           ) : (
             <>
-              <Alert
-                variant="filled"
-                severity="warning"
-                sx={{ backgroundColor: "#f57c00 !important", color: "#212121", marginTop: "20px", maxWidth: "400px" }}
-              >
-                Due to an oversight, unfortunately we cannot link offline moderators to nicknames at this time - will be
-                fixed in a future update.
-              </Alert>
-
               {moderators.map((mod: Permissions) => {
                 return (
                   <Container key={"mod_" + mod.identity.toHexString().substring(0, 5)}>
                     <StyledDeleteIcon onClick={() => handleDeletePermission(mod.identity)} />
-                    <IdentitySpan>{mod.identity.toHexString().substring(0, 40)}...</IdentitySpan>
+                    {
+                      //<IdentitySpan>{mod.nickname !== "" ? mod.nickname : "Unknown..."}</IdentitySpan>
+                    }
                   </Container>
                 );
               })}

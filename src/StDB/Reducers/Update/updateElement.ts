@@ -1,11 +1,11 @@
-import ElementStruct from "../../../module_bindings/element_struct";
-import UpdateElementReducer from "../../../module_bindings/update_element_reducer";
+import { DbConnection, ElementStruct } from "../../../module_bindings";
 import {
   GetCoordsFromTransform,
   GetTransformFromCoords,
 } from "../../../Utility/ConvertCoordinates";
 
 export const updateElement = (
+  Client: DbConnection, 
   elementId: number,
   element: ElementStruct,
   transparency?: number,
@@ -24,7 +24,7 @@ export const updateElement = (
     transformCoords.scaleY
   );
 
-  UpdateElementReducer.call(
+  Client.reducers.updateElement(
     elementId,
     element,
     transparency || 100,

@@ -1,28 +1,26 @@
-import { Address, SpacetimeDBClient } from "@clockworklabs/spacetimedb-sdk";
-import Guests from "../module_bindings/guests";
-import Config from "../module_bindings/config";
 import { DebugLogger } from "./DebugLogger";
+import { Config, DbConnection, EventContext, Guests } from "../module_bindings";
 
 export const SetStdbConnected = (
-  client: SpacetimeDBClient,
-  address: Address,
+  client: DbConnection,
   fetchedConfig: Config,
   setStdbConnected: Function,
-  setStdbAuthenticated: Function
+  setStdbAuthenticated?: Function | undefined
 ) => {
   DebugLogger("Setting SpacetimeDB connected");
-  // NO AUTHENTICATION
-  Guests.onInsert((newGuest) => {
-    if (newGuest.address.toHexString() !== address.toHexString()) return;
 
+  // NO AUTHENTICATION
+  client.db.guests.onInsert((_ctx: EventContext, newGuest: Guests) => {
+    if (newGuest.address.toHexString() !== client.connectionId.toHexString()) return;
     setStdbConnected(true);
   });
 
-  // AUTHENTICATION
-  Guests.onUpdate((oldGuest, newGuest) => {
-    if (newGuest.address.toHexString() !== address.toHexString()) return;
-    if (oldGuest.authenticated === newGuest.authenticated) return;
+  if (!setStdbAuthenticated) return;
 
+  // AUTHENTICATION
+  client.db.guests.onUpdate((_ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
+    if (newGuest.address.toHexString() !== client.connectionId.toHexString()) return;
+    if (oldGuest.authenticated === newGuest.authenticated) return;
     if (fetchedConfig.authentication && newGuest.authenticated) setStdbAuthenticated(true);
   });
 };

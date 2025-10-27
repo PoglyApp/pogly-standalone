@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import CssFilterConverter from "css-filter-converter";
-import Guests from "../../module_bindings/guests";
 import { SettingsContext } from "../../Contexts/SettingsContext";
 import { GetTransformFromCoords } from "../../Utility/ConvertCoordinates";
 import { useTransformContext, useTransformEffect } from "react-zoom-pan-pinch";
+import { Guests } from "../../module_bindings";
 
 interface IProp {
   guest: Guests;
@@ -51,8 +51,9 @@ export const CursorComponent = (props: IProp) => {
           style={{
             width: "15px",
             height: "22px",
-            position: "fixed",
+            position: "relative",
             filter: `${result.color}`,
+            zIndex: 200,
           }}
           src="./assets/cursor.png"
           alt="cursor"
@@ -61,9 +62,9 @@ export const CursorComponent = (props: IProp) => {
           <div>
             <p
               style={{
-                position: "fixed",
+                position: "relative",
                 left: "8px",
-                top: "4px",
+                top: "-5px",
                 filter: `${result.color}`,
                 fontSize: "10px",
               }}

@@ -1,30 +1,30 @@
-import { useEffect } from "react";
-import Guests from "../../module_bindings/guests";
+import { useContext, useEffect } from "react";
 import { useAppDispatch } from "../../Store/Features/store";
 import { initGuests } from "../../Store/Features/GuestSlice";
 import { CanvasInitializedType } from "../../Types/General/CanvasInitializedType";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 
 const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasInitialized: Function) => {
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!Identity.identity || canvasInitialized.guestFetchInitialized) return;
+    if (!spacetimeDB.Identity.identity || canvasInitialized.guestFetchInitialized) return;
 
     DebugLogger("Fetching guests");
 
-    const guests = Guests.all();
+    const guests: any[] = Array.from(spacetimeDB.Client.db.guests.iter());
 
-    const guest = guests.findIndex((g) => g.address.toHexString() === Identity.address.toHexString());
+    const updatedGuests = guests.map((g: any) => g.address.toHexString() === spacetimeDB.Client.connectionId.toHexString()
+      ? { ...g, nickname: spacetimeDB.Identity.nickname}
+      : g
+    );
 
-    guests[guest].nickname = Identity.nickname;
-
-    dispatch(initGuests(guests));
+    dispatch(initGuests(updatedGuests));
 
     setCanvasInitialized((init: CanvasInitializedType) => ({ ...init, guestFetchInitialized: true }));
-  }, [Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch]);
+  }, [spacetimeDB.Identity, canvasInitialized.guestFetchInitialized, setCanvasInitialized, dispatch, spacetimeDB.Client]);
 };
 
 export default useFetchGuests;

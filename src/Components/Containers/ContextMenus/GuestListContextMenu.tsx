@@ -1,14 +1,11 @@
 import { Menu, MenuItem, Paper } from "@mui/material";
-import Guests from "../../../module_bindings/guests";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import styled from "styled-components";
-import SetIdentityPermissionModeratorReducer from "../../../module_bindings/set_identity_permission_moderator_reducer";
-import ClearIdentityPermissionReducer from "../../../module_bindings/clear_identity_permission_reducer";
-import KickGuestReducer from "../../../module_bindings/kick_guest_reducer";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import KickSelfReducer from "../../../module_bindings/kick_self_reducer";
+import { Guests } from "../../../module_bindings";
+import { useContext } from "react";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
 
 interface IProps {
   contextMenu: any;
@@ -16,13 +13,18 @@ interface IProps {
 }
 
 export const GuestListContextMenu = (props: IProps) => {
-  const { Identity } = useSpacetimeContext();
-  const identityPermission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
-
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const identityPermission = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
+  
   const selectedGuest: Guests | null = props.contextMenu ? props.contextMenu.guest : null;
-  let selectedGuestPermission: PermissionLevel | undefined;
+  let selectedGuestPermission: PermissionTypes[] | undefined;
   if (selectedGuest !== null && selectedGuest.identity)
-    selectedGuestPermission = Permissions.findByIdentity(selectedGuest.identity)?.permissionLevel;
+    selectedGuestPermission = getPermissions(spacetimeDB, selectedGuest.identity);
+
+  const isSelf = selectedGuest?.identity.isEqual(spacetimeDB.Identity.identity);
+  const viewerIsOwner = (identityPermission ?? []).includes(PermissionTypes.Owner);
+  const selectedIsModerator = (selectedGuestPermission ?? []).includes(PermissionTypes.Moderator);
+  const selectedIsOwner = (selectedGuestPermission ?? []).includes(PermissionTypes.Owner);
 
   const handleClose = () => {
     DebugLogger("Handling close context");
@@ -44,6 +46,7 @@ export const GuestListContextMenu = (props: IProps) => {
       transitionDuration={{ enter: 0, exit: 0 }}
       MenuListProps={{ onMouseLeave: handleClose }}
       sx={{ zIndex: 2000000 }}
+      className="canvas-font"
     >
       <div>
         <Paper variant="outlined" sx={{ fontWeight: "bold", color: "#ffffffa6", padding: "5px", margin: "5px" }}>
@@ -52,51 +55,53 @@ export const GuestListContextMenu = (props: IProps) => {
 
         <Paper variant="outlined" sx={{ color: "#ffffffa6", padding: "5px", margin: "5px" }}>
           {"Permission: "}
-          {selectedGuestPermission?.tag === undefined ? "User" : selectedGuestPermission?.tag}
+          {selectedGuestPermission?.length === 0 ? "User" : selectedGuestPermission?.map(p => PermissionTypes[p]).join(", ")}
         </Paper>
 
-        {!selectedGuest.identity.isEqual(Identity.identity) &&
-        identityPermission &&
-        identityPermission.tag === "Owner" ? (
-          <>
-            {selectedGuestPermission?.tag === "Moderator" ? (
-              <StyledMenuItemOrange
-                onClick={() => {
-                  ClearIdentityPermissionReducer.call(selectedGuest.identity);
-                  handleClose();
-                }}
-                sx={{ color: "#008205" }}
-              >
-                Revoke Moderator
-              </StyledMenuItemOrange>
-            ) : (
-              <StyledMenuItemGreen
-                onClick={() => {
-                  SetIdentityPermissionModeratorReducer.call(selectedGuest.identity);
-                  handleClose();
-                }}
-              >
-                Grant Moderator
-              </StyledMenuItemGreen>
-            )}
-            <StyledMenuItemRed
-              onClick={() => {
-                KickGuestReducer.call(selectedGuest.address);
-                handleClose();
-              }}
-            >
-              Kick Guest
-            </StyledMenuItemRed>
-          </>
-        ) : (
-          <></>
-        )}
+        {!isSelf && viewerIsOwner ? (
+            <>
+              {selectedIsModerator ? (
+                <StyledMenuItemOrange
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.clearIdentityPermission(selectedGuest.identity);
+                    handleClose();
+                  }}
+                  sx={{ color: "#008205" }}
+                >
+                  Revoke Moderator
+                </StyledMenuItemOrange>
+              ) : (
+                <StyledMenuItemGreen
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.setIdentityPermissionModerator(selectedGuest.identity);
+                    handleClose();
+                  }}
+                >
+                  Grant Moderator
+                </StyledMenuItemGreen>
+              )}
 
-        {selectedGuest.identity.isEqual(Identity.identity) ? (
+              {!selectedIsOwner && (
+                <StyledMenuItemRed
+                  onClick={() => {
+                    spacetimeDB.Client.reducers.kickGuest(selectedGuest.address);
+                    handleClose();
+                  }}
+                >
+                  Kick Guest
+                </StyledMenuItemRed>
+              )}
+            </>
+          ) : (
+            <></>
+          )
+        }
+
+        {selectedGuest.identity.isEqual(spacetimeDB.Identity.identity) ? (
           <>
             <StyledMenuItemRed
               onClick={() => {
-                KickSelfReducer.call();
+                spacetimeDB.Client.reducers.kickSelf();
                 handleClose();
               }}
             >
@@ -140,9 +145,10 @@ const StyledMenuItemOrange = styled(MenuItem)`
 const StyledMenuItemRed = styled(MenuItem)`
   &:hover {
     background-color: #001529;
+    color: #960000 !important;
   }
 
-  color: #800000;
+  color: #d82b2b !important;
 
   padding-left: 5px;
 

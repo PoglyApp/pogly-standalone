@@ -1,9 +1,4 @@
 import { toast } from "react-toastify";
-import DeleteElementReducer from "../module_bindings/delete_element_reducer";
-import ElementStruct from "../module_bindings/element_struct";
-import Elements from "../module_bindings/elements";
-import ImageElementData from "../module_bindings/image_element_data";
-import Layouts from "../module_bindings/layouts";
 import { insertElement } from "../StDB/Reducers/Insert/insertElement";
 import { updateElementTransformNoViewportAdjustment } from "../StDB/Reducers/Update/updateElementTransform";
 import { SelectedType } from "../Types/General/SelectedType";
@@ -12,10 +7,30 @@ import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
-import UpdateElementTransparencyReducer from "../module_bindings/update_element_transparency_reducer";
 import { handleFlipElement } from "./ContextMenuMethods";
+import { DbConnection, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
+import { getElementByID } from "../StDB/SpacetimeDBUtils";
+
+let hobbesArmed = false;
+let hobbesTimer: number | null = null;
+const HOBBES_CHAIN_MS = 4000;
+
+const armHobbes = () => {
+  hobbesArmed = true;
+  if (hobbesTimer) clearTimeout(hobbesTimer);
+  hobbesTimer = window.setTimeout(() => (hobbesArmed = false), HOBBES_CHAIN_MS);
+};
+
+const disarmHobbes = () => {
+  hobbesArmed = false;
+  if (hobbesTimer) {
+    clearTimeout(hobbesTimer);
+    hobbesTimer = null;
+  }
+};
 
 export const UserInputHandler = (
+  Client: DbConnection,
   activeLayout: Layouts,
   selectedElement: SelectedType | undefined,
   selectoElements: Array<SVGElement | HTMLElement>,
@@ -54,7 +69,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("Deleting element");
-        selectoElements.forEach((e) => DeleteElementReducer.call(Number(e.id)));
+        selectoElements.forEach((e) => Client.reducers.deleteElement(Number(e.id)));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to Delete an element!");
       }
@@ -72,7 +87,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("showing element(s)");
-        selectoElements.forEach((e) => UpdateElementTransparencyReducer.call(Number(e.id), 100));
+        selectoElements.forEach((e) => Client.reducers.updateElementTransparency(Number(e.id), 100));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to show an element(s)!");
       }
@@ -90,7 +105,7 @@ export const UserInputHandler = (
 
       try {
         DebugLogger("hiding element(s)");
-        selectoElements.forEach((e) => UpdateElementTransparencyReducer.call(Number(e.id), 0));
+        selectoElements.forEach((e) => Client.reducers.updateElementTransparency(Number(e.id), 0));
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to hide an element(s)!");
       }
@@ -109,12 +124,12 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
         DebugLogger("Deleting and copying element");
 
-        DeleteElementReducer.call(selectedElement.Elements.id);
+        Client.reducers.deleteElement(selectedElement.Elements.id);
       } catch {
         console.log("Pogly encountered an issue when attempting to Cut an element!");
       }
@@ -133,13 +148,13 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
         DebugLogger("Duplicating element");
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element) {
           const matrix = GetMatrixFromElement(element.transform) || undefined;
           const transform = OffsetElementForCanvas(element).transform;
 
-          insertElement(element.element, activeLayout, element.transparency, transform, element.clip, matrix);
+          insertElement(Client, element.element, activeLayout, element.transparency, transform, element.clip, matrix);
         }
       } catch {
         console.log("Pogly encountered an issue when attempting to Duplicate an element!");
@@ -159,7 +174,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
         DebugLogger("Copying element");
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (element) navigator.clipboard.writeText(JSON.stringify(element));
       } catch {
@@ -210,6 +225,7 @@ export const UserInputHandler = (
             blobToBase64(blob, (result: { r: any; w: number; h: number }) => {
               DebugLogger("Inserting new element");
               insertElement(
+                Client,
                 ElementStruct.ImageElement({
                   imageElementData: ImageElementData.RawData(result.r as string),
                   width: result.w,
@@ -231,7 +247,15 @@ export const UserInputHandler = (
             const matrix = GetMatrixFromElement(json.transform) || undefined;
             const transform = OffsetElementForCanvas(json).transform;
 
-            insertElement(json.element as ElementStruct, activeLayout, json.transparency, transform, json.clip, matrix);
+            insertElement(
+              Client,
+              json.element as ElementStruct,
+              activeLayout,
+              json.transparency,
+              transform,
+              json.clip,
+              matrix
+            );
           } catch (error) {
             const isImageUrl = /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg|webp|avif))/i.test(text);
 
@@ -241,6 +265,7 @@ export const UserInputHandler = (
 
               image.onload = async function () {
                 insertElement(
+                  Client,
                   ElementStruct.ImageElement({
                     imageElementData: ImageElementData.RawData(text as string),
                     width: image.width,
@@ -259,7 +284,7 @@ export const UserInputHandler = (
                 css: "",
               });
 
-              insertElement(textElement, activeLayout);
+              insertElement(Client, textElement, activeLayout);
             }
           }
         }
@@ -281,7 +306,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -299,7 +324,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -331,7 +356,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -349,7 +374,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -381,7 +406,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -399,7 +424,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -431,7 +456,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -449,7 +474,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -481,7 +506,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -499,7 +524,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -532,7 +557,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -550,7 +575,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -582,7 +607,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -600,7 +625,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -632,7 +657,7 @@ export const UserInputHandler = (
       try {
         if (!selectedElement) return;
 
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
 
@@ -650,7 +675,7 @@ export const UserInputHandler = (
           coords.scaleY
         );
 
-        updateElementTransformNoViewportAdjustment(element.id, newTransform);
+        updateElementTransformNoViewportAdjustment(Client, element.id, newTransform);
 
         selectedElement.Component.style.setProperty(
           "transform",
@@ -801,7 +826,7 @@ export const UserInputHandler = (
     callback: (event: any) => {
       event.preventDefault();
 
-      handleFlipElement(false, selectedElement!.Elements);
+      handleFlipElement(Client, false, selectedElement!.Elements);
     },
   });
 
@@ -812,7 +837,7 @@ export const UserInputHandler = (
     callback: (event: any) => {
       event.preventDefault();
 
-      handleFlipElement(true, selectedElement!.Elements);
+      handleFlipElement(Client, true, selectedElement!.Elements);
     },
   });
 
@@ -879,7 +904,7 @@ export const UserInputHandler = (
       if (transformSelect.size) return;
 
       if (selectedElement) {
-        const element = Elements.findById(selectedElement.Elements.id);
+        const element = getElementByID(Client, selectedElement.Elements.id);
 
         if (element) {
           const hasElementBeenWarped = element.transform.includes("matrix");
@@ -905,6 +930,50 @@ export const UserInputHandler = (
       });
 
       toast.info("Scale transform enabled", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    },
+  });
+
+  userInputs.push({
+    name: "hobbes_part1",
+    keys: ["h", "o", "b"],
+    action: "keydown",
+    callback: (event: KeyboardEvent) => {
+      event.preventDefault();
+      armHobbes();
+    },
+  });
+
+  userInputs.push({
+    name: "hobbes_part2",
+    keys: ["b", "e", "s"],
+    action: "keydown",
+    callback: (event: KeyboardEvent) => {
+      if (!hobbesArmed) return;
+      event.preventDefault();
+      disarmHobbes();
+
+      insertElement(
+        Client,
+        ElementStruct.ImageElement({
+          imageElementData: ImageElementData.RawData(
+            "https://images.steamusercontent.com/ugc/436076195940631339/AF31CA667FA29E51E6D450FB58838C2B4F19C068/" as string
+          ),
+          width: 500,
+          height: 320,
+        }),
+        activeLayout
+      );
+
+      toast.success("In loving memory <3", {
         position: "bottom-right",
         autoClose: 2000,
         hideProgressBar: false,

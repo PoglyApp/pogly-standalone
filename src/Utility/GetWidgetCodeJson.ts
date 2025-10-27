@@ -1,10 +1,12 @@
-import ElementData from "../module_bindings/element_data";
 import { WidgetVariableType } from "../Types/General/WidgetVariableType";
 import { DebugLogger } from "./DebugLogger";
+import { DbConnection } from "../module_bindings";
 
-export const GetWidgetCodeJsonByElementDataID = (elementDataId: number) => {
+export const GetWidgetCodeJsonByElementDataID = (Client: DbConnection, elementDataId: number) => {
+
   DebugLogger("Getting widget code JSON by element data ID");
-  const widgetData = ElementData.findById(elementDataId);
+  const widgetData = Client.db.elementData.id.find(elementDataId);
+  
   if (!widgetData) return;
   const jsonObject = JSON.parse(widgetData.data);
 

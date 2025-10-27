@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import handleElementBorder from "../../Utility/HandleElementBorder";
-import ElementData from "../../module_bindings/element_data";
-import Elements from "../../module_bindings/elements";
-import ImageElement from "../../module_bindings/image_element";
-import { useAppSelector } from "../../Store/Features/store";
-import { useSpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { InRenderBounds } from "../../Utility/ConvertCoordinates";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
+import { ElementData, Elements, ImageElement } from "../../module_bindings";
+import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
 
 interface IProp {
   elements: Elements;
@@ -16,21 +14,23 @@ interface IProp {
 export const Image = (props: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
-  const { Identity } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const targetRef = useRef<HTMLDivElement>(null);
 
   const [imageData, setImageData] = useState<string>("");
   const [imageName, setImageName] = useState<string>("");
 
   const imageElement = props.elements.element.value as ImageElement;
-  const elementData: ElementData[] = useAppSelector((state: any) => state.elementData.elementData);
 
   useEffect(() => {
-    handleElementBorder(Identity.address, props.elements.id.toString());
+    if (!isOverlay) {
+      handleElementBorder(spacetimeDB.Client, spacetimeDB.Client.connectionId, props.elements.id.toString());
+    }
+
     DebugLogger("Creating image");
 
     if (imageElement.imageElementData.tag === "ElementDataId") {
-      const eData: ElementData = elementData.filter((e) => e.id === imageElement.imageElementData.value)[0];
+      const eData: ElementData = getElementDataByID(spacetimeDB.Client, imageElement.imageElementData.value);
 
       if (!eData) return;
 
@@ -41,22 +41,21 @@ export const Image = (props: IProp) => {
       setImageName("RawData");
     }
   }, [
-    elementData,
-    Identity.identity,
+    spacetimeDB.Identity.identity,
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
-    Identity.address
+    spacetimeDB.Client.connectionId,
+    spacetimeDB.Client,
   ]);
 
   const renderDisplay = () => {
-    if(InRenderBounds(props.elements)) {
+    if (InRenderBounds(props.elements)) {
       return "block";
-    }
-    else {
+    } else {
       return "none";
     }
-  }
+  };
 
   return (
     <div
@@ -78,7 +77,7 @@ export const Image = (props: IProp) => {
       }}
       data-locked={props.elements.locked}
     >
-      <img src={imageData} alt={imageName} draggable="false" width={"100%"} height={"100%"} />
+      <img src={imageData} alt={imageName} draggable="false" className="imageElement" />
       <p id={"debug-text" + props.elements.id} style={{ color: "white", display: "inline", fontSize: "6px" }}></p>
     </div>
   );

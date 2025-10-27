@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react";
-import Layouts from "../../module_bindings/layouts";
+import { useContext, useEffect, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
 const useFetchLayouts = (setLayouts: Function) => {
+  const { spacetimeDB } = useContext(SpacetimeContext);
+
   useEffect(() => {
     DebugLogger("Fetching layouts");
-    const fetchedLayouts = Layouts.all();
+    const fetchedLayouts = Array.from(spacetimeDB.Client.db.layouts.iter());
 
     setLayouts(
       fetchedLayouts.sort((a: any, b: any) => {
         return a.id - b.id;
       })
     );
-  }, [setLayouts]);
+  }, [setLayouts, spacetimeDB.Client]);
 };
 
 export default useFetchLayouts;

@@ -17,12 +17,9 @@ import styled from "styled-components";
 import { UploadBackupFromFile } from "../../Utility/UploadElementData";
 import { ModalContext } from "../../Contexts/ModalContext";
 import { DownloadElementData } from "../../Utility/DownloadElementData";
-import { ConfigContext } from "../../Contexts/ConfigContext";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import DeleteAllElementDataReducer from "../../module_bindings/delete_all_element_data_reducer";
-import DeleteAllElementsReducer from "../../module_bindings/delete_all_elements_reducer";
-import DeleteAllLayoutsReducer from "../../module_bindings/delete_all_layouts_reducer";
-import DeleteAllFoldersReducer from "../../module_bindings/delete_all_folders_reducer";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { Config } from "../../module_bindings";
 
 interface IProps {
   download: boolean;
@@ -30,7 +27,8 @@ interface IProps {
 
 export const BackupModal = (props: IProps) => {
   const { modals, setModals, closeModal } = useContext(ModalContext);
-  const config = useContext(ConfigContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [file, setFile] = useState<any>(null);
@@ -38,31 +36,27 @@ export const BackupModal = (props: IProps) => {
   const [downData, setDownData] = useState<boolean>(true);
   const [downElement, setDownElement] = useState<boolean>(false);
   const [downLayout, setDownLayout] = useState<boolean>(false);
-  const [deleteOnUpload,setDeleteOnUpload] = useState<boolean>(false);
+  const [deleteOnUpload, setDeleteOnUpload] = useState<boolean>(false);
 
   useEffect(() => {
     if (!props.download) return;
 
     if (downElement) setDownData(true);
-    DebugLogger("Setting download data");
   }, [downData, downElement, downLayout, props.download]);
 
   const handleOnClose = () => {
-    DebugLogger("Handling backup modal close");
     setFile(null);
     setError("");
     closeModal("backup_modal", modals, setModals);
   };
 
   const handleFileChange = (file: any) => {
-    DebugLogger("Handling backup modal file change");
     setError("");
 
-    const isJson = file.target.files[0].type === "application/json";
+    const isSqlite = file.target.files[0].name.endsWith(".sqlite");
 
-    if (!isJson) {
-      DebugLogger("File not JSON");
-      setError("Incorrect file format. File must be a .json file.");
+    if (!isSqlite) {
+      setError("Incorrect file format. File must be a sqlite file.");
       setFile(null);
       return;
     }
@@ -70,25 +64,14 @@ export const BackupModal = (props: IProps) => {
     setFile(file.target.files[0]);
   };
 
-  const handleUpload = () => {
-    if(!deleteOnUpload) {
-      DebugLogger("Uploading backup data");
-      UploadBackupFromFile(file);
-      closeModal("backup_modal", modals, setModals);
-    } else {
-      DebugLogger("Uploading backup data - clearing existing data");
-      DeleteAllElementsReducer.call();
-      DeleteAllElementDataReducer.call();
-      DeleteAllLayoutsReducer.call(false);
-      DeleteAllFoldersReducer.call(false);
-      UploadBackupFromFile(file);
-      closeModal("backup_modal", modals, setModals);
-    }
+  const handleUpload = async () => {
+    await UploadBackupFromFile(spacetimeDB.Client, file, deleteOnUpload, true);
+    closeModal("backup_modal", modals, setModals);
   };
 
   const handleDownload = () => {
     DebugLogger("Handling download data");
-    DownloadElementData(downData, downElement, downLayout, config, modals, setModals, closeModal);
+    DownloadElementData(spacetimeDB.Client, downData, downElement, downLayout, config, modals, setModals, closeModal);
   };
 
   if (isOverlay) return <></>;
@@ -109,22 +92,22 @@ export const BackupModal = (props: IProps) => {
             </Typography>
             <Input type="file" onChange={(event: any) => handleFileChange(event)} />
             <div style={{ display: "grid", marginTop: "10px" }}>
-                <FormControlLabel
-                  componentsProps={{
-                    typography: { color: "#ffffffa6", paddingTop: "1px" },
-                  }}
-                  sx={{ alignItems: "start" }}
-                  control={
-                    <Checkbox
-                      onChange={() => setDeleteOnUpload(!deleteOnUpload)}
-                      defaultChecked={deleteOnUpload}
-                      sx={{ color: "#ffffffa6", paddingTop: "0px" }}
-                    />
-                  }
-                  label="Clear existing data"
-                  title="Recommended for large modules with multiple layouts!"
-                />
-              </div>
+              <FormControlLabel
+                componentsProps={{
+                  typography: { color: "#ffffffa6", paddingTop: "1px" },
+                }}
+                sx={{ alignItems: "start" }}
+                control={
+                  <Checkbox
+                    onChange={() => setDeleteOnUpload(!deleteOnUpload)}
+                    defaultChecked={deleteOnUpload}
+                    sx={{ color: "#ffffffa6", paddingTop: "0px" }}
+                  />
+                }
+                label="Clear existing data"
+                title="Recommended for large modules with multiple layouts!"
+              />
+            </div>
             {error !== "" && (
               <Alert
                 variant="filled"

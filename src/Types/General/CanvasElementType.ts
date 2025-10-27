@@ -1,6 +1,5 @@
-import Elements from "../../module_bindings/elements";
-import ElementData from "../../module_bindings/element_data";
-import ImageElementData from "../../module_bindings/image_element_data";
+import { ElementData, Elements, ImageElementData } from "../../module_bindings";
+
 
 export type CanvasElementType = {
   Elements: Elements;

@@ -2,17 +2,14 @@ import { Menu, MenuItem, Paper, Tooltip } from "@mui/material";
 import { useContext, useState } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
-import SetLayoutActiveReducer from "../../../module_bindings/set_layout_active_reducer";
 import { ModalContext } from "../../../Contexts/ModalContext";
 import { LayoutDeletionConfirmationModal } from "../../Modals/LayoutDeletionConfirmationModal";
 import { DebugLogger } from "../../../Utility/DebugLogger";
-import Config from "../../../module_bindings/config";
-import PermissionLevel from "../../../module_bindings/permission_level";
-import Permissions from "../../../module_bindings/permissions";
-import { useSpacetimeContext } from "../../../Contexts/SpacetimeContext";
+import { SpacetimeContext } from "../../../Contexts/SpacetimeContext";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutlined";
-import DuplicateLayoutReducer from "../../../module_bindings/duplicate_layout_reducer";
 import { LayoutCreationModal } from "../../Modals/LayoutCreationModal";
+import { PermissionTypes } from "../../../Types/General/PermissionType";
+import { getPermissions } from "../../../Utility/PermissionsHelper";
 
 interface IProps {
   contextMenu: any;
@@ -21,16 +18,16 @@ interface IProps {
 
 export const LayoutContextMenu = (props: IProps) => {
   const { setModals } = useContext(ModalContext);
-  const { Identity, Runtime } = useSpacetimeContext();
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [showExamine, setShowExamine] = useState(false);
 
-  const strictMode: boolean = Config.findByVersion(0)!.strictMode;
-  const permissions: PermissionLevel | undefined = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const strictMode: boolean = spacetimeDB.Client.db.config.version.find(0)!.strictMode;
+  const permissions: PermissionTypes[] = getPermissions(spacetimeDB, spacetimeDB.Identity.identity);
 
   const handleSetActive = () => {
     DebugLogger("Changing active layout");
-    SetLayoutActiveReducer.call(props.contextMenu.layout.id);
+    spacetimeDB.Client.reducers.setLayoutActive(props.contextMenu.layout.id);
     handleClose();
   };
 
@@ -44,7 +41,7 @@ export const LayoutContextMenu = (props: IProps) => {
 
   const cloneLayout = () => {
     DebugLogger("Cloning layout");
-    DuplicateLayoutReducer.call(props.contextMenu.layout.id);
+    spacetimeDB.Client.reducers.duplicateLayout(props.contextMenu.layout.id);
     handleClose();
   };
 
@@ -72,10 +69,10 @@ export const LayoutContextMenu = (props: IProps) => {
   };
 
   const copyLayoutOverlayURL = (layoutName: string) => {
-    let overlayURL = window.location.origin + "/overlay?module=" + Runtime?.module;
-    const isPoglyInstance: Boolean = Runtime?.domain === "wss://pogly.spacetimedb.com";
+    let overlayURL = window.location.origin + "/overlay?module=" + spacetimeDB.Runtime?.module;
+    const isPoglyInstance: Boolean = spacetimeDB.Runtime?.domain === "wss://maincloud.spacetimedb.com";
 
-    if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + Runtime?.domain;
+    if (!isPoglyInstance) overlayURL = overlayURL + "&domain=" + spacetimeDB.Runtime?.domain;
 
     navigator.clipboard.writeText(overlayURL + `&layout=${layoutName}`);
   };
@@ -183,7 +180,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDeleteMenuItem = styled(MenuItem)`
-  color: #d82b2b;
+  color: #d82b2b !important;
 
   margin-left: 5px;
   margin-right: 5px;
@@ -203,7 +200,7 @@ const StyledDisabledMenuItem = styled(MenuItem)`
 `;
 
 const StyledDisabledDeleteMenuItem = styled(MenuItem)`
-  color: #681c1c;
+  color: #681c1c !important;
 
   margin-left: 5px;
   margin-right: 5px;

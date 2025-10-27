@@ -3,7 +3,6 @@ import { styled } from "styled-components";
 import { CursorsContainer } from "../Components/Containers/CursorsContainer";
 import { MoveableComponent } from "../Components/General/MoveableComponent";
 import StreamContainer from "../Components/Containers/StreamContainer";
-import Elements from "../module_bindings/elements";
 import { useElementDataEvents } from "../StDB/Hooks/useElementDataEvents";
 import { useElementsEvents } from "../StDB/Hooks/useElementsEvents";
 import useFetchElement from "../StDB/Hooks/useFetchElements";
@@ -12,7 +11,6 @@ import { useGuestsEvents } from "../StDB/Hooks/useGuestsEvents";
 import { useAppSelector } from "../Store/Features/store";
 import { CanvasElementType } from "../Types/General/CanvasElementType";
 import { SelectedType } from "../Types/General/SelectedType";
-import Config from "../module_bindings/config";
 import { Loading } from "../Components/General/Loading";
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { SelectoComponent } from "../Components/General/SelectoComponent";
@@ -22,38 +20,45 @@ import { ElementContextMenu } from "../Components/Elements/ContextMenus/ElementC
 import { HandleElementContextMenu } from "../Utility/HandleContextMenu";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
 import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
-import { ConfigContext } from "../Contexts/ConfigContext";
-import UpdateGuestPositionReducer from "../module_bindings/update_guest_position_reducer";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
-import Layouts from "../module_bindings/layouts";
 import { LayoutContext } from "../Contexts/LayoutContext";
-import UpdateGuestSelectedElementReducer from "../module_bindings/update_guest_selected_element_reducer";
 import { useHotkeys } from "reakeys";
 import { UserInputHandler } from "../Utility/UserInputHandler";
 import { SettingsContext } from "../Contexts/SettingsContext";
 import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
-import { useSpacetimeContext } from "../Contexts/SpacetimeContext";
-import Permissions from "../module_bindings/permissions";
+import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { ModalContext } from "../Contexts/ModalContext";
+import { Config, Elements, Layouts } from "../module_bindings";
+import { useNavigate } from "react-router-dom";
+import { PermissionTypes } from "../Types/General/PermissionType";
+import { getPermissions } from "../Utility/PermissionsHelper";
 
-interface IProps {
-  setActivePage: Function;
-  canvasInitialized: CanvasInitializedType;
-  setCanvasInitialized: Function;
-  disconnected: boolean;
-}
+export const Canvas = () => {
+  const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
+    elementsFetchInitialized: false,
+    elementEventsInitialized: false,
+    elementDataEventsInitialized: false,
+    guestFetchInitialized: false,
+    guestEventsInitialized: false,
+  });
 
-export const Canvas = (props: IProps) => {
+  const navigate = useNavigate();
+
   const isOverlay: Boolean = window.location.href.includes("/overlay");
-  const config: Config = useContext(ConfigContext);
-  const layoutContext = useContext(LayoutContext);
+  const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Identity } = useSpacetimeContext();
-  const permission = Permissions.findByIdentity(Identity.identity)?.permissionLevel;
+  const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+  const [disconnectedState, setDisconnectedState] = useState<boolean>(false);
+  const config: Config = spacetimeDB.Client.db.config.version.find(0);
+
+  if (!spacetimeDB || !activeLayout) navigate("/", { replace: true });
+
+  const [permission, setPermission] = useState<PermissionTypes[]>(
+    getPermissions(spacetimeDB, spacetimeDB.Identity.identity)
+  );
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -77,39 +82,40 @@ export const Canvas = (props: IProps) => {
 
   const initGuidelineAccept = () => {
     if (isOverlay) return true;
-    if (permission && permission.tag === "Owner") return true;
+    if (permission && permission.includes(PermissionTypes.Owner)) return true;
     if (localStorage.getItem("Accept_EditorGuidelines")) return true;
     return false;
   };
 
   const [acceptedGuidelines, setAcceptedGuidelines] = useState<boolean>(initGuidelineAccept);
 
-  useFetchElement(layoutContext.activeLayout, props.canvasInitialized, props.setCanvasInitialized);
+  useFetchElement(activeLayout, canvasInitialized, setCanvasInitialized);
 
-  useElementDataEvents(props.canvasInitialized, props.setCanvasInitialized);
+  useElementDataEvents(canvasInitialized, setCanvasInitialized);
   useElementsEvents(
     selectoRef,
     selected,
     setSelected,
     setSelectoTargets,
-    props.canvasInitialized,
-    props.setCanvasInitialized,
-    layoutContext.activeLayout,
+    canvasInitialized,
+    setCanvasInitialized,
+    activeLayout,
     transformSelect,
     setTransformSelect
   );
 
-  const disconnected = useGuestsEvents(props.canvasInitialized, props.setCanvasInitialized, transformRef);
-  useFetchGuests(props.canvasInitialized, props.setCanvasInitialized);
+  const userDisconnected = useGuestsEvents(canvasInitialized, setCanvasInitialized, transformRef);
+  useFetchGuests(canvasInitialized, setCanvasInitialized);
 
-  useHeartbeatEvents(props.canvasInitialized);
-  const configReload = useConfigEvents(props.canvasInitialized);
+  useHeartbeatEvents(canvasInitialized);
+  const configReload = useConfigEvents(canvasInitialized);
 
   useNotice(setNoticeMessage);
 
   useHotkeys(
     UserInputHandler(
-      layoutContext.activeLayout,
+      spacetimeDB.Client,
+      activeLayout,
       selected,
       selectoTargets,
       settings.compressPaste,
@@ -120,9 +126,22 @@ export const Canvas = (props: IProps) => {
   );
 
   useEffect(() => {
-    if (!layoutContext.activeLayout) {
+    if (permission) return;
+
+    setPermission(getPermissions(spacetimeDB, spacetimeDB.Identity.identity));
+  }, []);
+
+  useEffect(() => {
+    if (!spacetimeDB.Disconnected) return;
+    setDisconnectedState(spacetimeDB.Disconnected);
+  }, [spacetimeDB.Disconnected]);
+
+  useEffect(() => {
+    if (!activeLayout) {
       DebugLogger("Setting active layout");
-      layoutContext.setActiveLayout(Layouts.filterByActive(true).next().value);
+      setActiveLayout(
+        (Array.from(spacetimeDB.Client.db.layouts.iter()) as Layouts[]).find((l: Layouts) => l.active === true)
+      );
     }
 
     DebugLogger("Layout context updated");
@@ -130,14 +149,8 @@ export const Canvas = (props: IProps) => {
     setSelected(undefined);
     setSelectoTargets(() => []);
 
-    UpdateGuestSelectedElementReducer.call(0);
-  }, [layoutContext]);
-
-  useEffect(() => {
-    DebugLogger("Setting active page");
-    props.setActivePage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.setActivePage]);
+    spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
+  }, [activeLayout, setActiveLayout, spacetimeDB.Client]);
 
   // Limit how many times cursor event is updated
   let waitUntil = 0;
@@ -151,12 +164,12 @@ export const Canvas = (props: IProps) => {
     const x = (event.clientX - streamRect.left) / transformRef.current.instance.transformState.scale;
     const y = (event.clientY - streamRect.top) / transformRef.current.instance.transformState.scale;
 
-    UpdateGuestPositionReducer.call(x, y);
+    spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
     waitUntil = Date.now() + 1000 / config.updateHz;
   };
 
-  if (disconnected || props.disconnected) {
+  if (userDisconnected || spacetimeDB.Disconnected || disconnectedState) {
     DebugLogger("Guest is disconnected");
     return (
       <ErrorRefreshModal
@@ -182,14 +195,14 @@ export const Canvas = (props: IProps) => {
     );
   }
 
-  if (!acceptedGuidelines) {
+  if (!acceptedGuidelines && !permission.includes(PermissionTypes.Owner)) {
     DebugLogger("Guest has not accepted guidelines");
     return <EditorGuidelineModal key="guideline_modal" setAcceptedGuidelines={setAcceptedGuidelines} />;
   }
 
   return (
-    <div className="mouseContainer" onMouseMove={onMouseMove}>
-      {Object.values(props.canvasInitialized).every((init) => init === true) && layoutContext.activeLayout ? (
+    <div className="mouseContainer canvas-font" onMouseMove={onMouseMove}>
+      {Object.values(canvasInitialized).every((init) => init === true) && activeLayout ? (
         <TransformWrapper
           ref={transformRef}
           limitToBounds={false}
@@ -252,7 +265,7 @@ export const Canvas = (props: IProps) => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer />
+                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} settings={settings} />
               </div>
             </Container>
 

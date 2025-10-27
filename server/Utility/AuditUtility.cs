@@ -1,5 +1,4 @@
 ﻿using SpacetimeDB;
-using static SpacetimeDB.Runtime;
 
 public partial class Module
 {
@@ -8,14 +7,14 @@ public partial class Module
         try
         {
             string nick = "";
-            if (ctx.Sender == Heartbeat.FilterById(0).First().ServerIdentity)
+            if(ctx.Sender == ctx.Db.Heartbeat.Id.Find(0)!.Value.ServerIdentity)
             {
                 nick = "Server";
             }
             else
             {
-                if (ctx.Address is null) return;
-                var guest = Guests.FindByAddress(ctx.Address);
+                if (ctx.ConnectionId is null) return;
+                var guest = ctx.Db.Guests.Address.Find(ctx.ConnectionId.Value);
                 if (guest is null)
                 {
                     //Log($"[AuditLog - {reducer}] Unable to audit log because Guest nickname is null!",LogLevel.Error);
@@ -45,10 +44,10 @@ public partial class Module
                         switch (oldChange)
                         {
                             case ChangeStruct.EmptyChange:
-                                Log($"[Elements - {reducer}] {ctx.Sender} added:\n\t({b.ElementChange_.Id},{b.ElementChange_.Element},{b.ElementChange_.Transparency},{b.ElementChange_.Transform},{b.ElementChange_.Clip},{b.ElementChange_.PlacedBy},{b.ElementChange_.LastEditedBy},{b.ElementChange_.ZIndex})", LogLevel.Info);
+                                Log.Info($"[Elements - {reducer}] {ctx.Sender} added:\n\t({b.ElementChange_.Id},{b.ElementChange_.Element},{b.ElementChange_.Transparency},{b.ElementChange_.Transform},{b.ElementChange_.Clip},{b.ElementChange_.PlacedBy},{b.ElementChange_.LastEditedBy},{b.ElementChange_.ZIndex})");
                                 break;
                             case ChangeStruct.ElementChange a:
-                                Log($"[Elements - {reducer}] {ctx.Sender} changed:\n\tOld: ({a.ElementChange_.Id},{a.ElementChange_.Element},{a.ElementChange_.Transparency},{a.ElementChange_.Transform},{a.ElementChange_.Clip},{a.ElementChange_.PlacedBy},{a.ElementChange_.LastEditedBy},{a.ElementChange_.ZIndex})\n\tNew: ({b.ElementChange_.Id},{b.ElementChange_.Element},{b.ElementChange_.Transparency},{b.ElementChange_.Transform},{b.ElementChange_.Clip},{b.ElementChange_.PlacedBy},{b.ElementChange_.LastEditedBy},{b.ElementChange_.ZIndex})", LogLevel.Info);
+                                Log.Info($"[Elements - {reducer}] {ctx.Sender} changed:\n\tOld: ({a.ElementChange_.Id},{a.ElementChange_.Element},{a.ElementChange_.Transparency},{a.ElementChange_.Transform},{a.ElementChange_.Clip},{a.ElementChange_.PlacedBy},{a.ElementChange_.LastEditedBy},{a.ElementChange_.ZIndex})\n\tNew: ({b.ElementChange_.Id},{b.ElementChange_.Element},{b.ElementChange_.Transparency},{b.ElementChange_.Transform},{b.ElementChange_.Clip},{b.ElementChange_.PlacedBy},{b.ElementChange_.LastEditedBy},{b.ElementChange_.ZIndex})");
                                 break;
                         }
 
@@ -57,10 +56,10 @@ public partial class Module
                         switch (oldChange)
                         {
                             case ChangeStruct.EmptyChange:
-                                Log($"[ElementData - {reducer}] {ctx.Sender} added:\n\t({d.ElementDataChange_.Id},{d.ElementDataChange_.Name},{d.ElementDataChange_.DataType},{d.ElementDataChange_.Data},{d.ElementDataChange_.CreatedBy})", LogLevel.Info);
+                                Log.Info($"[ElementData - {reducer}] {ctx.Sender} added:\n\t({d.ElementDataChange_.Id},{d.ElementDataChange_.Name},{d.ElementDataChange_.DataType},{d.ElementDataChange_.Data},{d.ElementDataChange_.CreatedBy})");
                                 break;
                             case ChangeStruct.ElementDataChange c:
-                                Log($"[ElementData - {reducer}] {ctx.Sender} changed:\n\tOld: ({c.ElementDataChange_.Id},{c.ElementDataChange_.Name},{c.ElementDataChange_.DataType},{c.ElementDataChange_.Data},{c.ElementDataChange_.CreatedBy})\n\tNew: ({d.ElementDataChange_.Id},{d.ElementDataChange_.Name},{d.ElementDataChange_.DataType},{d.ElementDataChange_.Data},{d.ElementDataChange_.CreatedBy})", LogLevel.Info);
+                                Log.Info($"[ElementData - {reducer}] {ctx.Sender} changed:\n\tOld: ({c.ElementDataChange_.Id},{c.ElementDataChange_.Name},{c.ElementDataChange_.DataType},{c.ElementDataChange_.Data},{c.ElementDataChange_.CreatedBy})\n\tNew: ({d.ElementDataChange_.Id},{d.ElementDataChange_.Name},{d.ElementDataChange_.DataType},{d.ElementDataChange_.Data},{d.ElementDataChange_.CreatedBy})");
                                 break;
                         }
                         break;
@@ -68,10 +67,10 @@ public partial class Module
                         switch (oldChange)
                         {
                             case ChangeStruct.EmptyChange:
-                                Log($"[Guests - {reducer}] {ctx.Sender} added:\n\t({f.GuestChange_.Identity}{f.GuestChange_.Nickname},{f.GuestChange_.Color},{f.GuestChange_.SelectedElementId},{f.GuestChange_.PositionX},{f.GuestChange_.PositionY})",LogLevel.Info);
+                                Log.Info($"[Guests - {reducer}] {ctx.Sender} added:\n\t({f.GuestChange_.Identity}{f.GuestChange_.Nickname},{f.GuestChange_.Color},{f.GuestChange_.SelectedElementId},{f.GuestChange_.PositionX},{f.GuestChange_.PositionY})");
                                 break;
                             case ChangeStruct.GuestChange e:
-                                Log($"[Guests - {reducer}] {ctx.Sender} change:\n\tOld: ({e.GuestChange_.Identity}{e.GuestChange_.Nickname},{e.GuestChange_.Color},{e.GuestChange_.SelectedElementId},{e.GuestChange_.PositionX},{e.GuestChange_.PositionY})\n\tNew: ({f.GuestChange_.Identity}{f.GuestChange_.Nickname},{f.GuestChange_.Color},{f.GuestChange_.SelectedElementId},{f.GuestChange_.PositionX},{f.GuestChange_.PositionY})",LogLevel.Info);
+                                Log.Info($"[Guests - {reducer}] {ctx.Sender} change:\n\tOld: ({e.GuestChange_.Identity}{e.GuestChange_.Nickname},{e.GuestChange_.Color},{e.GuestChange_.SelectedElementId},{e.GuestChange_.PositionX},{e.GuestChange_.PositionY})\n\tNew: ({f.GuestChange_.Identity}{f.GuestChange_.Nickname},{f.GuestChange_.Color},{f.GuestChange_.SelectedElementId},{f.GuestChange_.PositionX},{f.GuestChange_.PositionY})");
                                 break;
                         }
                         break;
@@ -79,31 +78,31 @@ public partial class Module
                         switch (oldChange)
                         {
                             case ChangeStruct.ElementDataChange g:
-                                Log($"[ElementData - {reducer}] {ctx.Sender} deleted:\n\t({g.ElementDataChange_.Id},{g.ElementDataChange_.Name},{g.ElementDataChange_.DataType},{g.ElementDataChange_.Data},{g.ElementDataChange_.CreatedBy})",LogLevel.Info);
+                                Log.Info($"[ElementData - {reducer}] {ctx.Sender} deleted:\n\t({g.ElementDataChange_.Id},{g.ElementDataChange_.Name},{g.ElementDataChange_.DataType},{g.ElementDataChange_.Data},{g.ElementDataChange_.CreatedBy})");
                                 break;
                             case ChangeStruct.ElementChange h:
-                                Log($"[Elements - {reducer}] {ctx.Sender} deleted:\n\t({h.ElementChange_.Id},{h.ElementChange_.Element},{h.ElementChange_.Transparency},{h.ElementChange_.Transform},{h.ElementChange_.Clip},{h.ElementChange_.PlacedBy},{h.ElementChange_.LastEditedBy},{h.ElementChange_.ZIndex})",LogLevel.Info);
+                                Log.Info($"[Elements - {reducer}] {ctx.Sender} deleted:\n\t({h.ElementChange_.Id},{h.ElementChange_.Element},{h.ElementChange_.Transparency},{h.ElementChange_.Transform},{h.ElementChange_.Clip},{h.ElementChange_.PlacedBy},{h.ElementChange_.LastEditedBy},{h.ElementChange_.ZIndex})");
                                 break;
                             case ChangeStruct.GuestChange i:
-                                Log($"[Guests - {reducer}] {ctx.Sender} deleted:\n\t({i.GuestChange_.Identity},{i.GuestChange_.Nickname},{i.GuestChange_.Color},{i.GuestChange_.SelectedElementId},{i.GuestChange_.PositionX},{i.GuestChange_.PositionY})",LogLevel.Info);
+                                Log.Info($"[Guests - {reducer}] {ctx.Sender} deleted:\n\t({i.GuestChange_.Identity},{i.GuestChange_.Nickname},{i.GuestChange_.Color},{i.GuestChange_.SelectedElementId},{i.GuestChange_.PositionX},{i.GuestChange_.PositionY})");
                                 break;
                             case ChangeStruct.EmptyChange:
-                                Log($"Logger encountered null changing to null?? Shouldn't happen",LogLevel.Error);
+                                Log.Info($"Logger encountered null changing to null?? Shouldn't happen");
                                 break;
                             case ChangeStruct.ChatMessage:
-                                Log($"[AuditLog - {reducer}] Somehow the chat message made its way into the oldChange Struct?", LogLevel.Error);
+                                Log.Info($"[AuditLog - {reducer}] Somehow the chat message made its way into the oldChange Struct?");
                                 break;
                         }
                         break;
                     case ChangeStruct.ChatMessage chat:
-                        Log($"[AuditLog - {reducer}] {ctx.Sender} chatted: ({chat.ChatMessage_.Message})", LogLevel.Info);
+                        Log.Info($"[AuditLog - {reducer}] {ctx.Sender} chatted: ({chat.ChatMessage_.Message})");
                         break;
                 }
             }
         }
         catch (Exception e)
         {
-            Log($"[Audit Log] Unable to log changes for {reducer}! " + e.Message,LogLevel.Error);
+            Log.Info($"[Audit Log] Unable to log changes for {reducer}! " + e.Message);
         }
     }
 

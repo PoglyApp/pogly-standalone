@@ -28,7 +28,7 @@ export const Loading = (props: IProps) => {
   };
 
   if (isOverlay) return <></>;
-
+  
   return (
     <LoadingContainer>
       <div style={{ position: "absolute", top: "45%" }}>
