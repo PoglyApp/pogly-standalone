@@ -12,9 +12,9 @@ import { insertElement } from "../../StDB/Reducers/Insert/insertElement";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import SevenTVWrap from "../../Utility/SevenTVWrap";
 import styled from "styled-components";
-import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData, ElementStruct, ImageElementData } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 
 interface IProps {
   sevenTVEmotes: SevenTVEmoteType[] | undefined;
