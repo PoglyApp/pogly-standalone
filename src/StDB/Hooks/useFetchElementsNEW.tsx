@@ -20,8 +20,7 @@ const useFetchElement = (
   useEffect(() => {
     if (!Client || !subscriptionsApplied || !refetchElements) return;
 
-    const activeLayout: Layouts = layoutParam ? getLayoutByName(Client, layoutParam)! : getLayoutByActivity(Client)!;
-
+    const activeLayout: Layouts | undefined = layoutParam ? getLayoutByName(Client, layoutParam) : getLayoutByActivity(Client);
     if (!activeLayout) return;
 
     const elements: Elements[] = (Client.db.elements.iter() as Elements[]).filter(
@@ -38,7 +37,7 @@ const useFetchElement = (
     setElements(canvasElements);
 
     if (refetchElements) setRefetchElements(false);
-  }, [subscriptionsApplied, refetchElements]);
+  }, [Client, subscriptionsApplied, refetchElements]);
 };
 
 const elementOffsetForCanvas = (elements: Elements[]) => {

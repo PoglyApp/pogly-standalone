@@ -41,7 +41,6 @@ export const Overlay = () => {
     const nickname = urlParams.get("nickname");
 
     SetSubscriptions(spacetimeDB.Client, setSubscriptionsApplied);
-    spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
 
     spacetimeDB.Client.reducers.clearRefreshOverlayRequests();
 
