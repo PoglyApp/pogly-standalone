@@ -18,7 +18,6 @@ const useStDB = (
   const { setSpacetimeDB } = useContext(SpacetimeContext);
 
   const [identity, setIdentity] = useState<Identity>();
-  const [address, setAddress] = useState<ConnectionId>();
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState<boolean>(false);
@@ -122,7 +121,6 @@ const useStDB = (
 
   return {
     Client: client,
-    Address: address,
     Identity: identity,
     InstanceConfig: config,
     Error: error,
