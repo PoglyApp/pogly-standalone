@@ -82,7 +82,7 @@ const useStDB = (
 
     const client = DbConnection.builder()
       .withUri(stdbDomain)
-      .withModuleName(connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "")
+      .withModuleName("pogly_" + connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "")
       .withToken(isOverlay ? "" : stdbToken)
       .onConnect(onConnect)
       .onConnectError(onConnectError)
