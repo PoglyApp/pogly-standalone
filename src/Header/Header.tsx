@@ -18,6 +18,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
+import { useGetVersionNumber } from "../Hooks/useGetVersionNumber";
 
 export const Header = () => {
   const location = useLocation();

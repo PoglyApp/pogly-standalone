@@ -99,6 +99,13 @@ export const Login = () => {
     stdbAuthenticatedRef.current = stdbAuthenticated;
   }, [stdbAuthenticated]);
 
+  useEffect(() => {
+    if (spacetime.TokenExpired) {
+      auth.removeUser();
+      navigate("/login", { replace: true });
+    }
+  }, [spacetime.TokenExpired]);
+
   if (spacetime.TokenExpired) {
     return (
       <ErrorRefreshModal
