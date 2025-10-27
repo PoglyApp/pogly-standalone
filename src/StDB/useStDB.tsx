@@ -44,7 +44,7 @@ const useStDB = (
     let modulename = connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "";
 
     if (window.location.origin) {
-      modulename = "pogly_" + modulename;
+      modulename = "pogly-" + modulename;
     }
 
     DebugLogger("Initializing SpacetimeDB");
