@@ -17,6 +17,8 @@ const useStDB = (
   const auth = useAuth();
   const { setSpacetimeDB } = useContext(SpacetimeContext);
 
+  const [initialized, setInitialized] = useState<boolean>(false);
+
   const [identity, setIdentity] = useState<Identity>();
   const [address, setAddress] = useState<ConnectionId>();
   const [config, setConfig] = useState<Config>();
@@ -26,7 +28,7 @@ const useStDB = (
   const [client, setClient] = useState<DbConnection>();
 
   useEffect(() => {
-    if (!connectionConfig) return;
+    if (!connectionConfig || initialized) return;
 
     let stdbDomain = connectionConfig?.domain || "";
     const isOverlay: Boolean = window.location.href.includes("/overlay");
@@ -42,14 +44,15 @@ const useStDB = (
 
     DebugLogger("Initializing SpacetimeDB");
 
+    setInitialized(true);
+
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
         setIdentity(identity);
         setClient(DbCtx);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
-        DbCtx
-          .subscriptionBuilder()
+        DbCtx.subscriptionBuilder()
           .onApplied(onSubscriptionsApplied)
           .subscribe([
             "SELECT * FROM Heartbeat",
