@@ -41,12 +41,6 @@ const useStDB = (
       stdbToken = auth.user.id_token;
     }
 
-    let modulename = connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "";
-
-    if (window.location.origin) {
-      modulename = "pogly_" + modulename;
-    }
-
     DebugLogger("Initializing SpacetimeDB");
 
     setInitialized(true);
@@ -88,7 +82,7 @@ const useStDB = (
 
     const client = DbConnection.builder()
       .withUri(stdbDomain)
-      .withModuleName(modulename)
+      .withModuleName(connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "")
       .withToken(isOverlay ? "" : stdbToken)
       .onConnect(onConnect)
       .onConnectError(onConnectError)
