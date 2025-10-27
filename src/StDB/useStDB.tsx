@@ -43,7 +43,7 @@ const useStDB = (
 
     let modulename = connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "";
 
-    if (window.location.origin) {
+    if (window.location.origin === "https://cloud.pogly.gg" || window.location.origin === "http://localhost:3006") {
       modulename = "pogly-" + modulename;
     }
 
