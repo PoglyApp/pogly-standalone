@@ -140,8 +140,8 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center bg-[#10121a] max-md:flex-col p-5">
       <PoglyLogo />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30 overflow-scroll hideScrollbar">
-        <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] min-h-[550px] max-md:min-h-0 mb-30 overflow-scroll hideScrollbar">
+        <div className="w-full min-h-fit md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl overflow-hidden">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
             <span className="text-[#82a5ff] whitespace-nowrap">
@@ -164,7 +164,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         </div>
 
         {step === 0 && (
-          <div className="relative w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10 m-h-[422px]">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
@@ -261,7 +261,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:h-[290px]">
+            <div className="rounded-lg h-fit text-[#edf1ff] max-md:h-[290px]">
               <p className="mb-5">
                 This channel will be shown in the preview in middle of the canvas so you can place elements pixel
                 perfectly on the screen.
@@ -302,9 +302,13 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               )}
             </div>
 
-            <div className="flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
-              <StyledButton disabled={!channelName ? true : false} onClick={() => setStep((s) => s + 1)}>
+              <StyledButton
+                disabled={!channelName ? true : false}
+                onClick={() => setStep((s) => s + 1)}
+                className="mr-10"
+              >
                 Next
               </StyledButton>
             </div>
@@ -316,7 +320,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:h-[310px]">
+            <div className="rounded-lgh-fit text-[#edf1ff] max-md:h-[310px]">
               <p>
                 Pogly has couple of security measures you can enable to make sure unauthorized users cannot wreak havoc
                 on your stream. While these options are optional, we <b>highly</b> recommend you turn them on.
@@ -378,11 +382,12 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton
                 disabled={(usePassword && !password) || passwordError ? true : false}
                 onClick={() => setStep((s) => s + 1)}
+                className="mr-10"
               >
                 Next
               </StyledButton>
@@ -395,7 +400,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[422px] text-[#edf1ff] max-md:mb-20 max-sm:mb-30">
+            <div className="rounded-lg h-fit text-[#edf1ff] max-md:mb-20 max-sm:mb-30">
               <p>
                 And that's it! Your module is now setup. Remember, as the owner of the module you can always change the
                 configuration from the settings.
@@ -475,16 +480,16 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>
               {!showUploadingText ? (
-                <StyledButton disabled={initializing} onClick={handleSave}>
+                <StyledButton disabled={initializing} onClick={handleSave} className="mr-10">
                   Finish
                 </StyledButton>
               ) : (
-                <span className="grid self-center">Uploading backup, do not close the window.</span>
+                <span className="grid self-center mr-10">Uploading backup, do not close the window.</span>
               )}
             </div>
           </div>
