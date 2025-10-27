@@ -40,7 +40,8 @@ export const Header = () => {
     const heartBeat = spacetimeDB.Client?.db.heartbeat.id.find(0);
     const config = spacetimeDB.Client?.db.config.version.find(0);
 
-    if (config?.ownerIdentity.toHexString() === heartBeat?.serverIdentity.toHexString()) setShowVerificationButton(true);
+    if (config?.ownerIdentity.toHexString() === heartBeat?.serverIdentity.toHexString())
+      setShowVerificationButton(true);
   }, [spacetimeDB]);
 
   useEffect(() => {
@@ -54,9 +55,6 @@ export const Header = () => {
       window.location.href = "/";
     }
   }, [location, navigate]);
-
-  const [version, setVersion] = useState<string>();
-  useGetVersionNumber(setVersion);
 
   const showSettingsMenu = () => {
     DebugLogger("Opening settings modal");
@@ -131,20 +129,6 @@ export const Header = () => {
                 )}
               </Tabs>
             </Box>
-
-            {version && version !== "0.2.2" && (
-              <StyledNoOwner
-                icon={<ReportGmailerrorredIcon />}
-                iconPosition="start"
-                label="You are using a legacy version of Pogly. Click here to find out how to update!"
-                onClick={() =>
-                  window.open(
-                    "https://github.com/PoglyApp/pogly-documentation/blob/main/use/moduleMigration.md",
-                    "_blank"
-                  )
-                }
-              />
-            )}
 
             <GuestListContainer />
           </Toolbar>
