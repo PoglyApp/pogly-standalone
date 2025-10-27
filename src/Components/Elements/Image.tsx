@@ -24,7 +24,7 @@ export const Image = (props: IProp) => {
 
   useEffect(() => {
     if (!isOverlay) {
-      handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, props.elements.id.toString());
+      handleElementBorder(spacetimeDB.Client, spacetimeDB.Client.connectionId, props.elements.id.toString());
     }
 
     DebugLogger("Creating image");
@@ -45,7 +45,7 @@ export const Image = (props: IProp) => {
     imageElement.imageElementData.tag,
     imageElement.imageElementData.value,
     props.elements.id,
-    spacetimeDB.Identity.address,
+    spacetimeDB.Client.connectionId,
     spacetimeDB.Client,
   ]);
 

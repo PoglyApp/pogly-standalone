@@ -16,7 +16,7 @@ const useFetchGuests = (canvasInitialized: CanvasInitializedType, setCanvasIniti
 
     const guests: any[] = Array.from(spacetimeDB.Client.db.guests.iter());
 
-    const updatedGuests = guests.map((g: any) => g.address.toHexString() === spacetimeDB.Identity.address.toHexString()
+    const updatedGuests = guests.map((g: any) => g.address.toHexString() === spacetimeDB.Client.connectionId.toHexString()
       ? { ...g, nickname: spacetimeDB.Identity.nickname}
       : g
     );

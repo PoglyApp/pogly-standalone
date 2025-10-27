@@ -227,7 +227,7 @@ export const useElementsEvents = (
       // ===== MOVEABLE OBJECT RELATED =====
       if (ctx.event.tag === "Reducer") {
         if (
-          ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Identity.address.toHexString() ||
+          ctx.event.value.callerConnectionId?.toHexString() === spacetimeDB.Client.connectionId.toHexString() ||
           !component
         )
           return;
@@ -275,7 +275,7 @@ export const useElementsEvents = (
   }, [
     canvasInitialized.elementEventsInitialized,
     spacetimeDB.Identity.identity,
-    spacetimeDB.Identity.address,
+    spacetimeDB.Client.connectionId,
     selectoRef,
     setCanvasInitialized,
     setSelected,

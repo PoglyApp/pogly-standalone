@@ -34,13 +34,13 @@ export const useGuestsEvents = (
     spacetimeDB.Client.db.guests.onUpdate((ctx: EventContext, oldGuest: Guests, newGuest: Guests) => {
       // Quick and dirty fix, all of this will be redone when getting rid of guest store
       if (
-        newGuest.address.toHexString() === spacetimeDB.Identity.address.toHexString() &&
+        newGuest.address.toHexString() === spacetimeDB.Client.connectionId.toHexString() &&
         oldGuest.nickname !== newGuest.nickname
       ) {
         dispatch(updateGuest(newGuest));
       }
 
-      if (newGuest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) return;
+      if (newGuest.address.toHexString() === spacetimeDB.Client.connectionId.toHexString()) return;
 
       // IF NICKNAME IS UPDATED
       if (oldGuest.nickname === "" && newGuest.nickname !== "") {
@@ -61,10 +61,10 @@ export const useGuestsEvents = (
       // IF SELECTED ELEMENT IS UPDATED
       if (oldGuest.selectedElementId !== newGuest.selectedElementId) {
         // Handle old element
-        handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, oldGuest.selectedElementId.toString());
+        handleElementBorder(spacetimeDB.Client, spacetimeDB.Client.connectionId, oldGuest.selectedElementId.toString());
 
         // Handle new element
-        handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, newGuest.selectedElementId.toString());
+        handleElementBorder(spacetimeDB.Client, spacetimeDB.Client.connectionId, newGuest.selectedElementId.toString());
       }
 
       // IF CURSOR POSITION IS UPDATED
@@ -107,11 +107,11 @@ export const useGuestsEvents = (
         theme: "dark",
       });
 
-      handleElementBorder(spacetimeDB.Client, spacetimeDB.Identity.address, guest.selectedElementId.toString());
+      handleElementBorder(spacetimeDB.Client, spacetimeDB.Client.connectionId, guest.selectedElementId.toString());
 
       dispatch(removeGuest(guest));
 
-      if (guest.address.toHexString() === spacetimeDB.Identity.address.toHexString()) {
+      if (guest.address.toHexString() === spacetimeDB.Client.connectionId.toHexString()) {
         setDisconnected(true);
       }
     });
@@ -120,7 +120,7 @@ export const useGuestsEvents = (
   }, [
     canvasInitialized.guestEventsInitialized,
     spacetimeDB.Identity.identity,
-    spacetimeDB.Identity.address,
+    spacetimeDB.Client.connectionId,
     isOverlay,
     transformRef,
     setCanvasInitialized,

@@ -17,7 +17,7 @@ export const CursorsContainer = () => {
       {guests
         .filter(
           (guest: Guests) =>
-            guest.address.toHexString() !== spacetimeDB.Identity.address.toHexString() &&
+            guest.address.toHexString() !== spacetimeDB.Client.connectionId.toHexString() &&
             guest.nickname !== "" &&
             activeLayout.id === guest.selectedLayoutId
         )
