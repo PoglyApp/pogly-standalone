@@ -67,6 +67,11 @@ html {
     }
   }
 
+  .title-holder .error-logo {
+  display: block;
+  margin: 0 auto 12px;
+  }
+
   .error {
     font-family: "Courier New", Courier, monospace;
     background-color: rgba(59, 59, 59, .65);

@@ -33,7 +33,7 @@ export const Error: React.FC = () => {
               <img
                 src="./assets/notlikethis.png"
                 alt="notlikethis"
-                style={{ justifySelf: "center", display: "grid" }}
+                className="error-logo"
               />
               <pre className="error">
                 <code>{errorMessage(error)}</code>

@@ -26,16 +26,20 @@ const useStDB = (
 
   useEffect(() => {
     if (!connectionConfig) return;
-    DebugLogger("Initializing SpacetimeDB");
 
-    const stdbToken = auth.user?.id_token || "";
     let stdbDomain = connectionConfig?.domain || "";
-
     const isOverlay: Boolean = window.location.href.includes("/overlay");
-
     if (isOverlay && stdbDomain === "") {
       stdbDomain = "wss://maincloud.spacetimedb.com";
     }
+
+    let stdbToken = "";
+    if (!isOverlay) {
+      if (auth.isLoading || !auth.isAuthenticated || !auth.user?.id_token) return;
+      stdbToken = auth.user.id_token;
+    }
+
+    DebugLogger("Initializing SpacetimeDB");
 
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
@@ -43,7 +47,7 @@ const useStDB = (
         setClient(DbCtx);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
-        client
+        DbCtx
           .subscriptionBuilder()
           .onApplied(onSubscriptionsApplied)
           .subscribe([
@@ -68,7 +72,6 @@ const useStDB = (
       setError(true);
       StopHeartbeat();
       console.log("Error with SpacetimeDB: ", ErrCtx.event?.message, error);
-
       if (error && error.message.includes("Unauthorized")) {
         setTokenExpired(true);
       }
@@ -105,7 +108,16 @@ const useStDB = (
         console.log("initialStateSync failed:", error);
       }
     };
-  }, [connectionConfig, setInstanceConfigured, setStdbConnected, setStdbAuthenticated, error]);
+  }, [
+    connectionConfig,
+    setInstanceConfigured,
+    setStdbConnected,
+    setStdbAuthenticated,
+    error,
+    auth.isLoading,
+    auth.isAuthenticated,
+    auth.user?.id_token,
+  ]);
 
   return {
     Client: client,

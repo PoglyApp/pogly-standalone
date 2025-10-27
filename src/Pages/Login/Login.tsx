@@ -50,6 +50,22 @@ export const Login = () => {
   }, [spacetimeDB]);
 
   useEffect(() => {
+    const exp = (auth.user?.profile as any)?.exp;
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof exp === "number" && exp <= now) {
+      auth.removeUser();
+      navigate("/login", { replace: true });
+    }
+  }, [auth.user]);
+
+  useEffect(() => {
+    if (spacetime.TokenExpired) {
+      auth.removeUser();
+      navigate("/login", { replace: true });
+    }
+  }, [spacetime.TokenExpired]);
+
+  useEffect(() => {
     if (
       !connectionConfig ||
       !stdbInitialized ||
@@ -108,6 +124,17 @@ export const Login = () => {
         contentText="You need to re-authenticate through the login page."
         clearSettings={true}
         redirectBackToLogin={true}
+      />
+    );
+  }
+
+  // Step 0) Check if we are OAuthed
+  if (!auth.isLoading && !auth.isAuthenticated) {
+    return (
+      <ConnectionContainer
+        setInstanceSettings={setConnectionConfig}
+        setNickname={setNickname}
+        setLegacyLogin={setLegacyLogin}
       />
     );
   }
