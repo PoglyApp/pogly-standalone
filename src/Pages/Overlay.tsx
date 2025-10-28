@@ -27,7 +27,7 @@ export const Overlay = () => {
 
   useFetchElement(spacetimeDB.Client, subscriptionsApplied, setElements, refetchElements, setRefetchElements);
 
-  useOverlayElementsEvents(setElements, spacetimeDB.Client);
+  useOverlayElementsEvents(setElements, spacetimeDB.Client, subscriptionsApplied);
   useOverlayGuestsEvents(spacetimeDB, setUserDisconnected);
   useOverlayLayoutEvents(spacetimeDB, setRefetchElements);
   useOverlayHeartbeatEvents(spacetimeDB);

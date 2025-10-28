@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CanvasElementType } from "../../Types/General/CanvasElementType";
 import { CreateElementComponent } from "../../Utility/CreateElementComponent";
 import { WidgetCodeCompiler } from "../../Utility/WidgetCodeCompiler";
@@ -17,21 +17,34 @@ import {
   TextElement,
   WidgetElement,
 } from "../../module_bindings";
-import { getActiveLayout } from "../SpacetimeDBUtils";
+import { getActiveLayout, getLayoutByName } from "../SpacetimeDBUtils";
 
-export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbConnection | undefined) => {
+export const useOverlayElementsEvents = (
+  setElements: Function,
+  spacetimeDB: DbConnection | undefined,
+  subscriptionsApplied: boolean
+) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const layoutParam = urlParams.get("layout");
+
   const [initialized, setInitialized] = useState<boolean>(false);
+  const layout = useRef<Layouts | undefined>(undefined);
 
   useEffect(() => {
-    if (initialized || !spacetimeDB) return;
+    if (initialized || !spacetimeDB || !subscriptionsApplied) return;
 
     DebugLogger("Initializing overlay element events");
 
-    spacetimeDB.db.elements.onInsert((ctx: EventContext, element: Elements) => {
-      if (!ctx.event) return;
+    if (layoutParam) {
+      layout.current = getLayoutByName(spacetimeDB, layoutParam);
+    } else {
+      layout.current = getActiveLayout(spacetimeDB);
+    }
 
-      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
-      if (element.layoutId !== activeLayout.id) return;
+    if (!layout.current) return;
+
+    spacetimeDB.db.elements.onInsert((ctx: EventContext, element: Elements) => {
+      if (!ctx.event || !layout.current || element.layoutId !== layout.current.id) return;
 
       const newElement: CanvasElementType | undefined = CreateElementComponent(element);
 
@@ -39,10 +52,7 @@ export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbC
     });
 
     spacetimeDB.db.elements.onUpdate(async (ctx: EventContext, oldElement: Elements, newElement: Elements) => {
-      if (!ctx.event) return;
-
-      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
-      if (newElement.layoutId !== activeLayout.id) return;
+      if (!ctx.event || !layout.current || newElement.layoutId !== layout.current.id) return;
 
       const component = document.getElementById(oldElement.id.toString());
 
@@ -201,10 +211,7 @@ export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbC
     });
 
     spacetimeDB.db.elements.onDelete((ctx: EventContext, element: Elements) => {
-      if (!ctx.event) return;
-
-      const activeLayout: Layouts = getActiveLayout(spacetimeDB);
-      if (element.layoutId !== activeLayout.id) return;
+      if (!ctx.event || !layout.current || element.layoutId !== layout.current.id) return;
 
       setElements((elements: CanvasElementType[]) => {
         const filteredElements = elements.filter((e: CanvasElementType) => e.Elements.id !== element.id);
@@ -214,5 +221,5 @@ export const useOverlayElementsEvents = (setElements: Function, spacetimeDB: DbC
     });
 
     setInitialized(true);
-  }, [spacetimeDB]);
+  }, [spacetimeDB, subscriptionsApplied]);
 };
