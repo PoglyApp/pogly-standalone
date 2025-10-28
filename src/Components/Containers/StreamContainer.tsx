@@ -6,7 +6,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Config } from "../../module_bindings";
 
 interface IProps {
-  Runtime: any;
   spacetimeDB: any;
   settings: any;
 }
@@ -16,7 +15,7 @@ const handleIsChrome = () => {
   return ua.includes("chrome") || ua.includes("crios");
 };
 
-const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) => {
+const StreamContainer = React.memo(({ spacetimeDB, settings }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
@@ -25,10 +24,10 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
 
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !Runtime) return;
+    if (!streamOverrides || !spacetimeDB.Runtime) return;
 
     const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === Runtime.module);
+    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
 
     if (!currentOverride) return;
 
@@ -50,7 +49,7 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
 
       setStreamOverride(currentOverride.override);
     })();
-  }, [Runtime]);
+  }, [spacetimeDB.Runtime]);
 
   const setExplanation = (display: string) => {
     const explanation = document.getElementById("explanation");

@@ -265,7 +265,7 @@ export const Canvas = () => {
                   })}
                 </div>
                 <CursorsContainer />
-                <StreamContainer Runtime={Runtime} spacetimeDB={spacetimeDB} settings={settings} />
+                <StreamContainer spacetimeDB={spacetimeDB} settings={settings} />
               </div>
             </Container>
 

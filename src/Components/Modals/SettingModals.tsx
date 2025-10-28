@@ -118,34 +118,6 @@ export const SettingsModal = () => {
     newSettings.urlAsDefault = urlAsDefault;
     newSettings.streamInteractable = streamPlayerInteractable;
 
-    const streamOverrides = localStorage.getItem("streamOverride");
-
-    if (streamOverrides && spacetimeDB.Runtime) {
-      let oldList = JSON.parse(streamOverrides);
-      let oldOverride = oldList.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
-
-      if (!oldOverride && !streamOverride) return;
-
-      if (oldOverride) {
-        if (!streamOverride) {
-          oldList = oldList.filter((obj: any) => obj.module !== spacetimeDB.Runtime.module);
-        } else {
-          oldOverride.override = streamOverride;
-        }
-      } else {
-        oldList.push({ module: spacetimeDB.Runtime.module, override: streamOverride });
-      }
-
-      localStorage.setItem("streamOverride", JSON.stringify(oldList));
-    } else {
-      if (streamOverride && spacetimeDB.Runtime) {
-        localStorage.setItem(
-          "streamOverride",
-          JSON.stringify([{ module: spacetimeDB.Runtime.module, override: streamOverride }])
-        );
-      }
-    }
-
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings(newSettings);
   };
@@ -156,16 +128,6 @@ export const SettingsModal = () => {
     const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
 
     setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
-
-    const streamOverrides = localStorage.getItem("streamOverride");
-    if (!streamOverrides || !spacetimeDB.Runtime) return;
-
-    const overrideJson = JSON.parse(streamOverrides);
-    const currentOverride = overrideJson.find((obj: any) => obj.module === spacetimeDB.Runtime.module);
-
-    if (!currentOverride) return;
-
-    setStreamOverride(currentOverride.override);
   }, [settings, setSettings, spacetimeDB.Runtime]);
 
   function clearConnectionSettings() {
