@@ -339,7 +339,7 @@ export const ElementContextMenu = (props: IProps) => {
       </StyledMenuItem>
 
       {(selectedElement.element.tag === "TextElement" || selectedElement.element.tag === "WidgetElement") && (
-        <StyledMenuItem onClick={openEditModal}>Edit</StyledMenuItem>
+        <StyledMenuItem onClick={openEditModal}>Edit widget</StyledMenuItem>
       )}
 
       {selectedElement?.element.tag === "WidgetElement" && widgetVariables && (
