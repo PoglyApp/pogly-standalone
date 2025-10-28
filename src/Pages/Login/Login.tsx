@@ -162,9 +162,10 @@ export const Login = () => {
         <ErrorRefreshModal
           type="button"
           buttonText="Reload"
-          titleText="Error receiving starting SpacetimeDB Client!"
-          contentText="The standalone client encountered an issue starting the SpacetimeDB Client. 
-                  Please check console logs and send to a developer!"
+          titleText="Error connecting to SpacetimeDB!"
+          contentText="The SpacetimeDB SDK failed to connect to the specified module & domain.
+                  Please double-check you entered the module name correctly.
+                  If the error persists, check your console & report to a developer."
           clearSettings={true}
         />
       );
@@ -207,7 +208,7 @@ export const Login = () => {
   }
 
   if (!spacetime.InstanceConfig) {
-    DebugLogger("Waiting for instance config ");
+    DebugLogger("Waiting for instance config");
     if (spacetime.Error) {
       DebugLogger("Failed to load instance config");
       return (
@@ -232,8 +233,10 @@ export const Login = () => {
         <ErrorRefreshModal
           type="button"
           buttonText="Reload"
-          titleText="Error connecting to Pogly instance!"
-          contentText="This means that either the domain or module name selected are invalid. Please try again!"
+          titleText="Error with SpacetimeDB!"
+          contentText="The SpacetimeDB connection encountered an error during initialization. 
+                      confirm your module name and domain settings in the connection dialog. 
+                      If this error persists, check your console & report to a developer."
           clearSettings={true}
         />
       );
@@ -247,9 +250,9 @@ export const Login = () => {
         <ErrorRefreshModal
           type="button"
           buttonText="Clear Connections & Reload"
-          titleText="Multiple Connections Detected"
-          contentText="Pogly only supports a single connection from each identity at this time.
-                  Either multiple tabs are open, or an error occurred and your identity is still signed in."
+          titleText="Multiple ConnectionId's Detected"
+          contentText="An error occurred and your identity is still signed in on this connectionId.
+                      This is super uncommon! Take a screenshot, check your console logs and send to a developer."
           clearSettings={true}
           kickSelf={true}
           client={spacetime.Client}
@@ -272,8 +275,7 @@ export const Login = () => {
           type="timer"
           refreshTimer={5}
           titleText="Authentication Required"
-          contentText="This Pogly Standalone instance requires authentication.
-                  You either did not provide an authentication key, or it was incorrect."
+          contentText="You either did not provide an authentication key, or it was incorrect."
           clearSettings={true}
         />
       );

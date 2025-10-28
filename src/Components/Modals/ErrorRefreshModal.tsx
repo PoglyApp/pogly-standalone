@@ -24,7 +24,6 @@ export const ErrorRefreshModal = (props: IProp) => {
 
   const navigate = useNavigate();
 
-  //Clear out connection settings to prevent getting stuck
   if (props.clearSettings) ClearConnectionSettings();
 
   useEffect(() => {

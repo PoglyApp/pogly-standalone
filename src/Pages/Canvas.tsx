@@ -176,7 +176,7 @@ export const Canvas = () => {
         type="button"
         buttonText="Reload"
         titleText="Disconnected"
-        contentText="You have been disconnected from the Pogly instance."
+        contentText="Your SpacetimeDB connection has been interrupted and you have been disconnected from the Pogly instance."
         clearSettings={false}
       />
     );
