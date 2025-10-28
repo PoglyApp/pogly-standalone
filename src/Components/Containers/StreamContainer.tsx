@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { TwitchPlayer, TwitchPlayerInstance } from "react-twitch-embed";
 import styled from "styled-components";
 import { Alert, Button, IconButton } from "@mui/material";
@@ -11,13 +11,17 @@ interface IProps {
   settings: any;
 }
 
+const handleIsChrome = () => {
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.includes("chrome") || ua.includes("crios");
+};
+
 const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) => {
   const [streamOverride, setStreamOverride] = useState<string | null>(null);
   const [invalidOverride, setInvalidOverride] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
-  const ua = navigator.userAgent.toLowerCase();
-  const chrome = ua.includes("chrome") || ua.includes("crios");
+  let isChrome = useMemo(() => handleIsChrome(), []);
 
   useEffect(() => {
     const streamOverrides = localStorage.getItem("streamOverride");
@@ -48,19 +52,25 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
     })();
   }, [Runtime]);
 
+  const setExplanation = (display: string) => {
+    const explanation = document.getElementById("explanation");
+    if (!explanation) return;
+
+    explanation.style.display = display;
+  };
+
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
+
+    if (isChrome) {
+      document.getElementById("stream")?.style.setProperty("pointer-events", "auto");
+    }
   };
 
   const streamOnLive = () => {
-    if (!chrome) return;
+    if (!isChrome) return;
 
-    try {
-      document.getElementById("chromealert")?.style.removeProperty("display");
-      document.getElementById("stream")?.style.removeProperty("pointer-events");
-    } catch (error) {
-      console.log("[ERROR] Failed to remove properties from stream container", error);
-    }
+    setExplanation("none");
   };
 
   const streamOnPlaying = () => {
@@ -73,24 +83,13 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
         document.getElementById("stream")?.style.setProperty("pointer-events", "none");
       }
 
-      document.getElementById("chromealert")?.remove();
+      const alert = document.getElementById("chromealert");
+      if (!alert) return;
+
+      alert.style.display = "none";
+      setExplanation("none");
     } catch (error) {
       console.log("[ERROR] Failed to close alert", error);
-    }
-  };
-
-  const showExplanation = () => {
-    const explanation = document.getElementById("explanation");
-    if (!explanation) return console.log("Explanation somehow missing?");
-
-    try {
-      if (explanation.style.display !== "unset") {
-        explanation.style.display = "unset";
-      } else {
-        explanation.style.display = "none";
-      }
-    } catch (error) {
-      console.log("[ERROR] Failed to show explanation", error);
     }
   };
 
@@ -119,12 +118,12 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
     <>
       {config.streamingPlatform === "twitch" && !streamOverride && (
         <>
-          {chrome && (
-            <StyledAlert severity="warning" id="chromealert" style={{ display: "none" }}>
+          {isChrome && (
+            <StyledAlert severity="warning" id="chromealert">
               Unable to autoplay stream. Please click play on the stream preview manually.
-              <AlertButton onClick={showExplanation}>(Why am I seeing this?)</AlertButton>
-              <IconButton sx={{ padding: "0px", marginLeft: "auto" }} onClick={closeAlert}>
-                <CloseIcon sx={{ color: "#ffffffd9", fontSize: "36px", marginTop: "10px" }} />
+              <AlertButton onClick={() => setExplanation("block")}>(Why am I seeing this?)</AlertButton>
+              <IconButton sx={{ padding: "0px", marginLeft: "auto", marginTop: "5px" }} onClick={closeAlert}>
+                <CloseIcon sx={{ color: "#ffffffd9", fontSize: "36px" }} />
               </IconButton>
             </StyledAlert>
           )}
@@ -143,46 +142,42 @@ const StreamContainer = React.memo(({ Runtime, spacetimeDB, settings }: IProps) 
               onPlaying={streamOnPlaying}
             />
 
-            {chrome && (
-              <ExplanationContainer id="explanation">
-                <ExplanationContent>
-                  <ExplanationTitle>Stream preview changes for Chrome users</ExplanationTitle>
-                  <ExplanationText>
-                    You may have noticed that the stream preview no longer autoplays. This change comes from Twitch,
-                    which recently introduced stricter visibility rules for embedding streams in order to combat
-                    viewbotting.
-                    <br />
-                    <br />
-                    Because of the way Pogly uses the embed, it's unfortunately not possible for us to fully comply with
-                    these new requirements and Twitch does not currently offer a whitelist or workaround.
-                    <br />
-                    <br />
-                    For now, if you'd like to watch the stream from the editor, you'll need to press play manually.
-                    We'll continue exploring options to meet the visibility rules and restore autoplay if possible.
-                    <br />
-                    <br />
-                    We apologize for the inconvenience and appreciate your understanding.
-                  </ExplanationText>
+            <ExplanationContainer id="explanation">
+              <ExplanationContent>
+                <ExplanationTitle>Stream preview changes for Chrome users</ExplanationTitle>
+                <ExplanationText>
+                  You may have noticed that the stream preview no longer autoplays. This change comes from Twitch, which
+                  recently introduced stricter visibility rules for embedding streams in order to combat viewbotting.
+                  <br />
+                  <br />
+                  Because of the way Pogly uses the embed, it's unfortunately not possible for us to fully comply with
+                  these new requirements and Twitch does not currently offer a whitelist or workaround.
+                  <br />
+                  <br />
+                  For now, if you'd like to watch the stream from the editor, you'll need to press play manually. We'll
+                  continue exploring options to meet the visibility rules and restore autoplay if possible.
+                  <br />
+                  <br />
+                  We apologize for the inconvenience and appreciate your understanding.
+                </ExplanationText>
 
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      color: "#ffffffa6",
-                      borderColor: "#ffffffa6",
-                      "&:hover": { borderColor: "white" },
-                      marginTop: "10px",
-                      marginRight: "10px",
-                      width: "fit-content",
-                      justifySelf: "center",
-                      display: "block",
-                    }}
-                    onClick={showExplanation}
-                  >
-                    Close
-                  </Button>
-                </ExplanationContent>
-              </ExplanationContainer>
-            )}
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#ffffffa6",
+                    borderColor: "#ffffffa6",
+                    "&:hover": { borderColor: "white" },
+                    marginRight: "10px",
+                    width: "fit-content",
+                    justifySelf: "center",
+                    display: "block",
+                  }}
+                  onClick={() => setExplanation("none")}
+                >
+                  Close
+                </Button>
+              </ExplanationContent>
+            </ExplanationContainer>
           </div>
         </>
       )}
@@ -239,22 +234,23 @@ export default StreamContainer;
 const StyledAlert = styled(Alert)`
   position: absolute;
 
-  font-size: 24px;
+  font-size: 24px !important;
   background-color: #c27707 !important;
   color: #ffffffd9 !important;
+  text-align: center !important;
 
   border-style: solid;
   border-color: #a76707;
   border-radius: 0px !important;
 
-  padding: 0 8px 12px 8px;
-  height: 40px;
+  padding: 0 8px 12px 8px !important;
+  height: 50px;
 
   top: -52px;
   overflow-y: hidden;
 
   & > .MuiAlert-icon {
-    color: #ffb13d;
+    color: #ffb13d !important;
     font-size: 36px;
   }
 
@@ -272,11 +268,10 @@ const StyledAlert = styled(Alert)`
 const AlertButton = styled.a`
   text-decoration: inherit;
 
-  font-size: 16px;
+  font-size: 24px !important;
   color: #fdd79c;
 
   margin-left: 10px;
-  margin-top: 5px;
 
   &:hover {
     color: #ffb13d;
@@ -285,9 +280,8 @@ const AlertButton = styled.a`
 `;
 
 const ExplanationContainer = styled.div`
-  display: none;
-
   position: absolute;
+  display: none;
 
   width: 100%;
   height: 100%;
