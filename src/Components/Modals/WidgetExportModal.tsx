@@ -124,7 +124,7 @@ export const WidgetExportModal = (props: IProps) => {
 const StyledTextarea = styled.textarea`
   background-color: #0a2a47;
   color: #ffffffa6;
-  border-color: #ffffffa6;
+  border: 1px solid #ffffffa6;
   padding: 8px;
 
   &::placeholder {
