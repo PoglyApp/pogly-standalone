@@ -711,7 +711,7 @@ export const SettingsModal = () => {
                   Update Instance Password
                 </Button>
 
-                <Button
+                {/* <Button
                   variant="outlined"
                   sx={{
                     color: "#00ad03",
@@ -722,7 +722,7 @@ export const SettingsModal = () => {
                   onClick={showModeratorListModal}
                 >
                   Moderator list
-                </Button>
+                </Button> */}
               </div>
             </SettingsTabPanel>
           )}
