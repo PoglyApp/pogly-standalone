@@ -18,15 +18,13 @@ export const GuestListContainer = () => {
   const [showPedro, setShowPedro] = useState<boolean>(false);
   const [contextMenu, setContextMenu] = useState<any>(null);
 
-  const [hidenGuestsAnchor, setHidenGuestsAnchor] = useState(null);
+  const [hidenGuestsAnchor, setHidenGuestsAnchor] = useState<HTMLElement | null>(null);
   const open = Boolean(hidenGuestsAnchor);
 
   useEffect(() => {
     if (guestStore.length > 5) {
       const guestsArray = [...guestStore.filter((guest: Guests) => guest.nickname !== "")];
-
       DebugLogger("Initializing more than 5 guests");
-
       setDisplayedGuests(() => [...guestsArray.slice(0, 5)]);
       setHiddenGuests(() => [...guestsArray.slice(5, guestStore.length)]);
     } else {
@@ -42,11 +40,9 @@ export const GuestListContainer = () => {
     else setHidenGuestsAnchor(null);
   };
 
-  const easterEgg = (event: any) => {
+  const easterEgg = () => {
     DebugLogger("Show easter egg");
-    if (event.detail === 2) {
-      setShowPedro(!showPedro);
-    }
+    setShowPedro((v) => !v);
   };
 
   if (!guestStore) return <></>;
@@ -56,7 +52,6 @@ export const GuestListContainer = () => {
       <Container id="GuestList">
         {displayedGuests.map((guest: Guests) => {
           if ((config.authentication && guest.authenticated) || !config.authentication) {
-            //Authentication Enabled - Guest Authenticated
             if (guest.nickname !== "") {
               return (
                 <div
@@ -72,14 +67,26 @@ export const GuestListContainer = () => {
                       position: "relative",
                       marginLeft: "6px",
                     }}
-                    onClick={easterEgg}
+                    onDoubleClick={easterEgg}
                   >
-                    {(showPedro && (
-                      <img src="./assets/pedro.gif" style={{ width: "32px", height: "32px" }} alt="pedro" />
-                    )) ||
-                    guest.nickname
-                      ? guest.nickname[0]
-                      : "?"}
+                    {showPedro ? (
+                      <img
+                        src="./assets/pedro.gif"
+                        alt="pedro"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    ) : guest.nickname ? (
+                      guest.nickname[0]
+                    ) : (
+                      "?"
+                    )}
                   </Avatar>
                 </div>
               );
@@ -87,7 +94,6 @@ export const GuestListContainer = () => {
               return <></>;
             }
           } else {
-            //Authentication Enabled - Guest not Authenticated
             return <></>;
           }
         })}
@@ -100,13 +106,10 @@ export const GuestListContainer = () => {
               anchorEl={hidenGuestsAnchor}
               open={open}
               onClose={() => setHidenGuestsAnchor(null)}
-              sx={{
-                margin: "8px 0px 0 0",
-              }}
+              sx={{ margin: "8px 0px 0 0" }}
             >
               {hiddenGuests.map((guest: Guests) => {
                 if ((config.authentication && guest.authenticated) || !config.authentication) {
-                  //Authentication Enabled - Guest Authenticated
                   if (guest.nickname !== "") {
                     return (
                       <div
@@ -122,12 +125,26 @@ export const GuestListContainer = () => {
                             position: "relative",
                             margin: "6px",
                           }}
-                          onClick={easterEgg}
+                          onDoubleClick={easterEgg}
                         >
-                          {(showPedro && (
-                            <img src="./assets/pedro.gif" style={{ width: "32px", height: "32px" }} alt="pedro" />
-                          )) ||
-                            guest.nickname[0]}
+                          {showPedro ? (
+                            <img
+                              src="./assets/pedro.gif"
+                              alt="pedro"
+                              style={{
+                                position: "absolute",
+                                inset: 0,
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                pointerEvents: "none",
+                              }}
+                            />
+                          ) : guest.nickname ? (
+                            guest.nickname[0]
+                          ) : (
+                            "?"
+                          )}
                         </Avatar>
                       </div>
                     );
@@ -135,7 +152,6 @@ export const GuestListContainer = () => {
                     return <></>;
                   }
                 } else {
-                  //Authentication Enabled - Guest not Authenticated
                   return <></>;
                 }
               })}
@@ -164,7 +180,6 @@ const StyledAvatar = styled(Avatar)`
   vertical-align: center;
   position: relative;
   margin-left: 6px;
-
   font-size: 18px;
 
   &:hover {
