@@ -133,6 +133,7 @@ public partial class Module
                         Clip = element.Clip,
                         Locked = false,
                         LayoutId = newLayoutId + 1,
+                        FolderId = 0,
                         PlacedBy = guest.Nickname,
                         LastEditedBy = guest.Nickname,
                         ZIndex = element.ZIndex
@@ -163,7 +164,10 @@ public partial class Module
     {
         string func = "ImportLayout";
 
-        if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        if (!IsGuestOwner(func, ctx))
+        {
+            if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        }
 
         try
         {

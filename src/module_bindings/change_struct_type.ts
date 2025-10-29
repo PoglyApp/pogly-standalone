@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { ElementDataChange } from "./element_data_change_type";
 // Mark import as potentially unused
@@ -51,6 +52,8 @@ export type ChangeStruct = ChangeStructVariants.ElementDataChange |
   ChangeStructVariants.EmptyChange |
   ChangeStructVariants.ChatMessage;
 
+let _cached_ChangeStruct_type_value: __AlgebraicTypeType | null = null;
+
 // A value with helper functions to construct the type.
 export const ChangeStruct = {
   // Helper functions for constructing each variant of the tagged union.
@@ -59,22 +62,23 @@ export const ChangeStruct = {
   // assert!(foo.tag === "A");
   // assert!(foo.value === 42);
   // ```
-  ElementDataChange: (value: ElementDataChange): ChangeStruct => ({ tag: "ElementDataChange", value }),
-  ElementChange: (value: ElementChange): ChangeStruct => ({ tag: "ElementChange", value }),
-  GuestChange: (value: GuestChange): ChangeStruct => ({ tag: "GuestChange", value }),
-  EmptyChange: (value: EmptyChange): ChangeStruct => ({ tag: "EmptyChange", value }),
-  ChatMessage: (value: ChatMessage): ChangeStruct => ({ tag: "ChatMessage", value }),
+  ElementDataChange: (value: ElementDataChange): ChangeStructVariants.ElementDataChange => ({ tag: "ElementDataChange", value }),
+  ElementChange: (value: ElementChange): ChangeStructVariants.ElementChange => ({ tag: "ElementChange", value }),
+  GuestChange: (value: GuestChange): ChangeStructVariants.GuestChange => ({ tag: "GuestChange", value }),
+  EmptyChange: (value: EmptyChange): ChangeStructVariants.EmptyChange => ({ tag: "EmptyChange", value }),
+  ChatMessage: (value: ChatMessage): ChangeStructVariants.ChatMessage => ({ tag: "ChatMessage", value }),
 
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Sum({
-      variants: [
-        { name: "ElementDataChange", algebraicType: ElementDataChange.getTypeScriptAlgebraicType() },
-        { name: "ElementChange", algebraicType: ElementChange.getTypeScriptAlgebraicType() },
-        { name: "GuestChange", algebraicType: GuestChange.getTypeScriptAlgebraicType() },
-        { name: "EmptyChange", algebraicType: EmptyChange.getTypeScriptAlgebraicType() },
-        { name: "ChatMessage", algebraicType: ChatMessage.getTypeScriptAlgebraicType() },
-      ]
-    });
+    if (_cached_ChangeStruct_type_value) return _cached_ChangeStruct_type_value;
+    _cached_ChangeStruct_type_value = __AlgebraicTypeValue.Sum({ variants: [] });
+    _cached_ChangeStruct_type_value.value.variants.push(
+      { name: "ElementDataChange", algebraicType: ElementDataChange.getTypeScriptAlgebraicType() },
+      { name: "ElementChange", algebraicType: ElementChange.getTypeScriptAlgebraicType() },
+      { name: "GuestChange", algebraicType: GuestChange.getTypeScriptAlgebraicType() },
+      { name: "EmptyChange", algebraicType: EmptyChange.getTypeScriptAlgebraicType() },
+      { name: "ChatMessage", algebraicType: ChatMessage.getTypeScriptAlgebraicType() },
+    );
+    return _cached_ChangeStruct_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ChangeStruct): void {

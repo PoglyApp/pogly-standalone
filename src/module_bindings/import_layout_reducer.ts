@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type ImportLayout = {
@@ -33,6 +34,8 @@ export type ImportLayout = {
   createdBy: string,
   active: boolean,
 };
+let _cached_ImportLayout_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -42,14 +45,15 @@ export const ImportLayout = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "name", algebraicType: __AlgebraicTypeValue.String},
-        { name: "createdBy", algebraicType: __AlgebraicTypeValue.String},
-        { name: "active", algebraicType: __AlgebraicTypeValue.Bool},
-      ]
-    });
+    if (_cached_ImportLayout_type_value) return _cached_ImportLayout_type_value;
+    _cached_ImportLayout_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ImportLayout_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "name", algebraicType: __AlgebraicTypeValue.String },
+      { name: "createdBy", algebraicType: __AlgebraicTypeValue.String },
+      { name: "active", algebraicType: __AlgebraicTypeValue.Bool },
+    );
+    return _cached_ImportLayout_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImportLayout): void {

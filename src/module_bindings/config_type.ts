@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type Config = {
@@ -40,6 +41,8 @@ export type Config = {
   editorGuidelines: string,
   configInit: boolean,
 };
+let _cached_Config_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -49,21 +52,22 @@ export const Config = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "version", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "ownerIdentity", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "streamingPlatform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "streamName", algebraicType: __AlgebraicTypeValue.String},
-        { name: "debugMode", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "editorBorder", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "editorGuidelines", algebraicType: __AlgebraicTypeValue.String},
-        { name: "configInit", algebraicType: __AlgebraicTypeValue.Bool},
-      ]
-    });
+    if (_cached_Config_type_value) return _cached_Config_type_value;
+    _cached_Config_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_Config_type_value.value.elements.push(
+      { name: "version", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "ownerIdentity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "streamingPlatform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "streamName", algebraicType: __AlgebraicTypeValue.String },
+      { name: "debugMode", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "updateHz", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "editorBorder", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "editorGuidelines", algebraicType: __AlgebraicTypeValue.String },
+      { name: "configInit", algebraicType: __AlgebraicTypeValue.Bool },
+    );
+    return _cached_Config_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: Config): void {

@@ -25,12 +25,9 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { Permissions } from "./permissions_type";
-import { PermissionLevel } from "./permission_level_type";
-// Mark import as potentially unused
-declare type __keep_PermissionLevel = PermissionLevel;
-
 import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
 declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
 
@@ -44,7 +41,9 @@ declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
  * but to directly chain method calls,
  * like `ctx.db.permissions.on_insert(...)`.
  */
-export class PermissionsTableHandle {
+export class PermissionsTableHandle<TableName extends string> implements __TableHandle<TableName> {
+  // phantom type to track the table name
+  readonly tableName!: TableName;
   tableCache: __TableCache<Permissions>;
 
   constructor(tableCache: __TableCache<Permissions>) {
@@ -58,28 +57,6 @@ export class PermissionsTableHandle {
   iter(): Iterable<Permissions> {
     return this.tableCache.iter();
   }
-  /**
-   * Access to the `identity` unique index on the table `Permissions`,
-   * which allows point queries on the field of the same name
-   * via the [`PermissionsIdentityUnique.find`] method.
-   *
-   * Users are encouraged not to explicitly reference this type,
-   * but to directly chain method calls,
-   * like `ctx.db.permissions.identity().find(...)`.
-   *
-   * Get a handle on the `identity` unique index on the table `Permissions`.
-   */
-  identity = {
-    // Find the subscribed row whose `identity` column value is equal to `col_val`,
-    // if such a row is present in the client cache.
-    find: (col_val: __Identity): Permissions | undefined => {
-      for (let row of this.tableCache.iter()) {
-        if (__deepEqual(row.identity, col_val)) {
-          return row;
-        }
-      }
-    },
-  };
 
   onInsert = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.onInsert(cb);
@@ -96,12 +73,4 @@ export class PermissionsTableHandle {
   removeOnDelete = (cb: (ctx: EventContext, row: Permissions) => void) => {
     return this.tableCache.removeOnDelete(cb);
   }
-
-  // Updates are only defined for tables with primary keys.
-  onUpdate = (cb: (ctx: EventContext, oldRow: Permissions, newRow: Permissions) => void) => {
-    return this.tableCache.onUpdate(cb);
-  }
-
-  removeOnUpdate = (cb: (ctx: EventContext, onRow: Permissions, newRow: Permissions) => void) => {
-    return this.tableCache.removeOnUpdate(cb);
-  }}
+}

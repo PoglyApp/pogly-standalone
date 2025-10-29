@@ -25,17 +25,15 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
-import { PermissionLevel } from "./permission_level_type";
-// Mark import as potentially unused
-declare type __keep_PermissionLevel = PermissionLevel;
-
 
 export type Permissions = {
   identity: __Identity,
-  nickname: string,
-  permissionLevel: PermissionLevel,
+  permissionType: number,
 };
+let _cached_Permissions_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -45,13 +43,13 @@ export const Permissions = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType()},
-        { name: "nickname", algebraicType: __AlgebraicTypeValue.String},
-        { name: "permissionLevel", algebraicType: PermissionLevel.getTypeScriptAlgebraicType()},
-      ]
-    });
+    if (_cached_Permissions_type_value) return _cached_Permissions_type_value;
+    _cached_Permissions_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_Permissions_type_value.value.elements.push(
+      { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
+      { name: "permissionType", algebraicType: __AlgebraicTypeValue.U32 },
+    );
+    return _cached_Permissions_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: Permissions): void {

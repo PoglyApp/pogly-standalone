@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { DataType } from "./data_type_type";
 // Mark import as potentially unused
@@ -39,9 +40,10 @@ export type ElementData = {
   byteArray: Uint8Array | undefined,
   dataWidth: number,
   dataHeight: number,
-  folderId: number,
   createdBy: string,
 };
+let _cached_ElementData_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -51,19 +53,19 @@ export const ElementData = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "name", algebraicType: __AlgebraicTypeValue.String},
-        { name: "dataType", algebraicType: DataType.getTypeScriptAlgebraicType()},
-        { name: "data", algebraicType: __AlgebraicTypeValue.String},
-        { name: "byteArray", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8))},
-        { name: "dataWidth", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "dataHeight", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "folderId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "createdBy", algebraicType: __AlgebraicTypeValue.String},
-      ]
-    });
+    if (_cached_ElementData_type_value) return _cached_ElementData_type_value;
+    _cached_ElementData_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ElementData_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "name", algebraicType: __AlgebraicTypeValue.String },
+      { name: "dataType", algebraicType: DataType.getTypeScriptAlgebraicType() },
+      { name: "data", algebraicType: __AlgebraicTypeValue.String },
+      { name: "byteArray", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8)) },
+      { name: "dataWidth", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "dataHeight", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "createdBy", algebraicType: __AlgebraicTypeValue.String },
+    );
+    return _cached_ElementData_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ElementData): void {

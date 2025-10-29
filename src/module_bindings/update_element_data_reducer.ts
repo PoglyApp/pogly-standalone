@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 export type UpdateElementData = {
@@ -34,6 +35,8 @@ export type UpdateElementData = {
   width: number,
   height: number,
 };
+let _cached_UpdateElementData_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -43,15 +46,16 @@ export const UpdateElementData = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "dataId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "name", algebraicType: __AlgebraicTypeValue.String},
-        { name: "data", algebraicType: __AlgebraicTypeValue.String},
-        { name: "width", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "height", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
+    if (_cached_UpdateElementData_type_value) return _cached_UpdateElementData_type_value;
+    _cached_UpdateElementData_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_UpdateElementData_type_value.value.elements.push(
+      { name: "dataId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "name", algebraicType: __AlgebraicTypeValue.String },
+      { name: "data", algebraicType: __AlgebraicTypeValue.String },
+      { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+    );
+    return _cached_UpdateElementData_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: UpdateElementData): void {

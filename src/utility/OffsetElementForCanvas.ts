@@ -1,8 +1,12 @@
-import { Elements, ElementStruct, ImageElement, ImageElementData, TextElement, WidgetElement } from "../module_bindings";
 import {
-  GetCoordsFromTransform,
-  GetTransformFromCoords,
-} from "./ConvertCoordinates";
+  Elements,
+  ElementStruct,
+  ImageElement,
+  ImageElementData,
+  TextElement,
+  WidgetElement,
+} from "../module_bindings";
+import { GetCoordsFromTransform, GetMatrixFromElement, GetTransformFromCoords } from "./ConvertCoordinates";
 import { DebugLogger } from "./DebugLogger";
 
 export const OffsetElementForCanvas = (element: Elements) => {
@@ -61,9 +65,10 @@ export const OffsetElementForCanvas = (element: Elements) => {
     zIndex: element.zIndex,
   };
 
+  const matrix = GetMatrixFromElement(newElement.transform);
   const transformCoords = GetCoordsFromTransform(newElement.transform);
 
-  newElement.transform = GetTransformFromCoords(
+  let newTransform = GetTransformFromCoords(
     transformCoords.x,
     transformCoords.y,
     transformCoords.rotation,
@@ -72,6 +77,12 @@ export const OffsetElementForCanvas = (element: Elements) => {
     transformCoords.scaleX,
     transformCoords.scaleY
   );
+
+  if (matrix) {
+    newTransform += " " + matrix;
+  }
+
+  newElement.transform = newTransform;
 
   switch (newElement.element.tag) {
     case "TextElement":

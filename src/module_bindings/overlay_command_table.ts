@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { OverlayCommand } from "./overlay_command_type";
 import { CommandType } from "./command_type_type";
@@ -44,7 +45,9 @@ declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
  * but to directly chain method calls,
  * like `ctx.db.overlayCommand.on_insert(...)`.
  */
-export class OverlayCommandTableHandle {
+export class OverlayCommandTableHandle<TableName extends string> implements __TableHandle<TableName> {
+  // phantom type to track the table name
+  readonly tableName!: TableName;
   tableCache: __TableCache<OverlayCommand>;
 
   constructor(tableCache: __TableCache<OverlayCommand>) {

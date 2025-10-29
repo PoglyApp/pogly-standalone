@@ -1,4 +1,4 @@
-import { ChevronDown, SaveIcon, Trash } from "lucide-react";
+import { ChevronDown, SaveIcon, UserRound, Trash } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
@@ -109,7 +109,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   const saveQuickSwap = () => {
     const quickSwap = localStorage.getItem("poglyQuickSwap");
-    const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: guestNickname, auth: authKey };
+    const newConnection: QuickSwapType = { domain: domain, module: moduleName, nickname: "", auth: authKey };
 
     if (quickSwap && quickSwap.length > 0) {
       const modules: QuickSwapType[] = JSON.parse(quickSwap);
@@ -193,14 +193,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     setHasCustomNickname(true);
   };
 
-  if (isOverlay) return null;
+  if (isOverlay) return <></>;
 
   return (
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyTitle />
 
       {!auth.isLoading && !auth.isAuthenticated && (
-        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg mt-30">
+        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-2">
           <StyledButton
             className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
             onClick={() => {
@@ -211,6 +211,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
             <span>login with SpacetimeAuth</span>
           </StyledButton>
+          <a
+            href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/authentication.md"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[10px] text-[#82a5ff]"
+          >
+            What is SpacetimeAuth?
+          </a>
         </div>
       )}
 
@@ -306,7 +314,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
               )}
             </div>
 
-            <div className="flex justify-end gap-2 mt-5">
+            <div className="flex justify-end gap-2 mt-4">
               {auth.isAuthenticated && (
                 <StyledButton
                   className="absolute left-5"

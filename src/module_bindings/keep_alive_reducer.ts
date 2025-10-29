@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 
 import { KeepAliveWorker } from "./keep_alive_worker_type";
@@ -34,6 +35,8 @@ declare type __keep_KeepAliveWorker = KeepAliveWorker;
 export type KeepAlive = {
   arg: KeepAliveWorker,
 };
+let _cached_KeepAlive_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -43,11 +46,12 @@ export const KeepAlive = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "arg", algebraicType: KeepAliveWorker.getTypeScriptAlgebraicType()},
-      ]
-    });
+    if (_cached_KeepAlive_type_value) return _cached_KeepAlive_type_value;
+    _cached_KeepAlive_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_KeepAlive_type_value.value.elements.push(
+      { name: "arg", algebraicType: KeepAliveWorker.getTypeScriptAlgebraicType() },
+    );
+    return _cached_KeepAlive_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: KeepAlive): void {

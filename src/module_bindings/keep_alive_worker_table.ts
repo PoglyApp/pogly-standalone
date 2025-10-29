@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { KeepAliveWorker } from "./keep_alive_worker_type";
 import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
@@ -40,7 +41,9 @@ declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
  * but to directly chain method calls,
  * like `ctx.db.keepAliveWorker.on_insert(...)`.
  */
-export class KeepAliveWorkerTableHandle {
+export class KeepAliveWorkerTableHandle<TableName extends string> implements __TableHandle<TableName> {
+  // phantom type to track the table name
+  readonly tableName!: TableName;
   tableCache: __TableCache<KeepAliveWorker>;
 
   constructor(tableCache: __TableCache<KeepAliveWorker>) {

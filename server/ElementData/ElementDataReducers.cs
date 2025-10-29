@@ -31,7 +31,6 @@ public partial class Module
                 Data = data,
                 DataWidth = width,
                 DataHeight = height,
-                FolderId = 0,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -45,7 +44,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataWithId(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height, uint folderId)
+    public static void AddElementDataWithId(ReducerContext ctx, uint id, string name, DataType type, string data, int width, int height)
     {
         string func = "AddElementDataWithId";
         
@@ -67,7 +66,6 @@ public partial class Module
                 Data = data,
                 DataWidth = width,
                 DataHeight = height,
-                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -81,7 +79,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height, uint folderId)
+    public static void AddElementDataArray(ReducerContext ctx, string name, DataType type, string data, byte[] array, int width, int height)
     {
         string func = "AddElementDataArray";
         
@@ -110,7 +108,6 @@ public partial class Module
                 ByteArray = array,
                 DataWidth = width,
                 DataHeight = height,
-                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -124,7 +121,7 @@ public partial class Module
     }
     
     [Reducer]
-    public static void AddElementDataArrayWithId(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] array, int width, int height, uint folderId)
+    public static void AddElementDataArrayWithId(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] array, int width, int height)
     {
         string func = "AddElementDataArrayWithId";
         
@@ -147,7 +144,6 @@ public partial class Module
                 ByteArray = array,
                 DataWidth = width,
                 DataHeight = height,
-                FolderId = folderId,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -161,11 +157,14 @@ public partial class Module
     }
     
     [Reducer]
-    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, uint folderId, string createdBy)
+    public static void ImportElementData(ReducerContext ctx, uint id, string name, DataType type, string data, byte[] byteArray, int width, int height, string createdBy)
     {
         string func = "ImportElementDataArrayWithId";
         
-        if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        if (!IsGuestOwner(func, ctx))
+        {
+            if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        }
         
         try
         {
@@ -178,7 +177,6 @@ public partial class Module
                 ByteArray = byteArray,
                 DataWidth = width,
                 DataHeight = height,
-                FolderId = folderId,
                 CreatedBy = createdBy
             };
             ctx.Db.ElementData.Insert(elementData);
@@ -330,43 +328,6 @@ public partial class Module
         catch (Exception e)
         {
             Log.Error($"[{func}] Error updating element data name with id {dataId}, requested by {ctx.Sender}. " + e.Message);
-        }
-    }
-    
-    [Reducer]
-    public static void UpdateElementDataFolder(ReducerContext ctx, uint dataId, uint folderId)
-    {
-        string func = "UpdateElementDataFolder";
-        
-        if (ctx.ConnectionId is null) return;
-        if (!GetGuest(func, ctx, out var guest)) return;
-        if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
-        
-        try
-        {
-            var oldData = ctx.Db.ElementData.Id.Find(dataId);
-
-            if (oldData.HasValue)
-            {
-                var updatedData = oldData.Value;
-                updatedData.FolderId = folderId;
-                
-                ctx.Db.ElementData.Id.Update(updatedData);
-            
-                LogAudit(ctx,func,GetChangeStructFromElementData(oldData.Value),GetChangeStructFromElementData(updatedData), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
-            }
-            else
-            {
-                Log.Error($"[{func}] Error updating element data folder with id {dataId} and folderId {folderId}, requested by {ctx.Sender}! Couldn't find existing Element!");
-            }
-        }
-        catch(Exception e)
-        {
-            Log.Error($"[{func}] Error updating element data folder with id {dataId} and folderId {folderId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 

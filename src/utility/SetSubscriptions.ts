@@ -22,7 +22,6 @@ export const SetSubscriptions = (
       "SELECT * FROM Config",
       "SELECT * FROM Permissions",
       "SELECT * FROM Layouts",
-      "SELECT * FROM Folders",
     ]);
 
   if (setStdbInitialized) setStdbInitialized(true);

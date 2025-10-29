@@ -16,6 +16,7 @@ export const convertDataURIToBinary = (dataURI: any) => {
 
 export const convertBinaryToDataURI = (element: ElementData) => {
     if(!element.byteArray) return element.data;
+    if(element.byteArray.length <= 0) return element.data;
 
     var raw = "";
     for (var i = 0; i < element.byteArray.length; i++) {
@@ -29,6 +30,7 @@ export const convertBinaryToDataURI = (element: ElementData) => {
 
 export const convertBinaryToRaw = (element: ElementData) => {
   if(!element.byteArray) return element.data;
+  if(element.byteArray.length <= 0) return element.data;
 
   var raw = "";
   for (var i = 0; i < element.byteArray.length; i++) {

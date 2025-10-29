@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { ImageElementData } from "./image_element_data_type";
 // Mark import as potentially unused
@@ -36,6 +37,8 @@ export type ImageElement = {
   width: number,
   height: number,
 };
+let _cached_ImageElement_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -45,13 +48,14 @@ export const ImageElement = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "imageElementData", algebraicType: ImageElementData.getTypeScriptAlgebraicType()},
-        { name: "width", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "height", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
+    if (_cached_ImageElement_type_value) return _cached_ImageElement_type_value;
+    _cached_ImageElement_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_ImageElement_type_value.value.elements.push(
+      { name: "imageElementData", algebraicType: ImageElementData.getTypeScriptAlgebraicType() },
+      { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+    );
+    return _cached_ImageElement_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: ImageElement): void {

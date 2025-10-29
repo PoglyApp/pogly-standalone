@@ -21,14 +21,4 @@ public partial class Module
 
         public bool Authenticated;
     }
-
-    [Table(Public = true, Name = "Permissions")]
-    public partial struct Permissions
-    {
-        [PrimaryKey]
-        public Identity Identity;
-
-        public string Nickname;
-        public PermissionLevel PermissionLevel;
-    }
 }

@@ -25,6 +25,7 @@ import {
   type EventContextInterface as __EventContextInterface,
   type ReducerEventContextInterface as __ReducerEventContextInterface,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
+  type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { ElementStruct } from "./element_struct_type";
 // Mark import as potentially unused
@@ -38,11 +39,14 @@ export type Elements = {
   transform: string,
   clip: string,
   locked: boolean,
+  folderId: number | undefined,
   layoutId: number,
   placedBy: string,
   lastEditedBy: string,
   zIndex: number,
 };
+let _cached_Elements_type_value: __AlgebraicTypeType | null = null;
+
 /**
  * An object for generated helper functions.
  */
@@ -52,20 +56,22 @@ export const Elements = {
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    return __AlgebraicTypeValue.Product({
-      elements: [
-        { name: "id", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType()},
-        { name: "transparency", algebraicType: __AlgebraicTypeValue.I32},
-        { name: "transform", algebraicType: __AlgebraicTypeValue.String},
-        { name: "clip", algebraicType: __AlgebraicTypeValue.String},
-        { name: "locked", algebraicType: __AlgebraicTypeValue.Bool},
-        { name: "layoutId", algebraicType: __AlgebraicTypeValue.U32},
-        { name: "placedBy", algebraicType: __AlgebraicTypeValue.String},
-        { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String},
-        { name: "zIndex", algebraicType: __AlgebraicTypeValue.I32},
-      ]
-    });
+    if (_cached_Elements_type_value) return _cached_Elements_type_value;
+    _cached_Elements_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_Elements_type_value.value.elements.push(
+      { name: "id", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "element", algebraicType: ElementStruct.getTypeScriptAlgebraicType() },
+      { name: "transparency", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "transform", algebraicType: __AlgebraicTypeValue.String },
+      { name: "clip", algebraicType: __AlgebraicTypeValue.String },
+      { name: "locked", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32) },
+      { name: "layoutId", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "placedBy", algebraicType: __AlgebraicTypeValue.String },
+      { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String },
+      { name: "zIndex", algebraicType: __AlgebraicTypeValue.I32 },
+    );
+    return _cached_Elements_type_value;
   },
 
   serialize(writer: __BinaryWriter, value: Elements): void {

@@ -31,6 +31,8 @@ const useStDB = (
       stdbDomain = "wss://maincloud.spacetimedb.com";
     }
 
+    const moduleName = "pogly-" + connectionConfig?.module.replace("_", "-").toLocaleLowerCase();
+
     const onConnect = (DbCtx: DbConnection, identity: Identity, token: string) => {
       try {
         setIdentity(identity);
@@ -66,7 +68,7 @@ const useStDB = (
 
     const client = DbConnection.builder()
       .withUri(stdbDomain)
-      .withModuleName(connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "")
+      .withModuleName(moduleName)
       .withToken(isOverlay ? "" : stdbToken)
       .onConnect(onConnect)
       .onConnectError(onConnectError)

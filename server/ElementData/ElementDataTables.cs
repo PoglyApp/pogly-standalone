@@ -16,7 +16,6 @@ public partial class Module
         public byte[]? ByteArray;
         public int DataWidth;
         public int DataHeight;
-        public uint FolderId;
         public string CreatedBy;
     }
 }

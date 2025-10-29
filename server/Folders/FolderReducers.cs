@@ -134,17 +134,17 @@ public partial class Module
 
         try
         {
-            foreach (var e in ctx.Db.ElementData.Iter().Where(x => x.FolderId == folderId))
+            foreach (var e in ctx.Db.Elements.Iter().Where(x => x.FolderId == folderId))
             {
                 if (preserveElements)
                 {
                     var newE = e;
-                    newE.FolderId = 0;
-                    ctx.Db.ElementData.Id.Update(newE);
+                    newE.FolderId = null;
+                    ctx.Db.Elements.Id.Update(newE);
                 }
                 else
                 {
-                    ctx.Db.ElementData.Id.Delete(e.Id);
+                    ctx.Db.Elements.Id.Delete(e.Id);
                 }
             }
 
@@ -175,17 +175,17 @@ public partial class Module
 
         try
         {
-            foreach (var e in ctx.Db.ElementData.Iter())
+            foreach (var e in ctx.Db.Elements.Iter())
             {
                 if (preserveElements)
                 {
                     var newE = e;
-                    newE.FolderId = 0;
-                    ctx.Db.ElementData.Id.Update(newE);
+                    newE.FolderId = null;
+                    ctx.Db.Elements.Id.Update(newE);
                 }
                 else
                 {
-                    ctx.Db.ElementData.Id.Delete(e.Id);
+                    ctx.Db.Elements.Id.Delete(e.Id);
                 }
             }
 

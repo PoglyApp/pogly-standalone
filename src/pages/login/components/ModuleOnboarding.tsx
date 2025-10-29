@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { Check, TriangleAlert } from "lucide-react";
-import { PoglyTitle } from "./PoglyTitle";
+import { Check, TriangleAlert, X } from "lucide-react";
 import { ConnectionConfigType } from "../../../Types/ConfigTypes/ConnectionConfigType";
-import { UploadElementDataFromString } from "../../../Utility/UploadElementData";
+import { UploadBackupFromFile, UploadElementDataFromString } from "../../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
+import { PoglyTitle } from "./PoglyTitle";
 
 interface IProps {
   legacyLogin: boolean;
@@ -25,6 +27,9 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   // Just to display debug box of doom
   const debug: boolean = false;
 
+  const auth = useAuth();
+  const navigate = useNavigate();
+
   const [step, setStep] = useState<number>(0);
 
   const [platform, setPlatform] = useState<string | null>();
@@ -33,13 +38,18 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const [useStrictMode, setUseStrictMode] = useState<boolean>(false);
   const [password, setPassword] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<boolean>(false);
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [overlayURL, setOverlayURL] = useState<string>("");
-  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState("Copy Overlay URL");
-  const [copyAuthButtonText, setAuthButtonText] = useState("Copy authentication token");
+  const [copyOverlayButtonText, setCopyOverlayButtonText] = useState<string>("Copy Overlay URL");
 
   const [defaultElements, setDefaultElements] = useState<string>("");
   const [initializing, setInitializing] = useState<boolean>(false);
+
+  const [backupFile, setBackupFile] = useState<any>(null);
+  const [fileError, setFileError] = useState<boolean>(false);
+  const [backupRowCount, setBackupRowCount] = useState<any>(null);
+  const [showUploadingText, setShowUploadingText] = useState<boolean>(false);
 
   const isPoglyInstance: Boolean = connectionConfig.domain === "wss://maincloud.spacetimedb.com";
 
@@ -51,6 +61,23 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
 
     setOverlayURL(baseUrl);
   }, []);
+
+  useEffect(() => {
+    if (!backupRowCount) return;
+    const { elementDataCount, elementCount, layoutCount } = backupRowCount;
+
+    const rowChecker = setInterval(() => {
+      const elementDataRows = spacetime.Client.db.elementData.iter().length;
+      const elementRows = spacetime.Client.db.elements.iter().length;
+      const layoutRows = spacetime.Client.db.layouts.iter().length;
+
+      if (elementDataCount === elementDataRows && elementCount === elementRows && layoutCount === layoutRows) {
+        return navigate("login");
+      }
+    }, 2000);
+
+    return () => clearInterval(rowChecker);
+  }, [backupRowCount]);
 
   const handleChannelName = (value: string) => {
     if (value === "") setChannelName(null);
@@ -67,52 +94,70 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
     setPassword(value);
   };
 
-  const handleSave = () => {
+  const handleFileChange = (file: any) => {
+    const isSqlite = file.target.files[0].name.endsWith(".sqlite");
+
+    if (!isSqlite) {
+      setFileError(true);
+      setBackupFile(null);
+      return;
+    }
+
+    setFileError(false);
+    setBackupFile(file.target.files[0]);
+  };
+
+  const handleSave = async () => {
+    setInitializing(true);
+
     spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
 
     if (usePassword && password) {
       localStorage.setItem("stdbConnectModuleAuthKey", password);
 
       const quickSwap = localStorage.getItem("poglyQuickSwap");
-
       if (quickSwap && quickSwap.length > 0) {
         const modules: QuickSwapType[] = JSON.parse(quickSwap);
-
-        const savedModule = modules.findIndex((module: QuickSwapType) => module.module === connectionConfig.module);
-        modules[savedModule] = { ...modules[savedModule], auth: password };
-
-        localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+        const savedModule = modules.findIndex((m: QuickSwapType) => m.module === connectionConfig.module);
+        if (savedModule !== -1) {
+          modules[savedModule] = { ...modules[savedModule], auth: password };
+          localStorage.setItem("poglyQuickSwap", JSON.stringify(modules));
+        }
       }
     }
 
-    (async () => {
-      UploadElementDataFromString(spacetime.Client, defaultElements);
-      setInitializing(true);
-    })();
+    if (backupFile) {
+      setShowUploadingText(true);
+      await UploadBackupFromFile(spacetime.Client, backupFile, false, false, setBackupRowCount);
+    } else {
+      await UploadElementDataFromString(spacetime.Client, defaultElements);
 
-    setTimeout(function () {
-      window.location.reload();
-    }, 3000);
+      setTimeout(() => {
+        return navigate("login");
+      }, 1500);
+    }
   };
 
+  if (isOverlay) return <></>;
+
   return (
-    <div className="w-screen h-screen relative flex flex-col items-center justify-center overflow-hidden bg-[#10121a]">
+    <div className="w-screen h-screen relative flex flex-col items-center justify-center bg-[#10121a] max-md:flex-col p-5">
       <PoglyTitle />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] mb-30">
-        <div className="w-full md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] min-h-[550px] max-md:min-h-0 mb-30 overflow-scroll hideScrollbar">
+        <div className="w-full min-h-fit md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl overflow-hidden">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
-            <span className="text-[#82a5ff]">
+            <span className="text-[#82a5ff] whitespace-nowrap">
               {step + 1} / {steps.length}
             </span>
           </h2>
-          <ul className="space-y-3">
+          <ul className="space-y-3 max-md:flex max-md:flex-wrap max-md:items-center max-md:space-y-0 max-md:space-x-2.5">
             {steps.map((category, index) => (
               <li
                 key={index}
-                className={`flex items-center space-x-3 text-sm ${step === index ? "text-[#82a5ff]" : "text-gray-500"}`}
+                className={`flex items-center gap-3 text-sm ${step === index ? "text-[#82a5ff]" : "text-gray-500"}`}
               >
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full bg-[#1e212b]`}>
+                <span className="w-5 h-5 flex items-center justify-center rounded-full bg-[#1e212b]">
                   {step > index && <Check size={13} className="text-green-500" />}
                 </span>
                 <span>{category.label}</span>
@@ -122,11 +167,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         </div>
 
         {step === 0 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10 m-h-[422px]">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg text-[#edf1ff] max-md:h-[350px]">
               <p>In order to start using Pogly, you must first configure your module.</p>
               <br />
               <p>
@@ -146,58 +191,68 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                 </a>
                 !
               </p>
-            </div>
 
-            <StyledButton className="mt-18" onClick={() => setStep((s) => s + 1)}>
-              Lets get started!
-            </StyledButton>
+              <StyledButton
+                className="absolute bottom-0 max-md:relative max-md:mt-3 max-md:mb-3"
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Lets get started!
+              </StyledButton>
+            </div>
           </div>
         )}
 
         {step === 1 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg text-[#edf1ff] max-md:h-[290px]">
               <p className="mb-15">
                 Pogly currently supports Twitch, Youtube and Kick officially. This can be manually overwritten from
                 settings later but proper functionality is not guaranteed.
               </p>
-              <StyledButton
-                className="bg-[#8956FB]! w-[120px] mb-5 flex justify-center"
-                onClick={() => {
-                  setPlatform("twitch");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
-                Twitch
-              </StyledButton>
-              <StyledButton
-                className="bg-[#FF0000]! w-[120px] mb-5 flex justify-center"
-                onClick={() => {
-                  setPlatform("youtube");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/youtube.png" />
-                Youtube
-              </StyledButton>
-              <StyledButton
-                className="bg-[#00e701]! w-[120px] text-black! flex justify-center"
-                onClick={() => {
-                  setPlatform("kick");
-                  setStep((s) => s + 1);
-                }}
-              >
-                <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/kick.svg" />
-                Kick
-              </StyledButton>
+              <div className="max-md:flex max-md:gap-2">
+                <StyledButton
+                  className="bg-[#8956FB]! w-[120px] mb-5 flex justify-center"
+                  onClick={() => {
+                    setPlatform("twitch");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/twitch.png" />
+                  Twitch
+                </StyledButton>
+
+                <StyledButton
+                  className="bg-[#FF0000]! w-[120px] mb-5 flex justify-center"
+                  onClick={() => {
+                    setPlatform("youtube");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/youtube.png" />
+                  Youtube
+                </StyledButton>
+
+                <StyledButton
+                  className="bg-[#00e701]! w-[120px] text-black! flex max-md:items-center h-fit"
+                  onClick={() => {
+                    setPlatform("kick");
+                    setStep((s) => s + 1);
+                  }}
+                >
+                  <img className="w-[16px] h-[16px] self-center mr-2 " src="./assets/kick.svg" />
+                  Kick
+                </StyledButton>
+              </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
-              <StyledButton className="bg-gray-700 hover:bg-gray-600" onClick={() => setStep((s) => s - 1)}>
+            <div className="flex justify-between">
+              <StyledButton
+                className="absolute bottom-0 max-md:relative max-md:mt-3 max-md:mb-3"
+                onClick={() => setStep((s) => s - 1)}
+              >
                 Back
               </StyledButton>
             </div>
@@ -205,11 +260,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 2 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg h-fit text-[#edf1ff] max-md:h-[290px]">
               <p className="mb-5">
                 This channel will be shown in the preview in middle of the canvas so you can place elements pixel
                 perfectly on the screen.
@@ -250,9 +305,13 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               )}
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
-              <StyledButton disabled={!channelName ? true : false} onClick={() => setStep((s) => s + 1)}>
+              <StyledButton
+                disabled={!channelName ? true : false}
+                onClick={() => setStep((s) => s + 1)}
+                className="mr-10"
+              >
                 Next
               </StyledButton>
             </div>
@@ -260,11 +319,11 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 3 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lgh-fit text-[#edf1ff] max-md:h-[310px]">
               <p>
                 Pogly has couple of security measures you can enable to make sure unauthorized users cannot wreak havoc
                 on your stream. While these options are optional, we <b>highly</b> recommend you turn them on.
@@ -326,11 +385,12 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton
                 disabled={(usePassword && !password) || passwordError ? true : false}
                 onClick={() => setStep((s) => s + 1)}
+                className="mr-10"
               >
                 Next
               </StyledButton>
@@ -339,17 +399,18 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 4 && (
-          <div className="w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10 ">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
-            <div className="rounded-lg h-[350px] text-[#edf1ff]">
+            <div className="rounded-lg h-fit text-[#edf1ff] max-md:mb-20 max-sm:mb-30">
               <p>
                 And that's it! Your module is now setup. Remember, as the owner of the module you can always change the
                 configuration from the settings.
               </p>
 
-              {legacyLogin && (
+              {/* NEED TO FIGURE OUT HOW TO HANDLE LEGACY/ANONYMOUS SPACETIMEAUTH LOGINS */}
+              {/* {legacyLogin && (
                 <div className="mt-8">
                   <p>
                     Since you're using legacy login, it is <b>your responsibility</b> to keep your authentication token
@@ -370,7 +431,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                     {copyAuthButtonText}
                   </StyledButton>
                 </div>
-              )}
+              )} */}
 
               <div className="mt-8">
                 <p>
@@ -401,15 +462,38 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
                   {copyOverlayButtonText}
                 </StyledButton>
               </div>
+
+              <div className="grid mt-6">
+                <h3 className="flex text-xl font-semibold mb-2 text-[#e9eeff]">Load backup</h3>
+                <span>
+                  If you have a backup file, you can select it here. It will then be loaded once you finish onboarding.
+                </span>
+                <div className="flex gap-1 mt-3">
+                  <Input
+                    type="file"
+                    className="bg-[#10121a] text-[#ffffffa6] p-3 rounded-md  w-fit border border-[#2c2f3a]"
+                    onChange={(event: any) => {
+                      handleFileChange(event);
+                    }}
+                    accept=".sqlite"
+                  />
+                  {fileError && <X color="red" className="grid self-center" />}
+                  {!fileError && backupFile && <Check color="green" className="grid self-center" />}
+                </div>
+              </div>
             </div>
 
-            <div className="mt-18 flex justify-between">
+            <div className="absolute bottom-0 w-full flex justify-between">
               <StyledButton disabled={initializing} onClick={() => setStep((s) => s - 1)}>
                 Back
               </StyledButton>
-              <StyledButton disabled={initializing} onClick={handleSave}>
-                Finish
-              </StyledButton>
+              {!showUploadingText ? (
+                <StyledButton disabled={initializing} onClick={handleSave} className="mr-10">
+                  Finish
+                </StyledButton>
+              ) : (
+                <span className="grid self-center mr-10">Uploading backup, do not close the window.</span>
+              )}
             </div>
           </div>
         )}
@@ -452,5 +536,12 @@ const StyledButton = styled.button`
     &:hover {
       background-color: #10121a;
     }
+  }
+`;
+
+const Input = styled.input`
+  &::file-selector-button {
+    margin-right: 15px;
+    color: white;
   }
 `;
