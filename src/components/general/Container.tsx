@@ -16,7 +16,7 @@ export const Container = ({ children, title, subTitle, className, style }: IProp
           {subTitle && <span className="pl-2 text-[12px] text-[#82a5ff]">{subTitle}</span>}
         </div>
       )}
-      <div className="grid rounded-xl bg-[#1e212b] w-full h-full content-center justify-items-center">{children}</div>
+      <div className="rounded-xl bg-[#1e212b] w-full h-full content-center justify-items-center">{children}</div>
     </div>
   );
 };

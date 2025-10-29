@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { PoglyTitle } from "./Components/PoglyTitle";
 import { StreamContainer } from "./Components/StreamContainer";
 import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
@@ -7,11 +7,12 @@ import { LayoutsContainer } from "./Components/LayoutsContainer";
 import { LayersContainer } from "./Components/LayersContainter";
 import { Footer } from "./Components/Footer";
 import { ElementPicker } from "./Components/ElementPicker";
-import { Settings } from "./Components/Settings";
+import { SettingsButton } from "./Components/Settings/SettingsButton";
 import { Details } from "./Components/Details";
 import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
+import { Settings } from "@/Pages/Canvas/Components/Settings/Settings";
 
 export const Canvas = () => {
   const auth = useAuth();
@@ -20,6 +21,8 @@ export const Canvas = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
+
+  const [settingsVisible, setSettingsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (!spacetimeDB || !auth.user) return navigate("/", { replace: true });
@@ -46,9 +49,11 @@ export const Canvas = () => {
         <div className="editor-overlay flex fixed w-full bottom-0 mb-8 justify-between">
           <Footer />
           <ElementPicker />
-          <Settings />
+          <SettingsButton settingsVisible={settingsVisible} setSettingsVisible={setSettingsVisible} />
         </div>
       </div>
+
+      <Settings visible={settingsVisible} setVisible={setSettingsVisible} />
 
       <ZoomContainer transformRef={transformRef}>
         <div id="streamContainer" className="relative w-[1920px] h-[1080px]">

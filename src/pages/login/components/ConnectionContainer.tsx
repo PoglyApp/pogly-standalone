@@ -314,7 +314,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
               )}
             </div>
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex justify-end gap-2">
               {auth.isAuthenticated && (
                 <StyledButton
                   className="absolute left-5"

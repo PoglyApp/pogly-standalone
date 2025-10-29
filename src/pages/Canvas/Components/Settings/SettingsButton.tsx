@@ -1,9 +1,14 @@
 import styled from "styled-components";
 import SettingsIcon from "@/Assets/Icons/SettingsIcon.svg";
 
-export const Settings = () => {
+interface IProps {
+  settingsVisible: boolean;
+  setSettingsVisible: Function;
+}
+
+export const SettingsButton = ({ settingsVisible, setSettingsVisible }: IProps) => {
   return (
-    <Button className="mr-10 self-center">
+    <Button className="mr-10 self-center" onClick={() => setSettingsVisible(!settingsVisible)}>
       <img src={SettingsIcon} alt="settings" />
     </Button>
   );
