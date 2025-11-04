@@ -39,6 +39,7 @@ export type AddElementDataWithId = {
   data: string,
   width: number,
   height: number,
+  folderId: number,
 };
 let _cached_AddElementDataWithId_type_value: __AlgebraicTypeType | null = null;
 
@@ -60,6 +61,7 @@ export const AddElementDataWithId = {
       { name: "data", algebraicType: __AlgebraicTypeValue.String },
       { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
       { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.U32 },
     );
     return _cached_AddElementDataWithId_type_value;
   },

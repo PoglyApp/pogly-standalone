@@ -71,6 +71,7 @@ export const ElementPicker = () => {
 
     setImages(elementData.filter((data: ElementData) => data.dataType.tag === "ImageElement"));
     setWidgets(elementData.filter((data: ElementData) => data.dataType.tag === "WidgetElement"));
+
     setFolders(imageFolders);
   }, [spacetimeDB, initialized]);
 
@@ -198,7 +199,7 @@ export const ElementPicker = () => {
             </CategoryButton>
           </div>
 
-          <div className="flex mt-3 ml-4 mr-4">
+          <div className="flex mt-3 ml-4 mr-4 gap-2">
             <TextInput placeholder="search..." onChange={() => {}} inputClassName="h-[37px] text-[14px]" />
             {selectedCategory === Category.Images && (
               <>
@@ -213,7 +214,7 @@ export const ElementPicker = () => {
           </div>
 
           {showFolderNameInput && (
-            <div className="flex mt-3 ml-4 mr-4">
+            <div className="flex mt-3 ml-4 mr-4 gap-2">
               <TextInput
                 placeholder="folder name"
                 onChange={(event) => setFolderNameInput(event.target.value)}

@@ -37,7 +37,6 @@ export type AddElement = {
   transparency: number,
   transform: string,
   clip: string,
-  folderId: number | undefined,
 };
 let _cached_AddElement_type_value: __AlgebraicTypeType | null = null;
 
@@ -57,7 +56,6 @@ export const AddElement = {
       { name: "transparency", algebraicType: __AlgebraicTypeValue.I32 },
       { name: "transform", algebraicType: __AlgebraicTypeValue.String },
       { name: "clip", algebraicType: __AlgebraicTypeValue.String },
-      { name: "folderId", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.U32) },
     );
     return _cached_AddElement_type_value;
   },

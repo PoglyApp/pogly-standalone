@@ -133,7 +133,6 @@ public partial class Module
                         Clip = element.Clip,
                         Locked = false,
                         LayoutId = newLayoutId + 1,
-                        FolderId = 0,
                         PlacedBy = guest.Nickname,
                         LastEditedBy = guest.Nickname,
                         ZIndex = element.ZIndex

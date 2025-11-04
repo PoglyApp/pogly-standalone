@@ -1,5 +1,6 @@
 ﻿using SpacetimeDB;
 
+
 public partial class Module
 {
     [Table(Public = true, Name = "ElementData")]
@@ -16,6 +17,7 @@ public partial class Module
         public byte[]? ByteArray;
         public int DataWidth;
         public int DataHeight;
+        public uint FolderId;
         public string CreatedBy;
     }
 }

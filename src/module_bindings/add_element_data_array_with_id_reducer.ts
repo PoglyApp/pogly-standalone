@@ -40,6 +40,7 @@ export type AddElementDataArrayWithId = {
   array: Uint8Array,
   width: number,
   height: number,
+  folderId: number,
 };
 let _cached_AddElementDataArrayWithId_type_value: __AlgebraicTypeType | null = null;
 
@@ -62,6 +63,7 @@ export const AddElementDataArrayWithId = {
       { name: "array", algebraicType: __AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8) },
       { name: "width", algebraicType: __AlgebraicTypeValue.I32 },
       { name: "height", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.U32 },
     );
     return _cached_AddElementDataArrayWithId_type_value;
   },

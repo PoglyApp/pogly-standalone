@@ -40,6 +40,7 @@ export type ElementData = {
   byteArray: Uint8Array | undefined,
   dataWidth: number,
   dataHeight: number,
+  folderId: number,
   createdBy: string,
 };
 let _cached_ElementData_type_value: __AlgebraicTypeType | null = null;
@@ -63,6 +64,7 @@ export const ElementData = {
       { name: "byteArray", algebraicType: __AlgebraicTypeValue.createOptionType(__AlgebraicTypeValue.Array(__AlgebraicTypeValue.U8)) },
       { name: "dataWidth", algebraicType: __AlgebraicTypeValue.I32 },
       { name: "dataHeight", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "folderId", algebraicType: __AlgebraicTypeValue.U32 },
       { name: "createdBy", algebraicType: __AlgebraicTypeValue.String },
     );
     return _cached_ElementData_type_value;

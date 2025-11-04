@@ -21,6 +21,7 @@ export const SetSubscriptions = (
       "SELECT * FROM ElementData",
       "SELECT * FROM Config",
       "SELECT * FROM Permissions",
+      "SELECT * FROM Folders",
       "SELECT * FROM Layouts",
     ]);
 

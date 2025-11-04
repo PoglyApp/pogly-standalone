@@ -143,7 +143,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   return (
     <div className="w-screen h-screen relative flex flex-col items-center justify-center bg-[#10121a] max-md:flex-col p-5">
       <PoglyTitle />
-      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] min-h-[550px] max-md:min-h-0 mb-30 overflow-scroll hideScrollbar">
+      <div className="bg-[#1e212b] p-5 rounded-xl w-full max-w-5xl shadow-xl flex flex-col md:flex-row mt-10 h-[550px] min-h-[550px] max-md:min-h-0 mb-30 overflow-auto hideScrollbar">
         <div className="w-full min-h-fit md:w-1/4 mb-6 md:mb-0 bg-[#10121a] p-3 rounded-xl overflow-hidden">
           <h2 className="text-lg font-semibold mb-4 text-gray-400">
             Module Setup{" "}
@@ -260,7 +260,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
         )}
 
         {step === 2 && (
-          <div className="relative w-full md:w-3/4 md:pl-10">
+          <div className="relative w-full md:w-3/4 md:pl-10 overflow-hidden">
             <h3 className="flex text-xl font-semibold mb-4 text-[#e9eeff]">
               {steps[step].label} <p className="text-xs self-center ml-2 text-gray-400">{steps[step].description}</p>
             </h3>
@@ -305,7 +305,7 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
               )}
             </div>
 
-            <div className="absolute bottom-0 w-full flex justify-between">
+            <div className="flex w-full absolute bottom-0 justify-between">
               <StyledButton onClick={() => setStep((s) => s - 1)}>Back</StyledButton>
               <StyledButton
                 disabled={!channelName ? true : false}
