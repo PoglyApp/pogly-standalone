@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { ChangeEventHandler, PropsWithChildren } from "react";
 
 interface IProps {
-  defaultValue?: string;
+  defaultValue?: any;
   title?: string;
   disabled?: boolean;
   className?: string;
@@ -16,7 +16,7 @@ export const Select = ({ defaultValue, title, disabled, className, onChange, chi
       {title && <p className="text-sm text-[#aeb4d4]">{title}</p>}
       <div className="flex">
         <StyledSelect onChange={onChange} disabled={disabled}>
-          {defaultValue && <option value="select">{defaultValue}</option>}
+          {defaultValue}
           {children}
         </StyledSelect>
         <ChevronDown className="pointer-events-none absolute self-center text-gray-400 right-0 mr-3" />
