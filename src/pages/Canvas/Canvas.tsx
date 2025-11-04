@@ -13,6 +13,7 @@ import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 import { Settings } from "@/Pages/Canvas/Components/Settings/Settings";
+import { UserList } from "./Components/UserList";
 
 export const Canvas = () => {
   const auth = useAuth();
@@ -41,7 +42,10 @@ export const Canvas = () => {
   return (
     <div className="w-full h-full absolute">
       <div className="editor-overlay absolute z-1000 w-full h-full">
-        <PoglyTitle />
+        <div>
+          <PoglyTitle />
+          <UserList />
+        </div>
         <LayoutsContainer />
         <LayersContainer />
         <Details />
