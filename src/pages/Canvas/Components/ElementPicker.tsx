@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 
 import { DndContext, useDraggable, useDroppable, DragEndEvent } from "@dnd-kit/core";
-import { useElementDataEvents } from "@/StDB/Hooks_NEW/useElementDataEvents";
-import { useFolderEvents } from "@/StDB/Hooks_NEW/useFolderEvents";
+import { useElementDataEvents } from "@/StDB/Hooks/useElementDataEvents";
+import { useFolderEvents } from "@/StDB/Hooks/useFolderEvents";
 import { ElementDataType } from "@/Types/General/ElementDataType";
 import { insertElementData } from "@/StDB/Reducers/Insert/insertElementData";
 
@@ -59,8 +59,8 @@ export const ElementPicker = () => {
 
   useChannelEmotes(setSevenTVEmotes, setBetterTVEmotes);
 
-  useElementDataEvents(setInitialized);
-  useFolderEvents(setInitialized);
+  useElementDataEvents(setImages);
+  useFolderEvents(setFolders);
 
   useEffect(() => {
     if (!spacetimeDB || initialized) return;
@@ -68,6 +68,8 @@ export const ElementPicker = () => {
 
     const elementData: ElementData[] = Array.from(spacetimeDB.Client.db.elementData.iter());
     const imageFolders: Folders[] = Array.from(spacetimeDB.Client.db.folders.iter());
+
+    console.log(elementData);
 
     setImages(elementData.filter((data: ElementData) => data.dataType.tag === "ImageElement"));
     setWidgets(elementData.filter((data: ElementData) => data.dataType.tag === "WidgetElement"));

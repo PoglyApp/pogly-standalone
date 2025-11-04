@@ -2,7 +2,9 @@ import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { ElementData, EventContext } from "@/module_bindings";
 import { useContext, useEffect, useState } from "react";
 
-export const useElementDataEvents = (dataInitialized: Function) => {
+type SetElementDataList = React.Dispatch<React.SetStateAction<ElementData[]>>;
+
+export const useElementDataEvents = (setElementDataList: SetElementDataList) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -12,25 +14,24 @@ export const useElementDataEvents = (dataInitialized: Function) => {
     setInitialized(true);
 
     // INSERT
-    spacetimeDB.Client.db.elementData.onInsert((ctx: EventContext, element: ElementData) => {
+    spacetimeDB.Client.db.elementData.onInsert((ctx: EventContext, elementData: ElementData) => {
       if (!ctx.event) return;
-      dataInitialized(false);
+
+      setElementDataList((prev) => [...prev, elementData]);
     });
 
     // UPDATE
     spacetimeDB.Client.db.elementData.onUpdate((ctx: EventContext, oldData: ElementData, newData: ElementData) => {
       if (!ctx.event) return;
 
-      // FOLDER UPDATE
-      if (oldData.folderId !== newData.folderId) {
-        dataInitialized(false);
-      }
+      setElementDataList((prev) => prev.map((d) => (d.id === newData.id ? newData : d)));
     });
 
     // DELETE
-    spacetimeDB.Client.db.elementData.onDelete((ctx: EventContext, element: ElementData) => {
+    spacetimeDB.Client.db.elementData.onDelete((ctx: EventContext, elementData: ElementData) => {
       if (!ctx.event) return;
-      dataInitialized(false);
+
+      setElementDataList((prev) => prev.filter((d) => d.id !== elementData.id));
     });
   }, [spacetimeDB, initialized]);
 };

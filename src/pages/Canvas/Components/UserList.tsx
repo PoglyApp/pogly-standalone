@@ -1,6 +1,6 @@
 import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { Guests } from "@/module_bindings";
-import { useGuestEvents } from "@/StDB/Hooks_NEW/useGuestEvents";
+import { useGuestEvents } from "@/StDB/Hooks/useGuestEvents";
 import { useContext, useEffect, useState } from "react";
 
 export const UserList = () => {
