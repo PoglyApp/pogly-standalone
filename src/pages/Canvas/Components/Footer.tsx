@@ -3,8 +3,22 @@ import ChangelogIcon from "@/Assets/Icons/ChangelogIcon.svg";
 import GithubIcon from "@/Assets/Icons/GithubIcon.svg";
 import DiscordIcon from "@/Assets/Icons/DiscordIcon.svg";
 import LogoutIcon from "@/Assets/Icons/LogoutIcon.svg";
+import { Replace } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Dropdown } from "@/Components/Inputs/Dropdown";
+import { DropdownItem } from "@/Components/Inputs/DropdownItem";
+import { QuickSwapType } from "@/Types/General/QuickSwapType";
 
 export const Footer = () => {
+  const [quickswapVisible, setQuickswapVisible] = useState<boolean>(false);
+  const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
+
+  useEffect(() => {
+    const modules = localStorage.getItem("poglyQuickSwap");
+
+    if (modules && modules !== undefined) setQuickSwapModules(JSON.parse(modules));
+  }, []);
+
   const disconnect = () => {
     localStorage.removeItem("stdbConnectDomain");
     localStorage.removeItem("stdbConnectModule");
@@ -27,6 +41,25 @@ export const Footer = () => {
         <Button>
           <ButtonIcon src={DiscordIcon} alt="discord" />
         </Button>
+        <div className="flex items-center">
+          <Button onClick={() => setQuickswapVisible(!quickswapVisible)}>
+            <Replace color="#7e818c" width="30px" height="30px" />
+          </Button>
+
+          {quickswapVisible && (
+            <Dropdown className="bottom-17" setQuickswapVisible={setQuickswapVisible}>
+              {quickSwapModules.length > 0 ? (
+                <>
+                  {quickSwapModules.map((quickswap) => {
+                    return <DropdownItem value={quickswap.module} onClick={() => {}} />;
+                  })}
+                </>
+              ) : (
+                <DropdownItem value="none" onClick={() => {}} />
+              )}
+            </Dropdown>
+          )}
+        </div>
 
         <Button onClick={disconnect}>
           <ButtonIcon src={LogoutIcon} alt="logout" />
