@@ -60,7 +60,7 @@ export const Overlay = () => {
       localStorage.removeItem("stdbToken");
       window.location.reload();
     }
-  }, [userDisconnected]);
+  }, [userDisconnected, spacetimeDB.Disconnected]);
 
   return (
     <SpacetimeContext.Provider value={{ spacetimeDB }}>
