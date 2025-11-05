@@ -6,7 +6,7 @@ import { ZoomContainer } from "./Components/ZoomContainer";
 import { LayoutsContainer } from "./Components/LayoutsContainer";
 import { LayersContainer } from "./Components/LayersContainter";
 import { Footer } from "./Components/Footer";
-import { ElementPicker } from "./Components/ElementPicker";
+import { ElementPicker } from "./Components/ElementPicker/ElementMenu";
 import { SettingsButton } from "./Components/Settings/SettingsButton";
 import { Details } from "./Components/Details";
 import { SpacetimeContext } from "@/Contexts/SpacetimeContext";

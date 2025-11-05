@@ -24,7 +24,7 @@ export const TextInput = ({
   inputClassName,
 }: IProps) => {
   return (
-    <div className={"w-full" + (titleOnLeft ? " flex items-center gap-2" : "")}>
+    <div className={titleOnLeft ? " flex items-center gap-2" : ""}>
       {title && (
         <p className="text-sm text-[#aeb4d4]">
           {title} {subTitle && <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">{subTitle}</span>}

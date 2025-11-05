@@ -1,6 +1,41 @@
 @import url("fonts.css");
 @import "tailwindcss";
 
+* {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #3f465b #14151b;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #14151b;
+  border-left: 1px solid #0f1117;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #2e3447;
+  border: 2px solid #14151b;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a4157;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: #4a526b;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #14151b;
+}
+
 html {
   font-family: Geist, serif;
 
@@ -32,41 +67,6 @@ body {
   & > * {
     pointer-events: auto;
   }
-}
-
-.dark-scrollbar {
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: #3f465b #14151b;
-}
-
-.dark-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-track {
-  background: #14151b;
-  border-left: 1px solid #0f1117;
-  border-radius: 8px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-thumb {
-  background: #2e3447;
-  border: 2px solid #14151b;
-  border-radius: 8px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3a4157;
-}
-
-.dark-scrollbar::-webkit-scrollbar-thumb:active {
-  background: #4a526b;
-}
-
-.dark-scrollbar::-webkit-scrollbar-corner {
-  background: #14151b;
 }
 
 .appear {

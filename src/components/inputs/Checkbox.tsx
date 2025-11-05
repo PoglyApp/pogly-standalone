@@ -35,8 +35,8 @@ export const Checkbox = ({ label, checked, onChange, disabled, className = "" }:
             grid place-items-center h-5 w-5 rounded-md
             bg-[#111318] border border-[#2a2d33] shadow-sm
             transition
-            peer-checked:border-blue-500 peer-checked:bg-blue-500/10
-            peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/40
+            peer-checked:border-[#82a5ff] peer-checked:bg-[#82a5ff]/10
+            peer-focus-visible:ring-2 peer-focus-visible:ring-[#82a5ff]/40
           "
         >
           {checked && <Check size={14} />}
