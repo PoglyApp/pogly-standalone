@@ -108,4 +108,71 @@ public partial class Module
             Log.Error($"[{func}] Encountered error deleting permission, requested by {ctx.Sender}. " + e.Message);
         }
     }
+
+    [Reducer]
+    public static void WhitelistUser(ReducerContext ctx, StreamingPlatform platform, string username)
+    {
+        string func = "WhitelistUser";
+
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx)) return;
+
+        try
+        {
+            ctx.Db.Whitelist.Insert(new Whitelist
+            {
+                Platform = platform,
+                Username = username.ToLower()
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered an error adding user to guest!" + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void DeleteWhitelistUser(ReducerContext ctx, string username)
+    {
+        string func = "DeleteWhitelistUser";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx)) return;
+
+        try
+        {
+            ctx.Db.Whitelist.Username.Delete(username.ToLower());
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered an error deleting whitelisted user!" + e.Message);
+        }
+    }
+    
+    [Reducer]
+    public static void DeleteWhitelistUserPlatform(ReducerContext ctx, StreamingPlatform platform, string username)
+    {
+        string func = "DeleteWhitelistUserPlatform";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx)) return;
+
+        try
+        {
+            foreach (var user in ctx.Db.Whitelist.Username.Filter(username.ToLower()))
+            {
+                if(user.Platform == platform) ctx.Db.Whitelist.Delete(user);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered an error deleting whitelisted user with platform!" + e.Message);
+        }
+    }
 }

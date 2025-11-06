@@ -3,14 +3,6 @@ using SpacetimeDB;
 
 public partial class Module
 {
-    public enum StreamingPlatform
-    {
-        Twitch,
-        Youtube,
-        Kick,
-        Unhandled,
-    }
-    
     private static JwtClaims GetJwtClaims(ReducerContext ctx)
     {
         return ctx.SenderAuth.Jwt ?? throw new Exception("Client connected without JWT!");
