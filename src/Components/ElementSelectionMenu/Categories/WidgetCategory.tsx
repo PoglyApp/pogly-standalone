@@ -112,7 +112,7 @@ export const WidgetCategory = React.memo((props: IProps) => {
               onClick={() => AddElementToCanvas(elementData)}
               data-widget-selection-button={elementData.id}
             >
-              {elementData.name}
+              <p>{elementData.name}</p>
             </Button>
             <br />
           </div>
