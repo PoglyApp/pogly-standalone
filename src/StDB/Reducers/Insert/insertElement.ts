@@ -1,9 +1,14 @@
-import { DataType, DbConnection, ElementStruct, ImageElement, ImageElementData, Layouts, TextElement, WidgetElement } from "../../../module_bindings";
 import {
-  GetCoordsFromTransform,
-  GetTransformFromCoords,
-} from "../../../Utility/ConvertCoordinates";
-import { DebugLogger } from "../../../Utility/DebugLogger";
+  DataType,
+  DbConnection,
+  ElementStruct,
+  ImageElement,
+  ImageElementData,
+  Layouts,
+  TextElement,
+  WidgetElement,
+} from "../../../module_bindings";
+import { GetCoordsFromTransform, GetTransformFromCoords } from "../../../Utility/ConvertCoordinates";
 
 export const insertElement = (
   Client: DbConnection,
@@ -13,8 +18,6 @@ export const insertElement = (
   transform?: string,
   clip?: string
 ) => {
-  DebugLogger("Inserting new element");
-
   const transformCoords = GetCoordsFromTransform(transform || "translate(0px, 1100px)");
   const newTransform = GetTransformFromCoords(
     transformCoords.x,
@@ -68,7 +71,6 @@ export const insertElement = (
     transparency || 100,
     newTransform,
     clip || "rect(0px, 0px, 0px, 0px)",
-    activeLayout.id,
-    undefined
+    activeLayout.id
   );
 };

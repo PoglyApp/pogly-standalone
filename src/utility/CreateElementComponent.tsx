@@ -1,100 +1,48 @@
-import { CanvasElementType } from "../Types/General/CanvasElementType";
-import { Text } from "../Components/Elements/Text";
-import { Image } from "../Components/Elements/Image";
-import { Widget } from "../Components/Elements/Widget";
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
-import { DebugLogger } from "./DebugLogger";
-import { Elements, TextElement } from "../module_bindings";
+import { Elements } from "../module_bindings";
+import Text from "@/Pages/Canvas/Components/Elements/Text";
+import Image from "@/Pages/Canvas/Components/Elements/Image";
+import Widget from "@/Pages/Canvas/Components/Elements/Widget";
 
 export const CreateOffsetElementComponent = (elements: Elements) => {
-  DebugLogger("Creating offset element component");
-  const newElement: Elements = OffsetElementForCanvas(elements);
-
-  const canvasElement: CanvasElementType = {
-    Elements: newElement,
-    ElementData: undefined,
-    Component: undefined,
-  };
+  const newElement: Elements = OffsetElementForCanvas(elements) as Elements;
+  let component;
 
   switch (elements.element.tag) {
     case "TextElement":
-      canvasElement.Component = <Text elements={newElement} />;
+      component = <Text elements={newElement} />;
       break;
 
     case "ImageElement":
-      canvasElement.Component = <Image elements={newElement} />;
+      component = <Image elements={newElement} />;
       break;
 
     case "WidgetElement":
-      canvasElement.Component = <Widget elements={newElement} />;
+      component = <Widget elements={newElement} />;
 
       break;
   }
 
-  return canvasElement;
+  return component;
 };
 
-/*export const CreateElementComponent = (elements: Elements) => {
-  DebugLogger("Creating element component");
-  const newElement: Elements = {
-    id: elements.id,
-    element: { ...elements.element },
-    transparency: elements.transparency,
-    transform: elements.transform,
-    clip: elements.clip,
-    locked: elements.locked,
-    layoutId: elements.layoutId,
-    folderId: elements.folderId,
-    placedBy: elements.placedBy,
-    lastEditedBy: elements.lastEditedBy,
-    zIndex: elements.zIndex,
-  };
-
-  const canvasElement: CanvasElementType = {
-    Elements: newElement,
-    ElementData: undefined,
-    Component: undefined,
-  };
-
-  switch (elements.element.tag) {
-    case "TextElement":
-      canvasElement.Component = <Text elements={newElement} />;
-      break;
-
-    case "ImageElement":
-      canvasElement.Component = <Image elements={newElement} />;
-      break;
-
-    case "WidgetElement":
-      canvasElement.Component = <Widget elements={newElement} />;
-
-      break;
-  }
-
-  return canvasElement;
-};*/
-
 export const CreateElementComponent = (element: Elements) => {
-  const canvasElement: CanvasElementType = {
-    Elements: element,
-    ElementData: undefined,
-    Component: undefined,
-  };
+  let component;
 
   switch (element.element.tag) {
     case "TextElement":
-      canvasElement.Component = <Text elements={element} />;
+      component = <Text elements={element} />;
       break;
 
     case "ImageElement":
-      canvasElement.Component = <Image elements={element} />;
+      component = <Image elements={element} />;
       break;
 
     case "WidgetElement":
-      canvasElement.Component = <Widget elements={element} />;
+      component = <Widget elements={element} />;
 
       break;
   }
 
-  return canvasElement;
+  return component;
 };

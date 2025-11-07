@@ -1,6 +1,6 @@
 import { SpacetimeContext } from "@/Contexts/SpacetimeContext";
 import { useChannelEmotes } from "@/Hooks/useChannelEmotes";
-import { DataType, ElementData, Folders } from "@/module_bindings";
+import { DataType, ElementData, ElementStruct, Folders, ImageElementData, Layouts } from "@/module_bindings";
 import { useElementDataEvents } from "@/StDB/Hooks/useElementDataEvents";
 import { useFolderEvents } from "@/StDB/Hooks/useFolderEvents";
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
@@ -21,6 +21,10 @@ import {
   LinkIcon,
   Trash2Icon,
 } from "lucide-react";
+import { insertElement } from "@/StDB/Reducers/Insert/insertElement";
+import { getActiveLayout } from "@/StDB/SpacetimeDBUtils";
+import BetterTVWrap from "@/Utility/BetterTVWrap";
+import SevenTVWrap from "@/Utility/SevenTVWrap";
 
 enum Category {
   Images,
@@ -169,6 +173,40 @@ export const ElementDataPicker = () => {
     const folderID: any = over.id.toString().replace("_IMAGE_FOLDER", "");
 
     spacetimeDB.Client.reducers.updateElementDataFolder(elementDataID, folderID);
+  };
+
+  const spawnElement = (elementData: ElementData) => {
+    const layout: Layouts = getActiveLayout(spacetimeDB.Client) as Layouts;
+
+    insertElement(
+      spacetimeDB.Client,
+      ElementStruct.ImageElement({
+        imageElementData: ImageElementData.ElementDataId(elementData.id),
+        width: elementData.dataWidth,
+        height: elementData.dataHeight,
+      }),
+      layout
+    );
+  };
+
+  const spawnChannelEmouteElement = (sevenTV: SevenTVEmote | null, bttv: BetterTVEmote | null) => {
+    const layout: Layouts = getActiveLayout(spacetimeDB.Client) as Layouts;
+    const blob = sevenTV ? SevenTVWrap.GetURLFromEmote(sevenTV) : BetterTVWrap.GetURLFromEmote(bttv!);
+
+    const image = new Image();
+
+    image.src = blob;
+    image.onload = function () {
+      insertElement(
+        spacetimeDB.Client,
+        ElementStruct.ImageElement({
+          imageElementData: ImageElementData.RawData(blob),
+          width: image.width || 128,
+          height: image.height || 128,
+        }),
+        layout
+      );
+    };
   };
 
   return (
@@ -329,6 +367,7 @@ export const ElementDataPicker = () => {
                               <ItemButton
                                 onMouseEnter={() => setHighlightedData(data)}
                                 onMouseLeave={() => setHighlightedData(null)}
+                                onClick={() => spawnElement(data)}
                               >
                                 <img src={data.data} className="w-[50px] h-[50px]" />
                               </ItemButton>
@@ -351,6 +390,7 @@ export const ElementDataPicker = () => {
                           <ItemButton
                             onMouseEnter={() => setHighlightedData(data)}
                             onMouseLeave={() => setHighlightedData(null)}
+                            onClick={() => spawnElement(data)}
                           >
                             <img src={data.data} className="w-[50px] h-[50px]" />
                           </ItemButton>
@@ -370,7 +410,7 @@ export const ElementDataPicker = () => {
                 {sevenTVEmotes.map((data) => {
                   return (
                     <li key={data.id + "_7TV_EMOTE"} className="w-fit h-fit">
-                      <ItemButton>
+                      <ItemButton onClick={() => spawnChannelEmouteElement(data, null)}>
                         <img src={"https://cdn.7tv.app/emote/" + data.id + "/3x.webp"} className="w-[50px] h-[50px]" />
                       </ItemButton>
                     </li>
@@ -384,7 +424,7 @@ export const ElementDataPicker = () => {
                 {betterTVEmotes.map((data) => {
                   return (
                     <li key={data.id + "_7TV_EMOTE"} className="w-fit h-fit">
-                      <ItemButton>
+                      <ItemButton onClick={() => spawnChannelEmouteElement(null, data)}>
                         <img
                           src={"https://cdn.betterttv.net/emote/" + data.id + "/3x.webp"}
                           className="w-[50px] h-[50px]"

@@ -1,4 +1,3 @@
-import { DebugLogger } from "./DebugLogger";
 import { DbConnection, RemoteReducers, RemoteTables, SetReducerFlags } from "../module_bindings";
 import { SubscriptionEventContextInterface } from "spacetimedb";
 
@@ -7,8 +6,6 @@ export const SetSubscriptions = (
   setStdbSubscriptions: Function,
   setStdbInitialized?: Function
 ) => {
-  DebugLogger("Subscribing to tables");
-
   client
     .subscriptionBuilder()
     .onApplied((ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>) => {

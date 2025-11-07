@@ -5,7 +5,7 @@ export const StreamContainer = () => {
   const streamName = "guzu";
 
   return (
-    <>
+    <div id="streamContainer" className="relative w-[1920px] h-[1080px]">
       {streamingPlatform === "twitch" && (
         <TwitchPlayerNonInteractive
           style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
@@ -17,7 +17,7 @@ export const StreamContainer = () => {
           muted
         />
       )}
-    </>
+    </div>
   );
 };
 

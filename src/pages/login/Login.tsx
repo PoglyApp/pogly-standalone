@@ -64,9 +64,7 @@ export const Login = () => {
       Identity: guestWithNickname,
       Runtime: spacetime.Runtime,
       Config: spacetime.InstanceConfig,
-      Elements: [],
-      ElementData: [],
-      Guests: [],
+      Subscriptions: stdbSubscriptions,
     });
   }, [stdbSubscriptions, stdbInitialized, spacetime.Identity, spacetime.Client, spacetime.Runtime]);
 
