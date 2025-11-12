@@ -82,15 +82,19 @@ export const Widget = (props: IProp) => {
       }}
       onDoubleClick={showWidgetCreationModal}
     >
-      <iframe
-        srcDoc={iframeSrc}
-        style={{ pointerEvents: "none", border: "none", overflow: "hidden" }}
-        scrolling="no"
-        width="100%"
-        height="100%"
-        data-widget-element-data-id={widgetElement.elementDataId}
-        title="widget"
-      />
+      {iframeSrc !== "" ? (
+        <iframe
+          srcDoc={iframeSrc}
+          style={{ pointerEvents: "none", border: "none", overflow: "hidden" }}
+          scrolling="no"
+          width="100%"
+          height="100%"
+          data-widget-element-data-id={widgetElement.elementDataId}
+          title="widget"
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
