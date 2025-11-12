@@ -17,7 +17,7 @@ export const WidgetCodeCompiler = (
   if (!widgetData) {
     if (!elementDataId) return "";
     const elementData = Client.db.elementData.id.find(elementDataId);
-    
+
     if (!elementData) return "";
     const data = elementData.data;
 
@@ -27,7 +27,7 @@ export const WidgetCodeCompiler = (
   const headerTag: string = `<head>${widgetData.headerTag} <style> html { pointer-events: none; } ${widgetData.styleTag}</style> </head>`;
   const bodyTag: string = `<body>${widgetData.bodyTag} <script>${widgetData.scriptTag}</script> </body>`;
 
-  let htmlTag: string = `${headerTag} ${bodyTag}`;
+  let htmlTag: string = `<!DOCTYPE html><html>${headerTag} ${bodyTag}</html>`;
 
   if (widgetData.variables && widgetData.variables.length !== 0) {
     widgetData.variables.forEach((variable: any) => {
