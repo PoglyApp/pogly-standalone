@@ -105,6 +105,7 @@ export const ElementSelectionMenu = (props: IProps) => {
 };
 
 const SelectionMenuContainer = styled.div`
+  display: grid;
   background-color: #001529;
 
   width: 218px;
@@ -124,7 +125,6 @@ const SelectionMenuContainer = styled.div`
 `;
 
 const CategoryContainer = styled.div`
-  max-height: 80%;
   overflow-y: scroll;
   overflow-x: hidden;
 

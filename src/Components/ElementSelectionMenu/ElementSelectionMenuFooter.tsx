@@ -156,14 +156,8 @@ export const ElementSelectionMenuFooter = () => {
 };
 
 const SelectionMenuFooterContainer = styled.div`
-  width: 218px;
-  height: max-content;
-  bottom: 0;
-  position: fixed;
-  align-content: end;
-
+  align-self: end;
   padding-top: 15px;
-  z-index: 2;
 
   color: #ffffffa6;
   background-color: #001529;
