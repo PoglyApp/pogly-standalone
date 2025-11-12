@@ -19,6 +19,7 @@ import { QuickSwapMenu } from "./QuickswapMenu";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
 import { useGetVersionNumber } from "../Hooks/useGetVersionNumber";
+import { Settings } from "../Components/Settings/Settings";
 
 export const Header = () => {
   const location = useLocation();
@@ -31,6 +32,8 @@ export const Header = () => {
   const [isDroppingSelectionMenu, setIsDroppingSelectionMenu] = useState(false);
   const [quickSwapMenuAnchor, setQuickSwapMenuAnchor] = useState<any>(null);
   const quickSwapMenuOpen = Boolean(quickSwapMenuAnchor);
+
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const [showVerificationButton, setShowVerificationButton] = useState<boolean>(false);
 
@@ -55,11 +58,6 @@ export const Header = () => {
       window.location.href = "/";
     }
   }, [location, navigate]);
-
-  const showSettingsMenu = () => {
-    DebugLogger("Opening settings modal");
-    setModals((oldModals: any) => [...oldModals, <SettingsModal key="settings_modal" />]);
-  };
 
   const showEditorGuidelines = () => {
     DebugLogger("Opening editor guidelines modal");
@@ -111,7 +109,12 @@ export const Header = () => {
                   label="Swap module"
                   onClick={(event: any) => setQuickSwapMenuAnchor(event.currentTarget)}
                 />
-                <StyledTab icon={<SettingsIcon />} iconPosition="start" label="Settings" onClick={showSettingsMenu} />
+                <StyledTab
+                  icon={<SettingsIcon />}
+                  iconPosition="start"
+                  label="Settings"
+                  onClick={() => setShowSettings(!showSettings)}
+                />
                 <StyledGuidelines
                   icon={<SecurityIcon />}
                   iconPosition="start"
@@ -133,6 +136,8 @@ export const Header = () => {
             <GuestListContainer />
           </Toolbar>
         </AppBar>
+
+        <Settings visible={showSettings} setVisible={setShowSettings} />
 
         <Dropzone
           onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}

@@ -164,3 +164,38 @@ h1 {
 .hideScrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.darkScrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #3f465b #14151b;
+}
+
+.darkScrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.darkScrollbar::-webkit-scrollbar-track {
+  background: #14151b;
+  border-left: 1px solid #0f1117;
+  border-radius: 8px;
+}
+
+.darkScrollbar::-webkit-scrollbar-thumb {
+  background: #2e3447;
+  border: 2px solid #14151b;
+  border-radius: 8px;
+}
+
+.darkScrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3a4157;
+}
+
+.darkScrollbar::-webkit-scrollbar-thumb:active {
+  background: #4a526b;
+}
+
+.darkScrollbar::-webkit-scrollbar-corner {
+  background: #14151b;
+}

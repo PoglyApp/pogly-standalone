@@ -129,7 +129,7 @@ export const ImageCategory = React.memo((props: IProps) => {
         ) : null}
       </AccordionSummary>
 
-      <AccordionDetails sx={{ backgroundColor: "#000c17", paddingBottom: "5px" }}>
+      <AccordionDetails sx={{ backgroundColor: "#000c17", paddingBottom: "5px" }} className="hideScrollbar">
         {canUpload && (
           <Button
             variant="text"

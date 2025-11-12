@@ -78,8 +78,8 @@ export const TenorCategory = () => {
           maxHeight: "800px",
           overflowY: "scroll",
           overflowX: "hidden",
-          "::-webkit-scrollbar": { width: "0", background: "transparent" },
         }}
+        className="hideScrollbar"
       >
         {apiKey ? (
           <StyledInput focused={false} label="Search" color="#ffffffa6" onChange={handleSearch} defaultValue={""} />

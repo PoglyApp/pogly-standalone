@@ -53,8 +53,8 @@ export const ElementSelectionMenu = (props: IProps) => {
 
   return (
     <>
-      <SelectionMenuContainer id="SelectionMenu" className="canvas-font">
-        <CategoryContainer>
+      <SelectionMenuContainer id="SelectionMenu" className="canvas-font hideScrollbar">
+        <CategoryContainer className="hideScrollbar">
           <LayoutCategory />
 
           <Divider
@@ -117,11 +117,6 @@ const SelectionMenuContainer = styled.div`
   padding-top: 10px;
 
   z-index: 2;
-
-  &::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
 `;
 
 const CategoryContainer = styled.div`

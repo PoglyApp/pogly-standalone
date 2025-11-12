@@ -107,7 +107,7 @@ export const ChannelEmoteCategory = (props: IProps) => {
   };
 
   return (
-    <Accordion>
+    <Accordion className="hideScrollbar">
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: "#ffffffa6" }} />}
         aria-controls="panel1-content"
@@ -126,8 +126,8 @@ export const ChannelEmoteCategory = (props: IProps) => {
           maxHeight: "800px",
           overflowY: "scroll",
           overflowX: "hidden",
-          "::-webkit-scrollbar": { width: "0", background: "transparent" },
         }}
+        className="hideScrollbar"
       >
         {sevenTVEmotes.length === 0 ? (
           <h1 style={{ color: "#ffffffa6" }}>No emotes found</h1>
