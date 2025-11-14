@@ -60,19 +60,20 @@ const StreamContainer = React.memo(({ spacetimeDB, settings }: IProps) => {
 
   const streamOnReady = (player: TwitchPlayerInstance) => {
     player.setQuality(localStorage.getItem("streamQuality") ? localStorage.getItem("streamQuality")! : "auto");
-
-    if (isChrome) {
-      document.getElementById("stream")?.style.setProperty("pointer-events", "auto");
-    }
   };
 
   const streamOnLive = () => {
     if (!isChrome) return;
 
+    document.getElementById("stream")?.style.setProperty("pointer-events", "auto");
     setExplanation("none");
   };
 
   const streamOnPlaying = () => {
+    if (settings && !settings.streamInteractable) {
+      document.getElementById("stream")?.style.setProperty("pointer-events", "none");
+    }
+
     closeAlert();
   };
 

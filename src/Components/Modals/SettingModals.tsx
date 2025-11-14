@@ -59,7 +59,7 @@ export const SettingsModal = () => {
   const stream = document.getElementById("stream")!;
   const [tenorAPIKey, setTenorAPIKey] = useState<string>(localStorage.getItem("TenorAPIKey")!);
   const [streamPlayerInteractable, setStreamPlayerInteractable] = useState<boolean>(
-    stream.style.pointerEvents === "none" ? false : true
+    settings.streamInteractable != null ? settings.streamInteractable : false
   );
   const [urlAsDefault, setUrlAsDefault] = useState<boolean>(
     settings.urlAsDefault != null ? settings.urlAsDefault : false
@@ -124,10 +124,6 @@ export const SettingsModal = () => {
 
   useEffect(() => {
     setSettings(settings);
-
-    const streamInteractable = document.getElementById("stream")?.style.pointerEvents;
-
-    setStreamPlayerInteractable(streamInteractable === "none" ? false : true);
   }, [settings, setSettings, spacetimeDB.Runtime]);
 
   function clearConnectionSettings() {
