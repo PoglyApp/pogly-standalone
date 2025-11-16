@@ -49,6 +49,8 @@ import { AddLayout } from "./add_layout_reducer.ts";
 export { AddLayout };
 import { AddLayoutWithId } from "./add_layout_with_id_reducer.ts";
 export { AddLayoutWithId };
+import { AddPermissionSet } from "./add_permission_set_reducer.ts";
+export { AddPermissionSet };
 import { Authenticate } from "./authenticate_reducer.ts";
 export { Authenticate };
 import { ClaimOwnership } from "./claim_ownership_reducer.ts";
@@ -79,6 +81,8 @@ import { DeleteFolder } from "./delete_folder_reducer.ts";
 export { DeleteFolder };
 import { DeleteLayout } from "./delete_layout_reducer.ts";
 export { DeleteLayout };
+import { DeletePermissionSet } from "./delete_permission_set_reducer.ts";
+export { DeletePermissionSet };
 import { DeleteWhitelistUser } from "./delete_whitelist_user_reducer.ts";
 export { DeleteWhitelistUser };
 import { DeleteWhitelistUserPlatform } from "./delete_whitelist_user_platform_reducer.ts";
@@ -183,6 +187,8 @@ import { UpdateImageElementWidth } from "./update_image_element_width_reducer.ts
 export { UpdateImageElementWidth };
 import { UpdateLayoutName } from "./update_layout_name_reducer.ts";
 export { UpdateLayoutName };
+import { UpdatePermissionSet } from "./update_permission_set_reducer.ts";
+export { UpdatePermissionSet };
 import { UpdateTextElementColor } from "./update_text_element_color_reducer.ts";
 export { UpdateTextElementColor };
 import { UpdateTextElementFont } from "./update_text_element_font_reducer.ts";
@@ -233,6 +239,8 @@ import { OverlayCommandTableHandle } from "./overlay_command_table.ts";
 export { OverlayCommandTableHandle };
 import { OwnerRecoveryKeyTableHandle } from "./owner_recovery_key_table.ts";
 export { OwnerRecoveryKeyTableHandle };
+import { PermissionSetsTableHandle } from "./permission_sets_table.ts";
+export { PermissionSetsTableHandle };
 import { PermissionsTableHandle } from "./permissions_table.ts";
 export { PermissionsTableHandle };
 import { WhitelistTableHandle } from "./whitelist_table.ts";
@@ -287,6 +295,8 @@ import { Layouts } from "./layouts_type.ts";
 export { Layouts };
 import { OverlayCommand } from "./overlay_command_type.ts";
 export { OverlayCommand };
+import { PermissionSets } from "./permission_sets_type.ts";
+export { PermissionSets };
 import { Permissions } from "./permissions_type.ts";
 export { Permissions };
 import { StreamingPlatform } from "./streaming_platform_type.ts";
@@ -419,6 +429,15 @@ const REMOTE_MODULE = {
         colType: (AuthenticationKey.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
+    PermissionSets: {
+      tableName: "PermissionSets" as const,
+      rowType: PermissionSets.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+      primaryKeyInfo: {
+        colName: "id",
+        colType: (PermissionSets.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
     Permissions: {
       tableName: "Permissions" as const,
       rowType: Permissions.getTypeScriptAlgebraicType(),
@@ -473,6 +492,10 @@ const REMOTE_MODULE = {
     AddLayoutWithId: {
       reducerName: "AddLayoutWithId",
       argsType: AddLayoutWithId.getTypeScriptAlgebraicType(),
+    },
+    AddPermissionSet: {
+      reducerName: "AddPermissionSet",
+      argsType: AddPermissionSet.getTypeScriptAlgebraicType(),
     },
     Authenticate: {
       reducerName: "Authenticate",
@@ -533,6 +556,10 @@ const REMOTE_MODULE = {
     DeleteLayout: {
       reducerName: "DeleteLayout",
       argsType: DeleteLayout.getTypeScriptAlgebraicType(),
+    },
+    DeletePermissionSet: {
+      reducerName: "DeletePermissionSet",
+      argsType: DeletePermissionSet.getTypeScriptAlgebraicType(),
     },
     DeleteWhitelistUser: {
       reducerName: "DeleteWhitelistUser",
@@ -742,6 +769,10 @@ const REMOTE_MODULE = {
       reducerName: "UpdateLayoutName",
       argsType: UpdateLayoutName.getTypeScriptAlgebraicType(),
     },
+    UpdatePermissionSet: {
+      reducerName: "UpdatePermissionSet",
+      argsType: UpdatePermissionSet.getTypeScriptAlgebraicType(),
+    },
     UpdateTextElementColor: {
       reducerName: "UpdateTextElementColor",
       argsType: UpdateTextElementColor.getTypeScriptAlgebraicType(),
@@ -825,6 +856,7 @@ export type Reducer = never
 | { name: "AddFolder", args: AddFolder }
 | { name: "AddLayout", args: AddLayout }
 | { name: "AddLayoutWithId", args: AddLayoutWithId }
+| { name: "AddPermissionSet", args: AddPermissionSet }
 | { name: "Authenticate", args: Authenticate }
 | { name: "ClaimOwnership", args: ClaimOwnership }
 | { name: "ClearIdentityPermission", args: ClearIdentityPermission }
@@ -840,6 +872,7 @@ export type Reducer = never
 | { name: "DeleteElementDataByName", args: DeleteElementDataByName }
 | { name: "DeleteFolder", args: DeleteFolder }
 | { name: "DeleteLayout", args: DeleteLayout }
+| { name: "DeletePermissionSet", args: DeletePermissionSet }
 | { name: "DeleteWhitelistUser", args: DeleteWhitelistUser }
 | { name: "DeleteWhitelistUserPlatform", args: DeleteWhitelistUserPlatform }
 | { name: "DuplicateLayout", args: DuplicateLayout }
@@ -892,6 +925,7 @@ export type Reducer = never
 | { name: "UpdateImageElementSize", args: UpdateImageElementSize }
 | { name: "UpdateImageElementWidth", args: UpdateImageElementWidth }
 | { name: "UpdateLayoutName", args: UpdateLayoutName }
+| { name: "UpdatePermissionSet", args: UpdatePermissionSet }
 | { name: "UpdateTextElementColor", args: UpdateTextElementColor }
 | { name: "UpdateTextElementFont", args: UpdateTextElementFont }
 | { name: "UpdateTextElementShadow", args: UpdateTextElementShadow }
@@ -1050,6 +1084,22 @@ export class RemoteReducers {
 
   removeOnAddLayoutWithId(callback: (ctx: ReducerEventContext, id: number, name: string, active: boolean) => void) {
     this.connection.offReducer("AddLayoutWithId", callback);
+  }
+
+  addPermissionSet(name: string, permissions: number[]) {
+    const __args = { name, permissions };
+    let __writer = new __BinaryWriter(1024);
+    AddPermissionSet.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("AddPermissionSet", __argsBuffer, this.setCallReducerFlags.addPermissionSetFlags);
+  }
+
+  onAddPermissionSet(callback: (ctx: ReducerEventContext, name: string, permissions: number[]) => void) {
+    this.connection.onReducer("AddPermissionSet", callback);
+  }
+
+  removeOnAddPermissionSet(callback: (ctx: ReducerEventContext, name: string, permissions: number[]) => void) {
+    this.connection.offReducer("AddPermissionSet", callback);
   }
 
   authenticate(key: string) {
@@ -1274,6 +1324,22 @@ export class RemoteReducers {
 
   removeOnDeleteLayout(callback: (ctx: ReducerEventContext, layoutId: number, preserveElements: boolean, preserveLayoutId: number) => void) {
     this.connection.offReducer("DeleteLayout", callback);
+  }
+
+  deletePermissionSet(id: number) {
+    const __args = { id };
+    let __writer = new __BinaryWriter(1024);
+    DeletePermissionSet.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("DeletePermissionSet", __argsBuffer, this.setCallReducerFlags.deletePermissionSetFlags);
+  }
+
+  onDeletePermissionSet(callback: (ctx: ReducerEventContext, id: number) => void) {
+    this.connection.onReducer("DeletePermissionSet", callback);
+  }
+
+  removeOnDeletePermissionSet(callback: (ctx: ReducerEventContext, id: number) => void) {
+    this.connection.offReducer("DeletePermissionSet", callback);
   }
 
   deleteWhitelistUser(username: string) {
@@ -2076,6 +2142,22 @@ export class RemoteReducers {
     this.connection.offReducer("UpdateLayoutName", callback);
   }
 
+  updatePermissionSet(id: number, permissions: number[]) {
+    const __args = { id, permissions };
+    let __writer = new __BinaryWriter(1024);
+    UpdatePermissionSet.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("UpdatePermissionSet", __argsBuffer, this.setCallReducerFlags.updatePermissionSetFlags);
+  }
+
+  onUpdatePermissionSet(callback: (ctx: ReducerEventContext, id: number, permissions: number[]) => void) {
+    this.connection.onReducer("UpdatePermissionSet", callback);
+  }
+
+  removeOnUpdatePermissionSet(callback: (ctx: ReducerEventContext, id: number, permissions: number[]) => void) {
+    this.connection.offReducer("UpdatePermissionSet", callback);
+  }
+
   updateTextElementColor(elementId: number, color: string) {
     const __args = { elementId, color };
     let __writer = new __BinaryWriter(1024);
@@ -2300,6 +2382,11 @@ export class SetReducerFlags {
     this.addLayoutWithIdFlags = flags;
   }
 
+  addPermissionSetFlags: __CallReducerFlags = 'FullUpdate';
+  addPermissionSet(flags: __CallReducerFlags) {
+    this.addPermissionSetFlags = flags;
+  }
+
   authenticateFlags: __CallReducerFlags = 'FullUpdate';
   authenticate(flags: __CallReducerFlags) {
     this.authenticateFlags = flags;
@@ -2373,6 +2460,11 @@ export class SetReducerFlags {
   deleteLayoutFlags: __CallReducerFlags = 'FullUpdate';
   deleteLayout(flags: __CallReducerFlags) {
     this.deleteLayoutFlags = flags;
+  }
+
+  deletePermissionSetFlags: __CallReducerFlags = 'FullUpdate';
+  deletePermissionSet(flags: __CallReducerFlags) {
+    this.deletePermissionSetFlags = flags;
   }
 
   deleteWhitelistUserFlags: __CallReducerFlags = 'FullUpdate';
@@ -2625,6 +2717,11 @@ export class SetReducerFlags {
     this.updateLayoutNameFlags = flags;
   }
 
+  updatePermissionSetFlags: __CallReducerFlags = 'FullUpdate';
+  updatePermissionSet(flags: __CallReducerFlags) {
+    this.updatePermissionSetFlags = flags;
+  }
+
   updateTextElementColorFlags: __CallReducerFlags = 'FullUpdate';
   updateTextElementColor(flags: __CallReducerFlags) {
     this.updateTextElementColorFlags = flags;
@@ -2748,6 +2845,11 @@ export class RemoteTables {
   get ownerRecoveryKey(): OwnerRecoveryKeyTableHandle<'OwnerRecoveryKey'> {
     // clientCache is a private property
     return new OwnerRecoveryKeyTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<AuthenticationKey>(REMOTE_MODULE.tables.OwnerRecoveryKey));
+  }
+
+  get permissionSets(): PermissionSetsTableHandle<'PermissionSets'> {
+    // clientCache is a private property
+    return new PermissionSetsTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PermissionSets>(REMOTE_MODULE.tables.PermissionSets));
   }
 
   get permissions(): PermissionsTableHandle<'Permissions'> {
