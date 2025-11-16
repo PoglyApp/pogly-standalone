@@ -1,9 +1,8 @@
 import { AppBar, Box, MenuItem, Tab, Tabs, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { GuestListContainer } from "../Components/Containers/GuestListContainer";
-import { SettingsModal } from "../Components/Modals/SettingModals";
 import SecurityIcon from "@mui/icons-material/Security";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
@@ -18,7 +17,6 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { QuickSwapMenu } from "./QuickswapMenu";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
-import { useGetVersionNumber } from "../Hooks/useGetVersionNumber";
 import { Settings } from "../Components/Settings/Settings";
 
 export const Header = () => {
@@ -137,7 +135,7 @@ export const Header = () => {
           </Toolbar>
         </AppBar>
 
-        <Settings visible={showSettings} setVisible={setShowSettings} spacetimeDB={spacetimeDB} />
+        <Settings visible={showSettings} setVisible={setShowSettings} />
 
         <Dropzone
           onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}

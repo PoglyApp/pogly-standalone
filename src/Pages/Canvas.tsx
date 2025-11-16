@@ -50,7 +50,7 @@ export const Canvas = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
-  const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+  const { spacetimeDB } = useContext(SpacetimeContext);
   const [disconnectedState, setDisconnectedState] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 

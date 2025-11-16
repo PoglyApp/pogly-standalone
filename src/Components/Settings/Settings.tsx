@@ -26,17 +26,16 @@ const categories = Object.values(SettingsCategory);
 interface IProps {
   visible: boolean;
   setVisible: Function;
-  spacetimeDB: any;
 }
 
-export const Settings = ({ visible, setVisible, spacetimeDB }: IProps) => {
+export const Settings = ({ visible, setVisible }: IProps) => {
   const [selectedCategory, setSelectedCategory] = useState<SettingsCategory>(SettingsCategory.General);
 
   return (
-    <div>
+    <>
       {visible && (
         <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[clamp(320px,80vw,900px)] h-[clamp(420px,75vh,900px)] appear min-w-fit darkScrollbar">
-          <Container title="settings" subTitle={selectedCategory.toString()} className="w-full h-full shadow-md">
+          <Container title="settings" subTitle={selectedCategory.toString()} className="w-full h-full shadow-2xl">
             <div className="flex h-full w-full p-4 gap-3">
               <div className="flex flex-col gap-2 h-full min-w-[180px] bg-[#10121a] rounded-xl p-4 shadow-md overflow-y-auto ">
                 {categories.map((label) => (
@@ -50,29 +49,32 @@ export const Settings = ({ visible, setVisible, spacetimeDB }: IProps) => {
                 ))}
               </div>
 
-              <div className="w-full border border-[#10121a] rounded-xl p-3">
-                <div>{selectedCategory === SettingsCategory.General && <GeneralSettings />}</div>
-                <div>{selectedCategory === SettingsCategory.Editors && <EditorSettings spacetimeDB={spacetimeDB} />}</div>
-                <div>{selectedCategory === SettingsCategory.StreamPreview && <StreamPreviewSettings />}</div>
-                <div>{selectedCategory === SettingsCategory.Overrides && <OverrideSettings />}</div>
-                <div>{selectedCategory === SettingsCategory.APIKeys && <APIKeysSettings />}</div>
-                <div>{selectedCategory === SettingsCategory.DataManagement && <DataManagementSettings />}</div>
-                <div>{selectedCategory === SettingsCategory.Owner && <OwnerSettings />}</div>
-
-                <Button
-                  className="absolute bottom-0 right-0 mr-7 mb-2"
-                  onClick={() => {
-                    setVisible(!visible);
-                  }}
-                >
-                  close
-                </Button>
+              <div className="flex flex-col h-full w-full">
+                <div className="w-full h-full border border-[#10121a] rounded-xl p-3 overflow-auto">
+                  <>{selectedCategory === SettingsCategory.General && <GeneralSettings />}</>
+                  <>{selectedCategory === SettingsCategory.Editors && <EditorSettings />}</>
+                  <>{selectedCategory === SettingsCategory.StreamPreview && <StreamPreviewSettings />}</>
+                  <>{selectedCategory === SettingsCategory.Overrides && <OverrideSettings />}</>
+                  <>{selectedCategory === SettingsCategory.APIKeys && <APIKeysSettings />}</>
+                  <>{selectedCategory === SettingsCategory.DataManagement && <DataManagementSettings />}</>
+                  <>{selectedCategory === SettingsCategory.Owner && <OwnerSettings />}</>
+                </div>
+                <div className="contents h-fit w-full">
+                  <Button
+                    className="w-fit self-end mt-3"
+                    onClick={() => {
+                      setVisible(!visible);
+                    }}
+                  >
+                    close
+                  </Button>
+                </div>
               </div>
             </div>
           </Container>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
