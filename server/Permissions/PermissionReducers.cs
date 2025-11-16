@@ -26,6 +26,89 @@ public partial class Module
     }
 
     [Reducer]
+    public static void AddPermissionSet(ReducerContext ctx, string name, uint[] permissions)
+    {
+        string func = "AddPermissionSet";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyPermissions)) return;
+
+        try
+        {
+            ctx.Db.PermissionSets.Insert(new PermissionSets
+            {
+                Name = name,
+                Permissions = permissions
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered error adding permission set, requested by {ctx.Sender}. " + e.Message);
+        }
+    }
+    
+    [Reducer]
+    public static void UpdatePermissionSet(ReducerContext ctx, uint id, uint[] permissions)
+    {
+        string func = "UpdatePermissionSet";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyPermissions)) return;
+
+        try
+        {
+            var existingSet = ctx.Db.PermissionSets.Id.Find(id);
+            if (existingSet is null)
+            {
+                Log.Error($"[{func}] Tried to update permission set that doesn't exist, requested by {ctx.Sender}.");
+                return;
+            }
+
+            var updatedSet = existingSet.Value;
+            updatedSet.Permissions = permissions;
+            ctx.Db.PermissionSets.Id.Update(updatedSet);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered error updating permission set, requested by {ctx.Sender}. " + e.Message);
+        }
+    }
+    
+    [Reducer]
+    public static void DeletePermissionSet(ReducerContext ctx, uint id)
+    {
+        string func = "UpdatePermissionSet";
+        
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyPermissions)) return;
+
+        try
+        {
+            var existingSet = ctx.Db.PermissionSets.Id.Find(id);
+            if (existingSet is null || existingSet.Value.Id == 0)
+            {
+                Log.Error($"[{func}] Tried to delete permission set that doesn't exist, or tried to delete the default set, requested by {ctx.Sender}.");
+                return;
+            }
+
+            ctx.Db.PermissionSets.Id.Delete(id);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered error updating permission set, requested by {ctx.Sender}. " + e.Message);
+        }
+    }
+
+    [Reducer]
     public static void ImportPermission(ReducerContext ctx, Identity identity, string permissionLevel)
     {
         string func = "ImportPermission";

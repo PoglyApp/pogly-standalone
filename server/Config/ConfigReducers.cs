@@ -67,6 +67,13 @@ public partial class Module
                 CreatedBy = "Server",
                 Active = true
             });
+
+            ctx.Db.PermissionSets.Insert(new PermissionSets
+            {
+                Id = 0,
+                Name = "Default",
+                Permissions = DefaultPermissionSet
+            });
             
             Log.Info($"[Configure] Server successfully started!");
         }

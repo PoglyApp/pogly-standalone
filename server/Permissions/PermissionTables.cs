@@ -11,6 +11,14 @@ public partial class Module
         public uint PermissionType;
     }
 
+    [Table(Public = true, Name = "PermissionSets")]
+    public partial struct PermissionSets
+    {
+        [PrimaryKey] [AutoInc] public uint Id;
+        public string Name;
+        public uint[] Permissions;
+    }
+
     [Table(Public = true, Name = "Whitelist")]
     public partial struct Whitelist
     {

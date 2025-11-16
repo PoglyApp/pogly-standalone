@@ -39,4 +39,6 @@ public partial class Module
         Moderator = 9998,
         Owner = 9999,
     }
+
+    public static uint[] DefaultPermissionSet = [1, 2, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19];
 }
