@@ -137,7 +137,7 @@ export const Header = () => {
           </Toolbar>
         </AppBar>
 
-        <Settings visible={showSettings} setVisible={setShowSettings} />
+        <Settings visible={showSettings} setVisible={setShowSettings} spacetimeDB={spacetimeDB} />
 
         <Dropzone
           onDrop={(acceptedFiles) => HandleDragAndDropFiles(acceptedFiles, setModals)}

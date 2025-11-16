@@ -8,6 +8,7 @@ import { OwnerSettings } from "./OwnerSettings";
 import { OverrideSettings } from "./OverrideSettings";
 import { Container } from "../General/Container";
 import { Button } from "../NewUiComponents/Button";
+import { EditorSettings } from "./EditorSettings";
 
 enum SettingsCategory {
   General = "general",
@@ -25,9 +26,10 @@ const categories = Object.values(SettingsCategory);
 interface IProps {
   visible: boolean;
   setVisible: Function;
+  spacetimeDB: any;
 }
 
-export const Settings = ({ visible, setVisible }: IProps) => {
+export const Settings = ({ visible, setVisible, spacetimeDB }: IProps) => {
   const [selectedCategory, setSelectedCategory] = useState<SettingsCategory>(SettingsCategory.General);
 
   return (
@@ -50,6 +52,7 @@ export const Settings = ({ visible, setVisible }: IProps) => {
 
               <div className="w-full border border-[#10121a] rounded-xl p-3">
                 <div>{selectedCategory === SettingsCategory.General && <GeneralSettings />}</div>
+                <div>{selectedCategory === SettingsCategory.Editors && <EditorSettings spacetimeDB={spacetimeDB} />}</div>
                 <div>{selectedCategory === SettingsCategory.StreamPreview && <StreamPreviewSettings />}</div>
                 <div>{selectedCategory === SettingsCategory.Overrides && <OverrideSettings />}</div>
                 <div>{selectedCategory === SettingsCategory.APIKeys && <APIKeysSettings />}</div>

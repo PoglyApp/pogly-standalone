@@ -4,6 +4,7 @@ import { SpacetimeContextType } from "../Types/General/SpacetimeContextType";
 
 export function getPermissions(ctx: SpacetimeContextType, identity: Identity): PermissionTypes[] {
     const permissions: PermissionTypes[] = [];
+    if (!ctx.Client) return [];
 
     for (const row of ctx.Client.db.permissions.iter()) {
         if (row.identity.toHexString() === identity.toHexString()) {
