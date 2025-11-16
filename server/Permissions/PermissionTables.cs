@@ -18,4 +18,3 @@ public partial class Module
         [Index.BTree(Name = "Username")] public string Username;
     }
 }
-

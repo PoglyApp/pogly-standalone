@@ -4,7 +4,7 @@ import { Button } from "../NewUiComponents/Button";
 import { Checkbox } from "../NewUiComponents/Checkbox";
 import { TextInput } from "../NewUiComponents/TextInput";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
-import { DbConnection, Guests } from "../../module_bindings";
+import { DbConnection, Guests, Permissions } from "../../module_bindings";
 
 interface IProps {
   spacetimeDB: any;
@@ -30,7 +30,17 @@ export const EditorSettings = ({ spacetimeDB }: IProps) => {
     });
 
     if (!selectedGuest) return;
-    spacetimeDB.Client.reducers.setIdentityPermission((selectedGuest as Guests).identity, [parseInt(permission)]);
+
+    var permissions: Permissions[] = Array.from((spacetimeDB.Client as DbConnection).db.permissions.iter());
+
+    let userPerms: Number[] = [];
+    permissions.forEach((perm: Permissions) => {
+      if(selectedGuest!.identity.toHexString() === perm.identity.toHexString()) userPerms.push(perm.permissionType);
+    });
+
+    userPerms.push(parseInt(permission));
+
+    spacetimeDB.Client.reducers.setIdentityPermission((selectedGuest as Guests).identity, userPerms);
   };
 
   return (
