@@ -40,7 +40,7 @@
     "react-zoom-pan-pinch": "^3.4.4",
     "reakeys": "^2.0.3",
     "remark-gfm": "^4.0.0",
-    "spacetimedb": "^1.7.0",
+    "spacetimedb": "^1.8.0",
     "sql.js": "^1.13.0",
     "styled-components": "^6.1.6",
     "tailwindcss": "^4.1.4",
