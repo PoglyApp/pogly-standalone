@@ -185,7 +185,7 @@ export const PermissionSettings = () => {
       </div>
 
       <div className="flex-1 overflow-hidden mt-3">
-        <div className="min-w-full h-full border border-[#10121a] bg-[#10121a] overflow-auto">
+        <div className="min-w-full h-full border border-[#10121a]  overflow-auto">
           <div className="sticky top-0 z-10 grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_88px] border-b border-[#1e212b] text-[11px] uppercase tracking-wide text-gray-400 px-4 py-2 bg-[#10121a]">
             <div>Permission</div>
             <div>Description</div>
@@ -198,7 +198,7 @@ export const PermissionSettings = () => {
 
             return (
               <div key={group.id} className="border-t border-[#1e212b]">
-                <div className="flex items-center justify-between px-4 py-2 bg-[#191b24]">
+                <div className="flex items-center justify-between px-4 py-2 bg-[#17191f]">
                   <div className="flex items-center gap-3">
                     <Checkbox label={group.label} checked={allInGroupSelected} onChange={() => toggleGroup(group)} />
                     <span className="text-[11px] text-slate-500">{group.permissions.length} permissions</span>
@@ -226,7 +226,7 @@ export const PermissionSettings = () => {
                         <button
                           type="button"
                           onClick={() => togglePermission(perm.id)}
-                          className={`inline-flex items-center justify-center rounded-[999px] px-3 py-1 text-[11px] uppercase border transition-colors ${
+                          className={`inline-flex items-center justify-center rounded-[7px] px-3 py-1 text-[11px] uppercase border transition-colors ${
                             checked
                               ? "cursor-pointer border-[#82a5ff] bg-[#82a5ff4d] text-gray-200"
                               : "cursor-pointer border-[#1e212b] bg-[#10121a] text-gray-400 hover:bg-[#17191f]"
