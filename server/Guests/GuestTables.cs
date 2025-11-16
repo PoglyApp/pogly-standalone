@@ -21,4 +21,11 @@ public partial class Module
 
         public bool Authenticated;
     }
+
+    [Table(Public = true, Name = "GuestNames")]
+    public partial struct GuestNames
+    {
+        [PrimaryKey] public Identity Identity;
+        public string Nickname;
+    }
 }

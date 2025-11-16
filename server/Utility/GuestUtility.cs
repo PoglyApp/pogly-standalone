@@ -41,7 +41,7 @@ public partial class Module
 
     private static bool HasPermission(ReducerContext ctx, Identity identity, PermissionTypes type)
     {
-        return ctx.Db.Permissions.UserPermissions.Filter((identity, (uint)type)).Any() == true;
+        return ctx.Db.Permissions.UserPermissions.Filter((identity, (uint)PermissionTypes.Owner)).Any() || ctx.Db.Permissions.UserPermissions.Filter((identity, (uint)type)).Any();
     }
     
     private static bool HasAnyPermission(ReducerContext ctx, Identity identity, PermissionTypes[] types)
@@ -121,5 +121,22 @@ public partial class Module
     private static bool IsGuestModerator(string reducerContext, ReducerContext ctx)
     {
         return HasPermission(ctx, ctx.Sender, PermissionTypes.Moderator) || HasPermission(ctx, ctx.Sender, PermissionTypes.Owner);
+    }
+
+    private static void UpdateNickname(string nickname, ReducerContext ctx)
+    {
+        var existingNickname = ctx.Db.GuestNames.Identity.Find(ctx.Sender);
+        if (existingNickname is null)
+        {
+            ctx.Db.GuestNames.Insert(new GuestNames
+            {
+                Identity = ctx.Sender,
+                Nickname = nickname
+            });
+        }
+        else
+        {
+            if (existingNickname.Value.Nickname != nickname) ctx.Db.GuestNames.Identity.Update(existingNickname.Value with { Nickname = nickname });
+        }
     }
 }

@@ -10,7 +10,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyPermissions)) return;
 
         try
         {
@@ -96,7 +97,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyPermissions)) return;
 
         try
         {
@@ -117,7 +119,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyWhitelist)) return;
 
         try
         {
@@ -141,7 +144,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyWhitelist)) return;
 
         try
         {
@@ -161,7 +165,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.ModifyWhitelist)) return;
 
         try
         {

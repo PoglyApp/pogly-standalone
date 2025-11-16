@@ -24,6 +24,7 @@ public partial class Module
                 updatedGuest.PositionX = positionX;
                 updatedGuest.PositionY = positionY;
 
+                UpdateNickname(updatedGuest.Nickname, ctx);
                 ctx.Db.Guests.Address.Update(updatedGuest);
             
                 LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
@@ -56,6 +57,7 @@ public partial class Module
                 var updatedGuest = oldGuest.Value;
                 updatedGuest.Nickname = nickname;
 
+                UpdateNickname(updatedGuest.Nickname, ctx);
                 ctx.Db.Guests.Address.Update(updatedGuest);
             
                 LogAudit(ctx, func,GetChangeStructFromGuest(oldGuest.Value), GetChangeStructFromGuest(updatedGuest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
@@ -181,7 +183,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (!IsGuestOwner(func, ctx)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.KickGuest)) return;
 
         try
         {

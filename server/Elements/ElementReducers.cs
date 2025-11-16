@@ -14,12 +14,13 @@ public partial class Module
             if (ctx.ConnectionId is null) return;
             if (!GetGuest(func, ctx, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            
+            if (!HasPermission(ctx, ctx.Sender, PermissionTypes.AddElement)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
-                if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
-                        if (!IsGuestModerator(func, ctx)) return;
+                if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!HasPermission(ctx, ctx.Sender, PermissionTypes.AddElementData)) return;
             }
 
             if (element is ElementStruct.TextElement text)
@@ -69,12 +70,13 @@ public partial class Module
             if (ctx.ConnectionId is null) return;
             if (!GetGuest(func, ctx, out var guest)) return;
             if (!GuestAuthenticated(func, guest)) return;
+            
+            if (!HasPermission(ctx, ctx.Sender, PermissionTypes.AddElement)) return;
 
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
-                if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
-                        if (!IsGuestModerator(func, ctx)) return;
+                if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!HasPermission(ctx, ctx.Sender, PermissionTypes.AddElementData)) return;
             }
 
             if (element is ElementStruct.TextElement text)
@@ -157,13 +159,14 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             if (element is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
-                if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
-                        if (!IsGuestModerator(func, ctx)) return;
+                if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElementData)) return;
             }
             
             if (element is ElementStruct.TextElement text)
@@ -209,13 +212,14 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             if (elementStruct is ElementStruct.ImageElement {ImageElement_.ImageElementData: ImageElementData.RawData data})
             {
-                if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-                    if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
-                        if (!IsGuestModerator(func, ctx)) return;
+                if (!Regex.Match(data.RawData_, SEVEN_TV_TENOR_REGEX, RegexOptions.IgnoreCase).Success) 
+                    if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElementData)) return;
             }
             
             if (elementStruct is ElementStruct.TextElement text)
@@ -258,6 +262,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             if (Regex.Match(text, HTML_TAG_REGEX, RegexOptions.IgnoreCase).Success)
@@ -298,6 +304,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -334,6 +342,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -372,6 +382,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -408,6 +420,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -446,10 +460,9 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElementData)) return;
         
         try
         {
@@ -487,6 +500,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -526,6 +541,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -562,6 +579,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -600,6 +619,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -636,6 +657,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -675,6 +698,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -711,6 +736,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -749,10 +776,9 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElementData)) return;
         
         try
         {
@@ -793,6 +819,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -826,6 +854,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -861,6 +891,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -895,6 +927,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
+        
         try
         {
             var oldElement = ctx.Db.Elements.Id.Find(elementId);
@@ -928,10 +962,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
 
         try
         {
@@ -968,10 +1000,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -1008,6 +1038,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.UpdateElement)) return;
         
         try
         {
@@ -1060,10 +1092,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.DeleteElement)) return;
         
         try
         {
@@ -1094,10 +1124,8 @@ public partial class Module
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
-        if (ctx.Db.Config.Version.Find(0)!.Value.StrictMode)
-        {
-            if (!IsGuestModerator(func, ctx)) return;
-        }
+        
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.DeleteElement)) return;
         
         try
         {

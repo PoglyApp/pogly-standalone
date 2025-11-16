@@ -11,6 +11,8 @@ public partial class Module
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
         
+        if (!HasPermission(ctx, ctx.Sender, PermissionTypes.SendMessage)) return;
+        
         try
         {
             LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromChatMessage(chatMessage), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
