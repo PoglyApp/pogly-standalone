@@ -24,5 +24,6 @@ public partial class Module
     {
         public StreamingPlatform Platform;
         [Index.BTree(Name = "Username")] public string Username;
+        public uint PermissionSet;
     }
 }
