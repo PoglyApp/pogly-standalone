@@ -20,8 +20,10 @@ export const SetSubscriptions = (
       "SELECT * FROM Elements",
       "SELECT * FROM ElementData",
       "SELECT * FROM Config",
-      "SELECT * FROM Permissions",
       "SELECT * FROM Layouts",
+      "SELECT * FROM Permissions",
+      "SELECT * FROM PermissionSets",
+      "SELECT * FROM GuestNames",
     ]);
 
   if (setStdbInitialized) setStdbInitialized(true);

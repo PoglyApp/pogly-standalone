@@ -1,5 +1,6 @@
 import { Identity } from "spacetimedb";
-import { DbConnection, ElementData, Elements, Guests, Layouts } from "../module_bindings";
+import { DbConnection, ElementData, Elements, GuestNames, Guests, Layouts, Permissions } from "../module_bindings";
+import { Editor } from "../Types/General/Editor";
 
 export const getElementByID = (Client: DbConnection, elementID: number) => {
   return (Client.db.elements.iter() as Elements[]).find((data: Elements) => data.id === elementID) as Elements;
@@ -21,4 +22,23 @@ export const getLayoutByName = (Client: DbConnection, name: string) => {
 
 export const getGuestNickname = (Client: DbConnection, identity: Identity) => {
   return (Client.db.guests.iter() as Guests[]).find((g: Guests) => g.identity === identity)!;
+};
+
+export const getAllEditors = (Client: DbConnection) => {
+  const guests: GuestNames[] = Client.db.guestNames.iter() as GuestNames[];
+  const permissions: Permissions[] = Client.db.guests.iter() as Permissions[];
+
+  const editors: Editor[] = [];
+
+  guests.forEach((guest: GuestNames) => {
+    editors.push({
+      identity: guest.identity,
+      nickname: guest.nickname,
+      platform: guest.streamingPlatform,
+      avatar: guest.avatarUrl,
+      permissions: permissions.filter((permission) => permission.identity === guest.identity) as Permissions[],
+    });
+  });
+
+  return editors;
 };

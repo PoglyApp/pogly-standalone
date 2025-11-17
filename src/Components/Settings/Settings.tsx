@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StreamPreviewSettings } from "./StreamPreviewSettings";
 import { APIKeysSettings } from "./APIKeysSettings";
 import { GeneralSettings } from "./GeneralSettings";
@@ -8,7 +8,8 @@ import { OwnerSettings } from "./OwnerSettings";
 import { OverrideSettings } from "./OverrideSettings";
 import { Container } from "../General/Container";
 import { Button } from "../NewUiComponents/Button";
-import { EditorSettings } from "./EditorSettings";
+import { EditorSettings, EditorSettingsRef } from "./EditorSettings";
+import { ChevronLeft, Trash2Icon } from "lucide-react";
 
 enum SettingsCategory {
   General = "general",
@@ -30,6 +31,9 @@ interface IProps {
 
 export const Settings = ({ visible, setVisible }: IProps) => {
   const [selectedCategory, setSelectedCategory] = useState<SettingsCategory>(SettingsCategory.General);
+  const [showSaveFooter, setShowSaveFooter] = useState<boolean>(false);
+
+  const editorRef = useRef<EditorSettingsRef | null>(null);
 
   return (
     <>
@@ -52,22 +56,51 @@ export const Settings = ({ visible, setVisible }: IProps) => {
               <div className="flex flex-col h-full w-full">
                 <div className="w-full h-full border border-[#10121a] rounded-xl p-3 overflow-auto">
                   <>{selectedCategory === SettingsCategory.General && <GeneralSettings />}</>
-                  <>{selectedCategory === SettingsCategory.Editors && <EditorSettings />}</>
+                  <>
+                    {selectedCategory === SettingsCategory.Editors && (
+                      <EditorSettings ref={editorRef} showSaveFooter={setShowSaveFooter} />
+                    )}
+                  </>
                   <>{selectedCategory === SettingsCategory.StreamPreview && <StreamPreviewSettings />}</>
                   <>{selectedCategory === SettingsCategory.Overrides && <OverrideSettings />}</>
                   <>{selectedCategory === SettingsCategory.APIKeys && <APIKeysSettings />}</>
                   <>{selectedCategory === SettingsCategory.DataManagement && <DataManagementSettings />}</>
                   <>{selectedCategory === SettingsCategory.Owner && <OwnerSettings />}</>
                 </div>
+
                 <div className="contents h-fit w-full">
-                  <Button
-                    className="w-fit self-end mt-3"
-                    onClick={() => {
-                      setVisible(!visible);
-                    }}
-                  >
-                    close
-                  </Button>
+                  {!showSaveFooter ? (
+                    <Button
+                      className="w-fit self-end mt-3"
+                      onClick={() => {
+                        setVisible(!visible);
+                      }}
+                    >
+                      close
+                    </Button>
+                  ) : (
+                    <div className="flex">
+                      <Button
+                        className="w-fit self-end mt-3 bg-transparent!"
+                        onClick={() => editorRef.current?.cancel()}
+                      >
+                        <span className="flex text-gray-400">
+                          <ChevronLeft size={21} className="self-center" /> return
+                        </span>
+                      </Button>
+                      <div className="flex ml-auto gap-3">
+                        <Button className="w-fit self-end mt-3" onClick={() => editorRef.current?.delete()}>
+                          <span className="flex text-[#F0044B]">
+                            {" "}
+                            <Trash2Icon size={18} className="self-center mr-1" /> delete
+                          </span>
+                        </Button>
+                        <Button className="w-fit self-end mt-3" onClick={() => editorRef.current?.save()}>
+                          save
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,173 +1,115 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useImperativeHandle, useContext } from "react";
 import { TextInput } from "../NewUiComponents/TextInput";
 import { Checkbox } from "../NewUiComponents/Checkbox";
+import { PERMISSION_GROUPS, PermissionGroup } from "../../Types/General/PermissionGroups";
+import { Editor } from "../../Types/General/Editor";
+import { Permissions, PermissionSets } from "../../module_bindings";
+import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 
-type Permission = {
-  id: number;
-  label: string;
-  description?: string;
-};
+interface IProps {
+  editor: Editor | null;
+  setEditor: Function;
+  permissionSet: PermissionSets | null;
+  setPermissionSet: Function;
+  showSaveFooter: Function;
+  settingsRef: any;
+}
 
-type PermissionGroup = {
-  id: string;
-  label: string;
-  permissions: Permission[];
-};
+export const PermissionSettings = ({
+  editor,
+  setEditor,
+  permissionSet,
+  setPermissionSet,
+  showSaveFooter,
+  settingsRef,
+}: IProps) => {
+  const { spacetimeDB } = useContext(SpacetimeContext);
 
-const PERMISSION_GROUPS: PermissionGroup[] = [
-  {
-    id: "general",
-    label: "general",
-    permissions: [
-      {
-        id: 1,
-        label: "connect",
-        description: "lets user connect to the module.",
-      },
-    ],
-  },
-  {
-    id: "elements",
-    label: "element handling",
-    permissions: [
-      {
-        id: 9,
-        label: "spawn elements",
-        description: "allows user to spawn new elements.",
-      },
-      {
-        id: 10,
-        label: "interact with elements",
-        description: "allows user to interact with existing elements.",
-      },
-      {
-        id: 11,
-        label: "delete elements",
-        description: "allows user to delete elements.",
-      },
-    ],
-  },
-  {
-    id: "folders",
-    label: "element folders",
-    permissions: [
-      {
-        id: 12,
-        label: "add new folders",
-        description: "allows user add new element data folders.",
-      },
-      {
-        id: 13,
-        label: "update folders",
-        description: "allows user to update existing folders.",
-      },
-      {
-        id: 14,
-        label: "delete folders",
-        description: "allows user to delete folders.",
-      },
-    ],
-  },
-  {
-    id: "layouts",
-    label: "layouts",
-    permissions: [
-      {
-        id: 16,
-        label: "add layouts",
-        description: "allows user to add new layouts.",
-      },
-      {
-        id: 17,
-        label: "update layouts",
-        description: "allows user to update existing layouts.",
-      },
-      {
-        id: 18,
-        label: "change active layout",
-        description: "allows user to change active layouts.",
-      },
-      {
-        id: 19,
-        label: "delete layouts",
-        description: "allows user to delete layouts.",
-      },
-    ],
-  },
-  {
-    id: "admin",
-    label: "admin",
-    permissions: [
-      {
-        id: 15,
-        label: "kick users",
-        description: "allows user to kick other users.",
-      },
-      {
-        id: 21,
-        label: "modify permissions",
-        description: "allows user to modify other user's permissions.",
-      },
-      {
-        id: 22,
-        label: "add/remove editors",
-        description: "allows user to add or remove editors.",
-      },
-      {
-        id: 20,
-        label: "issue overlay commands",
-        description: "allows user to trigger overlay commands.",
-      },
-    ],
-  },
-];
-
-export const PermissionSettings = () => {
   const [selected, setSelected] = useState<Set<Number>>(new Set());
 
   const allPermissionIds = useMemo(() => PERMISSION_GROUPS.flatMap((g) => g.permissions.map((p) => p.id)), []);
   const isAllSelected = selected.size === allPermissionIds.length;
 
-  const togglePermission = (id: Number) => {
+  const [roleName, setRoleName] = useState<string>(permissionSet ? permissionSet.name : "");
+
+  useEffect(() => {
+    if (permissionSet) {
+      setSelected(new Set(permissionSet.permissions));
+    }
+
+    if (editor) {
+      setSelected(new Set(editor.permissions.map((permission: Permissions) => permission.permissionType)));
+    }
+  }, []);
+
+  const togglePermission = (id: number) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
 
   const toggleGroup = (group: PermissionGroup) => {
     const groupIds = group.permissions.map((p) => p.id);
-    const allInGroupSelected = groupIds.every((id) => selected.has(id));
+    const shouldDeselect = groupIds.every((id) => selected.has(id));
+
     setSelected((prev) => {
       const next = new Set(prev);
-      if (allInGroupSelected) {
-        groupIds.forEach((id) => next.delete(id));
-      } else {
-        groupIds.forEach((id) => next.add(id));
-      }
+      groupIds.forEach((id) => (shouldDeselect ? next.delete(id) : next.add(id)));
       return next;
     });
   };
 
   const toggleSelectAll = () => {
-    if (isAllSelected) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(allPermissionIds));
-    }
+    setSelected(isAllSelected ? new Set() : new Set(allPermissionIds));
   };
+
+  const handleSave = () => {
+    if (roleName.length === 0 || selected.size === 0) return;
+
+    spacetimeDB.Client.reducers.addPermissionSet(roleName, Array.from(selected));
+  };
+
+  const handleDelete = () => {
+    spacetimeDB.Client.reducers.deletePermissionSet(permissionSet?.id);
+    handleCancel();
+  };
+
+  const handleCancel = () => {
+    setSelected(new Set());
+    setRoleName("");
+    showSaveFooter(false);
+    setEditor(null);
+    setPermissionSet(null);
+  };
+
+  useImperativeHandle(settingsRef, () => ({
+    save() {
+      handleSave();
+    },
+    cancel() {
+      handleCancel();
+    },
+    delete() {
+      handleDelete();
+    },
+  }));
 
   return (
     <div className="flex flex-col h-full text-slate-100">
       <div className="border-b border-[#10121a] pt-3 pb-3">
-        <div className="flex gap-4">
+        {permissionSet && (
           <div className="flex-1">
             <label className="text-xs tracking-wide text-gray-400 mb-1 block">role name</label>
-            <TextInput placeholder="e.g. Moderator" inputClassName="min-w-[150px] h-[44px]" onChange={() => {}} />
+            <TextInput
+              placeholder="e.g. Moderator"
+              value={roleName}
+              inputClassName="min-w-[150px] h-[44px]"
+              onChange={(event) => setRoleName(event.target.value)}
+            />
           </div>
-        </div>
+        )}
 
         <div className="flex items-center justify-between text-xs text-gray-400 mt-3">
           <div className="flex items-center gap-2">

@@ -1,11 +1,15 @@
-import { useContext, useState } from "react";
+import { forwardRef, useContext, useEffect, useImperativeHandle, useState } from "react";
 import { Button } from "../NewUiComponents/Button";
 import { TextInput } from "../NewUiComponents/TextInput";
-import { DbConnection, Guests, Permissions } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { Table } from "../NewUiComponents/Table";
 import { Select } from "../NewUiComponents/Select";
 import styled, { css } from "styled-components";
+import { Editor } from "../../Types/General/Editor";
+import { getAllEditors } from "../../StDB/SpacetimeDBUtils";
+import { TableRow } from "@mui/material";
+import { TableCell } from "../NewUiComponents/TableCell";
+import { PermissionSets } from "../../module_bindings";
 import { PermissionSettings } from "./PermissionSettings";
 
 enum PermissionTab {
@@ -14,63 +18,64 @@ enum PermissionTab {
   Roles,
 }
 
-export const EditorSettings = () => {
+export type EditorSettingsRef = {
+  save: () => void;
+  cancel: () => void;
+  delete: () => void;
+};
+
+interface IProps {
+  showSaveFooter: Function;
+}
+
+export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveFooter }, ref) => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [tabSelected, setTabSelected] = useState<PermissionTab>(PermissionTab.Editors);
+  const [editors, setEditors] = useState<Editor[]>([]);
+  const [roles, setRoles] = useState<PermissionSets[]>([]);
 
-  const [username, setUsername] = useState<string>("");
-  const [permission, setPermission] = useState<string>("");
+  const [selectedEditor, setSelectedEditor] = useState<Editor | null>(null);
+  const [selectedRole, setSelectedRole] = useState<PermissionSets | null>(null);
 
-  const onUsernameUpdate = (e: any) => {
-    setUsername(e.target.value);
-  };
+  useEffect(() => {
+    if (!spacetimeDB) return;
 
-  const onPermissionUpdate = (e: any) => {
-    setPermission(e.target.value);
-  };
+    const editorCache: Editor[] = getAllEditors(spacetimeDB.Client);
+    setEditors(editorCache);
 
-  const addPermission = () => {
-    var guests: Guests[] = Array.from(spacetimeDB.Client.db.guests.iter());
-    let selectedGuest;
-    guests.forEach((guest: Guests) => {
-      if (guest.nickname.toLowerCase() === username.toLowerCase()) selectedGuest = guest;
-    });
+    const roleCache: PermissionSets[] = spacetimeDB.Client.db.permissionSets.iter() as PermissionSets[];
+    setRoles(roleCache);
+  }, []);
 
-    if (!selectedGuest) return;
-
-    var permissions: Permissions[] = Array.from((spacetimeDB.Client as DbConnection).db.permissions.iter());
-
-    let userPerms: Number[] = [];
-    permissions.forEach((perm: Permissions) => {
-      if (selectedGuest!.identity.toHexString() === perm.identity.toHexString()) userPerms.push(perm.permissionType);
-    });
-
-    userPerms.push(parseInt(permission));
-
-    spacetimeDB.Client.reducers.setIdentityPermission((selectedGuest as Guests).identity, userPerms);
+  const createEmptyRole = () => {
+    const emptyRole: PermissionSets = {} as PermissionSets;
+    setSelectedRole(emptyRole);
+    showSaveFooter(true);
   };
 
   if (!spacetimeDB.Client) return null;
 
   return (
     <div className="flex flex-col gap-1 overflow-hidden">
-      <div className="flex gap-2 pb-4 border-b border-[#10121a]">
-        <PermissionTabButton
-          selected={tabSelected === PermissionTab.Editors}
-          onClick={() => setTabSelected(PermissionTab.Editors)}
-        >
-          editors
-        </PermissionTabButton>
-        <PermissionTabButton
-          selected={tabSelected === PermissionTab.Roles}
-          onClick={() => setTabSelected(PermissionTab.Roles)}
-        >
-          roles
-        </PermissionTabButton>
-      </div>
+      {!(selectedEditor || selectedRole) && (
+        <div className="flex gap-2 pb-4 border-b border-[#10121a]">
+          <PermissionTabButton
+            selected={tabSelected === PermissionTab.Editors}
+            onClick={() => setTabSelected(PermissionTab.Editors)}
+          >
+            editors
+          </PermissionTabButton>
+          <PermissionTabButton
+            selected={tabSelected === PermissionTab.Roles}
+            onClick={() => setTabSelected(PermissionTab.Roles)}
+          >
+            roles
+          </PermissionTabButton>
+        </div>
+      )}
 
-      {tabSelected === PermissionTab.Editors && (
+      {tabSelected === PermissionTab.Editors && !(selectedEditor || selectedRole) && (
         <>
           <div>
             <p className="text-md">add editor</p>
@@ -84,9 +89,13 @@ export const EditorSettings = () => {
               </Select>
 
               <Select className="w-full h-[44px] max-lg:w-full" onChange={() => {}}>
-                <option value="edtior">editor</option>
-                <option value="admin">admin</option>
-                <option value="moderator">moderator</option>
+                {roles.map((role: PermissionSets) => {
+                  return (
+                    <option key={`${role.name}_user_row`} value={role.name}>
+                      {role.name}
+                    </option>
+                  );
+                })}
               </Select>
 
               <Button className="min-w-fit h-[44px]" onClick={() => {}}>
@@ -95,20 +104,67 @@ export const EditorSettings = () => {
             </div>
           </div>
 
-          <div>
+          <div className="mt-2">
             <p className="text-md">editors</p>
-            <Table
-              headers={["name", "platform", "permissions", "actions"]}
-              rows={[["dynny_", "twitch", "owner", "..."]]}
-            />
+            <Table headers={["name", "platform", "permissions", "actions"]}>
+              {editors.map((editor: Editor) => {
+                return (
+                  <TableRow key={`${editor.nickname}_row`}>
+                    <TableCell>{editor.nickname}</TableCell>
+                    <TableCell>{editor.platform}</TableCell>
+                    <TableCell>{editor.permissions.length}</TableCell>
+                    <TableCell>....</TableCell>
+                  </TableRow>
+                );
+              })}
+            </Table>
           </div>
         </>
       )}
 
-      {tabSelected === PermissionTab.Roles && <PermissionSettings />}
+      {tabSelected === PermissionTab.Roles && !(selectedEditor || selectedRole) && (
+        <div className="mt-2">
+          <Button className="w-full h-[44px] mb-3" onClick={createEmptyRole}>
+            create new role
+          </Button>
+
+          <Table headers={["name", "permissions", "actions"]} alignLastLeft={true}>
+            {roles.map((role: PermissionSets) => {
+              return (
+                <TableRow key={`${role.name}_row`}>
+                  <TableCell>{role.name}</TableCell>
+                  <TableCell>{role.permissions.length}</TableCell>
+                  <TableCell className=" flex justify-end">
+                    <Button
+                      className="min-w-fit m-0 py-1!"
+                      onClick={() => {
+                        setSelectedRole(role);
+                        showSaveFooter(true);
+                      }}
+                    >
+                      edit
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </Table>
+        </div>
+      )}
+
+      {(selectedEditor || selectedRole) && (
+        <PermissionSettings
+          editor={selectedEditor}
+          permissionSet={selectedRole}
+          setEditor={setSelectedEditor}
+          setPermissionSet={setSelectedRole}
+          showSaveFooter={showSaveFooter}
+          settingsRef={ref}
+        />
+      )}
     </div>
   );
-};
+});
 
 const PermissionTabButton = styled.button<{ selected: boolean }>`
   cursor: pointer;
