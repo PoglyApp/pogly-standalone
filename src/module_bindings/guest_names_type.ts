@@ -27,10 +27,16 @@ import {
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
   type TableHandle as __TableHandle,
 } from "spacetimedb";
+import { StreamingPlatform } from "./streaming_platform_type";
+// Mark import as potentially unused
+declare type __keep_StreamingPlatform = StreamingPlatform;
+
 
 export type GuestNames = {
   identity: __Identity,
   nickname: string,
+  streamingPlatform: StreamingPlatform,
+  avatarUrl: string,
 };
 let _cached_GuestNames_type_value: __AlgebraicTypeType | null = null;
 
@@ -48,6 +54,8 @@ export const GuestNames = {
     _cached_GuestNames_type_value.value.elements.push(
       { name: "identity", algebraicType: __AlgebraicTypeValue.createIdentityType() },
       { name: "nickname", algebraicType: __AlgebraicTypeValue.String },
+      { name: "streamingPlatform", algebraicType: StreamingPlatform.getTypeScriptAlgebraicType() },
+      { name: "avatarUrl", algebraicType: __AlgebraicTypeValue.String },
     );
     return _cached_GuestNames_type_value;
   },

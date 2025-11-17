@@ -28,6 +28,10 @@ import {
   type TableHandle as __TableHandle,
 } from "spacetimedb";
 import { GuestNames } from "./guest_names_type";
+import { StreamingPlatform } from "./streaming_platform_type";
+// Mark import as potentially unused
+declare type __keep_StreamingPlatform = StreamingPlatform;
+
 import { type EventContext, type Reducer, RemoteReducers, RemoteTables } from ".";
 declare type __keep = [EventContext, Reducer, RemoteReducers, RemoteTables];
 

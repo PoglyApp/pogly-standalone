@@ -23,7 +23,8 @@ public partial class Module
     public partial struct Whitelist
     {
         public StreamingPlatform Platform;
-        [Index.BTree(Name = "Username")] public string Username;
+        [Index.BTree]
+        public string Username;
         public uint PermissionSet;
     }
 }

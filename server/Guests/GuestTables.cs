@@ -27,5 +27,7 @@ public partial class Module
     {
         [PrimaryKey] public Identity Identity;
         public string Nickname;
+        public StreamingPlatform StreamingPlatform;
+        public string AvatarUrl;
     }
 }
