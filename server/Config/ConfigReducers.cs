@@ -127,6 +127,21 @@ public partial class Module
                     Log.Exception($"[{func}] - Unable to set guest as owner! " + e.Message);
                     throw new Exception($"[{func}] - Unable to set guest as owner!");
                 }
+
+                try
+                {
+                    ctx.Db.GuestNames.Insert(new GuestNames
+                    {
+                        Identity = ctx.Sender,
+                        Nickname = GetJwtUsernameCased(ctx),
+                        StreamingPlatform = GetJwtStreamingPlatform(ctx),
+                        AvatarUrl = "" //tbd - need spacetimeauth to expose that claim
+                    });
+                }
+                catch (Exception e)
+                {
+                    Log.Exception($"[{func}] - Unable to add Owner's GuestName! " + e.Message);
+                }
             
                 ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
                 {
