@@ -135,7 +135,7 @@ public partial class Module
                         Identity = ctx.Sender,
                         Nickname = GetJwtUsernameCased(ctx),
                         StreamingPlatform = GetJwtStreamingPlatform(ctx),
-                        AvatarUrl = "" //tbd - need spacetimeauth to expose that claim
+                        AvatarUrl = GetJwtAvatar(ctx)
                     });
                 }
                 catch (Exception e)

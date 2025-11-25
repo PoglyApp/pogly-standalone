@@ -131,7 +131,8 @@ public partial class Module
             ctx.Db.GuestNames.Insert(new GuestNames
             {
                 Identity = ctx.Sender,
-                Nickname = nickname
+                Nickname = nickname,
+                AvatarUrl = GetJwtAvatar(ctx)
             });
         }
         else

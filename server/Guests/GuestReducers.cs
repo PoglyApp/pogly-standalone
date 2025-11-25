@@ -47,6 +47,7 @@ public partial class Module
 
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
         
         try
         {
