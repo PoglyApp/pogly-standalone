@@ -36,7 +36,7 @@ export const getAllEditors = (Client: DbConnection) => {
       nickname: guest.nickname,
       platform: guest.streamingPlatform,
       avatar: guest.avatarUrl,
-      permissions: permissions.filter((permission) => permission.identity === guest.identity) as Permissions[],
+      permissions: permissions.filter((permission) => permission.identity.toHexString() === guest.identity.toHexString()) as Permissions[],
     });
   });
 

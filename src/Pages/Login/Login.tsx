@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import useStDB from "../../StDB/useStDB";
-import { Guests, Layouts } from "../../module_bindings";
+import { Guests, Layouts, ReducerEventContext } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 import { Loading } from "../../Components/General/Loading";
@@ -30,6 +30,7 @@ export const Login = () => {
   const [stdbAuthTimeout, setStdbAuthTimeout] = useState<boolean>(false);
   const [stdbInitialized, setStdbInitialized] = useState<boolean>(false);
   const [stdbSubscriptions, setStdbSubscriptions] = useState<boolean>(false);
+  const [notWhitelisted, setNotWhitelisted] = useState<boolean>(false);
 
   const stdbAuthenticatedRef = useRef<boolean>(false);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export const Login = () => {
   const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
-
+  
   const location = useLocation();
   const from = location.state?.from?.pathname;
 
@@ -224,6 +225,28 @@ export const Login = () => {
     return <Loading text="Loading Configuration" loadingStuckText={true} />;
   }
 
+  spacetime.Client.reducers.onConnect((ctx: ReducerEventContext) => {
+    if(ctx.event.callerIdentity.toHexString() !== spacetime.Identity!.toHexString()) return;
+
+    if (ctx.event.status.tag === "Failed") {
+        setNotWhitelisted(true);
+    }
+  });
+
+  if (notWhitelisted) {
+    DebugLogger("User not on the whitelist!");
+    return (
+          <ErrorRefreshModal
+            type="timer"
+            refreshTimer={5}
+            titleText="Not Whitelisted"
+            contentText="This Pogly instance requires you to be whitelisted to connect.
+                          If you think this is an error, contact the owner of this module, so they may add you to the whitelist."
+            clearSettings={true}
+            />
+        )
+  }
+
   // Step 3) Are we connected to SpacetimeDB?
   if (!stdbConnected) {
     DebugLogger("Waiting for SpacetimeDB connection");
@@ -266,7 +289,7 @@ export const Login = () => {
   }
 
   // Step 4) If Authentication is required, are we Authenticated?
-  if (!isOverlay && spacetime.InstanceConfig.authentication) {
+  if (!isOverlay && spacetime.InstanceConfig.authentication && !spacetime.Client.db.guests.address.find(spacetime.Client.connectionId)?.authenticated) {
     DebugLogger("Is guest authenticated");
     if (stdbAuthTimeout) {
       DebugLogger("Authentication required but authentication failed");

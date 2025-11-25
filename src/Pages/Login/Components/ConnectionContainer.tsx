@@ -264,19 +264,6 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                 />
               </div>
 
-              <div className="w-full">
-                <p className="text-sm text-[#aeb4d4] flex">
-                  module password <span className="text-xs text-[#aeb4d47a] pl-1 pt-0.5">(if required by module)</span>
-                </p>
-                <input
-                  type="password"
-                  placeholder="password"
-                  value={authKey}
-                  className="bg-[#10121a] text-[#e9eeff] p-3 rounded-md placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-[#2c2f3a]"
-                  onChange={(value: any) => setAuthKey(value.target.value)}
-                />
-              </div>
-
               <div className="relative w-full">
                 <p className="text-sm text-[#aeb4d4]">quick select</p>
                 <div className="flex">
