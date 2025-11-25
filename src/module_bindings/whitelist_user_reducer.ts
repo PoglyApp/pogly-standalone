@@ -35,6 +35,7 @@ declare type __keep_StreamingPlatform = StreamingPlatform;
 export type WhitelistUser = {
   platform: StreamingPlatform,
   username: string,
+  permissionSet: number,
 };
 let _cached_WhitelistUser_type_value: __AlgebraicTypeType | null = null;
 
@@ -52,6 +53,7 @@ export const WhitelistUser = {
     _cached_WhitelistUser_type_value.value.elements.push(
       { name: "platform", algebraicType: StreamingPlatform.getTypeScriptAlgebraicType() },
       { name: "username", algebraicType: __AlgebraicTypeValue.String },
+      { name: "permissionSet", algebraicType: __AlgebraicTypeValue.U32 },
     );
     return _cached_WhitelistUser_type_value;
   },

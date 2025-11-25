@@ -2318,19 +2318,19 @@ export class RemoteReducers {
     this.connection.offReducer("UpdateWidgetElementWidth", callback);
   }
 
-  whitelistUser(platform: StreamingPlatform, username: string) {
-    const __args = { platform, username };
+  whitelistUser(platform: StreamingPlatform, username: string, permissionSet: number) {
+    const __args = { platform, username, permissionSet };
     let __writer = new __BinaryWriter(1024);
     WhitelistUser.serialize(__writer, __args);
     let __argsBuffer = __writer.getBuffer();
     this.connection.callReducer("WhitelistUser", __argsBuffer, this.setCallReducerFlags.whitelistUserFlags);
   }
 
-  onWhitelistUser(callback: (ctx: ReducerEventContext, platform: StreamingPlatform, username: string) => void) {
+  onWhitelistUser(callback: (ctx: ReducerEventContext, platform: StreamingPlatform, username: string, permissionSet: number) => void) {
     this.connection.onReducer("WhitelistUser", callback);
   }
 
-  removeOnWhitelistUser(callback: (ctx: ReducerEventContext, platform: StreamingPlatform, username: string) => void) {
+  removeOnWhitelistUser(callback: (ctx: ReducerEventContext, platform: StreamingPlatform, username: string, permissionSet: number) => void) {
     this.connection.offReducer("WhitelistUser", callback);
   }
 
