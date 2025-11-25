@@ -9,7 +9,7 @@ import { Editor } from "../../Types/General/Editor";
 import { getAllEditors } from "../../StDB/SpacetimeDBUtils";
 import { TableRow } from "@mui/material";
 import { TableCell } from "../NewUiComponents/TableCell";
-import { PermissionSets } from "../../module_bindings";
+import { DbConnection, Guests, Permissions, PermissionSets, StreamingPlatform } from "../../module_bindings";
 import { PermissionSettings } from "./PermissionSettings";
 
 enum PermissionTab {
@@ -37,6 +37,17 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
 
   const [selectedEditor, setSelectedEditor] = useState<Editor | null>(null);
   const [selectedRole, setSelectedRole] = useState<PermissionSets | null>(null);
+
+  const [whitelistUsername, setWhitelistUsername] = useState<string>("");
+
+  const onWhitelistUsernameUpdate = (e: any) => {
+    setWhitelistUsername(e.target.value);
+  }
+
+  const addWhitelist = () => {
+    (spacetimeDB.Client as DbConnection).reducers.whitelistUser(StreamingPlatform.Twitch, whitelistUsername, 1);
+    setWhitelistUsername("");
+  }
 
   useEffect(() => {
     if (!spacetimeDB) return;
@@ -80,9 +91,9 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
           <div>
             <p className="text-md">add editor</p>
             <div className="flex gap-2 max-lg:grid">
-              <TextInput placeholder="username" inputClassName="min-w-[150px] h-[44px]" onChange={() => {}} />
+              <TextInput placeholder="username" inputClassName="min-w-[150px] h-[44px]" onChange={(e) => onWhitelistUsernameUpdate(e)} value={whitelistUsername} />
 
-              <Select className="w-full h-[44px] max-lg:w-full" onChange={() => {}}>
+              <Select className="w-full h-[44px] max-lg:w-full" onChange={(e) => {}}>
                 <option value="twitch">twitch</option>
                 <option value="kick">kick</option>
                 <option value="youtube">youtube</option>
@@ -98,7 +109,7 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
                 })}
               </Select>
 
-              <Button className="min-w-fit h-[44px]" onClick={() => {}}>
+              <Button className="min-w-fit h-[44px]" onClick={() => addWhitelist()}>
                 add user
               </Button>
             </div>
@@ -111,7 +122,7 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
                 return (
                   <TableRow key={`${editor.nickname}_row`}>
                     <TableCell>{editor.nickname}</TableCell>
-                    <TableCell>{editor.platform}</TableCell>
+                    <TableCell>{editor.platform.tag}</TableCell>
                     <TableCell>{editor.permissions.length}</TableCell>
                     <TableCell>....</TableCell>
                   </TableRow>
