@@ -195,7 +195,7 @@ public partial class Module
     }
 
     [Reducer]
-    public static void WhitelistUser(ReducerContext ctx, StreamingPlatform platform, string username)
+    public static void WhitelistUser(ReducerContext ctx, StreamingPlatform platform, string username, uint permissionSet)
     {
         string func = "WhitelistUser";
 
@@ -210,7 +210,8 @@ public partial class Module
             ctx.Db.Whitelist.Insert(new Whitelist
             {
                 Platform = platform,
-                Username = username.ToLower()
+                Username = username.ToLower(),
+                PermissionSet = permissionSet,
             });
         }
         catch (Exception e)

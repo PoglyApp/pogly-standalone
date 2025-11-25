@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using SpacetimeDB;
+using SpacetimeDB.Internal;
 
 static partial class Module
 {
@@ -64,33 +66,72 @@ static partial class Module
     [Reducer]
     public static void Connect(ReducerContext ctx)
     {
-        try
-        {
-            if (ctx.ConnectionId is null) throw new Exception("Guest with Null Address tried to Connect!");
-            
-            var random = new Random();
-            var color = $"#{random.Next(0x1000000):X6}";
+        if (ctx.ConnectionId is null) throw new Exception("[000] Guest with Null Address tried to Connect!");
 
-            var guest = ctx.Db.Guests.Insert(new Guests
-            {
-                Address = ctx.ConnectionId.Value,
-                Identity = ctx.Sender,
-                Nickname = "",
-                Color = color,
-                SelectedElementId = 0,
-                SelectedLayoutId = GetActiveLayout(ctx),
-                PositionX = -1,
-                PositionY = -1,
-                Authenticated = !ctx.Db.Config.Version.Find(0)!.Value.Authentication
-            });
-            
-            Log.Info($"[Connect] New guest {ctx.Sender} inserted into Guest table!");
-            LogAudit(ctx,"GuestConnected",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
-        }
-        catch (Exception e)
+        var configInit = ctx.Db.Config.Version.Find(0);
+        if (configInit is null) throw new Exception("[001] Config is missing! Something's super broken!");
+
+        if (configInit.Value.ConfigInit)
         {
-            Log.Info($"[GuestConnected] Error during connection with client {ctx.Sender}! " + e.Message);
+            var existingPermissions = GetPermissionsAsType(ctx, ctx.Sender);
+            if (existingPermissions.Length == 0)
+            {
+                var platform = GetJwtStreamingPlatform(ctx);
+                var username = GetJwtUsernameLower(ctx);
+                if (!ctx.Db.Whitelist.Iter().Any())
+                    throw new Exception("[002] No whitelists present & guest missing permissions!");
+                foreach (var wl in ctx.Db.Whitelist.Iter())
+                {
+                    if (wl.Platform != platform) throw new Exception("[003] Guest is not found in whitelist!");
+                    if (wl.Username != username) throw new Exception("[004] Guest is not found in whitelist!");;
+                
+                    var wlPerms = ctx.Db.PermissionSets.Id.Find(wl.PermissionSet);
+                    if (wlPerms is null) throw new Exception("[005] Invalid PermissionSet used for whitelist!");
+
+                    foreach (var perm in wlPerms.Value.Permissions)
+                    {
+                        ctx.Db.Permissions.Insert(new Permissions
+                        {
+                            Identity = ctx.Sender,
+                            PermissionType = perm
+                        });
+                    }
+                
+                    ctx.Db.GuestNames.Insert(new GuestNames
+                    {
+                        Identity = ctx.Sender,
+                        Nickname = GetJwtUsernameCased(ctx),
+                        StreamingPlatform = GetJwtStreamingPlatform(ctx),
+                        AvatarUrl = GetJwtAvatar(ctx)
+                    });
+
+                    ctx.Db.Whitelist.Delete(wl);
+                }
+            }
         }
+        
+        var whitelisted = HasPermission(ctx, ctx.Sender, PermissionTypes.Whitelisted);
+        if (configInit.Value.ConfigInit && !whitelisted) throw new Exception("[006] Guest has permissions but is disabled!");
+        
+        var random = new Random();
+        var color = $"#{random.Next(0x1000000):X6}";
+
+        var guest = ctx.Db.Guests.Insert(new Guests
+        {
+            Address = ctx.ConnectionId.Value,
+            Identity = ctx.Sender,
+            Nickname = "",
+            Color = color,
+            SelectedElementId = 0,
+            SelectedLayoutId = GetActiveLayout(ctx),
+            PositionX = -1,
+            PositionY = -1,
+            //Authenticated = !ctx.Db.Config.Version.Find(0)!.Value.Authentication
+            Authenticated = configInit.Value.ConfigInit && whitelisted
+        });
+        
+        Log.Info($"[Connect] New guest {ctx.Sender} inserted into Guest table!");
+        LogAudit(ctx,"GuestConnected",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
     }
 
     [Reducer(ReducerKind.ClientDisconnected)]
