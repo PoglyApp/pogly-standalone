@@ -38,6 +38,8 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const [useStrictMode, setUseStrictMode] = useState<boolean>(false);
   const [password, setPassword] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [oidcIssuer, setOidcIssuer] = useState<string>("https://authentik.dragonfruit.dev/application/o/pogly/");
+  const [oidcClientId, setOidcClientId] = useState<string>("2g7YX91k88URmEjPa3RkNU1877yNWyUyYD2NkLVS");
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [overlayURL, setOverlayURL] = useState<string>("");
@@ -110,7 +112,18 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const handleSave = async () => {
     setInitializing(true);
 
-    spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
+    spacetime.Client.reducers.setConfig(
+      platform,
+      channelName,
+      debug,
+      120,
+      200,
+      usePassword,
+      useStrictMode,
+      password || "",
+      oidcIssuer,
+      oidcClientId
+    );
 
     if (usePassword && password) {
       localStorage.setItem("stdbConnectModuleAuthKey", password);
