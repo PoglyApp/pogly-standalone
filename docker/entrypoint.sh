@@ -105,6 +105,7 @@ trap "kill 0" SIGINT
 # Clean up stale lock files
 rm -f /stdb/spacetime.pid
 rm -f /stdb/control-db/db/LOCK
+# NOTE: if you want to run >1 process sharing the same stdb storage backend, this will cause issues.
 
 setup_identity
 
