@@ -40,79 +40,94 @@
 
 <br>
 
-## What is [Pogly](https://pogly.gg) Standalone?
+## What is Pogly Standalone?
 
-Pogly is a real-time collaborative stream overlay. Think Figma, but for your OBS overlay sources.
+Pogly is a real-time collaborative stream overlay powered by [SpacetimeDB](https://spacetimedb.com). Think Figma for your OBS overlay.
 
-With the power of Pogly, you can condense your cluttered OBS overlays into a single, powerful browser source. But wait, how is that like Figma? [SpacetimeDB](https://spacetimedb.com) enables Pogly to communicate in real-time with multiple users; we call them Editors.
-
-Editors can add, edit, and delete overlay elements, with the changes being displayed in real-time while you stream. Why tab over to your OBS to update an overlay when you can have your chat moderators do it for you? While they're at it, perhaps they can add a fun emoji or meme to encourage chat interaction. With Text, Image and Widget elements, the opportunities for creativity are endless.
+With Pogly, you can condense your cluttered OBS overlays into a single, powerful browser source. Multiple editors can add, edit, and delete overlay elements in real-time while you stream. Let your chat moderators update overlays, add emojis, or drop memes to encourage chat interaction.
 
 [example.webm](https://github.com/PoglyApp/pogly-standalone/assets/36650721/7eb57196-bf56-4fa1-979f-36eb5c0746e9)
 
-## Looking to use Pogly in your stream?
+## Quick Start
 
-We offer both self-hosted option and **free** provided hosting (No installation required).
-If you're not tech-savvy and don't deliberately want to self-host Pogly, check out the [beginner's guide](https://github.com/PoglyApp/pogly-documentation/blob/main/use/beginnerGuide.md). It contains everything you need to know about how to setup Pogly.
+### Using Pogly Cloud (Recommended)
 
-For self-hosting installation and usage instructions please see the [Docs](https://github.com/PoglyApp/pogly-documentation/blob/main/index.md).
+The easiest way to use Pogly is through our free hosted service at [pogly.gg](https://pogly.gg). No installation required.
 
-For assistance with setting up Pogly, we are available in our [Discord](https://discord.gg/pogly).
+For setup instructions, check out the [beginner's guide](https://github.com/PoglyApp/pogly-documentation/blob/main/use/beginnerGuide.md).
 
-## Used by
+### Self-Hosting with Docker
 
-Want to be included in this list? Let us know in our [Discord](https://discord.gg/pogly)!
+**Prerequisites:**
+- Docker and Docker Compose
+- OIDC provider (Authentik, Keycloak, etc.)
 
-<a href="https://www.twitch.tv/shroud" rel="noreferrer" target="_blank" title="Shroud"><img src="./images/streamers/shroud.svg" /></a>
-<a href="https://www.twitch.tv/mizkif" rel="noreferrer" target="_blank" title="Mizkif"><img src="./images/streamers/mizkif.svg" /></a>
-<a href="https://www.twitch.tv/EMIRU" rel="noreferrer" target="_blank" title="Emiru"><img src="./images/streamers/emiru.svg" /></a>
-<a href="https://www.twitch.tv/npmlol" rel="noreferrer" target="_blank" title="Npmlol"><img src="./images/streamers/npmlol.svg" /></a>
-<a href="https://www.twitch.tv/tubbo" rel="noreferrer" target="_blank" title="Tubbo"><img src="./images/streamers/tubbo.svg" /></a>
-<a href="https://www.twitch.tv/jasontheween" rel="noreferrer" target="_blank" title="jasontheween"><img src="./images/streamers/jasontheween.svg" /></a>
-<a href="https://www.twitch.tv/orophia" rel="noreferrer" target="_blank" title="orophia"><img src="./images/streamers/orophia.svg" /></a>
-<a href="https://www.twitch.tv/maya" rel="noreferrer" target="_blank" title="Maya"><img src="./images/streamers/maya.svg" /></a>
-<a href="https://www.twitch.tv/zoil" rel="noreferrer" target="_blank" title="Zoil"><img src="./images/streamers/zoil.svg" /></a>
-<a href="https://www.twitch.tv/alveussanctuary" rel="noreferrer" target="_blank" title="AlveusSanctuary"><img src="./images/streamers/alveussanctuary.svg" /></a>
-<a href="https://www.twitch.tv/graycen" rel="noreferrer" target="_blank" title="Graycen"><img src="./images/streamers/graycen.svg" /></a>
-<a href="https://www.twitch.tv/bean" rel="noreferrer" target="_blank" title="Bean"><img src="./images/streamers/bean.svg" /></a>
-<a href="https://www.twitch.tv/siormax" rel="noreferrer" target="_blank" title="Siormax"><img src="./images/streamers/siormax.svg" /></a>
-<a href="https://www.twitch.tv/brain" rel="noreferrer" target="_blank" title="Brain"><img src="./images/streamers/brain.svg" /></a>
-<a href="https://www.twitch.tv/buttsoap" rel="noreferrer" target="_blank" title="Buttsoap"><img src="./images/streamers/buttsoap.svg" /></a>
-<a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank" title="Ashlynn"><img src="./images/streamers/ashlynn.svg" /></a>
-<a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank" title="Ssaab"><img src="./images/streamers/ssaab.svg" /></a>
-<a href="https://www.twitch.tv/itsklos" rel="noreferrer" target="_blank" title="ItsKlos"><img src="./images/streamers/itsklos.svg" /></a>
-<a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank" title="JustAGameOverScreen"><img src="./images/streamers/justagameoverscreen.svg" /></a>
-<a href="https://www.twitch.tv/firthy00" rel="noreferrer" target="_blank" title="Firthy00"><img src="./images/streamers/firthy00.svg" /></a>
-<a href="https://www.twitch.tv/misasoupy" rel="noreferrer" target="_blank" title="Misasoupy"><img src="./images/streamers/misasoupy.svg" /></a>
-<a href="https://www.twitch.tv/gappyv" rel="noreferrer" target="_blank" title="GappyV"><img src="./images/streamers/gappyv.svg" /></a>
-<a href="https://www.twitch.tv/kr3ia" rel="noreferrer" target="_blank" title="kr3ia"><img src="./images/streamers/kr3ia.svg" /></a>
-<a href="https://www.twitch.tv/whataturtle" rel="noreferrer" target="_blank" title="whataturtle"><img src="./images/streamers/whataturtle.svg" /></a>
-<a href="https://www.twitch.tv/savix" rel="noreferrer" target="_blank" title="Savix"><img src="./images/streamers/savix.svg" /></a>
-<a href="https://www.twitch.tv/derkajohnstv" rel="noreferrer" target="_blank" title="DerkaJohnsTV"><img src="./images/streamers/derkajohnstv.svg" /></a>
-<a href="https://www.twitch.tv/pengwin" rel="noreferrer" target="_blank" title="Pengwin"><img src="./images/streamers/pengwin.svg" /></a>
-<a href="https://www.twitch.tv/totless" rel="noreferrer" target="_blank" title="Totless"><img src="./images/streamers/totless.svg" /></a>
-<a href="https://www.twitch.tv/fubuki_vr" rel="noreferrer" target="_blank" title="Fubuki_Vr"><img src="./images/streamers/fubuki_vr.svg" /></a>
-<a href="https://www.twitch.tv/uberhaxornova" rel="noreferrer" target="_blank" title="UberHaxorNova"><img src="./images/streamers/uberhaxornova.svg" /></a>
-<a href="https://www.twitch.tv/sp00nerism" rel="noreferrer" target="_blank" title="Sp00nerism"><img src="./images/streamers/sp00nerism.svg" /></a>
-<a href="https://www.twitch.tv/kohrean" rel="noreferrer" target="_blank" title="Kohrean"><img src="./images/streamers/kohrean.svg" /></a>
-<a href="https://www.twitch.tv/boshiitime" rel="noreferrer" target="_blank" title="BoshiiTime"><img src="./images/streamers/boshiitime.svg" /></a>
-<a href="https://www.twitch.tv/kromia" rel="noreferrer" target="_blank" title="Kromia"><img src="./images/streamers/kromia.svg" /></a>
-<a href="https://www.twitch.tv/heyimradiant" rel="noreferrer" target="_blank" title="HeyImRadiant"><img src="./images/streamers/heyimradiant.svg" /></a>
-<a href="https://www.twitch.tv/krisuna" rel="noreferrer" target="_blank" title="Krisuna"><img src="./images/streamers/krisuna.svg" /></a>
-<a href="https://www.twitch.tv/echotheneko" rel="noreferrer" target="_blank" title="EchoTheNeko"><img src="./images/streamers/echotheneko.svg" /></a>
-<a href="https://www.twitch.tv/greywolf" rel="noreferrer" target="_blank" title="greywolf"><img src="./images/streamers/greywolf.svg" /></a>
-<a href="https://www.twitch.tv/shyfox_vr" rel="noreferrer" target="_blank" title="shyfox_vr"><img src="./images/streamers/shyfoxvr.svg" /></a>
-<a href="https://www.twitch.tv/supertf" rel="noreferrer" target="_blank" title="supertf"><img src="./images/streamers/supertf.svg" /></a>
-<a href="https://www.twitch.tv/amedoll" rel="noreferrer" target="_blank" title="AmeDoll"><img src="./images/streamers/amedoll.svg" /></a>
-<a href="https://www.twitch.tv/sakurasassi" rel="noreferrer" target="_blank" title="SakuraSassi"><img src="./images/streamers/sakurasassi.svg" /></a>
-<a href="https://www.twitch.tv/asby" rel="noreferrer" target="_blank" title="Asby"><img src="./images/streamers/asby.svg" /></a>
+**Installation:**
+
+1. Clone the repository:
+```bash
+git clone https://github.com/PoglyApp/pogly-standalone.git
+cd pogly-standalone
+```
+
+2. Create a `.env` file:
+```bash
+OIDC_ISSUER=https://your-oidc-provider.com/application/o/pogly/
+OIDC_CLIENT_ID=your_client_id_here
+```
+
+3. Run with Docker Compose:
+```bash
+docker compose up -d
+```
+
+4. Configure your OIDC provider with these redirect URIs:
+   - `http://localhost/callback`
+   - `http://localhost/`
+   - `http://localhost/silent-oidc-renew.html`
+
+5. Access Pogly at `http://localhost`
+
+**Environment Variables:**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OIDC_ISSUER` | OIDC provider issuer URL | Required |
+| `OIDC_CLIENT_ID` | OIDC client ID | Required |
+| `STREAM_PLATFORM` | Streaming platform (`twitch`, `youtube`) | `twitch` |
+| `STREAM_NAME` | Default channel/video ID | `bobross` |
+| `MODULES` | Space-separated list of module names | `pogly` |
+
+### Self-Hosting on Kubernetes
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Kubernetes deployment instructions with Flux GitOps.
+
+## Configuration
+
+After logging in via OIDC, the first user automatically becomes the owner. Access settings via the header menu to configure:
+
+- **Stream Platform:** Twitch or YouTube
+- **Stream Name:** Channel or video ID
+- **Update Rate:** Overlay refresh rate (Hz)
+- **Authentication:** Require authentication for editors
+- **Strict Mode:** Enhanced security mode
+
+## Architecture
+
+- **Frontend:** React + TypeScript + Vite
+- **Backend:** C# SpacetimeDB module
+- **Authentication:** OIDC (OAuth 2.0)
+- **Real-time sync:** SpacetimeDB WebSocket
+- **Reverse proxy:** Caddy
+
+## Support
+
+For assistance with setup or usage, join our [Discord](https://discord.gg/pogly).
 
 ## Contributing
 
-Check out our [contribution guidelines](https://github.com/PoglyApp/pogly-standalone/blob/main/CONTRIBUTING.md).
+Check out our [contribution guidelines](./CONTRIBUTING.md).
 
 ## License
 
-Pogly Standalone is licensed under the Apache-2.0 license.
-
-The Apache-2.0 license is a permissive free software license written by the Apache Software Foundation. It allows you to use Pogly Standalone for any purpose, including your right to distribute it, modify it, distribute modified versions of it (so long as those versions follow the terms of the license), without any concern for royalties.
+Licensed under Apache-2.0. See [LICENSE](./LICENSE) for details.
