@@ -1,7 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { AuthProvider, AuthProviderProps } from "react-oidc-context";
 import { WebStorageStateStore } from "oidc-client-ts";
-import { DbConnection } from "./module_bindings";
+import { Identity } from "spacetimedb";
+import { DbConnection, SubscriptionEventContext, ErrorContext } from "./module_bindings";
 
 interface DynamicAuthProviderProps {
   children: ReactNode;
@@ -39,11 +40,11 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
           .withUri(domain)
           .withModuleName(module)
           .withToken("")
-          .onConnect((dbCtx, identity) => {
+          .onConnect((dbCtx: SubscriptionEventContext, identity: Identity) => {
             console.log("[DynamicAuth] Connected to fetch config");
 
             dbCtx.subscriptionBuilder()
-              .onApplied((ctx) => {
+              .onApplied((ctx: SubscriptionEventContext) => {
                 const config = ctx.db.config.version.find(0);
 
                 if (!config || !config.configInit) {
@@ -79,7 +80,7 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
               })
               .subscribe(["SELECT * FROM Config"]);
           })
-          .onConnectError((errCtx, error) => {
+          .onConnectError((errCtx: ErrorContext, error: any) => {
             console.error("[DynamicAuth] Connection error:", error);
             setOidcConfig(getDefaultOidcConfig());
             setLoading(false);
@@ -107,9 +108,13 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
 }
 
 function getDefaultOidcConfig(): AuthProviderProps {
+  // Fallback to environment variables if available, otherwise use minimal config
+  const authority = import.meta.env.VITE_OIDC_ISSUER || "";
+  const client_id = import.meta.env.VITE_OIDC_CLIENT_ID || "";
+
   return {
-    authority: "https://auth.spacetimedb.com/oidc",
-    client_id: "client_031BvnxblLKmMtctMbLllZ",
+    authority,
+    client_id,
     redirect_uri: `${window.location.origin}/callback`,
     post_logout_redirect_uri: `${window.location.origin}/`,
     scope: "openid profile",
@@ -119,15 +124,6 @@ function getDefaultOidcConfig(): AuthProviderProps {
     includeIdTokenInSilentRenew: true,
     silent_redirect_uri: `${window.location.origin}/silent-oidc-renew.html`,
     loadUserInfo: false,
-    metadata: {
-      issuer: "https://auth.spacetimedb.com/oidc",
-      authorization_endpoint: "https://auth.spacetimedb.com/oidc/auth",
-      token_endpoint: "https://auth.spacetimedb.com/oidc/token",
-      jwks_uri: "https://auth.spacetimedb.com/oidc/jwks",
-      end_session_endpoint: "https://auth.spacetimedb.com/oidc/session/end",
-      userinfo_endpoint: "https://auth.spacetimedb.com/oidc/me",
-      introspection_endpoint: "https://auth.spacetimedb.com/oidc/token/introspection"
-    },
   };
 }
 

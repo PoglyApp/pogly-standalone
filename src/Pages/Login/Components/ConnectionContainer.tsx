@@ -206,15 +206,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-2">
           <StyledButton
             className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
-            onClick={() => {
-              setIsGuestLogin(true);
-              setGuestNickname("guest");
-              setLoginMethodThemeColor("#7e97a5");
-              setSubtitle("guest");
-            }}
+            onClick={() => auth.signinRedirect()}
           >
             <UserRound className="w-[16px] h-[16px] self-center mr-2" />
-            <span>continue as guest</span>
+            <span>login</span>
           </StyledButton>
         </div>
       )}
