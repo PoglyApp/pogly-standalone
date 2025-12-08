@@ -34,7 +34,9 @@ public partial class Module
                 Authentication = false,
                 StrictMode = false,
                 EditorGuidelines = "Placeholder: Follow Twitch ToS :^)",
-                ConfigInit = false
+                ConfigInit = false,
+                OidcIssuer = "",
+                OidcAudience = ""
             });
 
             int length = 12;
@@ -77,8 +79,8 @@ public partial class Module
     }
 
     [Reducer]
-    public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz, 
-        uint editorBorder, bool authentication, bool strictMode, string authKey="")
+    public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz,
+        uint editorBorder, bool authentication, bool strictMode, string authKey="", string oidcIssuer="", string oidcAudience="")
     {
         string func = "SetConfig";
 
@@ -110,6 +112,8 @@ public partial class Module
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
                 newConfig.ConfigInit = true;
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
 
                 try
                 {
@@ -120,13 +124,13 @@ public partial class Module
                     Log.Exception($"[{func}] - Unable to set guest as owner! " + e.Message);
                     throw new Exception($"[{func}] - Unable to set guest as owner!");
                 }
-            
+
                 ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
                 {
                     Version = 0,
                     Key = authKey
                 });
-                
+
                 ctx.Db.Config.Version.Update(newConfig);
                 
                 Log.Info($"[{func}] Success with Globals => DebugMode:{newConfig.DebugMode.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}, Authentication:{newConfig.Authentication.ToString()}!");
@@ -187,7 +191,7 @@ public partial class Module
     
     [Reducer]
     public static void UpdateConfig(ReducerContext ctx, string platform, string channel, uint updateHz,
-        bool authentication, bool strictMode)
+        bool authentication, bool strictMode, string oidcIssuer="", string oidcAudience="")
     {
         string func = "UpdateConfig";
         
@@ -208,7 +212,9 @@ public partial class Module
                 newConfig.UpdateHz = updateHz;
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
-            
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
+
                 ctx.Db.Config.Version.Update(newConfig);
                 Log.Info($"[{func}] Success with Globals => StreamingPlatform:{newConfig.StreamingPlatform}, StreamName:{newConfig.StreamName}, UpdateHz:{newConfig.UpdateHz.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}!");
             }
@@ -225,8 +231,8 @@ public partial class Module
     }
     
     [Reducer]
-    public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz, 
-        uint editorBorder, bool authentication, bool strictMode, int zmin, int zmax, string authKey="")
+    public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz,
+        uint editorBorder, bool authentication, bool strictMode, int zmin, int zmax, string authKey="", string oidcIssuer="", string oidcAudience="")
     {
         string func = "ImportConfig";
         var config = ctx.Db.Config.Version.Find(0);
@@ -251,7 +257,9 @@ public partial class Module
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
                 newConfig.ConfigInit = true;
-        
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
+
                 ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
                 {
                     Version = 0,
@@ -347,6 +355,40 @@ public partial class Module
         catch (Exception e)
         {
             Log.Error($"[{func}] Encountered error updating EditorGuidelines, requested by {ctx.Sender}. " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void UpdateOidcConfig(ReducerContext ctx, string oidcIssuer, string oidcAudience)
+    {
+        string func = "UpdateOidcConfig";
+
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx)) return;
+
+        try
+        {
+            var oldConfig = ctx.Db.Config.Version.Find(0);
+
+            if (oldConfig.HasValue)
+            {
+                var newConfig = oldConfig.Value;
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
+
+                ctx.Db.Config.Version.Update(newConfig);
+                Log.Info($"[{func}] Successfully updated OIDC config. Issuer: {oidcIssuer}, Audience: {oidcAudience}");
+            }
+            else
+            {
+                Log.Error($"[{func}] Error updating OIDC config - can't find default config!");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered error updating OIDC config, requested by {ctx.Sender}. " + e.Message);
         }
     }
 

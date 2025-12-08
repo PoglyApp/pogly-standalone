@@ -1,0 +1,16 @@
+services:
+  # Pogly instance under test
+  pogly:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - pogly-test-stdb:/stdb
+
+    environment:
+      - MODULES=pogly-test
+
+volumes:
+  pogly-test-stdb:
