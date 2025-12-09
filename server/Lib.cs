@@ -92,12 +92,23 @@ static partial class Module
                 // If OwnerIdentity matches server identity, ownership hasn't been claimed yet
                 if (config.Value.OwnerIdentity == heartbeat.Value.ServerIdentity)
                 {
-                    var newConfig = config.Value;
-                    newConfig.OwnerIdentity = ctx.Sender;
-                    ctx.Db.Config.Version.Update(newConfig);
+                    // Verify user is authenticated via OIDC before granting ownership
+                    try
+                    {
+                        VerifyClient(ctx);
+                        
+                        var newConfig = config.Value;
+                        newConfig.OwnerIdentity = ctx.Sender;
+                        ctx.Db.Config.Version.Update(newConfig);
 
-                    SetPermission(ctx, ctx.Sender, PermissionTypes.Owner);
-                    Log.Info($"[Connect] First user {ctx.Sender} auto-claimed ownership!");
+                        SetPermission(ctx, ctx.Sender, PermissionTypes.Owner);
+                        Log.Info($"[Connect] First authenticated user {ctx.Sender} auto-claimed ownership!");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[Connect] Failed to auto-claim ownership for {ctx.Sender}: {e.Message}");
+                        throw new Exception($"Failed to claim ownership: {e.Message}");
+                    }
                 }
             }
 

@@ -90,6 +90,8 @@ deploy() {
             BACKOFF=$((BACKOFF * 2))
           else
             echo "SetConfig failed after $MAX_RETRIES attempts"
+            echo "Container cannot start without proper configuration"
+            exit 1
           fi
         done
       fi
@@ -103,8 +105,26 @@ deploy() {
 trap "kill 0" SIGINT
 
 # Clean up stale lock files
-rm -f /stdb/spacetime.pid
-rm -f /stdb/control-db/db/LOCK
+if [ -f /stdb/spacetime.pid ]; then
+  PID=$(cat /stdb/spacetime.pid)
+  if ! kill -0 $PID 2>/dev/null; then
+    echo "Removing stale PID file for dead process $PID"
+    rm -f /stdb/spacetime.pid
+  else
+    echo "ERROR: SpacetimeDB process $PID is still running!"
+    echo "Cannot start a new instance while another is active."
+    exit 1
+  fi
+fi
+
+# Only remove DB lock if no process is holding it
+if [ -f /stdb/control-db/db/LOCK ]; then
+  echo "WARNING: Found existing database lock file"
+  if [ ! -f /stdb/spacetime.pid ]; then
+    echo "No PID file found, assuming stale lock - removing"
+    rm -f /stdb/control-db/db/LOCK
+  fi
+fi
 # NOTE: if you want to run >1 process sharing the same stdb storage backend, this will cause issues.
 
 setup_identity

@@ -60,7 +60,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       if (auth.user.profile) {
         const currentTime = Date.now() / 1000;
         if (auth.user.profile.exp < currentTime) {
-          console.warn("ID token has expired...");
+          console.warn("ID token has expired, requesting re-authentication");
+          auth.signinRedirect();
           return;
         }
       }

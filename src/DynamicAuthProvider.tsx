@@ -25,8 +25,11 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
       return;
     }
 
+    let client: DbConnection | null = null;
+    let mounted = true;
+
     // Connect to SpacetimeDB without auth to fetch OIDC config
-    const fetchOidcConfig = async () => {
+    const fetchOidcConfig = () => {
       try {
         // Get connection details from URL params or use defaults
         const params = new URLSearchParams(window.location.search);
@@ -36,15 +39,25 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
         const domain = params.get("domain") || defaultDomain;
         const module = params.get("module") || "pogly";
 
-        const client = DbConnection.builder()
+        client = DbConnection.builder()
           .withUri(domain)
           .withModuleName(module)
           .withToken("")
           .onConnect((dbCtx: SubscriptionEventContext, identity: Identity) => {
+            if (!mounted) {
+              client?.disconnect();
+              return;
+            }
+
             console.log("[DynamicAuth] Connected to fetch config");
 
             dbCtx.subscriptionBuilder()
               .onApplied((ctx: SubscriptionEventContext) => {
+                if (!mounted) {
+                  client?.disconnect();
+                  return;
+                }
+
                 const config = ctx.db.config.version.find(0);
 
                 if (!config || !config.configInit) {
@@ -61,7 +74,7 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
                     setOidcConfig(getDefaultOidcConfig());
                   }
                   setLoading(false);
-                  client.disconnect();
+                  client?.disconnect();
                   return;
                 }
 
@@ -76,24 +89,51 @@ export function DynamicAuthProvider({ children, onSigninCallback, oidcDebugLogs 
                 }
 
                 setLoading(false);
-                client.disconnect();
+                client?.disconnect();
               })
               .subscribe(["SELECT * FROM Config"]);
           })
           .onConnectError((errCtx: ErrorContext, error: any) => {
+            if (!mounted) return;
+            
             console.error("[DynamicAuth] Connection error:", error);
+            
+            // Show error to user instead of silent fallback
+            const errorMessage = error.message || 'Cannot connect to server';
+            alert(`Failed to fetch authentication configuration: ${errorMessage}\n\nFalling back to default configuration.`);
+
             setOidcConfig(getDefaultOidcConfig());
             setLoading(false);
           })
           .build();
       } catch (error) {
-        console.error("[DynamicAuth] Failed to fetch config:", error);
-        setOidcConfig(getDefaultOidcConfig());
-        setLoading(false);
+        if (!mounted) return;
+        
+        console.error("[DynamicAuth] Failed to build client:", error);
+        
+        // Only catch specific expected errors, let unexpected ones propagate
+        if (error instanceof Error && 
+            (error.message.includes('network') || 
+             error.message.includes('connection') ||
+             error.message.includes('timeout'))) {
+          alert(`Failed to initialize authentication: ${error.message}`);
+          setOidcConfig(getDefaultOidcConfig());
+          setLoading(false);
+        } else {
+          // Re-throw unexpected errors to error boundary
+          throw error;
+        }
       }
     };
 
     fetchOidcConfig();
+
+    return () => {
+      mounted = false;
+      if (client) {
+        client.disconnect();
+      }
+    };
   }, []);
 
   if (loading || !oidcConfig) {

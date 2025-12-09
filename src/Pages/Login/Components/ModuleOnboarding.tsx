@@ -9,10 +9,34 @@ import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 
+interface SpacetimeClient {
+  Client: {
+    reducers: {
+      setConfig: (
+        platform: string,
+        channelName: string,
+        debug: boolean,
+        param4: number,
+        param5: number,
+        usePassword: boolean,
+        useStrictMode: boolean,
+        password: string,
+        oidcIssuer: string,
+        oidcClientId: string
+      ) => void;
+    };
+    db: {
+      elementData: { iter: () => unknown[] };
+      elements: { iter: () => unknown[] };
+      layouts: { iter: () => unknown[] };
+    };
+  };
+}
+
 interface IProps {
   legacyLogin: boolean;
   connectionConfig: ConnectionConfigType;
-  spacetime: any;
+  spacetime: SpacetimeClient;
 }
 
 const steps = [
@@ -38,8 +62,6 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const [useStrictMode, setUseStrictMode] = useState<boolean>(false);
   const [password, setPassword] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<boolean>(false);
-  const [oidcIssuer, setOidcIssuer] = useState<string>("");
-  const [oidcClientId, setOidcClientId] = useState<string>("");
   const isOverlay: Boolean = window.location.href.includes("/overlay");
 
   const [overlayURL, setOverlayURL] = useState<string>("");
@@ -121,8 +143,8 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
       usePassword,
       useStrictMode,
       password || "",
-      oidcIssuer,
-      oidcClientId
+      import.meta.env.VITE_OIDC_ISSUER || "",
+      import.meta.env.VITE_OIDC_CLIENT_ID || ""
     );
 
     if (usePassword && password) {
