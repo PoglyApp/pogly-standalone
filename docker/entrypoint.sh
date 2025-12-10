@@ -1,3 +1,6 @@
+# Default to mainnet unless SPACETIME_SERVER is set to "local"
+SPACETIME_SERVER="${SPACETIME_SERVER:-https://maincloud.spacetimedb.com}"
+
 setup_identity() {
   CLI_CONFIG_DIR="/root/.config/spacetime"
   CLI_CONFIG_FILE="$CLI_CONFIG_DIR/cli.toml"
@@ -19,7 +22,7 @@ setup_identity() {
 
 deploy() {
   # Ignore errors,
-  until (spacetime server ping local 2>/dev/null) | grep -q "Server is online";
+  until (spacetime server ping "$SPACETIME_SERVER" 2>/dev/null) | grep -q "Server is online";
   do
     echo "Waiting for server to start..."
     sleep 1
@@ -38,7 +41,7 @@ deploy() {
 
     echo "Publishing $module..."
     while [ $RETRY -lt $MAX_RETRIES ]; do
-      if spacetime publish --bin-path /app/pogly.wasm --server local "$module" 2>&1; then
+      if spacetime publish --bin-path /app/pogly.wasm --server "$SPACETIME_SERVER" "$module" 2>&1; then
         echo "Successfully published $module"
         break
       fi
@@ -54,10 +57,10 @@ deploy() {
       fi
     done
 
-    # Initialize config with OIDC if env vars are set
-    if [ -n "$OIDC_ISSUER" ] && [ -n "$OIDC_CLIENT_ID" ]; then
+    # Initialize config with OIDC only for the first "pogly" module
+    if [ "$module" = "pogly" ] && [ -n "$OIDC_ISSUER" ] && [ -n "$OIDC_CLIENT_ID" ]; then
       # Check if config is already initialized
-      CONFIG_INIT=$(spacetime sql --server local "$module" "SELECT ConfigInit FROM Config" 2>/dev/null | grep -o "true\|false" | head -1)
+      CONFIG_INIT=$(spacetime sql --server "$SPACETIME_SERVER" "$module" "SELECT ConfigInit FROM Config" 2>/dev/null | grep -o "true\|false" | head -1)
 
       if [ "$CONFIG_INIT" = "true" ]; then
         echo "Config already initialized, skipping SetConfig"
@@ -68,7 +71,7 @@ deploy() {
         RETRY=0
         BACKOFF=1
         while [ $RETRY -lt $MAX_RETRIES ]; do
-          if spacetime call --server local "$module" SetConfig \
+          if spacetime call --server "$SPACETIME_SERVER" "$module" SetConfig \
             "${STREAM_PLATFORM:-twitch}" \
             "${STREAM_NAME:-bobross}" \
             "${DEBUG_MODE:-false}" \
@@ -95,8 +98,6 @@ deploy() {
           fi
         done
       fi
-    else
-      echo "No OIDC configuration provided, skipping auto-init"
     fi
   done
 }
@@ -118,11 +119,11 @@ if [ -f /stdb/spacetime.pid ]; then
 fi
 
 # Only remove DB lock if no process is holding it
-if [ -f /stdb/control-db/db/LOCK ]; then
+if [ -f /stdb/control_node/control_db/db/LOCK ]; then
   echo "WARNING: Found existing database lock file"
   if [ ! -f /stdb/spacetime.pid ]; then
     echo "No PID file found, assuming stale lock - removing"
-    rm -f /stdb/control-db/db/LOCK
+    rm -f /stdb/control_node/control_db/db/LOCK
   fi
 fi
 # NOTE: if you want to run >1 process sharing the same stdb storage backend, this will cause issues.
@@ -143,7 +144,7 @@ start_spacetime() {
     RETRY=$((RETRY + 1))
     if [ $RETRY -lt $MAX_RETRIES ]; then
       echo "SpacetimeDB failed to start (attempt $RETRY/$MAX_RETRIES), retrying in ${BACKOFF}s..."
-      rm -f /stdb/control-db/db/LOCK
+      rm -f /stdb/control_node/control_db/db/LOCK
       sleep $BACKOFF
       BACKOFF=$((BACKOFF * 2))
     else
