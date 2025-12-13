@@ -15,13 +15,6 @@ public partial class Module
                 Tick = 0
             });
 
-
-            ctx.Db.KeepAliveWorker.Insert(new KeepAliveWorker
-            {
-                Id = 0,
-                ScheduledAt = TimeSpan.FromSeconds(5)
-            });
-
             ctx.Db.Config.Insert(new Config
             {
                 Version = 0,
