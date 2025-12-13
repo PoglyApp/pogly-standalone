@@ -6,7 +6,6 @@ import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 import { Loading } from "../../Components/General/Loading";
 import { SetSubscriptions } from "../../Utility/SetSubscriptions";
-import { StartHeartbeat } from "../../Utility/PingHeartbeat";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LayoutContext } from "../../Contexts/LayoutContext";
 import { ConfigContext } from "../../Contexts/ConfigContext";
@@ -300,7 +299,6 @@ export const Login = () => {
   // Step 5) Redo final subscriptions ONLY ONCE && Start client heartbeat
   if (!stdbInitialized) {
     DebugLogger("Starting Client->Server heartbeat!");
-    StartHeartbeat(spacetime.Client);
     DebugLogger("Redoing subscriptions");
     SetSubscriptions(spacetime.Client, setStdbSubscriptions, setStdbInitialized);
   }

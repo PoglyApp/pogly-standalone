@@ -19,7 +19,6 @@ import Selecto from "react-selecto";
 import { ElementContextMenu } from "../Components/Elements/ContextMenus/ElementContextMenu";
 import { HandleElementContextMenu } from "../Utility/HandleContextMenu";
 import { CanvasInitializedType } from "../Types/General/CanvasInitializedType";
-import { useHeartbeatEvents } from "../StDB/Hooks/useHeartbeatEvents";
 import { useNotice } from "../Hooks/useNotice";
 import { Notice } from "../Components/General/Notice";
 import { ErrorRefreshModal } from "../Components/Modals/ErrorRefreshModal";
@@ -109,7 +108,6 @@ export const Canvas = () => {
   const userDisconnected = useGuestsEvents(canvasInitialized, setCanvasInitialized, transformRef);
   useFetchGuests(canvasInitialized, setCanvasInitialized);
 
-  useHeartbeatEvents(canvasInitialized);
   const configReload = useConfigEvents(canvasInitialized);
 
   useNotice(setNoticeMessage);
