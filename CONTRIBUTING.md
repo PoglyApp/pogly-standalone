@@ -43,7 +43,7 @@ You can find development documentation [here](https://github.com/PoglyApp/pogly-
 Make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/)
-- [SpacetimeDB](https://spacetimedb.com/)
+- [SpacetimeDB](https://spacetimedb.com/?referral=Lethalchip)
 
 ### Setup
 
