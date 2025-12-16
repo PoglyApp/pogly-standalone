@@ -37,7 +37,8 @@ export const UserInputHandler = (
   compressPaste: boolean | undefined,
   transformRef: ReactZoomPanPinchRef | null,
   transformSelect: any,
-  setTransformSelect: Function
+  setTransformSelect: Function,
+  openOwnershipModal: Function
 ): any => {
   const userInputs = [];
 
@@ -983,6 +984,16 @@ export const UserInputHandler = (
         progress: undefined,
         theme: "dark",
       });
+    },
+  });
+
+  userInputs.push({
+    name: "ownerclaim",
+    keys: ["o", "w", "n"],
+    action: "keydown",
+    callback: (event: KeyboardEvent) => {
+      event.preventDefault();
+      openOwnershipModal();
     },
   });
 

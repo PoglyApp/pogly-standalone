@@ -11,7 +11,7 @@ export const VerifyOwnershipModal = () => {
   const { spacetimeDB } = useContext(SpacetimeContext);
 
   const [verifyKey, setVerifyKey] = useState<string>("");
-  const [claimButtonText, setClaimButtonText] = useState<string>("Verify");
+  const [claimButtonText, setClaimButtonText] = useState<string>("Claim");
   const [verificationFailed, setVerificationFailed] = useState<boolean>(false);
 
   const attemptVerify = () => {
@@ -20,7 +20,7 @@ export const VerifyOwnershipModal = () => {
     const key = verifyKey;
     setVerifyKey("");
 
-    setClaimButtonText("Verifying...");
+    setClaimButtonText("Claiming...");
     spacetimeDB.Client.reducers.claimOwnership(verifyKey);
 
     setTimeout(() => {
@@ -42,7 +42,7 @@ export const VerifyOwnershipModal = () => {
       }}
     >
       <DialogTitle sx={{ backgroundColor: "#0a2a47", color: "#ffffffa6", textAlign: "center" }}>
-        Verify module ownership
+        Claim module ownership
       </DialogTitle>
       <DialogContent
         sx={{
@@ -53,29 +53,13 @@ export const VerifyOwnershipModal = () => {
         }}
       >
         <p style={{ color: "#ffffffa6" }}>
-          Pogly has been updated and there has been a significant under the hood change regarding authentication and
-          user identity management. Due to this change, the module owner must do a manual verification in order to
-          re-claim ownership for their module
+          Input below the one time use ownership claim key provided to you by Pogly developers or if self-hosted, your
+          Pogly instance maintainer.
         </p>
-
-        <ol style={{ listStyle: "auto", marginLeft: "30px", marginTop: "15px", color: "#ffffffa6" }}>
-          <li>
-            Run <a style={{ backgroundColor: "#78787957", padding: "3px", borderRadius: "8px" }}>/claim</a> command in{" "}
-            <a style={{ color: "#82a5ff" }} href="https://discord.gg/pogly">
-              Pogly Discord
-            </a>
-            .
-          </li>
-          <li>Pogly Bot will DM you keys for your modules.</li>
-          <li>Paste your key to the field below.</li>
-          <li>
-            Press <a style={{ backgroundColor: "#78787957", padding: "3px", borderRadius: "8px" }}>Verify</a> button.
-          </li>
-        </ol>
 
         <StyledInput
           focused={false}
-          label="Verification key"
+          label="Ownership claim key"
           color="#ffffffa6"
           onChange={setVerifyKey}
           style={{ width: "100%", marginTop: "20px" }}
@@ -87,7 +71,7 @@ export const VerifyOwnershipModal = () => {
             severity="error"
             sx={{ backgroundColor: "#f51313 !important", color: "#212121", marginTop: "20px", maxWidth: "100%" }}
           >
-            Failed to verify ownership. Please make sure the verification key is correct.
+            Failed to claim ownership. Please make sure the claim key is correct.
           </Alert>
         )}
       </DialogContent>

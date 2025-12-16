@@ -34,6 +34,8 @@ import { Config, Elements, Guests, Layouts } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
 import { PermissionTypes } from "../Types/General/PermissionType";
 import { getPermissions } from "../Utility/PermissionsHelper";
+import { ModalContext } from "../Contexts/ModalContext";
+import { VerifyOwnershipModal } from "../Components/Modals/VerifyOwnershipModal";
 
 export const Canvas = () => {
   const [canvasInitialized, setCanvasInitialized] = useState<CanvasInitializedType>({
@@ -50,6 +52,7 @@ export const Canvas = () => {
   const { activeLayout, setActiveLayout } = useContext(LayoutContext);
   const { settings } = useContext(SettingsContext);
   const { Runtime, spacetimeDB } = useContext(SpacetimeContext);
+  const { setModals } = useContext(ModalContext);
   const [disconnectedState, setDisconnectedState] = useState<boolean>(false);
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
@@ -121,7 +124,10 @@ export const Canvas = () => {
       settings.compressPaste,
       transformRef.current,
       transformSelect,
-      setTransformSelect
+      setTransformSelect,
+      () => {
+        setModals((oldModals: any) => [...oldModals, <VerifyOwnershipModal key="verifyownership_modal" />]);
+      }
     )
   );
 
