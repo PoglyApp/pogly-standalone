@@ -5,11 +5,8 @@ public partial class Module
     [Table(Public = true, Name = "Heartbeat")]
     public partial struct Heartbeat
     {
-        [PrimaryKey]
-        public uint Id;
-        
+        [PrimaryKey] public uint Id;
         public Identity ServerIdentity;
-
         public int Tick;
     }
 
@@ -23,9 +20,7 @@ public partial class Module
     [Table(Public = true, Name = "Config")]
     public partial struct Config
     {
-        [PrimaryKey]
-        public uint Version;
-
+        [PrimaryKey] public uint Version;
         public Identity OwnerIdentity;
         public string StreamingPlatform;
         public string StreamName;
@@ -42,21 +37,27 @@ public partial class Module
     [Table(Public = false, Name = "OwnerRecoveryKey")]
     public partial struct AuthenticationKey
     {
-        [PrimaryKey]
-        public uint Version;
-
+        [PrimaryKey] public uint Version;
         public string Key;
     }
     
     [Table(Public = false, Name = "ZIndex")]
     public partial struct ZIndex
     {
-        [PrimaryKey]
-        public uint Version;
-
+        [PrimaryKey] public uint Version;
         public int Min;
         public int Max;
         public int Ceiling;
+    }
+
+    [Table(Public = false, Name = "AutoInc")]
+    public partial struct AutoInc
+    {
+        [PrimaryKey] public uint Version;
+        public uint FolderIncrement;
+        public uint ElementsIncrement;
+        public uint ElementDataIncrement;
+        public uint LayoutsIncrement;
     }
 
     private const string SEVEN_TV_TENOR_REGEX = @"^https?:\/\/(www\.)?cdn\.7tv\.app(?:\/.*)?$|^https?:\/\/(www\.)?media\.tenor\.com(?:\/.*)?$|^https?:\/\/(www\.)?cdn\.betterttv\.net(?:\/.*)?$";
