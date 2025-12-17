@@ -6,7 +6,7 @@ import { GetCoordsFromTransform, GetMatrixFromElement, GetTransformFromCoords } 
 import { OffsetElementForCanvas } from "./OffsetElementForCanvas";
 import { CompressImage } from "./CompressImage";
 import { DebugLogger } from "./DebugLogger";
-import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import { ReactZoomPanPinchContext, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { handleFlipElement } from "./ContextMenuMethods";
 import { DbConnection, ElementStruct, ImageElementData, Layouts } from "../module_bindings";
 import { getElementByID } from "../StDB/SpacetimeDBUtils";
@@ -52,7 +52,7 @@ export const UserInputHandler = (
       event.preventDefault();
 
       try {
-        transformRef?.centerView();
+        transformRef?.centerView(0.5);
       } catch (error) {
         console.log("Pogly encountered an issue when attempting to Delete an element!");
       }
