@@ -15,20 +15,17 @@ public partial class Module
 
         try
         {
-            uint maxId = 0;
-            foreach (var i in ctx.Db.Folders.Iter())
-            {
-                if (i.Id > maxId) maxId = i.Id;
-            }
+            var autoInc = ctx.Db.AutoInc.Version.Find(0) ?? MigrateAutoInc(ctx, func);
             
             var newFolder = new Folders
             {
-                Id = maxId + 1,
+                Id = autoInc.FolderIncrement + 1,
                 Icon = icon,
                 Name = name,
                 CreatedBy = guest.Nickname
             };
             ctx.Db.Folders.Insert(newFolder);
+            IncrementFolder(ctx, func);
             
             //TODO: Add AuditLog() ChangeStruct types and methods for Folders
             if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 

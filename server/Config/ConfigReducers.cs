@@ -430,6 +430,11 @@ public partial class Module
             if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
         }
 
+        InternalAutoIncSync(ctx, func);
+    }
+
+    private static void InternalAutoIncSync(ReducerContext ctx, string func)
+    {
         try
         {
             uint maxFolderId = 0;
@@ -453,7 +458,7 @@ public partial class Module
                 if (l.Id > maxLayoutsId) maxLayoutsId = l.Id;
             }
             
-            var autoInc = ctx.Db.AutoInc.Version.Find(0).Value;
+            var autoInc = ctx.Db.AutoInc.Version.Find(0)!.Value;
             autoInc.FolderIncrement = maxFolderId;
             autoInc.ElementsIncrement = maxElementsId;
             autoInc.ElementDataIncrement = maxElementDataId;
