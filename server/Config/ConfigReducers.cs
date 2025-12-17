@@ -113,7 +113,7 @@ public partial class Module
             
             if (authentication && string.IsNullOrEmpty(authKey))
                 throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
-
+            
             try
             {
                 var newConfig = oldConfig.Value;
@@ -129,6 +129,8 @@ public partial class Module
 
                 try
                 {
+                    var configGuest = ctx.Db.Guests.Address.Find(guest.Address);
+                    if (configGuest is not null) ctx.Db.Guests.Address.Update(configGuest.Value with {Authenticated = true});
                     SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
                 }
                 catch (Exception e)
