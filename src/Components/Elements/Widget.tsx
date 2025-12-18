@@ -71,6 +71,8 @@ export const Widget = (props: IProp) => {
       style={{
         width: widgetElement.width,
         height: widgetElement.height,
+        minWidth: "32px",
+        minHeight: "32px",
         transform: props.elements.transform,
         opacity: props.elements.transparency / 100 <= 0.2 && !isOverlay ? 0.2 : props.elements.transparency / 100,
         clipPath: props.elements.clip,
