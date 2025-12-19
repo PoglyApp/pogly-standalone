@@ -40,6 +40,8 @@ export type Config = {
   strictMode: boolean,
   editorGuidelines: string,
   configInit: boolean,
+  oidcIssuer: string,
+  oidcAudience: string,
 };
 let _cached_Config_type_value: __AlgebraicTypeType | null = null;
 
@@ -66,6 +68,8 @@ export const Config = {
       { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool },
       { name: "editorGuidelines", algebraicType: __AlgebraicTypeValue.String },
       { name: "configInit", algebraicType: __AlgebraicTypeValue.Bool },
+      { name: "oidcIssuer", algebraicType: __AlgebraicTypeValue.String },
+      { name: "oidcAudience", algebraicType: __AlgebraicTypeValue.String },
     );
     return _cached_Config_type_value;
   },

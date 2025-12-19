@@ -1,12 +1,18 @@
 :80 {
     @spacetime {
+        path /v1/*
         path /identity/*
         path /database/*
         path /energy/*
     }
 
     handle @spacetime {
-        reverse_proxy localhost:3000
+        reverse_proxy localhost:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 
     handle {
