@@ -124,10 +124,13 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
+        if (!element) return;
+        if (element.locked) return;
 
-        if (element) navigator.clipboard.writeText(JSON.stringify(element));
+        navigator.clipboard.writeText(JSON.stringify(element));
         DebugLogger("Deleting and copying element");
 
         Client.reducers.deleteElement(selectedElement.Elements.id);
@@ -306,10 +309,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -356,10 +361,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -406,10 +413,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -456,10 +465,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -506,10 +517,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -557,10 +570,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -607,10 +622,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -657,10 +674,12 @@ export const UserInputHandler = (
 
       try {
         if (!selectedElement) return;
+        if (selectedElement.Elements.locked) return;
 
         const element = Client.db.elements.id.find(selectedElement.Elements.id);
 
         if (!element) return;
+        if (element.locked) return;
 
         DebugLogger("Nudging element");
 
@@ -827,6 +846,9 @@ export const UserInputHandler = (
     callback: (event: any) => {
       event.preventDefault();
 
+      if (!selectedElement) return;
+      if (selectedElement.Elements.locked) return;
+
       handleFlipElement(Client, false, selectedElement!.Elements);
     },
   });
@@ -837,6 +859,9 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
+
+      if (!selectedElement) return;
+      if (selectedElement.Elements.locked) return;
 
       handleFlipElement(Client, true, selectedElement!.Elements);
     },
