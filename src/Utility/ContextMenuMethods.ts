@@ -9,8 +9,9 @@ import {
   Elements,
   ElementStruct,
   ImageElementData,
-  WidgetElement,
 } from "../module_bindings";
+import { ElementDataId, RawData } from "../module_bindings/image_element_data_variants";
+import { TextElement, WidgetElement } from "../module_bindings/element_struct_variants";
 
 interface TransformObject {
   transformFunction: string;
@@ -107,12 +108,16 @@ export const handleResetTransform = (
     case TransformType.Scale:
       switch (elements.element.tag) {
         case "ImageElement":
-          const imageElement: ElementStruct = elements.element as ElementStruct.ImageElement;
+          const imageElement: ElementStruct = ElementStruct.ImageElement({
+            imageElementData: elements.element.value.imageElementData,
+            width: elements.element.value.width,
+            height: elements.element.value.height
+          });
 
           switch (imageElement.value.imageElementData.tag) {
             case "ElementDataId":
-              const dataId: ImageElementData.ElementDataId = imageElement.value
-                .imageElementData as ImageElementData.ElementDataId;
+              const dataId: ElementDataId = ImageElementData.ElementDataId(imageElement.value.imageElementData.value);
+
               const imgElementData: ElementData | undefined = Client.db.elementData.id.find(dataId.value);
 
               if (imgElementData !== undefined) {
@@ -132,7 +137,7 @@ export const handleResetTransform = (
               break;
 
             case "RawData":
-              const rawData: ImageElementData.RawData = imageElement.value.imageElementData as ImageElementData.RawData;
+              const rawData: RawData = ImageElementData.RawData(imageElement.value.imageElementData.value);
 
               var image = new Image();
               image.src = rawData.value;
@@ -156,7 +161,13 @@ export const handleResetTransform = (
           break;
 
         case "WidgetElement":
-          const widgetElement: ElementStruct = elements.element as ElementStruct.WidgetElement;
+          const widgetElement: WidgetElement = ElementStruct.WidgetElement({
+            elementDataId: elements.element.value.elementDataId,
+            width: elements.element.value.width,
+            height: elements.element.value.height,
+            rawData: elements.element.value.rawData
+          });
+
           const wgtElementData: ElementData | undefined = Client.db.elementData.id.find(
             widgetElement.value.elementDataId
           );
@@ -179,7 +190,13 @@ export const handleResetTransform = (
           break;
 
         case "TextElement":
-          const textElement: ElementStruct = elements.element as ElementStruct.TextElement;
+          const textElement: TextElement = ElementStruct.TextElement({
+            text: elements.element.value.text,
+            size: elements.element.value.size,
+            color: elements.element.value.color,
+            font: elements.element.value.font,
+            css: elements.element.value.css
+          });
           element.style.width = `auto`;
           element.style.height = `auto`;
           updateElementStruct(Client, elements.id, textElement);
@@ -233,16 +250,16 @@ export const handleToggle = (Client: DbConnection, selectedElement: Elements, ha
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
   DebugLogger("Handling toggle");
 
-  //const size = ViewportToStdbSize(selectedElement.element.value.width,selectedElement.element.value.height);
   const element = Client.db.elements.id.find(selectedElement.id);
 
   if (!element) return;
+  if (element.element.tag !== "WidgetElement") return;
 
   const widgetStruct: ElementStruct = ElementStruct.WidgetElement({
     elementDataId: selectedElement.element.value.elementDataId,
-    height: (element.element.value as WidgetElement).height,
-    width: (element.element.value as WidgetElement).width,
-    rawData: (element.element.value as WidgetElement).rawData,
+    height: element.element.value.height,
+    width: element.element.value.width,
+    rawData: element.element.value.rawData,
   });
 
   Client.reducers.updateElementStruct(selectedElement.id, widgetStruct);
@@ -302,10 +319,14 @@ export const handleWidgetToggle = (
   handleClose: Function
 ) => {
   DebugLogger("Handling widget toggle");
-  const widgetElement: WidgetElement = Client.db.elements.id.find(selectedElementId)?.element.value as WidgetElement;
+  const element = Client.db.elements.id.find(selectedElementId);
+  if (!element) return;
+  if (element.element.tag !== "WidgetElement") return;
 
-  if (widgetElement.rawData) {
-    const rawDataJson = JSON.parse(widgetElement.rawData);
+  const widgetElement: WidgetElement = element.element;
+
+  if (widgetElement.value.rawData) {
+    const rawDataJson = JSON.parse(widgetElement.value.rawData);
     const variableIndex = rawDataJson.variables.findIndex(
       (v: WidgetVariableType) => v.variableName === variable.variableName
     );
@@ -314,7 +335,7 @@ export const handleWidgetToggle = (
 
     Client.reducers.updateWidgetElementRawData(selectedElementId, JSON.stringify(rawDataJson));
   } else {
-    const elementData: ElementData = Client.db.elementData.id.find(widgetElement.elementDataId)!;
+    const elementData: ElementData = Client.db.elementData.id.find(widgetElement.value.elementDataId)!;
 
     const elementDataJson = JSON.parse(elementData.data);
 

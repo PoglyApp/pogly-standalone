@@ -845,9 +845,13 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
-
       if (!selectedElement) return;
       if (selectedElement.Elements.locked) return;
+
+      const element = Client.db.elements.id.find(selectedElement.Elements.id);
+
+      if (!element) return;
+      if (element.locked) return;
 
       handleFlipElement(Client, false, selectedElement!.Elements);
     },
@@ -859,9 +863,13 @@ export const UserInputHandler = (
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
-
       if (!selectedElement) return;
       if (selectedElement.Elements.locked) return;
+
+      const element = Client.db.elements.id.find(selectedElement.Elements.id);
+
+      if (!element) return;
+      if (element.locked) return;
 
       handleFlipElement(Client, true, selectedElement!.Elements);
     },
