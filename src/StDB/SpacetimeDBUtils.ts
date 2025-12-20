@@ -26,7 +26,7 @@ export const getGuestNickname = (Client: DbConnection, identity: Identity) => {
 
 export const getAllEditors = (Client: DbConnection) => {
   const guests: GuestNames[] = Client.db.guestNames.iter() as GuestNames[];
-  const permissions: Permissions[] = Client.db.guests.iter() as Permissions[];
+  const permissions: Permissions[] = Client.db.permissions.iter() as Permissions[];
 
   const editors: Editor[] = [];
 

@@ -36,9 +36,7 @@ export const Overlay = () => {
     if (!spacetimeDB || !spacetimeDB.Client) return;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const layoutParam = urlParams.get("layout");
     const transparent = urlParams.get("transparent");
-    const nickname = urlParams.get("nickname");
 
     SetSubscriptions(spacetimeDB.Client, setSubscriptionsApplied);
 
@@ -47,10 +45,6 @@ export const Overlay = () => {
     if (transparent != null) {
       document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
       document.documentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
-    }
-
-    if (nickname != null) {
-      spacetimeDB.Client.reducers.updateGuestNickname(nickname);
     }
   }, [spacetimeDB, spacetimeDB.Client]);
 
