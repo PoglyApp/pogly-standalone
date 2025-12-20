@@ -29,15 +29,11 @@ public partial class Module
                     return;
             }
             
-            uint maxId = 0;
-            foreach (var i in ctx.Db.Elements.Iter())
-            {
-                if (i.Id > maxId) maxId = i.Id;
-            }
+            var autoInc = ctx.Db.AutoInc.Version.Find(0) ?? MigrateAutoInc(ctx, func);
 
             var newElement = new Elements
             {
-                Id = maxId + 1,
+                Id = autoInc.ElementsIncrement + 1,
                 Element = element,
                 Transparency = transparency,
                 Transform = transform,
@@ -50,6 +46,7 @@ public partial class Module
                 ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
             };
             ctx.Db.Elements.Insert(newElement);
+            IncrementElements(ctx, func);
             
             LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromElement(newElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }
@@ -85,15 +82,11 @@ public partial class Module
                     return;
             }
 
-            uint maxId = 0;
-            foreach (var i in ctx.Db.Elements.Iter())
-            {
-                if (i.Id > maxId) maxId = i.Id;
-            }
-            
+            var autoInc = ctx.Db.AutoInc.Version.Find(0) ?? MigrateAutoInc(ctx, func);
+
             var newElement = new Elements
             {
-                Id = maxId + 1,
+                Id = autoInc.ElementsIncrement + 1,
                 Element = element,
                 Transparency = transparency,
                 Transform = transform,
@@ -106,6 +99,7 @@ public partial class Module
                 ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
             };
             ctx.Db.Elements.Insert(newElement);
+            IncrementElements(ctx, func);
             
             LogAudit(ctx,func,GetEmptyStruct(),GetChangeStructFromElement(newElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }

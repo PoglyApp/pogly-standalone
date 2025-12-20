@@ -61,6 +61,15 @@ public partial class Module
                 Ceiling = 1000000
             });
 
+            ctx.Db.AutoInc.Insert(new AutoInc
+            {
+                Version = 0,
+                FolderIncrement = 0,
+                ElementsIncrement = 0,
+                ElementDataIncrement = 0,
+                LayoutsIncrement = 0,
+            });
+
             ctx.Db.Layouts.Insert(new Layouts
             {
                 Name = "Default",
@@ -104,7 +113,7 @@ public partial class Module
             
             if (authentication && string.IsNullOrEmpty(authKey))
                 throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
-
+            
             try
             {
                 var newConfig = oldConfig.Value;
@@ -120,12 +129,29 @@ public partial class Module
 
                 try
                 {
+                    var configGuest = ctx.Db.Guests.Address.Find(guest.Address);
+                    if (configGuest is not null) ctx.Db.Guests.Address.Update(configGuest.Value with {Authenticated = true});
                     SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
                 }
                 catch (Exception e)
                 {
                     Log.Exception($"[{func}] - Unable to set guest as owner! " + e.Message);
                     throw new Exception($"[{func}] - Unable to set guest as owner!");
+                }
+
+                try
+                {
+                    ctx.Db.GuestNames.Insert(new GuestNames
+                    {
+                        Identity = ctx.Sender,
+                        Nickname = GetJwtUsernameCased(ctx),
+                        StreamingPlatform = GetJwtStreamingPlatform(ctx),
+                        AvatarUrl = GetJwtAvatar(ctx)
+                    });
+                }
+                catch (Exception e)
+                {
+                    Log.Exception($"[{func}] - Unable to add Owner's GuestName! " + e.Message);
                 }
             
                 ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
@@ -393,6 +419,57 @@ public partial class Module
             Log.Error($"[Authenticate] - Unable to update {guest.Nickname} ({guest.Identity.ToString()}) authenticated status for some reason! " + e.Message);
             throw new Exception(
                 $"[Authenticate] - Unable to update {guest.Nickname} ({guest.Identity.ToString()}) authenticated status for some reason!");
+        }
+    }
+
+    [Reducer]
+    public static void SyncAutoInc(ReducerContext ctx)
+    {
+        string func = "SyncAutoInc";
+        
+        if (!IsGuestOwner(func, ctx))
+        {
+            if (ctx.Db.Config.Version.Find(0)!.Value.ConfigInit) return;
+        }
+
+        InternalAutoIncSync(ctx, func);
+    }
+
+    private static void InternalAutoIncSync(ReducerContext ctx, string func)
+    {
+        try
+        {
+            uint maxFolderId = 0;
+            uint maxElementsId = 0;
+            uint maxElementDataId = 0;
+            uint maxLayoutsId = 0;
+            foreach (var f in ctx.Db.Folders.Iter())
+            {
+                if (f.Id > maxFolderId) maxFolderId = f.Id;
+            }
+            foreach (var e in ctx.Db.Elements.Iter())
+            {
+                if (e.Id > maxElementsId) maxElementsId = e.Id;
+            }
+            foreach (var d in ctx.Db.ElementData.Iter())
+            {
+                if (d.Id > maxElementDataId) maxElementDataId = d.Id;
+            }
+            foreach (var l in ctx.Db.Layouts.Iter())
+            {
+                if (l.Id > maxLayoutsId) maxLayoutsId = l.Id;
+            }
+            
+            var autoInc = ctx.Db.AutoInc.Version.Find(0)!.Value;
+            autoInc.FolderIncrement = maxFolderId;
+            autoInc.ElementsIncrement = maxElementsId;
+            autoInc.ElementDataIncrement = maxElementDataId;
+            autoInc.LayoutsIncrement = maxLayoutsId;
+            ctx.Db.AutoInc.Version.Update(autoInc);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Error syncing AutoInc, requested by {ctx.Sender}. " + e.Message);
         }
     }
 }

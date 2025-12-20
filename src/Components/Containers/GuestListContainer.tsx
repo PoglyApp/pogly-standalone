@@ -5,12 +5,14 @@ import { Avatar, Menu } from "@mui/material";
 import { GuestListContextMenu } from "./ContextMenus/GuestListContextMenu";
 import { HandleGuestListContextMenu } from "../../Utility/HandleContextMenu";
 import { DebugLogger } from "../../Utility/DebugLogger";
-import { Config, Guests } from "../../module_bindings";
+import { Config, DbConnection, Guests } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
+import { useAuth } from "react-oidc-context";
 
 export const GuestListContainer = () => {
   const guestStore = useAppSelector((state: any) => state.guests.guests);
   const { spacetimeDB } = useContext(SpacetimeContext);
+  const auth = useAuth();
   const config: Config = spacetimeDB.Client.db.config.version.find(0);
 
   const [displayedGuests, setDisplayedGuests] = useState<Guests[]>([]);
@@ -53,6 +55,7 @@ export const GuestListContainer = () => {
         {displayedGuests.map((guest: Guests) => {
           if ((config.authentication && guest.authenticated) || !config.authentication) {
             if (guest.nickname !== "") {
+              const avatarUrl = (spacetimeDB.Client as DbConnection).db.guestNames.identity.find(guest.identity)?.avatarUrl;
               return (
                 <div
                   key={guest.nickname + guest.color}
@@ -82,7 +85,20 @@ export const GuestListContainer = () => {
                           pointerEvents: "none",
                         }}
                       />
-                    ) : guest.nickname ? (
+                    ) : avatarUrl ? (
+                    <img
+                        src={avatarUrl}
+                        alt={guest.nickname[0]}
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          pointerEvents: "none",
+                        }}
+                      />) : 
+                    guest.nickname ? (
                       guest.nickname[0]
                     ) : (
                       "?"

@@ -31,7 +31,7 @@ import { DebugLogger } from "../Utility/DebugLogger";
 import { useConfigEvents } from "../StDB/Hooks/useConfigEvents";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 import { EditorGuidelineModal } from "../Components/Modals/EditorGuidelineModal";
-import { Config, Elements, Layouts } from "../module_bindings";
+import { Config, Elements, Guests, Layouts } from "../module_bindings";
 import { useNavigate } from "react-router-dom";
 import { PermissionTypes } from "../Types/General/PermissionType";
 import { getPermissions } from "../Utility/PermissionsHelper";
@@ -59,6 +59,8 @@ export const Canvas = () => {
   const [permission, setPermission] = useState<PermissionTypes[]>(
     getPermissions(spacetimeDB, spacetimeDB.Identity.identity)
   );
+
+  const guestStore = useAppSelector((state: any) => state.guests.guests);
 
   const moveableRef = useRef<Moveable>(null);
   const selectoRef = useRef<Selecto>(null);
@@ -152,21 +154,29 @@ export const Canvas = () => {
     spacetimeDB.Client.reducers.updateGuestSelectedElement(0);
   }, [activeLayout, setActiveLayout, spacetimeDB.Client]);
 
-  // Limit how many times cursor event is updated
+  const GUEST_POS_UPDATE_DIVISOR = 4;
   let waitUntil = 0;
 
   const onMouseMove = (event: any) => {
     if (!transformRef.current) return;
 
-    var streamRect = document.getElementById("stream")?.getBoundingClientRect();
-    if (Date.now() < waitUntil || !streamRect) return;
+    const streamRect = document.getElementById("stream")?.getBoundingClientRect();
+    if (!streamRect) return;
 
-    const x = (event.clientX - streamRect.left) / transformRef.current.instance.transformState.scale;
-    const y = (event.clientY - streamRect.top) / transformRef.current.instance.transformState.scale;
+    const effectiveHz = Math.max(1, config.updateHz / GUEST_POS_UPDATE_DIVISOR);
+    const now = Date.now();
+
+    if (now < waitUntil) return;
+
+    if (guestStore.filter((guest: Guests) => guest.authenticated).length <= 1) return;
+
+    const scale = transformRef.current.instance.transformState.scale;
+    const x = (event.clientX - streamRect.left) / scale;
+    const y = (event.clientY - streamRect.top) / scale;
 
     spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
-    waitUntil = Date.now() + 1000 / config.updateHz;
+    waitUntil = now + 1000 / effectiveHz;
   };
 
   if (userDisconnected || spacetimeDB.Disconnected || disconnectedState) {

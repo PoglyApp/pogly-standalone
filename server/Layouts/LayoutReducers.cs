@@ -15,20 +15,17 @@ public partial class Module
 
         try
         {
-            uint maxId = 0;
-            foreach (var i in ctx.Db.Layouts.Iter())
-            {
-                if (i.Id > maxId) maxId = i.Id;
-            }
+            var autoInc = ctx.Db.AutoInc.Version.Find(0) ?? MigrateAutoInc(ctx, func);
 
             var newLayout = new Layouts
             {
-                Id = maxId + 1,
+                Id = autoInc.LayoutsIncrement + 1,
                 Name = name,
                 CreatedBy = guest.Nickname,
                 Active = active
             };
             ctx.Db.Layouts.Insert(newLayout);
+            IncrementLayouts(ctx, func);
             
             //TODO: Add AuditLog() ChangeStruct types and methods for Layouts
             if(ctx.Db.Config.Version.Find(0)!.Value.DebugMode) 
@@ -90,32 +87,23 @@ public partial class Module
 
             if (layout.HasValue)
             {
-                uint newLayoutId = 0;
-                foreach (var i in ctx.Db.Layouts.Iter())
-                {
-                    if (i.Id > newLayoutId) newLayoutId = i.Id;
-                }
-            
+                var autoInc = ctx.Db.AutoInc.Version.Find(0) ?? MigrateAutoInc(ctx, func);
+                var newLayoutId = autoInc.LayoutsIncrement + 1;
                 var newLayout = new Layouts
                 {
-                    Id = newLayoutId + 1,
+                    Id = newLayoutId,
                     Name = layout.Value.Name,
                     CreatedBy = guest.Nickname,
                     Active = false
                 };
 
                 ctx.Db.Layouts.Insert(newLayout);
+                IncrementLayouts(ctx, func);
             
                 var elements = ctx.Db.Elements.Iter().Where(e => e.LayoutId == layoutId);
-            
-                uint maxElementId = 0;
-                foreach (var i in ctx.Db.Elements.Iter())
-                {
-                    if (i.Id > maxElementId) maxElementId = i.Id;
-                }
 
-                uint newIndex = maxElementId + 1;
-
+                uint newIndex = autoInc.ElementsIncrement + 1;
+                
                 foreach (Elements element in elements)
                 {
                     var newElement = new Elements
@@ -126,7 +114,7 @@ public partial class Module
                         Transform = element.Transform,
                         Clip = element.Clip,
                         Locked = false,
-                        LayoutId = newLayoutId + 1,
+                        LayoutId = newLayoutId,
                         FolderId = 0,
                         PlacedBy = guest.Nickname,
                         LastEditedBy = guest.Nickname,
@@ -134,7 +122,7 @@ public partial class Module
                     };
 
                     ctx.Db.Elements.Insert(newElement);
-
+                    IncrementElements(ctx, func);
                     newIndex++;
                 }
             

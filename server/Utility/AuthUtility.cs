@@ -48,6 +48,14 @@ public partial class Module
         
         return GetJwtPayloadProperty(claims, "preferred_username");
     }
+
+    private static string GetJwtAvatar(ReducerContext ctx)
+    {
+        var claims = GetJwtClaims(ctx);
+        VerifyClient(ctx);
+        
+        return GetJwtPayloadProperty(claims, "picture");
+    }
     
     private static void VerifyClient(ReducerContext ctx)
     {

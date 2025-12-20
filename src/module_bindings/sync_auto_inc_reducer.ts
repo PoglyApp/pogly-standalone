@@ -28,45 +28,34 @@ import {
   type TableHandle as __TableHandle,
 } from "spacetimedb";
 
-import { StreamingPlatform } from "./streaming_platform_type";
-// Mark import as potentially unused
-declare type __keep_StreamingPlatform = StreamingPlatform;
-
-export type WhitelistUser = {
-  platform: StreamingPlatform,
-  username: string,
-  permissionSet: number,
-};
-let _cached_WhitelistUser_type_value: __AlgebraicTypeType | null = null;
+export type SyncAutoInc = {};
+let _cached_SyncAutoInc_type_value: __AlgebraicTypeType | null = null;
 
 /**
  * An object for generated helper functions.
  */
-export const WhitelistUser = {
+export const SyncAutoInc = {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    if (_cached_WhitelistUser_type_value) return _cached_WhitelistUser_type_value;
-    _cached_WhitelistUser_type_value = __AlgebraicTypeValue.Product({ elements: [] });
-    _cached_WhitelistUser_type_value.value.elements.push(
-      { name: "platform", algebraicType: StreamingPlatform.getTypeScriptAlgebraicType() },
-      { name: "username", algebraicType: __AlgebraicTypeValue.String },
-      { name: "permissionSet", algebraicType: __AlgebraicTypeValue.U32 },
+    if (_cached_SyncAutoInc_type_value) return _cached_SyncAutoInc_type_value;
+    _cached_SyncAutoInc_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_SyncAutoInc_type_value.value.elements.push(
     );
-    return _cached_WhitelistUser_type_value;
+    return _cached_SyncAutoInc_type_value;
   },
 
-  serialize(writer: __BinaryWriter, value: WhitelistUser): void {
-    __AlgebraicTypeValue.serializeValue(writer, WhitelistUser.getTypeScriptAlgebraicType(), value);
+  serialize(writer: __BinaryWriter, value: SyncAutoInc): void {
+    __AlgebraicTypeValue.serializeValue(writer, SyncAutoInc.getTypeScriptAlgebraicType(), value);
   },
 
-  deserialize(reader: __BinaryReader): WhitelistUser {
-    return __AlgebraicTypeValue.deserializeValue(reader, WhitelistUser.getTypeScriptAlgebraicType());
+  deserialize(reader: __BinaryReader): SyncAutoInc {
+    return __AlgebraicTypeValue.deserializeValue(reader, SyncAutoInc.getTypeScriptAlgebraicType());
   },
 
 }
 
-export default WhitelistUser;
+export default SyncAutoInc;
 

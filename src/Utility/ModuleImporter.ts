@@ -1,5 +1,5 @@
 import type initSqlJs from "sql.js";
-import { DataType } from "../module_bindings";
+import { DataType, DbConnection } from "../module_bindings";
 
 export class PoglyModuleImporter {
   private SQL: Awaited<ReturnType<typeof initSqlJs>>;
@@ -34,6 +34,7 @@ export class PoglyModuleImporter {
     this.importLayouts(client);
     this.importPermissions(client);
     this.importElements(client);
+    (client as DbConnection).reducers.syncAutoInc();
     this.importConfig(client);
   };
 
@@ -41,6 +42,7 @@ export class PoglyModuleImporter {
     this.importElementData(client);
     this.importElements(client);
     this.importLayouts(client);
+    (client as DbConnection).reducers.syncAutoInc();
   };
 
   private importConfig = (client: any) => {

@@ -28,45 +28,46 @@ import {
   type TableHandle as __TableHandle,
 } from "spacetimedb";
 
-import { StreamingPlatform } from "./streaming_platform_type";
-// Mark import as potentially unused
-declare type __keep_StreamingPlatform = StreamingPlatform;
-
-export type WhitelistUser = {
-  platform: StreamingPlatform,
-  username: string,
-  permissionSet: number,
+export type AutoInc = {
+  version: number,
+  folderIncrement: number,
+  elementsIncrement: number,
+  elementDataIncrement: number,
+  layoutsIncrement: number,
 };
-let _cached_WhitelistUser_type_value: __AlgebraicTypeType | null = null;
+let _cached_AutoInc_type_value: __AlgebraicTypeType | null = null;
 
 /**
  * An object for generated helper functions.
  */
-export const WhitelistUser = {
+export const AutoInc = {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   getTypeScriptAlgebraicType(): __AlgebraicTypeType {
-    if (_cached_WhitelistUser_type_value) return _cached_WhitelistUser_type_value;
-    _cached_WhitelistUser_type_value = __AlgebraicTypeValue.Product({ elements: [] });
-    _cached_WhitelistUser_type_value.value.elements.push(
-      { name: "platform", algebraicType: StreamingPlatform.getTypeScriptAlgebraicType() },
-      { name: "username", algebraicType: __AlgebraicTypeValue.String },
-      { name: "permissionSet", algebraicType: __AlgebraicTypeValue.U32 },
+    if (_cached_AutoInc_type_value) return _cached_AutoInc_type_value;
+    _cached_AutoInc_type_value = __AlgebraicTypeValue.Product({ elements: [] });
+    _cached_AutoInc_type_value.value.elements.push(
+      { name: "version", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "folderIncrement", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "elementsIncrement", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "elementDataIncrement", algebraicType: __AlgebraicTypeValue.U32 },
+      { name: "layoutsIncrement", algebraicType: __AlgebraicTypeValue.U32 },
     );
-    return _cached_WhitelistUser_type_value;
+    return _cached_AutoInc_type_value;
   },
 
-  serialize(writer: __BinaryWriter, value: WhitelistUser): void {
-    __AlgebraicTypeValue.serializeValue(writer, WhitelistUser.getTypeScriptAlgebraicType(), value);
+  serialize(writer: __BinaryWriter, value: AutoInc): void {
+    __AlgebraicTypeValue.serializeValue(writer, AutoInc.getTypeScriptAlgebraicType(), value);
   },
 
-  deserialize(reader: __BinaryReader): WhitelistUser {
-    return __AlgebraicTypeValue.deserializeValue(reader, WhitelistUser.getTypeScriptAlgebraicType());
+  deserialize(reader: __BinaryReader): AutoInc {
+    return __AlgebraicTypeValue.deserializeValue(reader, AutoInc.getTypeScriptAlgebraicType());
   },
 
 }
 
-export default WhitelistUser;
+export default AutoInc;
+
 
