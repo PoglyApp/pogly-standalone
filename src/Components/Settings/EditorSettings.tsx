@@ -11,6 +11,7 @@ import { TableRow } from "@mui/material";
 import { TableCell } from "../NewUiComponents/TableCell";
 import { PermissionSets } from "../../module_bindings";
 import { PermissionSettings } from "./PermissionSettings";
+import { usePermissionSetEvents } from "../../StDB/Hooks/usePermissionSetEvents";
 
 enum PermissionTab {
   Editors,
@@ -37,6 +38,8 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
 
   const [selectedEditor, setSelectedEditor] = useState<Editor | null>(null);
   const [selectedRole, setSelectedRole] = useState<PermissionSets | null>(null);
+
+  usePermissionSetEvents(setRoles);
 
   useEffect(() => {
     if (!spacetimeDB) return;
@@ -159,6 +162,7 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
           setEditor={setSelectedEditor}
           setPermissionSet={setSelectedRole}
           showSaveFooter={showSaveFooter}
+          setTabSelected={setTabSelected}
           settingsRef={ref}
         />
       )}

@@ -12,6 +12,7 @@ interface IProps {
   permissionSet: PermissionSets | null;
   setPermissionSet: Function;
   showSaveFooter: Function;
+  setTabSelected: Function;
   settingsRef: any;
 }
 
@@ -68,15 +69,21 @@ export const PermissionSettings = ({
   const handleSave = () => {
     if (roleName.length === 0 || selected.size === 0) return;
 
-    spacetimeDB.Client.reducers.addPermissionSet(roleName, Array.from(selected));
+    if (permissionSet && permissionSet.id) {
+      spacetimeDB.Client.reducers.updatePermissionSet(permissionSet.id, Array.from(selected));
+    } else {
+      spacetimeDB.Client.reducers.addPermissionSet(roleName, Array.from(selected));
+    }
+
+    handleClear();
   };
 
   const handleDelete = () => {
     spacetimeDB.Client.reducers.deletePermissionSet(permissionSet?.id);
-    handleCancel();
+    handleClear();
   };
 
-  const handleCancel = () => {
+  const handleClear = () => {
     setSelected(new Set());
     setRoleName("");
     showSaveFooter(false);
@@ -89,7 +96,7 @@ export const PermissionSettings = ({
       handleSave();
     },
     cancel() {
-      handleCancel();
+      handleClear();
     },
     delete() {
       handleDelete();

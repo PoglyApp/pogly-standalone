@@ -18,7 +18,7 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       {
         id: 1,
         label: "connect",
-        description: "lets user connect to the module.",
+        description: "allows user connect to the module.",
       },
     ],
   },
