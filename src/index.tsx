@@ -4,13 +4,19 @@ import "./index.css";
 import "unfonts.css";
 import { Provider } from "react-redux";
 import { store } from "./Store/Features/store";
+import { AuthProvider } from "react-oidc-context";
+import { oidcConfig, oidcEnabled, onSigninCallback } from "./Auth/oidc";
 
-//TODO: Dynamic oidc context either set oidc or use local stdb as issuer
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
 root.render(
-    <Provider store={store}>
+  <Provider store={store}>
+    {oidcEnabled ? (
+      <AuthProvider {...oidcConfig} onSigninCallback={onSigninCallback}>
+        <App />
+      </AuthProvider>
+    ) : (
       <App />
-    </Provider>
+    )}
+  </Provider>
 );
