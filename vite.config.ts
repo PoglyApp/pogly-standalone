@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
 });
 
 function setEnv(mode: string) {
-  Object.assign(process.env, loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]));
+  Object.assign(process.env, loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL", "OIDC_"]));
   process.env.NODE_ENV ||= mode;
   const { homepage } = JSON.parse(readFileSync("package.json", "utf-8"));
   process.env.PUBLIC_URL ||= homepage
@@ -51,7 +51,7 @@ function envPlugin(): Plugin {
   return {
     name: "env-plugin",
     config(_, { mode }) {
-      const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]);
+      const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL", "OIDC_"]);
       return {
         define: Object.fromEntries(
           Object.entries(env).map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
@@ -165,7 +165,7 @@ function importPrefixPlugin(): Plugin {
 // Migration guide: Follow the guide below, you may need to rename your environment variable to a name that begins with VITE_ instead of REACT_APP_
 // https://vitejs.dev/guide/env-and-mode.html#html-env-replacement
 function htmlPlugin(mode: string): Plugin {
-  const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL"]);
+  const env = loadEnv(mode, ".", ["REACT_APP_", "NODE_ENV", "PUBLIC_URL", "OIDC_"]);
   return {
     name: "html-plugin",
     transformIndexHtml: {
