@@ -5,7 +5,6 @@ import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
 import HintBubble from "../../../Components/General/HintBubble";
-import { useAuth } from "react-oidc-context";
 
 interface IProp {
   setInstanceSettings: Function;
@@ -14,28 +13,29 @@ interface IProp {
 }
 
 export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
-  const auth = useAuth();
+  const isOverlay: Boolean = window.location.href.includes("/overlay");
+  const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
+  const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
+  const [loginMethodThemeColor, setLoginMethodThemeColor] = useState<string>("#7e97a5");
+  const [signoutModalVisible, setSignoutModalVisible] = useState<boolean>(false);
 
+  const [guestNickname, setGuestNickname] = useState<string>(localStorage.getItem("nickname") || "");
+  const [stdbToken, setStdbToken] = useState<string>(localStorage.getItem("stdb-token") || "");
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
   const [domain, setDomain] = useState<string>("wss://maincloud.spacetimedb.com");
-  const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
-  const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
-  const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
-  const [subtitle, setSubtitle] = useState<string>("");
-
-  const [isGuestLogin, setIsGuestLogin] = useState<boolean>(false);
-  const [guestNickname, setGuestNickname] = useState<string>("");
-  const [hasCustomNickname, setHasCustomNickname] = useState<boolean>(false);
-  const [loginMethodThemeColor, setLoginMethodThemeColor] = useState<string>("#7e97a5");
 
   const nicknameFieldRef = useRef<HTMLInputElement>(null);
   const domainRef = useRef<HTMLSelectElement>(null);
 
-  const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
-
   useEffect(() => {
+    if (guestNickname === "") {
+      const newNick = "Guest" + String(Math.floor(Math.random() * 100000)).padStart(5, "0");
+      setGuestNickname(newNick);
+      localStorage.setItem("nickname",newNick);
+    };
+
     const modules = localStorage.getItem("poglyQuickSwap");
     if (modules) setQuickSwapModules(JSON.parse(modules));
 
@@ -49,57 +49,17 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     }
   }, []);
 
-  useEffect(() => {
-    if (auth.isAuthenticated && auth.user) {
-      const preferred =
-        (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub || "";
-
-      if (auth.user.profile) {
-        const currentTime = Date.now() / 1000;
-        if (auth.user.profile.exp < currentTime) {
-          console.warn("ID token has expired...");
-          return;
-        }
-      }
-
-      const loginMethod = (auth.user?.profile as any)?.login_method;
-
-      switch (loginMethod) {
-        case "guest":
-          // Chippy said no to guest login :cute_smile_cat_meme:
-          break;
-
-        case "twitch":
-          setLoginMethodThemeColor("#9146FF");
-          break;
-
-        case "kick":
-          setLoginMethodThemeColor("#53fc18");
-          break;
-
-        case "google":
-          setLoginMethodThemeColor("#FF0000");
-          break;
-      }
-
-      setSubtitle(loginMethod);
-      setNickname(preferred);
-      setGuestNickname(preferred);
-    }
-  }, [auth.isAuthenticated, auth.user, setNickname]);
-
   const handleConnect = () => {
     saveQuickSwap();
 
     setNickname(guestNickname);
-    setHasCustomNickname(true);
 
     localStorage.setItem("stdbConnectDomain", domain);
     localStorage.setItem("stdbConnectModule", moduleName);
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
     setInstanceSettings({
-      token: auth.user?.id_token ?? undefined,
+      token: localStorage.getItem("stdb-token") ?? undefined,
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -189,8 +149,23 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     const newNickname = value.target.value;
 
     if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
+    localStorage.setItem("nickname", newNickname);
     setGuestNickname(newNickname);
-    setHasCustomNickname(true);
+  };
+
+  const handleStartSignout = () => {
+    setSignoutModalVisible(true);
+  }
+
+  const handleCompleteSignout = () => {
+    localStorage.removeItem("stdb-token");
+    localStorage.removeItem("nickname");
+    setSignoutModalVisible(false);
+    window.location.reload();
+  }
+
+  const handleCancelSignout = () => {
+    setSignoutModalVisible(false);
   };
 
   if (isOverlay) return <></>;
@@ -199,38 +174,43 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyLogo />
 
-      {!auth.isLoading && !auth.isAuthenticated && (
-        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-2">
-          <StyledButton
-            className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
-            onClick={() => {
-              auth.signinRedirect();
-              setSubtitle("SpacetimeAuth");
-            }}
-          >
-            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
-            <span>login with SpacetimeAuth</span>
-          </StyledButton>
-          <a
-            href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/authentication.md"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[10px] text-[#82a5ff]"
-          >
-            What is SpacetimeAuth?
-          </a>
+      {signoutModalVisible && (
+        <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-3 w-full max-w-[500px]">
+          <div className="text-center text-white">
+            WARNING: You are about to delete your token. If you have not backed this up from localstorage, your identity will be lost forever!
+          </div>
+
+          <div className="flex flex-row items-center justify-center gap-2">
+            <StyledButton
+              className="flex justify-self-center bg-green-600! border border-transparent text-white! hover:border-green-300!"
+              onClick={() => {
+                handleCancelSignout();
+              }}
+            >
+              <span>Cancel</span>
+            </StyledButton>
+
+            <StyledButton
+              className="flex justify-self-center bg-red-600! border border-transparent text-white! hover:border-red-300!"
+              onClick={() => {
+                handleCompleteSignout();
+              }}
+            >
+              <span>Yes, clear my token and nickname</span>
+            </StyledButton>
+          </div>
         </div>
       )}
 
       <div className="flex justify-center z-10 mt-8">
         <Container
-          title={!auth.isAuthenticated ? "login" : "connect"}
-          subTitle={subtitle}
+          title="connect"
+          subTitle=""
           className="relative w-[400px]"
         >
           <div
             className={`flex flex-col justify-between h-full px-6 pt-8 pb-4 transition-all duration-300 ${
-              !auth.isAuthenticated || isRedirecting ? "blur-sm pointer-events-none select-none" : ""
+              signoutModalVisible ? "blur-sm pointer-events-none select-none" : ""
             }`}
           >
             <div className="flex flex-col gap-3">
@@ -238,14 +218,13 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
                 logged in as
                 <HintBubble
                   hint="change nickname"
-                  className={!isGuestLogin || hasCustomNickname ? "hidden" : ""}
+                  className={guestNickname.includes("Guest") ? "" : "hidden"}
                   style={{ left: "50px" }}
                 >
                   <input
                     ref={nicknameFieldRef}
                     type="text"
                     defaultValue={guestNickname}
-                    disabled={!isGuestLogin}
                     className={` ml-2 truncate bg-transparent outline-none w-auto max-w-[200px]`}
                     onBlur={handleUpdateNickname}
                     style={{ color: loginMethodThemeColor }}
@@ -315,10 +294,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
             </div>
 
             <div className="flex justify-end gap-2">
-              {auth.isAuthenticated && (
+              {stdbToken !== "" && (
                 <StyledButton
                   className="absolute left-5"
-                  onClick={() => auth.signoutRedirect()}
+                  onClick={() => handleStartSignout()}
                   logintheme={loginMethodThemeColor}
                 >
                   logout

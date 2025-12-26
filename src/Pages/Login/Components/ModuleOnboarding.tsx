@@ -7,7 +7,6 @@ import { UploadBackupFromFile, UploadElementDataFromString } from "../../../Util
 import { useGetDefaultElements } from "../../../Hooks/useGetDefaultElements";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "react-oidc-context";
 
 interface IProps {
   legacyLogin: boolean;
@@ -24,10 +23,8 @@ const steps = [
 ];
 
 export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: IProps) => {
-  // Just to display debug box of doom
   const debug: boolean = false;
 
-  const auth = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<number>(0);

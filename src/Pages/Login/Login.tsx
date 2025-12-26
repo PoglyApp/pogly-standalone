@@ -12,12 +12,10 @@ import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ConnectionContainer } from "./Components/ConnectionContainer";
 import { ModuleOnboarding } from "./Components/ModuleOnboarding";
 import { getActiveLayout } from "../../StDB/SpacetimeDBUtils";
-import { useAuth } from "react-oidc-context";
 
 export const Login = () => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const navigate = useNavigate();
-  const auth = useAuth();
 
   const { connectionConfig, setConnectionConfig } = useContext(ConfigContext);
   const { setActiveLayout } = useContext(LayoutContext);
@@ -32,9 +30,7 @@ export const Login = () => {
 
   const stdbAuthenticatedRef = useRef<boolean>(false);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
-  const [nickname, setNickname] = useState<string | null>(
-    (auth.user?.profile as any)?.preferred_username || auth.user?.profile?.name || auth.user?.profile?.sub || ""
-  );
+  const [nickname, setNickname] = useState<string>(localStorage.getItem("nickname") || "");
   const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
@@ -50,18 +46,8 @@ export const Login = () => {
 
   useEffect(() => {
     if(isOverlay) return;
-    const exp = (auth.user?.profile as any)?.exp;
-    const now = Math.floor(Date.now() / 1000);
-    if (typeof exp === "number" && exp <= now) {
-      auth.removeUser();
-      navigate("/login", { replace: true });
-    }
-  }, [auth.user]);
-
-  useEffect(() => {
-    if(isOverlay) return;
     if (spacetime.TokenExpired) {
-      auth.removeUser();
+      localStorage.removeItem("stdb-token");
       navigate("/login", { replace: true });
     }
   }, [spacetime.TokenExpired]);
@@ -81,14 +67,16 @@ export const Login = () => {
 
     let preferred = "";
 
-    if (auth.user) {
-      preferred = (auth.user.profile as any)?.preferred_username || auth.user.profile?.name || auth.user.profile?.sub;
+    if (nickname !== "") {
+      preferred = nickname;
     } else {
-      preferred = nickname || "";
+      preferred = "Guest" + String(Math.floor(Math.random() * 100000)).padStart(5, "0");
     }
+
 
     spacetime.Client.reducers.updateGuestNickname(preferred);
     setNickname(preferred);
+    localStorage.setItem("nickname", preferred);
 
     setActiveLayout(getActiveLayout(spacetime.Client));
 
@@ -125,17 +113,6 @@ export const Login = () => {
         contentText="You need to re-authenticate through the login page."
         clearSettings={true}
         redirectBackToLogin={true}
-      />
-    );
-  }
-
-  // Step 0) Check if we are OAuthed
-  if (!auth.isLoading && !auth.isAuthenticated) {
-    return (
-      <ConnectionContainer
-        setInstanceSettings={setConnectionConfig}
-        setNickname={setNickname}
-        setLegacyLogin={setLegacyLogin}
       />
     );
   }

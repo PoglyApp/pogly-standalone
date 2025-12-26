@@ -5,7 +5,6 @@ import { Config, DbConnection, ErrorContext, RemoteReducers, RemoteTables, SetRe
 import { DebugLogger } from "../Utility/DebugLogger";
 import { StopHeartbeat } from "../Utility/PingHeartbeat";
 import { SetStdbConnected } from "../Utility/SetStdbConnected";
-import { useAuth } from "react-oidc-context";
 import { SpacetimeContext } from "../Contexts/SpacetimeContext";
 
 const useStDB = (
@@ -14,7 +13,6 @@ const useStDB = (
   setInstanceConfigured?: Function,
   setStdbAuthenticated?: Function
 ) => {
-  const auth = useAuth();
   const { setSpacetimeDB } = useContext(SpacetimeContext);
 
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -37,8 +35,8 @@ const useStDB = (
 
     let stdbToken = "";
     if (!isOverlay) {
-      if (auth.isLoading || !auth.isAuthenticated || !auth.user?.id_token) return;
-      stdbToken = auth.user.id_token;
+//TODO: some stuff about token
+      stdbToken = localStorage.getItem("stdb-token") || "";
     }
 
     let modulename = connectionConfig?.module.replace("_", "-").toLocaleLowerCase() || "";
@@ -55,6 +53,7 @@ const useStDB = (
       try {
         setIdentity(identity);
         setClient(DbCtx);
+        if (!isOverlay) localStorage.setItem("stdb-token", token);
         console.log("Connected to StDB! [" + identity.toHexString() + "] @ [" + DbCtx.connectionId.toHexString() + "]");
 
         DbCtx.subscriptionBuilder()
@@ -123,9 +122,6 @@ const useStDB = (
     setStdbConnected,
     setStdbAuthenticated,
     error,
-    auth.isLoading,
-    auth.isAuthenticated,
-    auth.user?.id_token,
   ]);
 
   return {

@@ -19,7 +19,6 @@ import { UploadElementDataFromString } from "../../Utility/UploadElementData";
 import { useGetDefaultElements } from "../../Hooks/useGetDefaultElements";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import { Config, DbConnection, ElementData } from "../../module_bindings";
-import { useAuth } from "react-oidc-context";
 import { getElementDataByID } from "../../StDB/SpacetimeDBUtils";
 
 interface IProp {
@@ -30,7 +29,6 @@ interface IProp {
 }
 
 export const InitialSetupModal = (props: IProp) => {
-  const auth = useAuth();
   const [platform, setPlatform] = useState<string>(props.config.streamingPlatform);
   const [channel, setChannel] = useState<string>(props.config.streamName);
   const [debug, setDebug] = useState<boolean>(props.config.debugMode);
