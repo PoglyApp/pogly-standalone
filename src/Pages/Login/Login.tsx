@@ -31,7 +31,6 @@ export const Login = () => {
   const stdbAuthenticatedRef = useRef<boolean>(false);
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
   const [nickname, setNickname] = useState<string>(localStorage.getItem("nickname") || "");
-  const [legacyLogin, setLegacyLogin] = useState<boolean>(false);
 
   const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
 
@@ -124,7 +123,6 @@ export const Login = () => {
       <ConnectionContainer
         setInstanceSettings={setConnectionConfig}
         setNickname={setNickname}
-        setLegacyLogin={setLegacyLogin}
       />
     );
   }
@@ -294,7 +292,7 @@ export const Login = () => {
   // Step 8) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     DebugLogger("Pogly Instance is not configured");
-    return <ModuleOnboarding legacyLogin={legacyLogin} connectionConfig={connectionConfig} spacetime={spacetime} />;
+    return <ModuleOnboarding connectionConfig={connectionConfig} spacetime={spacetime} />;
   }
 
   navigate("/canvas", { replace: true });

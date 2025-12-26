@@ -9,10 +9,9 @@ import HintBubble from "../../../Components/General/HintBubble";
 interface IProp {
   setInstanceSettings: Function;
   setNickname: Function;
-  setLegacyLogin: Function;
 }
 
-export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegacyLogin }: IProp) => {
+export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
