@@ -95,8 +95,6 @@ const useStDB = (
       .onDisconnect(onDisconnect)
       .build();
 
-    client.db.heartbeat.id.find(0);
-
     const onSubscriptionsApplied = (
       ctx: SubscriptionEventContextInterface<RemoteTables, RemoteReducers, SetReducerFlags>
     ) => {
