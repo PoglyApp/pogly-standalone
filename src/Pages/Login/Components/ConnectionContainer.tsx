@@ -248,6 +248,7 @@ const ConnectionContainerInner = ({ setInstanceSettings, setNickname, oidc }: IP
               <span>Yes, clear my token and nickname</span>
             </StyledButton>
           </div>
+          <br />
         </div>
       )}
 
