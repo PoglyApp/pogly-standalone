@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
       basePlugin(),
       importPrefixPlugin(),
       htmlPlugin(mode),
+      multiHtmlEntrypointsPlugin(),
       tailwindcss(),
       Unfonts({
         custom: {
@@ -173,6 +174,25 @@ function htmlPlugin(mode: string): Plugin {
       handler(html) {
         return html.replace(/%(.*?)%/g, (match, p1) => env[p1] ?? match);
       },
+    },
+  };
+}
+
+// Build both index.html and silent-oidc-renew.html as HTML entrypoints
+function multiHtmlEntrypointsPlugin(): Plugin {
+  return {
+    name: "multi-html-entrypoints-plugin",
+    config() {
+      return {
+        build: {
+          rollupOptions: {
+            input: {
+              main: resolve("index.html"),
+              silent: resolve("silent-oidc-renew.html"),
+            },
+          },
+        },
+      };
     },
   };
 }
