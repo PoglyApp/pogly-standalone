@@ -32,14 +32,21 @@ export const App: React.FC = () => {
 
   // CONFIGS
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigType | undefined>(undefined);
-  const [settings, setSettings] = useState<any>(
-    JSON.parse(localStorage.getItem("settings")!) || {
-      debug: false,
-      cursorName: true,
-      compressUpload: true,
-      compressPaste: true,
+  const defaultSettings = {
+    debug: false,
+    cursorName: true,
+    compressUpload: true,
+    compressPaste: true,
+  };
+  const [settings, setSettings] = useState<any>(() => {
+    const raw = localStorage.getItem("settings");
+    if (!raw) return defaultSettings;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return defaultSettings;
     }
-  );
+  });
 
   useGetConnectionConfig(setConnectionConfig);
 

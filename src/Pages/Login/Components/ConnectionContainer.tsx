@@ -1,17 +1,29 @@
-import { ChevronDown, SaveIcon, UserRound, Trash } from "lucide-react";
+import { ChevronDown, SaveIcon, Trash } from "lucide-react";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { PoglyLogo } from "../../../Components/General/PoglyLogo";
 import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { Container } from "../../../Components/General/Container";
 import HintBubble from "../../../Components/General/HintBubble";
+import { oidcEnabled } from "../../../Auth/oidc";
+import { useAuth } from "react-oidc-context";
 
 interface IProp {
   setInstanceSettings: Function;
   setNickname: Function;
 }
 
-export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp) => {
+export const ConnectionContainer = (props: IProp) => {
+  if (!oidcEnabled) return <ConnectionContainerInner {...props} oidc={null} />;
+  return <ConnectionContainerWithOidc {...props} />;
+};
+
+const ConnectionContainerWithOidc = (props: IProp) => {
+  const auth = useAuth();
+  return <ConnectionContainerInner {...props} oidc={auth} />;
+};
+
+const ConnectionContainerInner = ({ setInstanceSettings, setNickname, oidc }: IProp & { oidc: any }) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
   const [quickSwapSelected, setQuickSwapSelected] = useState<QuickSwapType | null>(null);
@@ -28,22 +40,24 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
   const nicknameFieldRef = useRef<HTMLInputElement>(null);
   const domainRef = useRef<HTMLSelectElement>(null);
 
+  const oidcBlocking = !!oidc && (oidc.isLoading || !oidc.isAuthenticated);
+
   useEffect(() => {
     if (guestNickname === "") {
       const newNick = "Guest" + String(Math.floor(Math.random() * 100000)).padStart(5, "0");
       setGuestNickname(newNick);
-      localStorage.setItem("nickname",newNick);
-    };
+      localStorage.setItem("nickname", newNick);
+    }
 
     const modules = localStorage.getItem("poglyQuickSwap");
     if (modules) setQuickSwapModules(JSON.parse(modules));
 
     const urlParams = new URLSearchParams(window.location.search);
-    const domain = urlParams.get("domain");
+    const domainParam = urlParams.get("domain");
 
-    if (domain) {
+    if (domainParam) {
       setCustomDomain(true);
-      setDomain(domain);
+      setDomain(domainParam);
       if (domainRef.current) domainRef.current.value = "Custom";
     }
   }, []);
@@ -58,7 +72,7 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
     localStorage.setItem("stdbConnectModuleAuthKey", authKey);
 
     setInstanceSettings({
-      token: localStorage.getItem("stdb-token") ?? undefined,
+      token: oidc ? undefined : (localStorage.getItem("stdb-token") ?? undefined),
       domain: domain,
       module: moduleName,
       authKey: authKey,
@@ -74,13 +88,13 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
       const modules: QuickSwapType[] = JSON.parse(quickSwap);
 
       if (!moduleName) {
-        const filteredModules = modules.filter((module: QuickSwapType) => module.module !== quickSwapSelected?.module);
+        const filteredModules = modules.filter((m: QuickSwapType) => m.module !== quickSwapSelected?.module);
         setQuickSwapModules(filteredModules);
         setQuickSwapSelected(null);
         return localStorage.setItem("poglyQuickSwap", JSON.stringify(filteredModules));
       }
 
-      const isModuleAlreadySaved = modules.findIndex((module: QuickSwapType) => module.module === moduleName);
+      const isModuleAlreadySaved = modules.findIndex((m: QuickSwapType) => m.module === moduleName);
 
       if (isModuleAlreadySaved !== -1) {
         modules[isModuleAlreadySaved] = newConnection;
@@ -147,24 +161,40 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
   const handleUpdateNickname = (value: any) => {
     const newNickname = value.target.value;
 
-    if (newNickname === "") return (nicknameFieldRef.current!.value = guestNickname);
+    if (newNickname === "") {
+      if (nicknameFieldRef.current) {
+        nicknameFieldRef.current.value = guestNickname;
+      }
+      return;
+    }
+
     localStorage.setItem("nickname", newNickname);
     setGuestNickname(newNickname);
   };
 
   const handleStartSignout = () => {
     setSignoutModalVisible(true);
-  }
+  };
 
   const handleCompleteSignout = () => {
     localStorage.removeItem("stdb-token");
     localStorage.removeItem("nickname");
     setSignoutModalVisible(false);
     window.location.reload();
-  }
+  };
 
   const handleCancelSignout = () => {
     setSignoutModalVisible(false);
+  };
+
+  const handleOidcSignin = async () => {
+    if (!oidc) return;
+    await oidc.signinRedirect();
+  };
+
+  const handleOidcSignout = async () => {
+    if (!oidc) return;
+    await oidc.signoutRedirect();
   };
 
   if (isOverlay) return <></>;
@@ -172,6 +202,30 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
   return (
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyLogo />
+
+      {oidcBlocking && (
+        <div className="absolute z-30 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-4 rounded-lg shadow-lg mt-45 gap-3 w-full max-w-[500px]">
+          <div className="text-center text-white">
+            This Pogly instance requires OIDC sign-in before connecting.
+          </div>
+
+          {oidc?.error && (
+            <div className="text-center text-red-300">
+              OIDC error: {oidc.error.message}
+            </div>
+          )}
+
+          <div className="flex flex-row items-center justify-center gap-2">
+            <StyledButton
+              className="flex justify-self-center bg-[#060606] border border-transparent text-white hover:border-[#82a5ff]"
+              onClick={handleOidcSignin}
+              disabled={oidc?.isLoading}
+            >
+              <span>{oidc?.isLoading ? "loading..." : "sign in"}</span>
+            </StyledButton>
+          </div>
+        </div>
+      )}
 
       {signoutModalVisible && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-3 w-full max-w-[500px]">
@@ -182,18 +236,14 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
           <div className="flex flex-row items-center justify-center gap-2">
             <StyledButton
               className="flex justify-self-center bg-green-600! border border-transparent text-white! hover:border-green-300!"
-              onClick={() => {
-                handleCancelSignout();
-              }}
+              onClick={handleCancelSignout}
             >
               <span>Cancel</span>
             </StyledButton>
 
             <StyledButton
               className="flex justify-self-center bg-red-600! border border-transparent text-white! hover:border-red-300!"
-              onClick={() => {
-                handleCompleteSignout();
-              }}
+              onClick={handleCompleteSignout}
             >
               <span>Yes, clear my token and nickname</span>
             </StyledButton>
@@ -202,14 +252,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
       )}
 
       <div className="flex justify-center z-10 mt-8">
-        <Container
-          title="connect"
-          subTitle=""
-          className="relative w-[400px]"
-        >
+        <Container title="connect" subTitle="" className="relative w-[400px]">
           <div
             className={`flex flex-col justify-between h-full px-6 pt-8 pb-4 transition-all duration-300 ${
-              signoutModalVisible ? "blur-sm pointer-events-none select-none" : ""
+              signoutModalVisible || oidcBlocking ? "blur-sm pointer-events-none select-none" : ""
             }`}
           >
             <div className="flex flex-col gap-3">
@@ -263,9 +309,9 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
                     disabled={quickSwapModules.length === 0}
                   >
                     <option value="select">{quickSwapModules.length === 0 ? "no connections saved" : "select"}</option>
-                    {quickSwapModules.map((module) => (
-                      <option key={module.module} value={module.module}>
-                        {module.module}
+                    {quickSwapModules.map((m) => (
+                      <option key={m.module} value={m.module}>
+                        {m.module}
                       </option>
                     ))}
                   </StyledSelect>
@@ -293,10 +339,20 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname }: IProp)
             </div>
 
             <div className="flex justify-end gap-2">
-              {stdbToken !== "" && (
+              {!oidcEnabled && stdbToken !== "" && (
                 <StyledButton
                   className="absolute left-5"
-                  onClick={() => handleStartSignout()}
+                  onClick={handleStartSignout}
+                  logintheme={loginMethodThemeColor}
+                >
+                  logout
+                </StyledButton>
+              )}
+
+              {oidcEnabled && oidc?.isAuthenticated && (
+                <StyledButton
+                  className="absolute left-5"
+                  onClick={handleOidcSignout}
                   logintheme={loginMethodThemeColor}
                 >
                   logout

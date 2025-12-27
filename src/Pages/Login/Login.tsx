@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { DebugLogger } from "../../Utility/DebugLogger";
 import useStDB from "../../StDB/useStDB";
-import { Guests, Layouts } from "../../module_bindings";
+import { Guests } from "../../module_bindings";
 import { SpacetimeContext } from "../../Contexts/SpacetimeContext";
 import { ErrorRefreshModal } from "../../Components/Modals/ErrorRefreshModal";
 import { Loading } from "../../Components/General/Loading";
@@ -12,8 +12,22 @@ import { ConfigContext } from "../../Contexts/ConfigContext";
 import { ConnectionContainer } from "./Components/ConnectionContainer";
 import { ModuleOnboarding } from "./Components/ModuleOnboarding";
 import { getActiveLayout } from "../../StDB/SpacetimeDBUtils";
+import { oidcEnabled } from "../../Auth/oidc";
+import { useAuth } from "react-oidc-context";
 
 export const Login = () => {
+  if (!oidcEnabled) return <LoginInner oidcIdToken={undefined} oidcAuth={null} />;
+  return <LoginWithOidc />;
+};
+
+const LoginWithOidc = () => {
+  const auth = useAuth();
+  const idToken = auth.user?.id_token;
+
+  return <LoginInner oidcIdToken={idToken} oidcAuth={auth} />;
+};
+
+const LoginInner = ({ oidcIdToken, oidcAuth }: { oidcIdToken?: string; oidcAuth: any }) => {
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const navigate = useNavigate();
 
@@ -21,7 +35,6 @@ export const Login = () => {
   const { setActiveLayout } = useContext(LayoutContext);
   const { spacetimeDB, setSpacetimeDB } = useContext(SpacetimeContext);
 
-  // STDB
   const [stdbConnected, setStdbConnected] = useState<boolean>(false);
   const [stdbAuthenticated, setStdbAuthenticated] = useState<boolean>(false);
   const [stdbAuthTimeout, setStdbAuthTimeout] = useState<boolean>(false);
@@ -32,7 +45,17 @@ export const Login = () => {
   const [instanceConfigured, setInstanceConfigured] = useState<boolean>(false);
   const [nickname, setNickname] = useState<string>(localStorage.getItem("nickname") || "");
 
-  const spacetime = useStDB(connectionConfig, setStdbConnected, setInstanceConfigured, setStdbAuthenticated);
+  const oidcReady = !oidcEnabled || (typeof oidcIdToken === "string" && oidcIdToken.trim().length > 0);
+
+  const connectionConfigForStdb = oidcReady ? connectionConfig : undefined;
+
+  const spacetime = useStDB(
+    connectionConfigForStdb,
+    setStdbConnected,
+    setInstanceConfigured,
+    setStdbAuthenticated,
+    oidcReady ? oidcIdToken : undefined
+  );
 
   const location = useLocation();
   const from = location.state?.from?.pathname;
@@ -44,9 +67,12 @@ export const Login = () => {
   }, [spacetimeDB]);
 
   useEffect(() => {
-    if(isOverlay) return;
+    if (isOverlay) return;
+
     if (spacetime.TokenExpired) {
-      localStorage.removeItem("stdb-token");
+      if (!oidcEnabled) {
+        localStorage.removeItem("stdb-token");
+      }
       navigate("/login", { replace: true });
     }
   }, [spacetime.TokenExpired]);
@@ -72,14 +98,12 @@ export const Login = () => {
       preferred = "Guest" + String(Math.floor(Math.random() * 100000)).padStart(5, "0");
     }
 
-
     spacetime.Client.reducers.updateGuestNickname(preferred);
     setNickname(preferred);
     localStorage.setItem("nickname", preferred);
 
     setActiveLayout(getActiveLayout(spacetime.Client));
 
-    // Local cache has not updated with the nickname at this point yet, hence the guestWithNickname
     const guest = spacetime.Client.db.guests.address.find(spacetime.Client.connectionId);
     const guestWithNickname: Guests = { ...guest, nickname: preferred } as Guests;
 
@@ -103,31 +127,57 @@ export const Login = () => {
     stdbAuthenticatedRef.current = stdbAuthenticated;
   }, [stdbAuthenticated]);
 
+  if (oidcEnabled && !oidcReady && !isOverlay) {
+    if (oidcAuth?.isLoading) return <Loading text="Loading sign-in..." loadingStuckText={true} />;
+
+    if (oidcAuth?.error) {
+      return (
+        <ErrorRefreshModal
+          type="button"
+          buttonText="Retry Sign In"
+          titleText="OIDC Error"
+          contentText={oidcAuth.error.message}
+          clearSettings={false}
+        />
+      );
+    }
+
+    return (
+      <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
+        <div className="flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 rounded-lg shadow-lg gap-3 w-full max-w-[500px]">
+          <div className="text-center text-white">
+            This Pogly instance requires OIDC sign-in before connecting.
+          </div>
+
+          <button
+            className="bg-[#060606] text-white px-4 py-2 rounded-md border border-transparent hover:border-[#82a5ff]"
+            onClick={() => oidcAuth?.signinRedirect()}
+          >
+            sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (spacetime.TokenExpired) {
     return (
       <ErrorRefreshModal
         type="button"
-        buttonText="Reload"
+        buttonText={oidcEnabled ? "Sign In" : "Reload"}
         titleText="Authentication token has expired!"
-        contentText="You need to re-authenticate through the login page."
-        clearSettings={true}
+        contentText={oidcEnabled ? "Sign in again to continue." : "You need to re-authenticate through the login page."}
+        clearSettings={!oidcEnabled}
         redirectBackToLogin={true}
       />
     );
   }
 
-  // Step 1) Are connection settings configured?
   if (!connectionConfig) {
     DebugLogger("Connection config not configured");
-    return (
-      <ConnectionContainer
-        setInstanceSettings={setConnectionConfig}
-        setNickname={setNickname}
-      />
-    );
+    return <ConnectionContainer setInstanceSettings={setConnectionConfig} setNickname={setNickname} />;
   }
 
-  // Step 2) Check that spacetime properties got initialized properly, avoid null exceptions
   if (!spacetime.Client) {
     DebugLogger("Waiting for SpacetimeDB client");
     if (spacetime.Error) {
@@ -198,7 +248,6 @@ export const Login = () => {
     return <Loading text="Loading Configuration" loadingStuckText={true} />;
   }
 
-  // Step 3) Are we connected to SpacetimeDB?
   if (!stdbConnected) {
     DebugLogger("Waiting for SpacetimeDB connection");
     if (spacetime.Error) {
@@ -239,7 +288,6 @@ export const Login = () => {
     return <Loading text="Connecting to Instance" loadingStuckText={true} />;
   }
 
-  // Step 4) If Authentication is required, are we Authenticated?
   if (!isOverlay && spacetime.InstanceConfig.authentication) {
     DebugLogger("Is guest authenticated");
     if (stdbAuthTimeout) {
@@ -271,14 +319,12 @@ export const Login = () => {
     if (timeout) clearTimeout(timeout);
   }
 
-  // Step 5) Redo final subscriptions ONLY ONCE && Start client heartbeat
   if (!stdbInitialized) {
     DebugLogger("Starting Client->Server heartbeat!");
     DebugLogger("Redoing subscriptions");
     SetSubscriptions(spacetime.Client, setStdbSubscriptions, setStdbInitialized);
   }
 
-  // Step 6) Is SpacetimeDB fully initialized?
   if (!stdbSubscriptions) {
     DebugLogger("Waiting for subscriptions");
     return <Loading text="Loading data..." />;
@@ -289,7 +335,6 @@ export const Login = () => {
     return <Loading text="Loading Canvas" />;
   }
 
-  // Step 8) Has the Pogly Instance been configured?
   if (!instanceConfigured) {
     DebugLogger("Pogly Instance is not configured");
     return <ModuleOnboarding connectionConfig={connectionConfig} spacetime={spacetime} />;
