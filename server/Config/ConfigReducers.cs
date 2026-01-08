@@ -27,7 +27,9 @@ public partial class Module
                 Authentication = false,
                 StrictMode = false,
                 EditorGuidelines = "Placeholder: Follow Twitch ToS :^)",
-                ConfigInit = false
+                ConfigInit = false,
+                OidcIssuer = "",
+                OidcAudience = ""
             });
 
             int length = 12;
@@ -70,14 +72,11 @@ public partial class Module
     }
 
     [Reducer]
-    public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz, 
-        uint editorBorder, bool authentication, bool strictMode, string authKey="")
+    public static void SetConfig(ReducerContext ctx, string platform, string channel, bool debug, uint updateHz,
+        uint editorBorder, bool authentication, bool strictMode, string authKey="", string oidcIssuer="", string oidcAudience="")
     {
         string func = "SetConfig";
 
-        if (ctx.ConnectionId is null) return;
-        if (!GetGuest(func, ctx, out var guest)) return;
-        
         var oldConfig = ctx.Db.Config.Version.Find(0);
 
         if (oldConfig.HasValue)
@@ -87,7 +86,7 @@ public partial class Module
                 Log.Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
                 throw new Exception($"{ctx.Sender} tried to initialize Config- but Config is already initialized!");
             }
-            
+
             if (authentication && string.IsNullOrEmpty(authKey))
                 throw new Exception($"Unable to {func}: {ctx.Sender} has authentication enabled but did not provide a Key!");
 
@@ -96,33 +95,51 @@ public partial class Module
                 var newConfig = oldConfig.Value;
                 newConfig.StreamingPlatform = platform;
                 newConfig.StreamName = channel;
-                newConfig.OwnerIdentity = guest.Identity;
+
+                // If called without a connection (e.g., from CLI during startup), keep existing owner
+                if (ctx.ConnectionId is not null && GetGuest(func, ctx, out var guest))
+                {
+                    newConfig.OwnerIdentity = guest.Identity;
+                    try
+                    {
+                        SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Exception($"[{func}] - Unable to set guest as owner! " + e.Message);
+                        throw new Exception($"[{func}] - Unable to set guest as owner!");
+                    }
+                }
+
                 newConfig.DebugMode = debug;
                 newConfig.UpdateHz = updateHz;
                 newConfig.EditorBorder = editorBorder;
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
                 newConfig.ConfigInit = true;
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
 
-                try
+                // Update or insert authentication key
+                var existingKey = ctx.Db.AuthenticationKey.Version.Find(0);
+                if (existingKey.HasValue && !string.IsNullOrEmpty(authKey))
                 {
-                    SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
+                    var updatedKey = existingKey.Value;
+                    updatedKey.Key = authKey;
+                    ctx.Db.AuthenticationKey.Version.Update(updatedKey);
                 }
-                catch (Exception e)
+                else if (!existingKey.HasValue)
                 {
-                    Log.Exception($"[{func}] - Unable to set guest as owner! " + e.Message);
-                    throw new Exception($"[{func}] - Unable to set guest as owner!");
+                    ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
+                    {
+                        Version = 0,
+                        Key = authKey
+                    });
                 }
-            
-                ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
-                {
-                    Version = 0,
-                    Key = authKey
-                });
-                
+
                 ctx.Db.Config.Version.Update(newConfig);
-                
-                Log.Info($"[{func}] Success with Globals => DebugMode:{newConfig.DebugMode.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}, Authentication:{newConfig.Authentication.ToString()}!");
+
+                Log.Info($"[{func}] Success with Globals => DebugMode:{newConfig.DebugMode.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}, Authentication:{newConfig.Authentication.ToString()}, OidcIssuer:{newConfig.OidcIssuer}, OidcAudience:{newConfig.OidcAudience}!");
             }
             catch (Exception e)
             {
@@ -183,7 +200,7 @@ public partial class Module
         bool authentication, bool strictMode)
     {
         string func = "UpdateConfig";
-        
+
         if (ctx.ConnectionId is null) return;
         if (!GetGuest(func, ctx, out var guest)) return;
         if (!GuestAuthenticated(func, guest)) return;
@@ -201,7 +218,8 @@ public partial class Module
                 newConfig.UpdateHz = updateHz;
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
-            
+                // OIDC config is set via SetConfig only, not updateable from UI
+
                 ctx.Db.Config.Version.Update(newConfig);
                 Log.Info($"[{func}] Success with Globals => StreamingPlatform:{newConfig.StreamingPlatform}, StreamName:{newConfig.StreamName}, UpdateHz:{newConfig.UpdateHz.ToString()}, StrictMode:{newConfig.StrictMode.ToString()}!");
             }
@@ -209,7 +227,7 @@ public partial class Module
             {
                 Log.Error($"[{func}] Error updating Config - Could not find Default config!");
             }
-            
+
         }
         catch (Exception e)
         {
@@ -218,8 +236,8 @@ public partial class Module
     }
     
     [Reducer]
-    public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz, 
-        uint editorBorder, bool authentication, bool strictMode, int zmin, int zmax, string authKey="")
+    public static void ImportConfig(ReducerContext ctx, string platform, string channel, Identity ownerIdentity, bool debug, uint updateHz,
+        uint editorBorder, bool authentication, bool strictMode, int zmin, int zmax, string authKey="", string oidcIssuer="", string oidcAudience="")
     {
         string func = "ImportConfig";
         var config = ctx.Db.Config.Version.Find(0);
@@ -244,7 +262,9 @@ public partial class Module
                 newConfig.Authentication = authentication;
                 newConfig.StrictMode = strictMode;
                 newConfig.ConfigInit = true;
-        
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
+
                 ctx.Db.AuthenticationKey.Insert(new AuthenticationKey
                 {
                     Version = 0,
@@ -340,6 +360,40 @@ public partial class Module
         catch (Exception e)
         {
             Log.Error($"[{func}] Encountered error updating EditorGuidelines, requested by {ctx.Sender}. " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void UpdateOidcConfig(ReducerContext ctx, string oidcIssuer, string oidcAudience)
+    {
+        string func = "UpdateOidcConfig";
+
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+        if (!IsGuestOwner(func, ctx)) return;
+
+        try
+        {
+            var oldConfig = ctx.Db.Config.Version.Find(0);
+
+            if (oldConfig.HasValue)
+            {
+                var newConfig = oldConfig.Value;
+                newConfig.OidcIssuer = oidcIssuer;
+                newConfig.OidcAudience = oidcAudience;
+
+                ctx.Db.Config.Version.Update(newConfig);
+                Log.Info($"[{func}] Successfully updated OIDC config. Issuer: {oidcIssuer}, Audience: {oidcAudience}");
+            }
+            else
+            {
+                Log.Error($"[{func}] Error updating OIDC config - can't find default config!");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Encountered error updating OIDC config, requested by {ctx.Sender}. " + e.Message);
         }
     }
 

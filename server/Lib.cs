@@ -67,7 +67,7 @@ static partial class Module
         try
         {
             if (ctx.ConnectionId is null) throw new Exception("Guest with Null Address tried to Connect!");
-            
+
             var random = new Random();
             var color = $"#{random.Next(0x1000000):X6}";
 
@@ -83,7 +83,35 @@ static partial class Module
                 PositionY = -1,
                 Authenticated = !ctx.Db.Config.Version.Find(0)!.Value.Authentication
             });
-            
+
+            // Auto-claim ownership for first OIDC user on self-hosted instances
+            var config = ctx.Db.Config.Version.Find(0);
+            var heartbeat = ctx.Db.Heartbeat.Id.Find(0);
+            if (config.HasValue && heartbeat.HasValue)
+            {
+                // If OwnerIdentity matches server identity, ownership hasn't been claimed yet
+                if (config.Value.OwnerIdentity == heartbeat.Value.ServerIdentity)
+                {
+                    // Verify user is authenticated via OIDC before granting ownership
+                    try
+                    {
+                        VerifyClient(ctx);
+                        
+                        var newConfig = config.Value;
+                        newConfig.OwnerIdentity = ctx.Sender;
+                        ctx.Db.Config.Version.Update(newConfig);
+
+                        SetPermission(ctx, ctx.Sender, PermissionTypes.Owner);
+                        Log.Info($"[Connect] First authenticated user {ctx.Sender} auto-claimed ownership!");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[Connect] Failed to auto-claim ownership for {ctx.Sender}: {e.Message}");
+                        throw new Exception($"Failed to claim ownership: {e.Message}");
+                    }
+                }
+            }
+
             Log.Info($"[Connect] New guest {ctx.Sender} inserted into Guest table!");
             LogAudit(ctx,"GuestConnected",GetEmptyStruct(),GetChangeStructFromGuest(guest), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
         }

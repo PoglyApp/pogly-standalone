@@ -36,6 +36,8 @@ public partial class Module
         public bool StrictMode;
         public string EditorGuidelines;
         public bool ConfigInit;
+        public string OidcIssuer;
+        public string OidcAudience;
     }
 
     [Table(Public = false, Name = "AuthenticationKey")]

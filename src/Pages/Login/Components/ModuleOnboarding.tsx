@@ -9,10 +9,34 @@ import { QuickSwapType } from "../../../Types/General/QuickSwapType";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 
+interface SpacetimeClient {
+  Client: {
+    reducers: {
+      setConfig: (
+        platform: string,
+        channelName: string,
+        debug: boolean,
+        param4: number,
+        param5: number,
+        usePassword: boolean,
+        useStrictMode: boolean,
+        password: string,
+        oidcIssuer: string,
+        oidcClientId: string
+      ) => void;
+    };
+    db: {
+      elementData: { iter: () => unknown[] };
+      elements: { iter: () => unknown[] };
+      layouts: { iter: () => unknown[] };
+    };
+  };
+}
+
 interface IProps {
   legacyLogin: boolean;
   connectionConfig: ConnectionConfigType;
-  spacetime: any;
+  spacetime: SpacetimeClient;
 }
 
 const steps = [
@@ -110,7 +134,18 @@ export const ModuleOnboarding = ({ legacyLogin, connectionConfig, spacetime }: I
   const handleSave = async () => {
     setInitializing(true);
 
-    spacetime.Client.reducers.setConfig(platform, channelName, debug, 120, 200, usePassword, useStrictMode, password);
+    spacetime.Client.reducers.setConfig(
+      platform,
+      channelName,
+      debug,
+      120,
+      200,
+      usePassword,
+      useStrictMode,
+      password || "",
+      import.meta.env.VITE_OIDC_ISSUER || "",
+      import.meta.env.VITE_OIDC_CLIENT_ID || ""
+    );
 
     if (usePassword && password) {
       localStorage.setItem("stdbConnectModuleAuthKey", password);
