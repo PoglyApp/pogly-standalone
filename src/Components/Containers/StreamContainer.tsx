@@ -115,7 +115,7 @@ const StreamContainer = React.memo(({ spacetimeDB, settings }: IProps) => {
   };
 
   return (
-    <>
+    <div style={{ display: "flex", width: "100%", height: "100%" }}>
       {config.streamingPlatform === "twitch" && !streamOverride && (
         <>
           {isChrome && (
@@ -218,14 +218,24 @@ const StreamContainer = React.memo(({ spacetimeDB, settings }: IProps) => {
         />
       )}
 
-      {invalidOverride && (
-        <div style={{ width: "100%", height: "100%", backgroundColor: "black", alignContent: "center" }} id="stream">
-          <h1 style={{ color: "white", textAlign: "center", alignSelf: "center" }}>
-            Unable to embed stream override. Website might not allow embedding. (Check console for details)
-          </h1>
-        </div>
-      )}
-    </>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: "black",
+          alignContent: "center",
+          position: "absolute",
+          zIndex: "-1",
+        }}
+        id="stream"
+      >
+        <h1 style={{ color: "white", textAlign: "center", alignSelf: "center" }}>
+          {invalidOverride && (
+            <>Unable to embed stream override. Website might not allow embedding. (Check console for details)</>
+          )}
+        </h1>
+      </div>
+    </div>
   );
 });
 
