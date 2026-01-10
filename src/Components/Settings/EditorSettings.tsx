@@ -12,6 +12,7 @@ import { TableCell } from "../NewUiComponents/TableCell";
 import { DbConnection, Guests, Permissions, PermissionSets, StreamingPlatform } from "../../module_bindings";
 import { PermissionSettings } from "./PermissionSettings";
 import { usePermissionSetEvents } from "../../StDB/Hooks/usePermissionSetEvents";
+import { usePermissionEvents } from "../../StDB/Hooks/usePermissionEvents";
 
 enum PermissionTab {
   Editors,
@@ -42,6 +43,7 @@ export const EditorSettings = forwardRef<EditorSettingsRef, IProps>(({ showSaveF
   const [whitelistUsername, setWhitelistUsername] = useState<string>("");
 
   usePermissionSetEvents(setRoles);
+  usePermissionEvents();
 
   const onWhitelistUsernameUpdate = (e: any) => {
     setWhitelistUsername(e.target.value);

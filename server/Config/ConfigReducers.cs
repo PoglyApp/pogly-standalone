@@ -132,6 +132,14 @@ public partial class Module
                     var configGuest = ctx.Db.Guests.Address.Find(guest.Address);
                     if (configGuest is not null) ctx.Db.Guests.Address.Update(configGuest.Value with {Authenticated = true});
                     SetPermission(ctx, newConfig.OwnerIdentity, PermissionTypes.Owner);
+                    
+                    ctx.Db.GuestNames.Insert(new GuestNames
+                    {
+                        Identity = ctx.Sender,
+                        Nickname = GetJwtUsernameCased(ctx),
+                        StreamingPlatform = GetJwtStreamingPlatform(ctx),
+                        AvatarUrl = GetJwtAvatar(ctx)
+                    });
                 }
                 catch (Exception e)
                 {
