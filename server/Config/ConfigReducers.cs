@@ -30,22 +30,6 @@ public partial class Module
                 ConfigInit = false
             });
 
-            int length = 12;
-            Random rng = new Random();
-            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var sb = new StringBuilder(length);
-            for (int i = 0; i < length; i++)
-            {
-                int index = rng.Next(0, alphabet.Length);
-                sb.Append(alphabet[index]);
-            }
-
-            ctx.Db.OwnerRecoveryKey.Insert(new AuthenticationKey
-            {
-                Version = 0,
-                Key = sb.ToString()
-            });
-
             ctx.Db.ZIndex.Insert(new ZIndex
             {
                 Version = 0,
@@ -165,6 +149,7 @@ public partial class Module
                 ctx.Db.Config.Version.Update(newConfig);
                 
                 SetPermission(ctx, guest.Identity, PermissionTypes.Owner);
+                ctx.Db.OwnerRecoveryKey.Delete(key.Value);
             }
             else
             {
