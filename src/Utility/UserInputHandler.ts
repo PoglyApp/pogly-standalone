@@ -40,6 +40,12 @@ export const UserInputHandler = (
   setTransformSelect: Function,
   openOwnershipModal: Function
 ): any => {
+  /*
+    Check if the user is on MacOS
+  */
+  const isMac = navigator.userAgent.toUpperCase().indexOf("MAC") >= 0;
+  const modifierKey = isMac ? "meta" : "ctrl";
+
   const userInputs = [];
 
   // GO HOME
@@ -116,7 +122,7 @@ export const UserInputHandler = (
   // CUT SELECTED ELEMENT WITH CTRL + X
   userInputs.push({
     name: "cutElement",
-    keys: "ctrl+x",
+    keys: `${modifierKey}+x`,
     action: "keydown",
     callback: (event: any) => {
       DebugLogger("User pressed CTRL + X");
@@ -143,7 +149,7 @@ export const UserInputHandler = (
   // DUPLICATE ELEMENT WITH CTRL + D
   userInputs.push({
     name: "duplicateElement",
-    keys: "ctrl+d",
+    keys: `${modifierKey}+d`,
     action: "keydown",
     callback: (event: any) => {
       DebugLogger("User pressed CTRL + D");
@@ -169,7 +175,7 @@ export const UserInputHandler = (
   // COPY ELEMENT WITH CTRL + C
   userInputs.push({
     name: "copyElement",
-    keys: "ctrl+c",
+    keys: `${modifierKey}+c`,
     action: "keydown",
     callback: (event: any) => {
       DebugLogger("User pressed CTRL + C");
@@ -190,7 +196,7 @@ export const UserInputHandler = (
   // PASTE SOMETHING TO CAVNAS WITH CTRL + V
   userInputs.push({
     name: "pasteElement",
-    keys: "ctrl+v",
+    keys: `${modifierKey}+v`,
     action: "keydown",
     callback: async (event: any) => {
       DebugLogger("User pressed CTRL + V");
@@ -806,7 +812,7 @@ export const UserInputHandler = (
   // SPOTLIGHT FEATURE
   userInputs.push({
     name: "spotlight1",
-    keys: "ctrl+space",
+    keys: `${modifierKey}+space`,
     action: "keydown",
     callback: (event: any) => {
       DebugLogger("user opened spotlight");
@@ -824,7 +830,7 @@ export const UserInputHandler = (
   // SPOTLIGHT FEATURE (alt hotkey)
   userInputs.push({
     name: "spotlight2",
-    keys: "ctrl+k",
+    keys: `${modifierKey}+k`,
     action: "keydown",
     callback: (event: any) => {
       DebugLogger("user opened spotlight");
@@ -841,7 +847,7 @@ export const UserInputHandler = (
 
   userInputs.push({
     name: "fliphorizontal",
-    keys: "ctrl+f",
+    keys: `${modifierKey}+f`,
     action: "keydown",
     callback: (event: any) => {
       event.preventDefault();
