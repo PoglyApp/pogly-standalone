@@ -3,6 +3,9 @@ using SpacetimeDB;
 
 public partial class Module
 {
+    private const int ALWAYS_ON_TOP_MIN = 900001;
+    private const int ALWAYS_ON_TOP_MAX = 999999;
+
     [Reducer]
     public static void AddElement(ReducerContext ctx, ElementStruct element, int transparency, string transform,
         string clip, uint? folderId = null)
@@ -46,7 +49,8 @@ public partial class Module
                 FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
-                ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
+                ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1,
+                AlwaysOnTop = false
             };
             ctx.Db.Elements.Insert(newElement);
             
@@ -101,7 +105,8 @@ public partial class Module
                 FolderId = folderId,
                 PlacedBy = guest.Nickname,
                 LastEditedBy = guest.Nickname,
-                ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1
+                ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1,
+                AlwaysOnTop = false
             };
             ctx.Db.Elements.Insert(newElement);
             
@@ -137,7 +142,8 @@ public partial class Module
                 FolderId = folderId,
                 PlacedBy = placedBy,
                 LastEditedBy = lastEditedBy,
-                ZIndex = zindex
+                ZIndex = zindex,
+                AlwaysOnTop = false
             };
             ctx.Db.Elements.Insert(newElement);
         }
@@ -183,7 +189,16 @@ public partial class Module
                 updatedElement.Clip = clip;
                 updatedElement.Locked = locked;
                 updatedElement.LastEditedBy = guest.Nickname;
-                updatedElement.ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1;
+
+                if (oldElement.Value.AlwaysOnTop)
+                {
+                    // Preserve Always On Top range for AOT elements
+                    updatedElement.ZIndex = oldElement.Value.ZIndex;
+                }
+                else
+                {
+                    updatedElement.ZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value.Max + 1;
+                }
 
                 ctx.Db.Elements.Id.Update(updatedElement);
             
@@ -1011,44 +1026,178 @@ public partial class Module
         
         try
         {
-            List<int> zIndexes = new List<int>();
-            foreach (var e in ctx.Db.Elements.Iter())
+            var targetElement = ctx.Db.Elements.Id.Find(elementId);
+
+            if (!targetElement.HasValue)
             {
-                zIndexes.Add(e.ZIndex);
+                Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
+                return;
             }
 
-            var updateZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value;
-            updateZIndex.Min = zIndexes.Min();
-            updateZIndex.Max = zIndexes.Max();
+            bool isAlwaysOnTop = targetElement.Value.AlwaysOnTop;
 
-            if (updateZIndex.Min > updateZIndex.Ceiling && updateZIndex.Max > updateZIndex.Ceiling)
+            if (isAlwaysOnTop)
             {
-                updateZIndex.Min -= updateZIndex.Ceiling;
-                updateZIndex.Max -= updateZIndex.Ceiling;
-            }
+                // Handle Always On Top range (ALWAYS_ON_TOP_MIN to ALWAYS_ON_TOP_MAX)
+                List<int> aotZIndexes = new List<int>();
+                foreach (var e in ctx.Db.Elements.Iter())
+                {
+                    if (e.AlwaysOnTop && e.Id != elementId) aotZIndexes.Add(e.ZIndex);
+                }
 
-            ctx.Db.ZIndex.Version.Update(updateZIndex);
-            
-            var oldElement = ctx.Db.Elements.Id.Find(elementId);
+                int newZIndex;
+                if (aotZIndexes.Count == 0)
+                {
+                    newZIndex = ALWAYS_ON_TOP_MIN;
+                }
+                else
+                {
+                    int aotMax = aotZIndexes.Max();
+                    if (aotMax >= ALWAYS_ON_TOP_MAX)
+                    {
+                        // Compress AOT range: reassign all non-target AOT elements starting from ALWAYS_ON_TOP_MIN
+                        var aotElements = ctx.Db.Elements.Iter()
+                            .Where(e => e.AlwaysOnTop && e.Id != elementId)
+                            .OrderBy(e => e.ZIndex)
+                            .ToList();
+                        int counter = ALWAYS_ON_TOP_MIN;
+                        foreach (var ae in aotElements)
+                        {
+                            var updated = ae;
+                            updated.ZIndex = counter++;
+                            ctx.Db.Elements.Id.Update(updated);
+                        }
+                        newZIndex = counter;
+                    }
+                    else
+                    {
+                        newZIndex = aotMax + 1;
+                    }
+                }
 
-            if (oldElement.HasValue)
-            {
-                var updatedElement = oldElement.Value;
-                updatedElement.ZIndex = updateZIndex.Max+1;
+                var updatedElement = targetElement.Value;
+                updatedElement.ZIndex = newZIndex;
                 updatedElement.LastEditedBy = guest.Nickname;
-
                 ctx.Db.Elements.Id.Update(updatedElement);
-            
-                LogAudit(ctx,func,GetChangeStructFromElement(oldElement.Value),GetChangeStructFromElement(updatedElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
+                LogAudit(ctx, func, GetChangeStructFromElement(targetElement.Value), GetChangeStructFromElement(updatedElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
             }
             else
             {
-                Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
+                // Handle normal range, excluding Always On Top elements from min/max tracking
+                List<int> zIndexes = new List<int>();
+                foreach (var e in ctx.Db.Elements.Iter())
+                {
+                    if (!e.AlwaysOnTop) zIndexes.Add(e.ZIndex);
+                }
+
+                if (zIndexes.Count == 0) return;
+
+                var updateZIndex = ctx.Db.ZIndex.Version.Find(0)!.Value;
+                updateZIndex.Min = zIndexes.Min();
+                updateZIndex.Max = zIndexes.Max();
+
+                if (updateZIndex.Min > updateZIndex.Ceiling && updateZIndex.Max > updateZIndex.Ceiling)
+                {
+                    updateZIndex.Min -= updateZIndex.Ceiling;
+                    updateZIndex.Max -= updateZIndex.Ceiling;
+                }
+
+                ctx.Db.ZIndex.Version.Update(updateZIndex);
+
+                var updatedElement = targetElement.Value;
+                updatedElement.ZIndex = updateZIndex.Max + 1;
+                updatedElement.LastEditedBy = guest.Nickname;
+                ctx.Db.Elements.Id.Update(updatedElement);
+                LogAudit(ctx, func, GetChangeStructFromElement(targetElement.Value), GetChangeStructFromElement(updatedElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
             }
         }
         catch (Exception e)
         {
             Log.Error($"[{func}] Error updating elements zIndex with id {elementId}, requested by {ctx.Sender}! " + e.Message);
+        }
+    }
+
+    [Reducer]
+    public static void UpdateElementAlwaysOnTop(ReducerContext ctx, uint elementId, bool alwaysOnTop)
+    {
+        string func = "UpdateElementAlwaysOnTop";
+
+        if (ctx.ConnectionId is null) return;
+        if (!GetGuest(func, ctx, out var guest)) return;
+        if (!GuestAuthenticated(func, guest)) return;
+
+        try
+        {
+            var oldElement = ctx.Db.Elements.Id.Find(elementId);
+
+            if (!oldElement.HasValue)
+            {
+                Log.Error($"[{func}] Error updating AlwaysOnTop for element with id {elementId}, requested by {ctx.Sender}! Couldn't find existing Element!");
+                return;
+            }
+
+            var updatedElement = oldElement.Value;
+            updatedElement.AlwaysOnTop = alwaysOnTop;
+
+            if (alwaysOnTop)
+            {
+                // Find max ZIndex in Always On Top range across all other AOT elements
+                List<int> aotZIndexes = new List<int>();
+                foreach (var e in ctx.Db.Elements.Iter())
+                {
+                    if (e.AlwaysOnTop && e.Id != elementId) aotZIndexes.Add(e.ZIndex);
+                }
+
+                int newZIndex;
+                if (aotZIndexes.Count == 0)
+                {
+                    newZIndex = ALWAYS_ON_TOP_MIN;
+                }
+                else
+                {
+                    int aotMax = aotZIndexes.Max();
+                    if (aotMax >= ALWAYS_ON_TOP_MAX)
+                    {
+                        // Compress AOT range: reassign all other AOT elements starting from ALWAYS_ON_TOP_MIN
+                        var aotElements = ctx.Db.Elements.Iter()
+                            .Where(e => e.AlwaysOnTop && e.Id != elementId)
+                            .OrderBy(e => e.ZIndex)
+                            .ToList();
+                        int counter = ALWAYS_ON_TOP_MIN;
+                        foreach (var ae in aotElements)
+                        {
+                            var updated = ae;
+                            updated.ZIndex = counter++;
+                            ctx.Db.Elements.Id.Update(updated);
+                        }
+                        newZIndex = counter;
+                    }
+                    else
+                    {
+                        newZIndex = aotMax + 1;
+                    }
+                }
+
+                updatedElement.ZIndex = newZIndex;
+            }
+            else
+            {
+                // Return element to the normal range, placing it above all current normal elements
+                var zIndexTable = ctx.Db.ZIndex.Version.Find(0)!.Value;
+                int newZIndex = zIndexTable.Max + 1;
+                updatedElement.ZIndex = newZIndex;
+                zIndexTable.Max = newZIndex;
+                ctx.Db.ZIndex.Version.Update(zIndexTable);
+            }
+
+            updatedElement.LastEditedBy = guest.Nickname;
+            ctx.Db.Elements.Id.Update(updatedElement);
+
+            LogAudit(ctx, func, GetChangeStructFromElement(oldElement.Value), GetChangeStructFromElement(updatedElement), ctx.Db.Config.Version.Find(0)!.Value.DebugMode);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[{func}] Error updating AlwaysOnTop for element with id {elementId}, requested by {ctx.Sender}! " + e.Message);
         }
     }
 

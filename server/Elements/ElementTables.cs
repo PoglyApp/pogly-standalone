@@ -23,5 +23,6 @@ public partial class Module
         public string LastEditedBy;
 
         public int ZIndex;
+        public bool AlwaysOnTop;
     }
 }

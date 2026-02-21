@@ -136,7 +136,8 @@ public partial class Module
                         FolderId = 0,
                         PlacedBy = guest.Nickname,
                         LastEditedBy = guest.Nickname,
-                        ZIndex = element.ZIndex
+                        ZIndex = element.ZIndex,
+                        AlwaysOnTop = element.AlwaysOnTop
                     };
 
                     ctx.Db.Elements.Insert(newElement);
