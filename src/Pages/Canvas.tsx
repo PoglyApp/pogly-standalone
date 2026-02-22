@@ -161,7 +161,27 @@ export const Canvas = () => {
   const GUEST_POS_UPDATE_DIVISOR = 4;
   let waitUntil = 0;
 
+  // Ref to track Ctrl+right-click drag state for manual canvas panning
+  const ctrlRightDragRef = useRef<{
+    startX: number;
+    startY: number;
+    startPosX: number;
+    startPosY: number;
+  } | null>(null);
+
   const onMouseMove = (event: any) => {
+    // Ctrl+right-click drag panning
+    if (ctrlRightDragRef.current && transformRef.current) {
+      const dx = event.clientX - ctrlRightDragRef.current.startX;
+      const dy = event.clientY - ctrlRightDragRef.current.startY;
+      transformRef.current.setTransform(
+        ctrlRightDragRef.current.startPosX + dx,
+        ctrlRightDragRef.current.startPosY + dy,
+        transformRef.current.instance.transformState.scale,
+        0
+      );
+    }
+
     if (!transformRef.current) return;
 
     const streamRect = document.getElementById("stream")?.getBoundingClientRect();
@@ -181,6 +201,31 @@ export const Canvas = () => {
     spacetimeDB.Client.reducers.updateGuestPosition(x, y);
 
     waitUntil = now + 1000 / effectiveHz;
+  };
+
+  const onMouseDown = (event: any) => {
+    // Begin Ctrl+right-click drag to pan the canvas
+    if (event.button === 2 && event.ctrlKey && transformRef.current) {
+      ctrlRightDragRef.current = {
+        startX: event.clientX,
+        startY: event.clientY,
+        startPosX: transformRef.current.instance.transformState.positionX,
+        startPosY: transformRef.current.instance.transformState.positionY,
+      };
+    }
+  };
+
+  const onMouseUp = (event: any) => {
+    if (event.button === 2) {
+      ctrlRightDragRef.current = null;
+    }
+  };
+
+  const onContextMenu = (event: any) => {
+    // Prevent the browser context menu when Ctrl+right-click is used for panning
+    if (event.ctrlKey) {
+      event.preventDefault();
+    }
   };
 
   if (userDisconnected || spacetimeDB.Disconnected || disconnectedState) {
@@ -215,7 +260,13 @@ export const Canvas = () => {
   }
 
   return (
-    <div className="mouseContainer canvas-font" onMouseMove={onMouseMove}>
+    <div
+      className="mouseContainer canvas-font"
+      onMouseMove={onMouseMove}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onContextMenu={onContextMenu}
+    >
       {Object.values(canvasInitialized).every((init) => init === true) && activeLayout ? (
         <TransformWrapper
           ref={transformRef}
@@ -235,6 +286,10 @@ export const Canvas = () => {
           smooth={true}
           wheel={{
             step: 0.1,
+            // wheelDisabled: true makes regular scroll pan (via wheelPanning above)
+            // while Ctrl+scroll (which browsers send for trackpad pinch) still zooms.
+            // Without this, the library ignores wheelPanning entirely.
+            wheelDisabled: true,
           }}
         >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
@@ -265,6 +320,9 @@ export const Canvas = () => {
                       <div
                         key={element.Elements.id.toString() + "_" + element.Elements.element.tag}
                         onContextMenu={(event: any) => {
+                          // Ctrl+right-click is reserved for canvas panning — skip element context menu
+                          if (event.ctrlKey) return;
+
                           HandleElementContextMenu(event, setContextMenu, contextMenu, element.Elements);
 
                           setSelected({
