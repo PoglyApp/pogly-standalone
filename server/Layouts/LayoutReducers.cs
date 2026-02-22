@@ -137,7 +137,6 @@ public partial class Module
                         PlacedBy = guest.Nickname,
                         LastEditedBy = guest.Nickname,
                         ZIndex = element.ZIndex,
-                        AlwaysOnTop = element.AlwaysOnTop
                     };
 
                     ctx.Db.Elements.Insert(newElement);
