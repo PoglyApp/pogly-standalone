@@ -286,10 +286,6 @@ export const Canvas = () => {
           smooth={true}
           wheel={{
             step: 0.1,
-            // wheelDisabled: true makes regular scroll pan (via wheelPanning above)
-            // while Ctrl+scroll (which browsers send for trackpad pinch) still zooms.
-            // Without this, the library ignores wheelPanning entirely.
-            wheelDisabled: true,
           }}
         >
           {noticeMessage && <Notice noticeMessage={noticeMessage} setNoticeMessage={setNoticeMessage} />}
