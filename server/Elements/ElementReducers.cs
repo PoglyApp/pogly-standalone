@@ -1035,15 +1035,15 @@ public partial class Module
             }
 
             bool isAlwaysOnTop = targetElement.Value.AlwaysOnTop;
+            var allElements = ctx.Db.Elements.Iter().ToList();
 
             if (isAlwaysOnTop)
             {
                 // Handle Always On Top range (ALWAYS_ON_TOP_MIN to ALWAYS_ON_TOP_MAX)
-                List<int> aotZIndexes = new List<int>();
-                foreach (var e in ctx.Db.Elements.Iter())
-                {
-                    if (e.AlwaysOnTop && e.Id != elementId) aotZIndexes.Add(e.ZIndex);
-                }
+                List<int> aotZIndexes = allElements
+                    .Where(e => e.AlwaysOnTop && e.Id != elementId)
+                    .Select(e => e.ZIndex)
+                    .ToList();
 
                 int newZIndex;
                 if (aotZIndexes.Count == 0)
@@ -1056,7 +1056,7 @@ public partial class Module
                     if (aotMax >= ALWAYS_ON_TOP_MAX)
                     {
                         // Compress AOT range: reassign all non-target AOT elements starting from ALWAYS_ON_TOP_MIN
-                        var aotElements = ctx.Db.Elements.Iter()
+                        var aotElements = allElements
                             .Where(e => e.AlwaysOnTop && e.Id != elementId)
                             .OrderBy(e => e.ZIndex)
                             .ToList();
@@ -1084,11 +1084,10 @@ public partial class Module
             else
             {
                 // Handle normal range, excluding Always On Top elements from min/max tracking
-                List<int> zIndexes = new List<int>();
-                foreach (var e in ctx.Db.Elements.Iter())
-                {
-                    if (!e.AlwaysOnTop) zIndexes.Add(e.ZIndex);
-                }
+                List<int> zIndexes = allElements
+                    .Where(e => !e.AlwaysOnTop)
+                    .Select(e => e.ZIndex)
+                    .ToList();
 
                 if (zIndexes.Count == 0) return;
 
@@ -1142,11 +1141,11 @@ public partial class Module
             if (alwaysOnTop)
             {
                 // Find max ZIndex in Always On Top range across all other AOT elements
-                List<int> aotZIndexes = new List<int>();
-                foreach (var e in ctx.Db.Elements.Iter())
-                {
-                    if (e.AlwaysOnTop && e.Id != elementId) aotZIndexes.Add(e.ZIndex);
-                }
+                var allElements = ctx.Db.Elements.Iter().ToList();
+                List<int> aotZIndexes = allElements
+                    .Where(e => e.AlwaysOnTop && e.Id != elementId)
+                    .Select(e => e.ZIndex)
+                    .ToList();
 
                 int newZIndex;
                 if (aotZIndexes.Count == 0)
@@ -1159,7 +1158,7 @@ public partial class Module
                     if (aotMax >= ALWAYS_ON_TOP_MAX)
                     {
                         // Compress AOT range: reassign all other AOT elements starting from ALWAYS_ON_TOP_MIN
-                        var aotElements = ctx.Db.Elements.Iter()
+                        var aotElements = allElements
                             .Where(e => e.AlwaysOnTop && e.Id != elementId)
                             .OrderBy(e => e.ZIndex)
                             .ToList();
