@@ -80,6 +80,7 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/buttsoap" rel="noreferrer" target="_blank" title="Buttsoap"><img src="./images/streamers/buttsoap.svg" /></a>
 <a href="https://www.twitch.tv/ashlynn" rel="noreferrer" target="_blank" title="Ashlynn"><img src="./images/streamers/ashlynn.svg" /></a>
 <a href="https://www.twitch.tv/ssaab" rel="noreferrer" target="_blank" title="Ssaab"><img src="./images/streamers/ssaab.svg" /></a>
+<a href="https://kick.com/saab" rel="noreferrer" target="_blank" title="Saab"><img src="./images/streamers/saab.svg" /></a>
 <a href="https://www.twitch.tv/itsklos" rel="noreferrer" target="_blank" title="ItsKlos"><img src="./images/streamers/itsklos.svg" /></a>
 <a href="https://www.twitch.tv/justagameoverscreen" rel="noreferrer" target="_blank" title="JustAGameOverScreen"><img src="./images/streamers/justagameoverscreen.svg" /></a>
 <a href="https://www.twitch.tv/firthy00" rel="noreferrer" target="_blank" title="Firthy00"><img src="./images/streamers/firthy00.svg" /></a>
@@ -92,7 +93,7 @@ Want to be included in this list? Let us know in our [Discord](https://discord.g
 <a href="https://www.twitch.tv/pengwin" rel="noreferrer" target="_blank" title="Pengwin"><img src="./images/streamers/pengwin.svg" /></a>
 <a href="https://www.twitch.tv/totless" rel="noreferrer" target="_blank" title="Totless"><img src="./images/streamers/totless.svg" /></a>
 <a href="https://www.twitch.tv/fubuki_vr" rel="noreferrer" target="_blank" title="Fubuki_Vr"><img src="./images/streamers/fubuki_vr.svg" /></a>
-<a href="https://www.twitch.tv/uberhaxornova" rel="noreferrer" target="_blank" title="UberHaxorNova"><img src="./images/streamers/uberhaxornova.svg" /></a>
+<a href="https://www.twitch.tv/uhn" rel="noreferrer" target="_blank" title="UberHaxorNova"><img src="./images/streamers/uberhaxornova.svg" /></a>
 <a href="https://www.twitch.tv/sp00nerism" rel="noreferrer" target="_blank" title="Sp00nerism"><img src="./images/streamers/sp00nerism.svg" /></a>
 <a href="https://www.twitch.tv/kohrean" rel="noreferrer" target="_blank" title="Kohrean"><img src="./images/streamers/kohrean.svg" /></a>
 <a href="https://www.twitch.tv/boshiitime" rel="noreferrer" target="_blank" title="BoshiiTime"><img src="./images/streamers/boshiitime.svg" /></a>
