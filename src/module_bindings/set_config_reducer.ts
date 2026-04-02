@@ -37,6 +37,8 @@ export type SetConfig = {
   authentication: boolean,
   strictMode: boolean,
   authKey: string,
+  oidcIssuer: string,
+  oidcAudience: string,
 };
 let _cached_SetConfig_type_value: __AlgebraicTypeType | null = null;
 
@@ -60,6 +62,8 @@ export const SetConfig = {
       { name: "authentication", algebraicType: __AlgebraicTypeValue.Bool },
       { name: "strictMode", algebraicType: __AlgebraicTypeValue.Bool },
       { name: "authKey", algebraicType: __AlgebraicTypeValue.String },
+      { name: "oidcIssuer", algebraicType: __AlgebraicTypeValue.String },
+      { name: "oidcAudience", algebraicType: __AlgebraicTypeValue.String },
     );
     return _cached_SetConfig_type_value;
   },

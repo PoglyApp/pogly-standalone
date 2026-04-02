@@ -18,7 +18,10 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
 
   const [moduleName, setModuleName] = useState<string>("");
   const [authKey, setAuthKey] = useState<string>("");
-  const [domain, setDomain] = useState<string>("wss://maincloud.spacetimedb.com");
+  const defaultDomain = window.location.protocol === "https:"
+    ? `wss://${window.location.host}`
+    : `ws://${window.location.host}`;
+  const [domain, setDomain] = useState<string>(defaultDomain);
   const isOverlay: Boolean = window.location.href.includes("/overlay");
   const [customDomain, setCustomDomain] = useState<boolean>(false);
   const [quickSwapModules, setQuickSwapModules] = useState<QuickSwapType[]>([]);
@@ -57,7 +60,8 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
       if (auth.user.profile) {
         const currentTime = Date.now() / 1000;
         if (auth.user.profile.exp < currentTime) {
-          console.warn("ID token has expired...");
+          console.warn("ID token has expired, requesting re-authentication");
+          auth.signinRedirect();
           return;
         }
       }
@@ -199,26 +203,15 @@ export const ConnectionContainer = ({ setInstanceSettings, setNickname, setLegac
     <div className="w-screen h-screen bg-[#10121a] relative flex flex-col items-center justify-center overflow-hidden pb-50">
       <PoglyLogo />
 
-      {!auth.isLoading && !auth.isAuthenticated && (
+      {!auth.isLoading && !auth.isAuthenticated && !isOverlay && (
         <div className="absolute z-20 flex flex-col items-center justify-center bg-[#1e212b] backdrop-blur-sm p-6 pb-3 rounded-lg shadow-lg mt-45 gap-2">
           <StyledButton
             className="flex justify-self-center bg-[#060606]! border border-transparent text-white! hover:border-[#82a5ff]!"
-            onClick={() => {
-              auth.signinRedirect();
-              setSubtitle("SpacetimeAuth");
-            }}
+            onClick={() => auth.signinRedirect()}
           >
-            <img className="w-[16px] h-[16px] self-center mr-2" src="./assets/spacetime.png" />
-            <span>login with SpacetimeAuth</span>
+            <UserRound className="w-[16px] h-[16px] self-center mr-2" />
+            <span>login</span>
           </StyledButton>
-          <a
-            href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/authentication.md"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[10px] text-[#82a5ff]"
-          >
-            What is SpacetimeAuth?
-          </a>
         </div>
       )}
 

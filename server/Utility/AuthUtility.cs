@@ -52,21 +52,30 @@ public partial class Module
     private static void VerifyClient(ReducerContext ctx)
     {
         if (ctx.SenderAuth.IsInternal) return;
-        
-        List<string> oidcClientIds = new List<string>
-        {
-            "client_031BvnxblLKmMtctMbLllZ"
-        };
 
-        var claims = GetJwtClaims(ctx);
-        if (claims.Issuer != "https://auth.spacetimedb.com/oidc")
+        var config = ctx.Db.Config.Version.Find(0);
+        if (!config.HasValue)
         {
-            throw new Exception("Unauthorized: invalid issuer!");
+            throw new Exception("Unauthorized: server configuration not found!");
         }
 
-        if (!oidcClientIds.Any(i => claims.Audience.Contains(i)))
+        var oidcIssuer = config.Value.OidcIssuer;
+        var oidcAudience = config.Value.OidcAudience;
+
+        if (string.IsNullOrEmpty(oidcIssuer) || string.IsNullOrEmpty(oidcAudience))
         {
-            throw new Exception("Unauthorized: invalid audience!");
+            throw new Exception("Unauthorized: OIDC configuration not set!");
+        }
+
+        var claims = GetJwtClaims(ctx);
+        if (claims.Issuer != oidcIssuer)
+        {
+            throw new Exception($"Unauthorized: invalid issuer! Expected {oidcIssuer}, got {claims.Issuer}");
+        }
+
+        if (!claims.Audience.Contains(oidcAudience))
+        {
+            throw new Exception($"Unauthorized: invalid audience! Expected {oidcAudience}");
         }
     }
 
