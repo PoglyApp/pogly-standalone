@@ -137,6 +137,8 @@ import { UpdateEditorGuidelines } from "./update_editor_guidelines_reducer.ts";
 export { UpdateEditorGuidelines };
 import { UpdateElement } from "./update_element_reducer.ts";
 export { UpdateElement };
+import { UpdateElementAlwaysOnTop } from "./update_element_always_on_top_reducer.ts";
+export { UpdateElementAlwaysOnTop };
 import { UpdateElementClip } from "./update_element_clip_reducer.ts";
 export { UpdateElementClip };
 import { UpdateElementData } from "./update_element_data_reducer.ts";
@@ -637,6 +639,10 @@ const REMOTE_MODULE = {
       reducerName: "UpdateElement",
       argsType: UpdateElement.getTypeScriptAlgebraicType(),
     },
+    UpdateElementAlwaysOnTop: {
+      reducerName: "UpdateElementAlwaysOnTop",
+      argsType: UpdateElementAlwaysOnTop.getTypeScriptAlgebraicType(),
+    },
     UpdateElementClip: {
       reducerName: "UpdateElementClip",
       argsType: UpdateElementClip.getTypeScriptAlgebraicType(),
@@ -856,6 +862,7 @@ export type Reducer = never
 | { name: "UpdateConfig", args: UpdateConfig }
 | { name: "UpdateEditorGuidelines", args: UpdateEditorGuidelines }
 | { name: "UpdateElement", args: UpdateElement }
+| { name: "UpdateElementAlwaysOnTop", args: UpdateElementAlwaysOnTop }
 | { name: "UpdateElementClip", args: UpdateElementClip }
 | { name: "UpdateElementData", args: UpdateElementData }
 | { name: "UpdateElementDataData", args: UpdateElementDataData }
@@ -1695,6 +1702,22 @@ export class RemoteReducers {
     this.connection.offReducer("UpdateElement", callback);
   }
 
+  updateElementAlwaysOnTop(elementId: number, alwaysOnTop: boolean) {
+    const __args = { elementId, alwaysOnTop };
+    let __writer = new __BinaryWriter(1024);
+    UpdateElementAlwaysOnTop.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("UpdateElementAlwaysOnTop", __argsBuffer, this.setCallReducerFlags.updateElementAlwaysOnTopFlags);
+  }
+
+  onUpdateElementAlwaysOnTop(callback: (ctx: ReducerEventContext, elementId: number, alwaysOnTop: boolean) => void) {
+    this.connection.onReducer("UpdateElementAlwaysOnTop", callback);
+  }
+
+  removeOnUpdateElementAlwaysOnTop(callback: (ctx: ReducerEventContext, elementId: number, alwaysOnTop: boolean) => void) {
+    this.connection.offReducer("UpdateElementAlwaysOnTop", callback);
+  }
+
   updateElementClip(elementId: number, clip: string) {
     const __args = { elementId, clip };
     let __writer = new __BinaryWriter(1024);
@@ -2495,6 +2518,11 @@ export class SetReducerFlags {
   updateElementFlags: __CallReducerFlags = 'FullUpdate';
   updateElement(flags: __CallReducerFlags) {
     this.updateElementFlags = flags;
+  }
+
+  updateElementAlwaysOnTopFlags: __CallReducerFlags = 'FullUpdate';
+  updateElementAlwaysOnTop(flags: __CallReducerFlags) {
+    this.updateElementAlwaysOnTopFlags = flags;
   }
 
   updateElementClipFlags: __CallReducerFlags = 'FullUpdate';
