@@ -9,6 +9,7 @@ import {
   handleFlipElement,
   handleHide,
   handleLocked,
+  handleAlwaysOnTop,
   handleResetTransform,
   handleTransparency,
   handleWidgetToggle,
@@ -401,6 +402,15 @@ export const ElementContextMenu = (props: IProps) => {
       >
         {locked === "true" ? "Locked" : "Lock"}
         {locked === "true" && <LockIcon sx={{ fontSize: "20px", paddingLeft: "5px" }} />}
+      </StyledMenuItem>
+
+      <StyledMenuItem
+        onClick={() => {
+          handleAlwaysOnTop(spacetimeDB.Client, selectedElement, handleClose);
+        }}
+      >
+        Always On Top
+        {element?.alwaysOnTop && <CheckIcon sx={{ color: "green", fontSize: "20px", paddingLeft: "5px" }} />}
       </StyledMenuItem>
 
       <StyledMenuItem onClick={() => setShowExamine((showExamine) => !showExamine)}>Show details</StyledMenuItem>

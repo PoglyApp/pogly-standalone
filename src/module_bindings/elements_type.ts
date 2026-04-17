@@ -44,6 +44,7 @@ export type Elements = {
   placedBy: string,
   lastEditedBy: string,
   zIndex: number,
+  alwaysOnTop: boolean,
 };
 let _cached_Elements_type_value: __AlgebraicTypeType | null = null;
 
@@ -70,6 +71,7 @@ export const Elements = {
       { name: "placedBy", algebraicType: __AlgebraicTypeValue.String },
       { name: "lastEditedBy", algebraicType: __AlgebraicTypeValue.String },
       { name: "zIndex", algebraicType: __AlgebraicTypeValue.I32 },
+      { name: "alwaysOnTop", algebraicType: __AlgebraicTypeValue.Bool },
     );
     return _cached_Elements_type_value;
   },
