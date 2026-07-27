@@ -44,7 +44,7 @@ Editors can add, edit, and delete overlay elements, with the changes being displ
 
 ## Looking to use Pogly in your stream?
 
-If you don't want to self-host, sign up for **free** at [pogly.gg](https://pogly.gg) — no installation required. The [beginner's guide](https://github.com/PoglyApp/pogly-documentation/blob/main/use/beginnerGuide.md) walks you through the cloud setup.
+If you don't want to self-host, sign up for **free** at [pogly.gg](https://pogly.gg) — no installation required. The [beginner's guide](https://docs.pogly.gg/#getting-started) walks you through the cloud setup.
 
 If you'd rather run your own instance, see **[Self-hosting Pogly Standalone](./docs/SELF_HOSTING.md)** for the Docker-based guide. It covers Mode 1 (anonymous tokens, no external accounts) and Mode 2 (third-party OIDC, recoverable identities).
 
