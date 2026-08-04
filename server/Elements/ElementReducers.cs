@@ -1021,10 +1021,27 @@ public partial class Module
             updateZIndex.Min = zIndexes.Min();
             updateZIndex.Max = zIndexes.Max();
 
-            if (updateZIndex.Min > updateZIndex.Ceiling && updateZIndex.Max > updateZIndex.Ceiling)
+            if (updateZIndex.Max >= AOT_THRESHOLD)
             {
-                updateZIndex.Min -= updateZIndex.Ceiling;
-                updateZIndex.Max -= updateZIndex.Ceiling;
+                // Reorder all non-AOT elements to compact ZIndex values starting from 1,
+                // preserving their relative stacking order. The selected element will be
+                // placed at the top of the non-AOT stack by the update below.
+                var nonAotElements = ctx.Db.Elements.Iter()
+                    .Where(e => !e.AlwaysOnTop && e.Id != elementId)
+                    .OrderBy(e => e.ZIndex)
+                    .ToList();
+
+                int nextZIndex = 1;
+                foreach (var e in nonAotElements)
+                {
+                    var reordered = e;
+                    reordered.ZIndex = nextZIndex++;
+                    ctx.Db.Elements.Id.Update(reordered);
+                }
+
+                // Compact the tracked range; the selected element will go to Max + 1 below.
+                updateZIndex.Min = 1;
+                updateZIndex.Max = nextZIndex - 1;
             }
 
             ctx.Db.ZIndex.Version.Update(updateZIndex);

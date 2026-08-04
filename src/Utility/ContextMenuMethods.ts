@@ -246,6 +246,18 @@ export const handleLocked = (Client: DbConnection, selectedElement: Elements, ha
   handleClose();
 };
 
+export const handleAlwaysOnTop = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
+  if (!selectedElement) return;
+
+  DebugLogger("Handling always on top");
+  const element = Client.db.elements.id.find(selectedElement.id);
+  if (!element) return;
+
+  Client.reducers.updateElementAlwaysOnTop(selectedElement.id, !element.alwaysOnTop);
+
+  handleClose();
+};
+
 export const handleToggle = (Client: DbConnection, selectedElement: Elements, handleClose: Function) => {
   if (!selectedElement || selectedElement.element.tag !== "WidgetElement") return;
   DebugLogger("Handling toggle");
