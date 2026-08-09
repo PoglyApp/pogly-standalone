@@ -435,7 +435,7 @@ export const ModuleOnboarding = ({ connectionConfig, spacetime }: IProps) => {
                   To start using Pogly on your stream, you need to create a new browser source in your OBS/StreamLabs
                   and paste the Pogly overlay URL into it.
                   <a
-                    href="https://github.com/PoglyApp/pogly-documentation/blob/main/use/firstTimeSetup.md#obs--streamlabs-browser-source"
+                    href="https://docs.pogly.gg/#getting-started"
                     target="_blank"
                     rel="noreferrer"
                     className="text-[10px] text-[#82a5ff] Geist-light"
