@@ -3,7 +3,7 @@ import styled from "styled-components";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { VariableValueType } from "../../Types/General/WidgetVariableType";
+import { VariableValueType, WidgetVariableType } from "../../Types/General/WidgetVariableType";
 import Checkbox from "@mui/material/Checkbox";
 import { Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
@@ -16,9 +16,7 @@ import { SpotlightElement } from "./SpotlightElement";
 import { convertBinaryToDataURI } from "../../Utility/ImageConversion";
 import { ElementData } from "../../module_bindings";
 
-interface Row {
-  variableName: string;
-  variableType: VariableValueType;
+interface Row extends Omit<WidgetVariableType, "variableValue"> {
   variableValue: string | number | boolean;
 }
 
@@ -197,9 +195,28 @@ export const WidgetVariableTable = (props: IProps) => {
                     <option value={VariableValueType.toggle}>Toggle</option>
                     <option value={VariableValueType.color}>Color</option>
                     <option value={VariableValueType.image}>Image</option>
+                    {Number(row.variableType) === VariableValueType.dropdown && (
+                      <option value={VariableValueType.dropdown}>Dropdown</option>
+                    )}
                   </StyledSelect>
                 </StyledTd>
                 <StyledTd>
+                  {Number(row.variableType) === VariableValueType.dropdown && (
+                    <StyledSelect
+                      name="variableValue"
+                      aria-label={row.variableName}
+                      value={String(row.variableValue ?? "")}
+                      onChange={(event) => handleVariableValueChange(index, event)}
+                    >
+                      <option value="">None</option>
+                      {row.variableOptions?.map((option, optionIndex) => (
+                        <option key={optionIndex} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </StyledSelect>
+                  )}
+
                   {row.variableType.toString() === VariableValueType.string.toString() && (
                     <StyledInput
                       type="text"
